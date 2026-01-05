@@ -6,7 +6,7 @@ import Animated, {
   FadeInDown,
   FadeInUp,
 } from 'react-native-reanimated';
-import { Moon, Sparkles, Heart, Calendar, ChevronRight, Apple, Dumbbell, Settings } from 'lucide-react-native';
+import { Moon, Sparkles, Heart, Calendar, ChevronRight, Apple, Dumbbell } from 'lucide-react-native';
 import { CycleWheel } from '@/components/CycleWheel';
 import { CycleGraph } from '@/components/CycleGraph';
 import { useCycleStore, phaseInfo } from '@/lib/cycle-store';
@@ -129,7 +129,7 @@ export default function HomeScreen() {
                 style={{ backgroundColor: theme.bg.card, borderColor: theme.border.light }}
                 onPress={() => router.push('/settings')}
               >
-                <Settings size={20} color={theme.accent.purple} />
+                <Moon size={20} color={theme.accent.purple} />
               </Pressable>
             </View>
           </Animated.View>
