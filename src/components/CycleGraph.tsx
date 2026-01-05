@@ -12,6 +12,7 @@ import Svg, {
 } from 'react-native-svg';
 import Animated, { FadeIn } from 'react-native-reanimated';
 import { useCycleStore } from '@/lib/cycle-store';
+import { useThemeStore, getTheme } from '@/lib/theme-store';
 
 const { width } = Dimensions.get('window');
 const GRAPH_WIDTH = width - 48;
@@ -20,13 +21,29 @@ const PADDING = { top: 30, bottom: 40, left: 10, right: 10 };
 const CHART_WIDTH = GRAPH_WIDTH - PADDING.left - PADDING.right;
 const CHART_HEIGHT = GRAPH_HEIGHT - PADDING.top - PADDING.bottom;
 
-// Phase colors - softer, lighter tones
-const phaseColors = {
-  menstrual: { main: '#ff8aa6', light: '#ffd6df', gradient: ['#ffb3c4', '#ff8aa6'] },
-  follicular: { main: '#f9a8d4', light: '#fce7f3', gradient: ['#fbcfe8', '#f9a8d4'] },
-  ovulatory: { main: '#c4b5fd', light: '#ede5ff', gradient: ['#ddd2fe', '#c4b5fd'] },
-  luteal: { main: '#b9a6f7', light: '#e4deff', gradient: ['#d1c7ff', '#b9a6f7'] },
-};
+// Phase colors - works for both light and dark mode
+const getPhaseColors = (isDark: boolean) => ({
+  menstrual: {
+    main: '#ff8aa6',
+    light: isDark ? 'rgba(255, 138, 166, 0.15)' : '#ffd6df',
+    gradient: ['#ffb3c4', '#ff8aa6']
+  },
+  follicular: {
+    main: '#f9a8d4',
+    light: isDark ? 'rgba(249, 168, 212, 0.15)' : '#fce7f3',
+    gradient: ['#fbcfe8', '#f9a8d4']
+  },
+  ovulatory: {
+    main: '#c4b5fd',
+    light: isDark ? 'rgba(196, 181, 253, 0.15)' : '#ede5ff',
+    gradient: ['#ddd2fe', '#c4b5fd']
+  },
+  luteal: {
+    main: '#b9a6f7',
+    light: isDark ? 'rgba(185, 166, 247, 0.15)' : '#e4deff',
+    gradient: ['#d1c7ff', '#b9a6f7']
+  },
+});
 
 // Hormone curve data points (simplified representation)
 // Estrogen peaks at ovulation, Progesterone peaks in luteal phase
@@ -109,8 +126,12 @@ interface Props {
 export function CycleGraph({ showLabels = true }: Props) {
   const cycleLength = useCycleStore(s => s.cycleLength);
   const getDayOfCycle = useCycleStore(s => s.getDayOfCycle);
+  const themeMode = useThemeStore(s => s.mode);
+  const theme = getTheme(themeMode);
   const dayOfCycle = getDayOfCycle();
+  const isDark = themeMode === 'dark';
 
+  const phaseColors = getPhaseColors(isDark);
   const { estrogen, progesterone } = generateHormoneData(cycleLength);
 
   const estrogenPath = createSmoothPath(estrogen, CHART_WIDTH, CHART_HEIGHT, PADDING.top);
@@ -129,10 +150,13 @@ export function CycleGraph({ showLabels = true }: Props) {
 
   return (
     <Animated.View entering={FadeIn.duration(800)}>
-      <View className="bg-white/80 rounded-3xl p-4 border border-moon-200/50">
+      <View
+        className="rounded-3xl p-4 border"
+        style={{ backgroundColor: theme.bg.card, borderColor: theme.border.light }}
+      >
         <Text
-          style={{ fontFamily: 'Quicksand_600SemiBold' }}
-          className="text-night-800 text-base mb-3 text-center"
+          style={{ fontFamily: 'Quicksand_600SemiBold', color: theme.text.primary }}
+          className="text-base mb-3 text-center"
         >
           Your Cycle Hormones
         </Text>
@@ -158,14 +182,14 @@ export function CycleGraph({ showLabels = true }: Props) {
                     L ${PADDING.left + phase.end * CHART_WIDTH} ${PADDING.top + CHART_HEIGHT}
                     L ${PADDING.left + phase.start * CHART_WIDTH} ${PADDING.top + CHART_HEIGHT} Z`}
                 fill={phase.color.light}
-                opacity={0.5}
+                opacity={isDark ? 1 : 0.5}
               />
               {/* Phase label at bottom */}
               <SvgText
                 x={PADDING.left + ((phase.start + phase.end) / 2) * CHART_WIDTH}
                 y={GRAPH_HEIGHT - 8}
                 fontSize={9}
-                fill="#6d4fc4"
+                fill={theme.text.secondary}
                 textAnchor="middle"
                 fontWeight="500"
               >
@@ -224,14 +248,14 @@ export function CycleGraph({ showLabels = true }: Props) {
         {/* Legend */}
         <View className="flex-row justify-center mt-2" style={{ gap: 16 }}>
           <View className="flex-row items-center">
-            <View className="w-4 h-1 bg-luna-500 rounded-full mr-2" />
-            <Text className="text-night-700 text-xs" style={{ fontFamily: 'Quicksand_500Medium' }}>
+            <View className="w-4 h-1 rounded-full mr-2" style={{ backgroundColor: '#f472b6' }} />
+            <Text style={{ fontFamily: 'Quicksand_500Medium', color: theme.text.secondary }} className="text-xs">
               Estrogen
             </Text>
           </View>
           <View className="flex-row items-center">
-            <View className="w-4 h-1 bg-cosmic-500 rounded-full mr-2" style={{ borderStyle: 'dashed' }} />
-            <Text className="text-night-700 text-xs" style={{ fontFamily: 'Quicksand_500Medium' }}>
+            <View className="w-4 h-1 rounded-full mr-2" style={{ backgroundColor: '#a78bfa' }} />
+            <Text style={{ fontFamily: 'Quicksand_500Medium', color: theme.text.secondary }} className="text-xs">
               Progesterone
             </Text>
           </View>

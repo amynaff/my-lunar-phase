@@ -1,20 +1,22 @@
 import React, { useState } from 'react';
-import { View, Text, ScrollView, Pressable, Alert, Platform, Modal } from 'react-native';
+import { View, Text, ScrollView, Pressable, Alert, Platform, Modal, Switch } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Animated, { FadeInDown, FadeInUp } from 'react-native-reanimated';
 import {
   X,
   Moon,
+  Sun,
   Calendar,
   Clock,
   RotateCcw,
   Heart,
   Info,
   ChevronRight,
-  Check,
+  Palette,
 } from 'lucide-react-native';
 import { useCycleStore, phaseInfo } from '@/lib/cycle-store';
+import { useThemeStore, getTheme } from '@/lib/theme-store';
 import { router } from 'expo-router';
 import * as Haptics from 'expo-haptics';
 import DateTimePicker from '@react-native-community/datetimepicker';
@@ -43,6 +45,10 @@ export default function SettingsScreen() {
   const resetOnboarding = useCycleStore(s => s.resetOnboarding);
   const getCurrentPhase = useCycleStore(s => s.getCurrentPhase);
   const getDayOfCycle = useCycleStore(s => s.getDayOfCycle);
+
+  const themeMode = useThemeStore(s => s.mode);
+  const toggleMode = useThemeStore(s => s.toggleMode);
+  const theme = getTheme(themeMode);
 
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [showCycleLengthPicker, setShowCycleLengthPicker] = useState(false);
@@ -82,6 +88,11 @@ export default function SettingsScreen() {
         },
       ]
     );
+  };
+
+  const handleThemeToggle = () => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    toggleMode();
   };
 
   const handleDateChange = (event: any, selectedDate?: Date) => {
@@ -128,7 +139,7 @@ export default function SettingsScreen() {
   return (
     <View className="flex-1">
       <LinearGradient
-        colors={['#f8f7ff', '#f0edff', '#fdf2f8', '#f5f0ff', '#f8f7ff']}
+        colors={theme.gradient}
         locations={[0, 0.25, 0.5, 0.75, 1]}
         style={{ flex: 1 }}
       >
@@ -145,7 +156,7 @@ export default function SettingsScreen() {
           >
             <View className="flex-row items-center justify-between">
               <Text
-                style={{ fontFamily: 'CormorantGaramond_600SemiBold', color: '#4a3485' }}
+                style={{ fontFamily: 'CormorantGaramond_600SemiBold', color: theme.text.primary }}
                 className="text-3xl"
               >
                 Settings
@@ -153,9 +164,9 @@ export default function SettingsScreen() {
               <Pressable
                 onPress={() => router.back()}
                 className="w-10 h-10 rounded-full items-center justify-center border"
-                style={{ backgroundColor: 'rgba(255,255,255,0.6)', borderColor: 'rgba(185, 166, 247, 0.3)' }}
+                style={{ backgroundColor: theme.bg.card, borderColor: theme.border.light }}
               >
-                <X size={20} color="#9d84ed" />
+                <X size={20} color={theme.accent.purple} />
               </Pressable>
             </View>
           </Animated.View>
@@ -167,7 +178,7 @@ export default function SettingsScreen() {
           >
             <View
               className="rounded-3xl p-5 border"
-              style={{ backgroundColor: 'rgba(255,255,255,0.7)', borderColor: 'rgba(185, 166, 247, 0.3)' }}
+              style={{ backgroundColor: theme.bg.card, borderColor: theme.border.light }}
             >
               <View className="flex-row items-center">
                 <View
@@ -178,13 +189,13 @@ export default function SettingsScreen() {
                 </View>
                 <View>
                   <Text
-                    style={{ fontFamily: 'Quicksand_600SemiBold', color: '#4a3485' }}
+                    style={{ fontFamily: 'Quicksand_600SemiBold', color: theme.text.primary }}
                     className="text-lg"
                   >
                     {info.name} Phase
                   </Text>
                   <Text
-                    style={{ fontFamily: 'Quicksand_400Regular', color: '#8466db' }}
+                    style={{ fontFamily: 'Quicksand_400Regular', color: theme.text.tertiary }}
                     className="text-sm"
                   >
                     Day {dayOfCycle} of {cycleLength}
@@ -194,20 +205,66 @@ export default function SettingsScreen() {
             </View>
           </Animated.View>
 
+          {/* Appearance Settings */}
+          <Animated.View
+            entering={FadeInUp.delay(250).duration(600)}
+            className="mx-6 mt-6"
+          >
+            <Text
+              style={{ fontFamily: 'Quicksand_600SemiBold', color: theme.text.accent }}
+              className="text-xs uppercase tracking-wider mb-4"
+            >
+              Appearance
+            </Text>
+            <View
+              className="rounded-2xl border overflow-hidden"
+              style={{ backgroundColor: theme.bg.card, borderColor: theme.border.light }}
+            >
+              <View className="p-4 flex-row items-center justify-between">
+                <View className="flex-row items-center">
+                  {themeMode === 'dark' ? (
+                    <Moon size={18} color={theme.accent.lavender} />
+                  ) : (
+                    <Sun size={18} color={theme.accent.pink} />
+                  )}
+                  <Text
+                    style={{ fontFamily: 'Quicksand_500Medium', color: theme.text.primary }}
+                    className="text-sm ml-3"
+                  >
+                    Dark Mode
+                  </Text>
+                </View>
+                <Switch
+                  value={themeMode === 'dark'}
+                  onValueChange={handleThemeToggle}
+                  trackColor={{ false: theme.border.medium, true: theme.accent.purple }}
+                  thumbColor={themeMode === 'dark' ? theme.accent.lavender : '#ffffff'}
+                  ios_backgroundColor={theme.border.medium}
+                />
+              </View>
+            </View>
+            <Text
+              style={{ fontFamily: 'Quicksand_400Regular', color: theme.text.muted }}
+              className="text-xs mt-2 ml-1"
+            >
+              Perfect for nighttime tracking
+            </Text>
+          </Animated.View>
+
           {/* Cycle Settings - Editable */}
           <Animated.View
             entering={FadeInUp.delay(300).duration(600)}
             className="mx-6 mt-6"
           >
             <Text
-              style={{ fontFamily: 'Quicksand_600SemiBold', color: '#9d84ed' }}
+              style={{ fontFamily: 'Quicksand_600SemiBold', color: theme.text.accent }}
               className="text-xs uppercase tracking-wider mb-4"
             >
               Cycle Information
             </Text>
             <View
               className="rounded-2xl border overflow-hidden"
-              style={{ backgroundColor: 'rgba(255,255,255,0.7)', borderColor: 'rgba(185, 166, 247, 0.3)' }}
+              style={{ backgroundColor: theme.bg.card, borderColor: theme.border.light }}
             >
               {/* Last Period Start - Tappable */}
               <Pressable
@@ -218,9 +275,9 @@ export default function SettingsScreen() {
                 className="p-4 flex-row items-center justify-between"
               >
                 <View className="flex-row items-center">
-                  <Calendar size={18} color="#ff6289" />
+                  <Calendar size={18} color={theme.accent.pink} />
                   <Text
-                    style={{ fontFamily: 'Quicksand_500Medium', color: '#4a3485' }}
+                    style={{ fontFamily: 'Quicksand_500Medium', color: theme.text.primary }}
                     className="text-sm ml-3"
                   >
                     Last Period Start
@@ -228,12 +285,12 @@ export default function SettingsScreen() {
                 </View>
                 <View className="flex-row items-center">
                   <Text
-                    style={{ fontFamily: 'Quicksand_500Medium', color: '#9d84ed' }}
+                    style={{ fontFamily: 'Quicksand_500Medium', color: theme.accent.purple }}
                     className="text-sm mr-2"
                   >
                     {formatDate(lastPeriodStart)}
                   </Text>
-                  <ChevronRight size={16} color="#b9a6f7" />
+                  <ChevronRight size={16} color={theme.text.muted} />
                 </View>
               </Pressable>
 
@@ -241,12 +298,12 @@ export default function SettingsScreen() {
               <Pressable
                 onPress={() => setShowCycleLengthPicker(true)}
                 className="p-4 flex-row items-center justify-between border-t"
-                style={{ borderTopColor: 'rgba(185, 166, 247, 0.2)' }}
+                style={{ borderTopColor: theme.border.light }}
               >
                 <View className="flex-row items-center">
-                  <Clock size={18} color="#9d84ed" />
+                  <Clock size={18} color={theme.accent.purple} />
                   <Text
-                    style={{ fontFamily: 'Quicksand_500Medium', color: '#4a3485' }}
+                    style={{ fontFamily: 'Quicksand_500Medium', color: theme.text.primary }}
                     className="text-sm ml-3"
                   >
                     Cycle Length
@@ -254,12 +311,12 @@ export default function SettingsScreen() {
                 </View>
                 <View className="flex-row items-center">
                   <Text
-                    style={{ fontFamily: 'Quicksand_500Medium', color: '#9d84ed' }}
+                    style={{ fontFamily: 'Quicksand_500Medium', color: theme.accent.purple }}
                     className="text-sm mr-2"
                   >
                     {cycleLength} days
                   </Text>
-                  <ChevronRight size={16} color="#b9a6f7" />
+                  <ChevronRight size={16} color={theme.text.muted} />
                 </View>
               </Pressable>
 
@@ -267,12 +324,12 @@ export default function SettingsScreen() {
               <Pressable
                 onPress={() => setShowPeriodLengthPicker(true)}
                 className="p-4 flex-row items-center justify-between border-t"
-                style={{ borderTopColor: 'rgba(185, 166, 247, 0.2)' }}
+                style={{ borderTopColor: theme.border.light }}
               >
                 <View className="flex-row items-center">
-                  <Moon size={18} color="#f9a8d4" />
+                  <Moon size={18} color={theme.accent.rose} />
                   <Text
-                    style={{ fontFamily: 'Quicksand_500Medium', color: '#4a3485' }}
+                    style={{ fontFamily: 'Quicksand_500Medium', color: theme.text.primary }}
                     className="text-sm ml-3"
                   >
                     Period Length
@@ -280,18 +337,18 @@ export default function SettingsScreen() {
                 </View>
                 <View className="flex-row items-center">
                   <Text
-                    style={{ fontFamily: 'Quicksand_500Medium', color: '#9d84ed' }}
+                    style={{ fontFamily: 'Quicksand_500Medium', color: theme.accent.purple }}
                     className="text-sm mr-2"
                   >
                     {periodLength} days
                   </Text>
-                  <ChevronRight size={16} color="#b9a6f7" />
+                  <ChevronRight size={16} color={theme.text.muted} />
                 </View>
               </Pressable>
             </View>
 
             <Text
-              style={{ fontFamily: 'Quicksand_400Regular', color: '#b9a6f7' }}
+              style={{ fontFamily: 'Quicksand_400Regular', color: theme.text.muted }}
               className="text-xs mt-2 ml-1"
             >
               Tap any field to edit
@@ -304,29 +361,29 @@ export default function SettingsScreen() {
             className="mx-6 mt-6"
           >
             <Text
-              style={{ fontFamily: 'Quicksand_600SemiBold', color: '#9d84ed' }}
+              style={{ fontFamily: 'Quicksand_600SemiBold', color: theme.text.accent }}
               className="text-xs uppercase tracking-wider mb-4"
             >
               Actions
             </Text>
             <View
               className="rounded-2xl border overflow-hidden"
-              style={{ backgroundColor: 'rgba(255,255,255,0.7)', borderColor: 'rgba(185, 166, 247, 0.3)' }}
+              style={{ backgroundColor: theme.bg.card, borderColor: theme.border.light }}
             >
               <Pressable
                 onPress={handleReset}
                 className="p-4 flex-row items-center justify-between"
               >
                 <View className="flex-row items-center">
-                  <RotateCcw size={18} color="#ff6289" />
+                  <RotateCcw size={18} color={theme.accent.pink} />
                   <Text
-                    style={{ fontFamily: 'Quicksand_500Medium', color: '#4a3485' }}
+                    style={{ fontFamily: 'Quicksand_500Medium', color: theme.text.primary }}
                     className="text-sm ml-3"
                   >
                     Reset Cycle Data
                   </Text>
                 </View>
-                <ChevronRight size={16} color="#b9a6f7" />
+                <ChevronRight size={16} color={theme.text.muted} />
               </Pressable>
             </View>
           </Animated.View>
@@ -337,19 +394,19 @@ export default function SettingsScreen() {
             className="mx-6 mt-6"
           >
             <Text
-              style={{ fontFamily: 'Quicksand_600SemiBold', color: '#9d84ed' }}
+              style={{ fontFamily: 'Quicksand_600SemiBold', color: theme.text.accent }}
               className="text-xs uppercase tracking-wider mb-4"
             >
               About
             </Text>
             <View
               className="rounded-2xl border overflow-hidden"
-              style={{ backgroundColor: 'rgba(255,255,255,0.7)', borderColor: 'rgba(185, 166, 247, 0.3)' }}
+              style={{ backgroundColor: theme.bg.card, borderColor: theme.border.light }}
             >
               <View className="p-4 flex-row items-center">
-                <Info size={18} color="#b9a6f7" />
+                <Info size={18} color={theme.text.muted} />
                 <Text
-                  style={{ fontFamily: 'Quicksand_400Regular', color: '#6d4fc4' }}
+                  style={{ fontFamily: 'Quicksand_400Regular', color: theme.text.secondary }}
                   className="text-sm ml-3 flex-1"
                 >
                   Luna Flow helps you understand and work with your menstrual cycle, not against it.
@@ -364,16 +421,16 @@ export default function SettingsScreen() {
             className="mx-6 mt-8 items-center"
           >
             <View className="flex-row items-center">
-              <Heart size={14} color="#f9a8d4" />
+              <Heart size={14} color={theme.accent.rose} />
               <Text
-                style={{ fontFamily: 'Quicksand_400Regular', color: '#b9a6f7' }}
+                style={{ fontFamily: 'Quicksand_400Regular', color: theme.text.muted }}
                 className="text-xs ml-2"
               >
                 Made with love for women everywhere
               </Text>
             </View>
             <Text
-              style={{ fontFamily: 'Quicksand_400Regular', color: '#d1c7ff' }}
+              style={{ fontFamily: 'Quicksand_400Regular', color: theme.text.muted }}
               className="text-xs mt-2"
             >
               Version 1.0.0
@@ -385,20 +442,20 @@ export default function SettingsScreen() {
       {/* Date Picker Modal */}
       {showDatePicker && Platform.OS === 'ios' && (
         <Modal transparent animationType="slide">
-          <View className="flex-1 justify-end" style={{ backgroundColor: 'rgba(0,0,0,0.4)' }}>
+          <View className="flex-1 justify-end" style={{ backgroundColor: theme.overlay }}>
             <View
               className="rounded-t-3xl"
-              style={{ backgroundColor: '#fff' }}
+              style={{ backgroundColor: theme.bg.cardSolid }}
             >
-              <View className="flex-row justify-between items-center p-4 border-b" style={{ borderBottomColor: 'rgba(185, 166, 247, 0.2)' }}>
+              <View className="flex-row justify-between items-center p-4 border-b" style={{ borderBottomColor: theme.border.light }}>
                 <Pressable onPress={() => setShowDatePicker(false)}>
-                  <Text style={{ fontFamily: 'Quicksand_500Medium', color: '#ff6289' }}>Cancel</Text>
+                  <Text style={{ fontFamily: 'Quicksand_500Medium', color: theme.accent.pink }}>Cancel</Text>
                 </Pressable>
-                <Text style={{ fontFamily: 'Quicksand_600SemiBold', color: '#4a3485' }}>
+                <Text style={{ fontFamily: 'Quicksand_600SemiBold', color: theme.text.primary }}>
                   Select Date
                 </Text>
                 <Pressable onPress={handleConfirmDate}>
-                  <Text style={{ fontFamily: 'Quicksand_600SemiBold', color: '#9d84ed' }}>Done</Text>
+                  <Text style={{ fontFamily: 'Quicksand_600SemiBold', color: theme.accent.purple }}>Done</Text>
                 </Pressable>
               </View>
               <DateTimePicker
@@ -407,7 +464,7 @@ export default function SettingsScreen() {
                 display="spinner"
                 onChange={handleDateChange}
                 maximumDate={new Date()}
-                themeVariant="light"
+                themeVariant={themeMode}
                 style={{ height: 200 }}
               />
               <View style={{ height: insets.bottom }} />
@@ -429,13 +486,13 @@ export default function SettingsScreen() {
 
       {/* Cycle Length Picker Modal */}
       <Modal visible={showCycleLengthPicker} transparent animationType="slide">
-        <View className="flex-1 justify-end" style={{ backgroundColor: 'rgba(0,0,0,0.4)' }}>
-          <View className="rounded-t-3xl" style={{ backgroundColor: '#fff' }}>
-            <View className="flex-row justify-between items-center p-4 border-b" style={{ borderBottomColor: 'rgba(185, 166, 247, 0.2)' }}>
+        <View className="flex-1 justify-end" style={{ backgroundColor: theme.overlay }}>
+          <View className="rounded-t-3xl" style={{ backgroundColor: theme.bg.cardSolid }}>
+            <View className="flex-row justify-between items-center p-4 border-b" style={{ borderBottomColor: theme.border.light }}>
               <Pressable onPress={() => setShowCycleLengthPicker(false)}>
-                <Text style={{ fontFamily: 'Quicksand_500Medium', color: '#ff6289' }}>Cancel</Text>
+                <Text style={{ fontFamily: 'Quicksand_500Medium', color: theme.accent.pink }}>Cancel</Text>
               </Pressable>
-              <Text style={{ fontFamily: 'Quicksand_600SemiBold', color: '#4a3485' }}>
+              <Text style={{ fontFamily: 'Quicksand_600SemiBold', color: theme.text.primary }}>
                 Cycle Length
               </Text>
               <View style={{ width: 50 }} />
@@ -448,14 +505,14 @@ export default function SettingsScreen() {
                     onPress={() => handleCycleLengthSelect(length)}
                     className="w-14 h-14 rounded-full items-center justify-center m-1.5 border"
                     style={{
-                      backgroundColor: cycleLength === length ? '#9d84ed' : 'rgba(248,247,255,1)',
-                      borderColor: cycleLength === length ? '#9d84ed' : 'rgba(185, 166, 247, 0.3)',
+                      backgroundColor: cycleLength === length ? theme.accent.purple : theme.bg.secondary,
+                      borderColor: cycleLength === length ? theme.accent.purple : theme.border.light,
                     }}
                   >
                     <Text
                       style={{
                         fontFamily: 'Quicksand_600SemiBold',
-                        color: cycleLength === length ? '#fff' : '#6d4fc4',
+                        color: cycleLength === length ? '#fff' : theme.text.secondary,
                       }}
                       className="text-base"
                     >
@@ -465,7 +522,7 @@ export default function SettingsScreen() {
                 ))}
               </View>
               <Text
-                style={{ fontFamily: 'Quicksand_400Regular', color: '#b9a6f7' }}
+                style={{ fontFamily: 'Quicksand_400Regular', color: theme.text.muted }}
                 className="text-sm text-center mt-4"
               >
                 Average is 28 days
@@ -478,13 +535,13 @@ export default function SettingsScreen() {
 
       {/* Period Length Picker Modal */}
       <Modal visible={showPeriodLengthPicker} transparent animationType="slide">
-        <View className="flex-1 justify-end" style={{ backgroundColor: 'rgba(0,0,0,0.4)' }}>
-          <View className="rounded-t-3xl" style={{ backgroundColor: '#fff' }}>
-            <View className="flex-row justify-between items-center p-4 border-b" style={{ borderBottomColor: 'rgba(185, 166, 247, 0.2)' }}>
+        <View className="flex-1 justify-end" style={{ backgroundColor: theme.overlay }}>
+          <View className="rounded-t-3xl" style={{ backgroundColor: theme.bg.cardSolid }}>
+            <View className="flex-row justify-between items-center p-4 border-b" style={{ borderBottomColor: theme.border.light }}>
               <Pressable onPress={() => setShowPeriodLengthPicker(false)}>
-                <Text style={{ fontFamily: 'Quicksand_500Medium', color: '#ff6289' }}>Cancel</Text>
+                <Text style={{ fontFamily: 'Quicksand_500Medium', color: theme.accent.pink }}>Cancel</Text>
               </Pressable>
-              <Text style={{ fontFamily: 'Quicksand_600SemiBold', color: '#4a3485' }}>
+              <Text style={{ fontFamily: 'Quicksand_600SemiBold', color: theme.text.primary }}>
                 Period Length
               </Text>
               <View style={{ width: 50 }} />
@@ -497,14 +554,14 @@ export default function SettingsScreen() {
                     onPress={() => handlePeriodLengthSelect(length)}
                     className="w-16 h-16 rounded-full items-center justify-center mx-2 border"
                     style={{
-                      backgroundColor: periodLength === length ? '#ff8aa6' : 'rgba(248,247,255,1)',
-                      borderColor: periodLength === length ? '#ff8aa6' : 'rgba(255, 179, 196, 0.4)',
+                      backgroundColor: periodLength === length ? theme.accent.blush : theme.bg.secondary,
+                      borderColor: periodLength === length ? theme.accent.blush : theme.border.light,
                     }}
                   >
                     <Text
                       style={{
                         fontFamily: 'Quicksand_600SemiBold',
-                        color: periodLength === length ? '#fff' : '#d42a56',
+                        color: periodLength === length ? '#fff' : theme.text.secondary,
                       }}
                       className="text-lg"
                     >
@@ -514,7 +571,7 @@ export default function SettingsScreen() {
                 ))}
               </View>
               <Text
-                style={{ fontFamily: 'Quicksand_400Regular', color: '#b9a6f7' }}
+                style={{ fontFamily: 'Quicksand_400Regular', color: theme.text.muted }}
                 className="text-sm text-center mt-4"
               >
                 Average is 5 days

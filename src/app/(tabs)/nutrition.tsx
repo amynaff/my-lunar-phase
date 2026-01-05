@@ -5,6 +5,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Animated, { FadeInDown, FadeInUp } from 'react-native-reanimated';
 import { Apple, Salad, Fish, Cookie, ShoppingCart, ChevronRight, Leaf } from 'lucide-react-native';
 import { useCycleStore, phaseInfo, CyclePhase } from '@/lib/cycle-store';
+import { useThemeStore, getTheme } from '@/lib/theme-store';
 import { router } from 'expo-router';
 import {
   useFonts,
@@ -93,6 +94,8 @@ export default function NutritionScreen() {
   const insets = useSafeAreaInsets();
   const getCurrentPhase = useCycleStore(s => s.getCurrentPhase);
   const addPhaseGroceries = useCycleStore(s => s.addPhaseGroceries);
+  const themeMode = useThemeStore(s => s.mode);
+  const theme = getTheme(themeMode);
 
   const [fontsLoaded] = useFonts({
     CormorantGaramond_400Regular,
@@ -116,8 +119,8 @@ export default function NutritionScreen() {
   return (
     <View className="flex-1">
       <LinearGradient
-        colors={['#0f0720', '#1e0a3c', '#2d1050', '#1e0a3c', '#0f0720']}
-        locations={[0, 0.3, 0.5, 0.7, 1]}
+        colors={theme.gradient}
+        locations={[0, 0.25, 0.5, 0.75, 1]}
         style={{ flex: 1 }}
       >
         <ScrollView
@@ -132,14 +135,14 @@ export default function NutritionScreen() {
             className="px-6"
           >
             <Text
-              style={{ fontFamily: 'CormorantGaramond_400Regular' }}
-              className="text-luna-300/60 text-sm tracking-widest uppercase"
+              style={{ fontFamily: 'CormorantGaramond_400Regular', color: theme.text.muted }}
+              className="text-sm tracking-widest uppercase"
             >
               Nutrition Guide
             </Text>
             <Text
-              style={{ fontFamily: 'CormorantGaramond_600SemiBold' }}
-              className="text-white text-3xl mt-1"
+              style={{ fontFamily: 'CormorantGaramond_600SemiBold', color: theme.text.primary }}
+              className="text-3xl mt-1"
             >
               Eat for Your Cycle
             </Text>
@@ -150,36 +153,39 @@ export default function NutritionScreen() {
             entering={FadeInUp.delay(200).duration(600)}
             className="mx-6 mt-6"
           >
-            <LinearGradient
-              colors={[`${info.color}30`, `${info.color}10`]}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 1 }}
-              style={{ borderRadius: 24, padding: 20 }}
+            <View
+              className="rounded-3xl p-5 border"
+              style={{ backgroundColor: theme.bg.card, borderColor: theme.border.light }}
             >
               <View className="flex-row items-center mb-3">
-                <Text className="text-2xl mr-2">{info.emoji}</Text>
+                <View
+                  className="w-12 h-12 rounded-full items-center justify-center mr-3"
+                  style={{ backgroundColor: `${info.color}20` }}
+                >
+                  <Text className="text-2xl">{info.emoji}</Text>
+                </View>
                 <View>
                   <Text
-                    style={{ fontFamily: 'Quicksand_600SemiBold' }}
-                    className="text-white text-lg"
+                    style={{ fontFamily: 'Quicksand_600SemiBold', color: theme.text.primary }}
+                    className="text-lg"
                   >
                     {info.name} Phase
                   </Text>
                   <Text
-                    style={{ fontFamily: 'Quicksand_500Medium' }}
-                    className="text-luna-300 text-sm"
+                    style={{ fontFamily: 'Quicksand_500Medium', color: theme.text.accent }}
+                    className="text-sm"
                   >
                     {nutrition.focus}
                   </Text>
                 </View>
               </View>
               <Text
-                style={{ fontFamily: 'Quicksand_400Regular' }}
-                className="text-luna-200/80 text-sm leading-5"
+                style={{ fontFamily: 'Quicksand_400Regular', color: theme.text.secondary }}
+                className="text-sm leading-5"
               >
                 {nutrition.description}
               </Text>
-            </LinearGradient>
+            </View>
           </Animated.View>
 
           {/* Foods Section */}
@@ -189,19 +195,20 @@ export default function NutritionScreen() {
           >
             <View className="px-6 flex-row items-center justify-between mb-4">
               <Text
-                style={{ fontFamily: 'Quicksand_600SemiBold' }}
-                className="text-white text-lg"
+                style={{ fontFamily: 'Quicksand_600SemiBold', color: theme.text.primary }}
+                className="text-lg"
               >
                 Recommended Foods
               </Text>
               <Pressable
                 onPress={handleAddToGrocery}
-                className="flex-row items-center bg-luna-500/20 px-3 py-2 rounded-full"
+                className="flex-row items-center px-3 py-2 rounded-full"
+                style={{ backgroundColor: `${theme.accent.pink}15` }}
               >
-                <ShoppingCart size={14} color="#f472b6" />
+                <ShoppingCart size={14} color={theme.accent.pink} />
                 <Text
-                  style={{ fontFamily: 'Quicksand_500Medium' }}
-                  className="text-luna-400 text-xs ml-2"
+                  style={{ fontFamily: 'Quicksand_500Medium', color: theme.accent.pink }}
+                  className="text-xs ml-2"
                 >
                   Add to List
                 </Text>
@@ -221,29 +228,35 @@ export default function NutritionScreen() {
                   className="mr-4"
                   style={{ width: 160 }}
                 >
-                  <View className="bg-white/5 rounded-2xl overflow-hidden border border-white/10">
+                  <View
+                    className="rounded-2xl overflow-hidden border"
+                    style={{ backgroundColor: theme.bg.card, borderColor: theme.border.light }}
+                  >
                     <Image
                       source={{ uri: food.image }}
                       className="w-full h-24"
-                      style={{ backgroundColor: '#1e0a3c' }}
+                      style={{ backgroundColor: theme.bg.secondary }}
                     />
                     <View className="p-3">
                       <Text
-                        style={{ fontFamily: 'Quicksand_600SemiBold' }}
-                        className="text-white text-sm"
+                        style={{ fontFamily: 'Quicksand_600SemiBold', color: theme.text.primary }}
+                        className="text-sm"
                         numberOfLines={1}
                       >
                         {food.name}
                       </Text>
                       <Text
-                        style={{ fontFamily: 'Quicksand_400Regular' }}
-                        className="text-luna-300/70 text-xs mt-1"
+                        style={{ fontFamily: 'Quicksand_400Regular', color: theme.text.tertiary }}
+                        className="text-xs mt-1"
                         numberOfLines={2}
                       >
                         {food.benefit}
                       </Text>
-                      <View className="mt-2 bg-luna-500/20 self-start px-2 py-1 rounded-full">
-                        <Text className="text-luna-400 text-xs">
+                      <View
+                        className="mt-2 self-start px-2 py-1 rounded-full"
+                        style={{ backgroundColor: `${theme.accent.purple}15` }}
+                      >
+                        <Text style={{ color: theme.accent.purple }} className="text-xs">
                           {food.category}
                         </Text>
                       </View>
@@ -260,23 +273,29 @@ export default function NutritionScreen() {
             className="mx-6 mt-8"
           >
             <Text
-              style={{ fontFamily: 'Quicksand_600SemiBold' }}
-              className="text-white text-lg mb-4"
+              style={{ fontFamily: 'Quicksand_600SemiBold', color: theme.text.primary }}
+              className="text-lg mb-4"
             >
               Nutrition Tips
             </Text>
-            <View className="bg-white/5 rounded-2xl p-4 border border-white/10">
+            <View
+              className="rounded-2xl p-4 border"
+              style={{ backgroundColor: theme.bg.card, borderColor: theme.border.light }}
+            >
               {nutrition.tips.map((tip, index) => (
                 <View
                   key={tip}
                   className={`flex-row items-start ${index > 0 ? 'mt-3' : ''}`}
                 >
-                  <View className="w-6 h-6 rounded-full bg-luna-500/20 items-center justify-center mr-3 mt-0.5">
-                    <Leaf size={12} color="#f472b6" />
+                  <View
+                    className="w-6 h-6 rounded-full items-center justify-center mr-3 mt-0.5"
+                    style={{ backgroundColor: `${theme.accent.pink}15` }}
+                  >
+                    <Leaf size={12} color={theme.accent.pink} />
                   </View>
                   <Text
-                    style={{ fontFamily: 'Quicksand_400Regular' }}
-                    className="text-luna-200/80 text-sm flex-1 leading-5"
+                    style={{ fontFamily: 'Quicksand_400Regular', color: theme.text.secondary }}
+                    className="text-sm flex-1 leading-5"
                   >
                     {tip}
                   </Text>
@@ -291,8 +310,8 @@ export default function NutritionScreen() {
             className="mx-6 mt-6"
           >
             <Text
-              style={{ fontFamily: 'Quicksand_600SemiBold' }}
-              className="text-white text-lg mb-4"
+              style={{ fontFamily: 'Quicksand_600SemiBold', color: theme.text.primary }}
+              className="text-lg mb-4"
             >
               Best to Avoid
             </Text>
@@ -300,11 +319,12 @@ export default function NutritionScreen() {
               {nutrition.avoid.map((item) => (
                 <View
                   key={item}
-                  className="bg-blush-500/10 border border-blush-500/20 rounded-full px-4 py-2 mr-2 mb-2"
+                  className="rounded-full px-4 py-2 mr-2 mb-2 border"
+                  style={{ backgroundColor: `${theme.accent.blush}10`, borderColor: `${theme.accent.blush}30` }}
                 >
                   <Text
-                    style={{ fontFamily: 'Quicksand_500Medium' }}
-                    className="text-blush-300 text-xs"
+                    style={{ fontFamily: 'Quicksand_500Medium', color: theme.accent.blush }}
+                    className="text-xs"
                   >
                     {item}
                   </Text>
@@ -323,7 +343,7 @@ export default function NutritionScreen() {
               className="overflow-hidden rounded-2xl"
             >
               <LinearGradient
-                colors={['#ec4899', '#9333ea']}
+                colors={['#f9a8d4', '#c4b5fd']}
                 start={{ x: 0, y: 0 }}
                 end={{ x: 1, y: 0 }}
                 style={{ padding: 16, flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}

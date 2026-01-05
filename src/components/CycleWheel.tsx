@@ -12,6 +12,7 @@ import Animated, {
 import { LinearGradient } from 'expo-linear-gradient';
 import Svg, { Circle, Defs, LinearGradient as SvgGradient, Stop, G, Path } from 'react-native-svg';
 import { useCycleStore, phaseInfo, CyclePhase } from '@/lib/cycle-store';
+import { useThemeStore, getTheme } from '@/lib/theme-store';
 import { useEffect } from 'react';
 
 const { width } = Dimensions.get('window');
@@ -30,6 +31,8 @@ export function CycleWheel({ size = WHEEL_SIZE }: Props) {
   const getCurrentPhase = useCycleStore(s => s.getCurrentPhase);
   const getDayOfCycle = useCycleStore(s => s.getDayOfCycle);
   const cycleLength = useCycleStore(s => s.cycleLength);
+  const themeMode = useThemeStore(s => s.mode);
+  const theme = getTheme(themeMode);
 
   const currentPhase = getCurrentPhase();
   const dayOfCycle = getDayOfCycle();
@@ -62,6 +65,8 @@ export function CycleWheel({ size = WHEEL_SIZE }: Props) {
   const markerX = CENTER + (RADIUS - 10) * Math.cos((angle * Math.PI) / 180);
   const markerY = CENTER + (RADIUS - 10) * Math.sin((angle * Math.PI) / 180);
 
+  const isDark = themeMode === 'dark';
+
   return (
     <AnimatedView style={[{ alignItems: 'center' }, containerStyle]}>
       {/* Soft glow effect behind wheel */}
@@ -77,7 +82,11 @@ export function CycleWheel({ size = WHEEL_SIZE }: Props) {
         ]}
       >
         <LinearGradient
-          colors={['rgba(249, 168, 212, 0.4)', 'rgba(196, 181, 253, 0.3)', 'transparent']}
+          colors={
+            isDark
+              ? ['rgba(167, 139, 250, 0.3)', 'rgba(196, 181, 253, 0.2)', 'transparent']
+              : ['rgba(249, 168, 212, 0.4)', 'rgba(196, 181, 253, 0.3)', 'transparent']
+          }
           style={{
             width: '100%',
             height: '100%',
@@ -107,13 +116,13 @@ export function CycleWheel({ size = WHEEL_SIZE }: Props) {
           </SvgGradient>
         </Defs>
 
-        {/* Background circle - light */}
+        {/* Background circle */}
         <Circle
           cx={CENTER}
           cy={CENTER}
           r={RADIUS}
-          fill="rgba(255, 255, 255, 0.8)"
-          stroke="rgba(209, 199, 255, 0.5)"
+          fill={isDark ? 'rgba(37, 29, 53, 0.9)' : 'rgba(255, 255, 255, 0.8)'}
+          stroke={isDark ? 'rgba(167, 139, 250, 0.3)' : 'rgba(209, 199, 255, 0.5)'}
           strokeWidth={1}
         />
 
@@ -158,13 +167,13 @@ export function CycleWheel({ size = WHEEL_SIZE }: Props) {
           opacity={currentPhase === 'luteal' ? 1 : 0.6}
         />
 
-        {/* Inner circle - light frosted glass look */}
+        {/* Inner circle */}
         <Circle
           cx={CENTER}
           cy={CENTER}
           r={INNER_RADIUS}
-          fill="rgba(255, 255, 255, 0.95)"
-          stroke="rgba(249, 168, 212, 0.3)"
+          fill={isDark ? 'rgba(26, 20, 40, 0.95)' : 'rgba(255, 255, 255, 0.95)'}
+          stroke={isDark ? 'rgba(167, 139, 250, 0.3)' : 'rgba(249, 168, 212, 0.3)'}
           strokeWidth={1}
         />
 
@@ -173,7 +182,7 @@ export function CycleWheel({ size = WHEEL_SIZE }: Props) {
           cx={markerX}
           cy={markerY}
           r={9}
-          fill="#fff"
+          fill={isDark ? '#1a1428' : '#fff'}
           stroke="#ff6289"
           strokeWidth={3}
         />
@@ -189,14 +198,14 @@ export function CycleWheel({ size = WHEEL_SIZE }: Props) {
         }}
       >
         <Text className="text-4xl mb-1">{info.emoji}</Text>
-        <Text style={{ fontFamily: 'Quicksand_600SemiBold', fontSize: 32, color: '#4a3485' }}>
+        <Text style={{ fontFamily: 'Quicksand_600SemiBold', fontSize: 32, color: theme.text.primary }}>
           {dayOfCycle}
         </Text>
-        <Text style={{ fontFamily: 'Quicksand_500Medium', fontSize: 10, color: '#8466db', letterSpacing: 1 }}>
+        <Text style={{ fontFamily: 'Quicksand_500Medium', fontSize: 10, color: theme.text.tertiary, letterSpacing: 1 }}>
           DAY OF CYCLE
         </Text>
-        <View className="mt-2 px-4 py-1.5 rounded-full" style={{ backgroundColor: 'rgba(185, 166, 247, 0.2)' }}>
-          <Text style={{ fontFamily: 'Quicksand_600SemiBold', fontSize: 11, color: '#6d4fc4' }}>
+        <View className="mt-2 px-4 py-1.5 rounded-full" style={{ backgroundColor: `${theme.accent.purple}20` }}>
+          <Text style={{ fontFamily: 'Quicksand_600SemiBold', fontSize: 11, color: theme.text.secondary }}>
             {info.name}
           </Text>
         </View>

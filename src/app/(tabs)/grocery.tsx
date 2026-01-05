@@ -17,6 +17,7 @@ import {
   X,
 } from 'lucide-react-native';
 import { useCycleStore, phaseInfo, CyclePhase } from '@/lib/cycle-store';
+import { useThemeStore, getTheme } from '@/lib/theme-store';
 import * as Haptics from 'expo-haptics';
 import {
   useFonts,
@@ -45,6 +46,8 @@ export default function GroceryScreen() {
   const addGroceryItem = useCycleStore(s => s.addGroceryItem);
   const getCurrentPhase = useCycleStore(s => s.getCurrentPhase);
   const addPhaseGroceries = useCycleStore(s => s.addPhaseGroceries);
+  const themeMode = useThemeStore(s => s.mode);
+  const theme = getTheme(themeMode);
 
   const [newItemName, setNewItemName] = useState('');
   const [showAddInput, setShowAddInput] = useState(false);
@@ -106,8 +109,8 @@ export default function GroceryScreen() {
   return (
     <View className="flex-1">
       <LinearGradient
-        colors={['#0f0720', '#1e0a3c', '#2d1050', '#1e0a3c', '#0f0720']}
-        locations={[0, 0.3, 0.5, 0.7, 1]}
+        colors={theme.gradient}
+        locations={[0, 0.25, 0.5, 0.75, 1]}
         style={{ flex: 1 }}
       >
         <ScrollView
@@ -122,14 +125,14 @@ export default function GroceryScreen() {
             className="px-6"
           >
             <Text
-              style={{ fontFamily: 'CormorantGaramond_400Regular' }}
-              className="text-luna-300/60 text-sm tracking-widest uppercase"
+              style={{ fontFamily: 'CormorantGaramond_400Regular', color: theme.text.muted }}
+              className="text-sm tracking-widest uppercase"
             >
               Shopping
             </Text>
             <Text
-              style={{ fontFamily: 'CormorantGaramond_600SemiBold' }}
-              className="text-white text-3xl mt-1"
+              style={{ fontFamily: 'CormorantGaramond_600SemiBold', color: theme.text.primary }}
+              className="text-3xl mt-1"
             >
               Grocery List
             </Text>
@@ -144,41 +147,34 @@ export default function GroceryScreen() {
               onPress={handleAddPhaseItems}
               className="overflow-hidden rounded-2xl"
             >
-              <LinearGradient
-                colors={[`${info.color}30`, `${info.color}10`]}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 1 }}
-                style={{
-                  padding: 16,
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
-                }}
+              <View
+                className="p-4 flex-row items-center justify-between rounded-2xl border"
+                style={{ backgroundColor: `${info.color}10`, borderColor: `${info.color}30` }}
               >
                 <View className="flex-row items-center flex-1">
                   <View
                     className="w-10 h-10 rounded-full items-center justify-center mr-3"
-                    style={{ backgroundColor: `${info.color}40` }}
+                    style={{ backgroundColor: `${info.color}20` }}
                   >
                     <Sparkles size={20} color={info.color} />
                   </View>
                   <View className="flex-1">
                     <Text
-                      style={{ fontFamily: 'Quicksand_600SemiBold' }}
-                      className="text-white text-sm"
+                      style={{ fontFamily: 'Quicksand_600SemiBold', color: theme.text.primary }}
+                      className="text-sm"
                     >
                       Add {info.name} Phase Foods
                     </Text>
                     <Text
-                      style={{ fontFamily: 'Quicksand_400Regular' }}
-                      className="text-luna-300/70 text-xs"
+                      style={{ fontFamily: 'Quicksand_400Regular', color: theme.text.tertiary }}
+                      className="text-xs"
                     >
                       Recommended for your current phase
                     </Text>
                   </View>
                 </View>
-                <Plus size={20} color="#fff" />
-              </LinearGradient>
+                <Plus size={20} color={info.color} />
+              </View>
             </Pressable>
           </Animated.View>
 
@@ -187,30 +183,36 @@ export default function GroceryScreen() {
             entering={FadeInUp.delay(250).duration(600)}
             className="mx-6 mt-4 flex-row"
           >
-            <View className="flex-1 bg-white/5 rounded-2xl p-4 mr-2 border border-white/10">
+            <View
+              className="flex-1 rounded-2xl p-4 mr-2 border"
+              style={{ backgroundColor: theme.bg.card, borderColor: theme.border.light }}
+            >
               <Text
-                style={{ fontFamily: 'Quicksand_600SemiBold' }}
-                className="text-white text-2xl"
+                style={{ fontFamily: 'Quicksand_600SemiBold', color: theme.text.primary }}
+                className="text-2xl"
               >
                 {uncheckedItems.length}
               </Text>
               <Text
-                style={{ fontFamily: 'Quicksand_400Regular' }}
-                className="text-luna-300/70 text-xs"
+                style={{ fontFamily: 'Quicksand_400Regular', color: theme.text.tertiary }}
+                className="text-xs"
               >
                 Items to get
               </Text>
             </View>
-            <View className="flex-1 bg-white/5 rounded-2xl p-4 ml-2 border border-white/10">
+            <View
+              className="flex-1 rounded-2xl p-4 ml-2 border"
+              style={{ backgroundColor: theme.bg.card, borderColor: theme.border.light }}
+            >
               <Text
-                style={{ fontFamily: 'Quicksand_600SemiBold' }}
-                className="text-white text-2xl"
+                style={{ fontFamily: 'Quicksand_600SemiBold', color: theme.text.primary }}
+                className="text-2xl"
               >
                 {checkedItems.length}
               </Text>
               <Text
-                style={{ fontFamily: 'Quicksand_400Regular' }}
-                className="text-luna-300/70 text-xs"
+                style={{ fontFamily: 'Quicksand_400Regular', color: theme.text.tertiary }}
+                className="text-xs"
               >
                 Completed
               </Text>
@@ -223,41 +225,47 @@ export default function GroceryScreen() {
             className="mx-6 mt-6"
           >
             {showAddInput ? (
-              <View className="bg-white/5 rounded-2xl p-4 border border-white/10">
+              <View
+                className="rounded-2xl p-4 border"
+                style={{ backgroundColor: theme.bg.card, borderColor: theme.border.light }}
+              >
                 <View className="flex-row items-center">
                   <TextInput
                     value={newItemName}
                     onChangeText={setNewItemName}
                     placeholder="Add item..."
-                    placeholderTextColor="rgba(249, 168, 212, 0.4)"
-                    className="flex-1 text-white text-base"
-                    style={{ fontFamily: 'Quicksand_400Regular' }}
+                    placeholderTextColor={theme.text.muted}
+                    className="flex-1 text-base"
+                    style={{ fontFamily: 'Quicksand_400Regular', color: theme.text.primary }}
                     autoFocus
                     onSubmitEditing={handleAddItem}
                   />
                   <Pressable
                     onPress={handleAddItem}
-                    className="w-10 h-10 rounded-full bg-luna-500/30 items-center justify-center ml-2"
+                    className="w-10 h-10 rounded-full items-center justify-center ml-2"
+                    style={{ backgroundColor: `${theme.accent.pink}20` }}
                   >
-                    <Check size={20} color="#f472b6" />
+                    <Check size={20} color={theme.accent.pink} />
                   </Pressable>
                   <Pressable
                     onPress={() => setShowAddInput(false)}
-                    className="w-10 h-10 rounded-full bg-white/10 items-center justify-center ml-2"
+                    className="w-10 h-10 rounded-full items-center justify-center ml-2"
+                    style={{ backgroundColor: `${theme.accent.purple}15` }}
                   >
-                    <X size={20} color="#a78bfa" />
+                    <X size={20} color={theme.accent.purple} />
                   </Pressable>
                 </View>
               </View>
             ) : (
               <Pressable
                 onPress={() => setShowAddInput(true)}
-                className="bg-white/5 rounded-2xl p-4 border border-white/10 flex-row items-center justify-center"
+                className="rounded-2xl p-4 border flex-row items-center justify-center"
+                style={{ backgroundColor: theme.bg.card, borderColor: theme.border.light }}
               >
-                <Plus size={18} color="#f472b6" />
+                <Plus size={18} color={theme.accent.pink} />
                 <Text
-                  style={{ fontFamily: 'Quicksand_500Medium' }}
-                  className="text-luna-300 text-sm ml-2"
+                  style={{ fontFamily: 'Quicksand_500Medium', color: theme.text.accent }}
+                  className="text-sm ml-2"
                 >
                   Add Custom Item
                 </Text>
@@ -274,12 +282,15 @@ export default function GroceryScreen() {
               {Object.entries(groupedItems).map(([category, items], catIndex) => (
                 <View key={category} className="mb-4">
                   <Text
-                    style={{ fontFamily: 'Quicksand_600SemiBold' }}
-                    className="text-luna-400 text-xs uppercase tracking-wider mb-2 px-6"
+                    style={{ fontFamily: 'Quicksand_600SemiBold', color: theme.text.accent }}
+                    className="text-xs uppercase tracking-wider mb-2 px-6"
                   >
                     {category}
                   </Text>
-                  <View className="mx-6 bg-white/5 rounded-2xl border border-white/10 overflow-hidden">
+                  <View
+                    className="mx-6 rounded-2xl border overflow-hidden"
+                    style={{ backgroundColor: theme.bg.card, borderColor: theme.border.light }}
+                  >
                     {items.map((item, index) => (
                       <Animated.View
                         key={item.id}
@@ -290,22 +301,23 @@ export default function GroceryScreen() {
                         <Pressable
                           onPress={() => handleToggle(item.id)}
                           className={`flex-row items-center p-4 ${
-                            index > 0 ? 'border-t border-white/10' : ''
+                            index > 0 ? 'border-t' : ''
                           }`}
+                          style={{ borderTopColor: theme.border.light }}
                         >
                           <View
-                            className={`w-6 h-6 rounded-full border-2 items-center justify-center mr-3 ${
-                              item.isChecked
-                                ? 'bg-luna-500 border-luna-500'
-                                : 'border-luna-400/50'
-                            }`}
+                            className={`w-6 h-6 rounded-full border-2 items-center justify-center mr-3`}
+                            style={{
+                              backgroundColor: item.isChecked ? theme.accent.purple : 'transparent',
+                              borderColor: item.isChecked ? theme.accent.purple : theme.text.muted,
+                            }}
                           >
                             {item.isChecked && <Check size={14} color="#fff" />}
                           </View>
                           <View className="flex-1">
                             <Text
-                              style={{ fontFamily: 'Quicksand_500Medium' }}
-                              className="text-white text-sm"
+                              style={{ fontFamily: 'Quicksand_500Medium', color: theme.text.primary }}
+                              className="text-sm"
                             >
                               {item.name}
                             </Text>
@@ -318,7 +330,7 @@ export default function GroceryScreen() {
                             onPress={() => handleRemove(item.id)}
                             hitSlop={10}
                           >
-                            <Trash2 size={16} color="#fb7185" />
+                            <Trash2 size={16} color={theme.accent.blush} />
                           </Pressable>
                         </Pressable>
                       </Animated.View>
@@ -337,21 +349,24 @@ export default function GroceryScreen() {
             >
               <View className="px-6 flex-row items-center justify-between mb-2">
                 <Text
-                  style={{ fontFamily: 'Quicksand_600SemiBold' }}
-                  className="text-luna-400/60 text-xs uppercase tracking-wider"
+                  style={{ fontFamily: 'Quicksand_600SemiBold', color: theme.text.muted }}
+                  className="text-xs uppercase tracking-wider"
                 >
                   Completed ({checkedItems.length})
                 </Text>
                 <Pressable onPress={clearGroceryList}>
                   <Text
-                    style={{ fontFamily: 'Quicksand_500Medium' }}
-                    className="text-blush-400 text-xs"
+                    style={{ fontFamily: 'Quicksand_500Medium', color: theme.accent.blush }}
+                    className="text-xs"
                   >
                     Clear All
                   </Text>
                 </Pressable>
               </View>
-              <View className="mx-6 bg-white/3 rounded-2xl border border-white/5 overflow-hidden">
+              <View
+                className="mx-6 rounded-2xl border overflow-hidden"
+                style={{ backgroundColor: theme.bg.card, borderColor: theme.border.light, opacity: 0.7 }}
+              >
                 {checkedItems.map((item, index) => (
                   <Animated.View
                     key={item.id}
@@ -362,15 +377,19 @@ export default function GroceryScreen() {
                     <Pressable
                       onPress={() => handleToggle(item.id)}
                       className={`flex-row items-center p-4 ${
-                        index > 0 ? 'border-t border-white/5' : ''
+                        index > 0 ? 'border-t' : ''
                       }`}
+                      style={{ borderTopColor: theme.border.light }}
                     >
-                      <View className="w-6 h-6 rounded-full bg-luna-500/30 border-2 border-luna-500/50 items-center justify-center mr-3">
-                        <Check size={14} color="#f472b6" />
+                      <View
+                        className="w-6 h-6 rounded-full border-2 items-center justify-center mr-3"
+                        style={{ backgroundColor: `${theme.accent.purple}30`, borderColor: `${theme.accent.purple}50` }}
+                      >
+                        <Check size={14} color={theme.accent.pink} />
                       </View>
                       <Text
-                        style={{ fontFamily: 'Quicksand_400Regular' }}
-                        className="text-luna-300/50 text-sm flex-1 line-through"
+                        style={{ fontFamily: 'Quicksand_400Regular', color: theme.text.muted, textDecorationLine: 'line-through' }}
+                        className="text-sm flex-1"
                       >
                         {item.name}
                       </Text>
@@ -378,7 +397,7 @@ export default function GroceryScreen() {
                         onPress={() => handleRemove(item.id)}
                         hitSlop={10}
                       >
-                        <Trash2 size={16} color="rgba(251, 113, 133, 0.5)" />
+                        <Trash2 size={16} color={`${theme.accent.blush}80`} />
                       </Pressable>
                     </Pressable>
                   </Animated.View>
@@ -393,18 +412,21 @@ export default function GroceryScreen() {
               entering={FadeInUp.delay(400).duration(600)}
               className="mx-6 mt-12 items-center"
             >
-              <View className="w-20 h-20 rounded-full bg-luna-500/10 items-center justify-center mb-4">
-                <ShoppingCart size={32} color="#f472b6" />
+              <View
+                className="w-20 h-20 rounded-full items-center justify-center mb-4"
+                style={{ backgroundColor: `${theme.accent.pink}15` }}
+              >
+                <ShoppingCart size={32} color={theme.accent.pink} />
               </View>
               <Text
-                style={{ fontFamily: 'Quicksand_600SemiBold' }}
-                className="text-white text-lg mb-2"
+                style={{ fontFamily: 'Quicksand_600SemiBold', color: theme.text.primary }}
+                className="text-lg mb-2"
               >
                 Your list is empty
               </Text>
               <Text
-                style={{ fontFamily: 'Quicksand_400Regular' }}
-                className="text-luna-300/60 text-sm text-center"
+                style={{ fontFamily: 'Quicksand_400Regular', color: theme.text.muted }}
+                className="text-sm text-center"
               >
                 Add foods from the Nutrition tab or{'\n'}tap above to add phase-specific items
               </Text>

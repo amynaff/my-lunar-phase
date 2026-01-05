@@ -18,6 +18,7 @@ import {
   Flower2,
 } from 'lucide-react-native';
 import { useCycleStore, phaseInfo, CyclePhase } from '@/lib/cycle-store';
+import { useThemeStore, getTheme } from '@/lib/theme-store';
 import {
   useFonts,
   CormorantGaramond_400Regular,
@@ -166,6 +167,8 @@ const phaseSelfCare: Record<CyclePhase, {
 export default function SelfCareScreen() {
   const insets = useSafeAreaInsets();
   const getCurrentPhase = useCycleStore(s => s.getCurrentPhase);
+  const themeMode = useThemeStore(s => s.mode);
+  const theme = getTheme(themeMode);
 
   const [fontsLoaded] = useFonts({
     CormorantGaramond_400Regular,
@@ -184,8 +187,8 @@ export default function SelfCareScreen() {
   return (
     <View className="flex-1">
       <LinearGradient
-        colors={['#0f0720', '#1e0a3c', '#2d1050', '#1e0a3c', '#0f0720']}
-        locations={[0, 0.3, 0.5, 0.7, 1]}
+        colors={theme.gradient}
+        locations={[0, 0.25, 0.5, 0.75, 1]}
         style={{ flex: 1 }}
       >
         <ScrollView
@@ -200,14 +203,14 @@ export default function SelfCareScreen() {
             className="px-6"
           >
             <Text
-              style={{ fontFamily: 'CormorantGaramond_400Regular' }}
-              className="text-luna-300/60 text-sm tracking-widest uppercase"
+              style={{ fontFamily: 'CormorantGaramond_400Regular', color: theme.text.muted }}
+              className="text-sm tracking-widest uppercase"
             >
               Self-Care
             </Text>
             <Text
-              style={{ fontFamily: 'CormorantGaramond_600SemiBold' }}
-              className="text-white text-3xl mt-1"
+              style={{ fontFamily: 'CormorantGaramond_600SemiBold', color: theme.text.primary }}
+              className="text-3xl mt-1"
             >
               Nurture Your Soul
             </Text>
@@ -218,36 +221,39 @@ export default function SelfCareScreen() {
             entering={FadeInUp.delay(200).duration(600)}
             className="mx-6 mt-6"
           >
-            <LinearGradient
-              colors={[`${info.color}30`, `${info.color}10`]}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 1 }}
-              style={{ borderRadius: 24, padding: 20 }}
+            <View
+              className="rounded-3xl p-5 border"
+              style={{ backgroundColor: theme.bg.card, borderColor: theme.border.light }}
             >
               <View className="flex-row items-center mb-3">
-                <Text className="text-2xl mr-2">{info.emoji}</Text>
+                <View
+                  className="w-12 h-12 rounded-full items-center justify-center mr-3"
+                  style={{ backgroundColor: `${info.color}20` }}
+                >
+                  <Text className="text-2xl">{info.emoji}</Text>
+                </View>
                 <View>
                   <Text
-                    style={{ fontFamily: 'Quicksand_600SemiBold' }}
-                    className="text-white text-lg"
+                    style={{ fontFamily: 'Quicksand_600SemiBold', color: theme.text.primary }}
+                    className="text-lg"
                   >
                     {info.name} Phase
                   </Text>
                   <Text
-                    style={{ fontFamily: 'Quicksand_500Medium' }}
-                    className="text-luna-300 text-sm"
+                    style={{ fontFamily: 'Quicksand_500Medium', color: theme.text.accent }}
+                    className="text-sm"
                   >
                     {selfCare.theme}
                   </Text>
                 </View>
               </View>
               <Text
-                style={{ fontFamily: 'Quicksand_400Regular' }}
-                className="text-luna-200/80 text-sm leading-5"
+                style={{ fontFamily: 'Quicksand_400Regular', color: theme.text.secondary }}
+                className="text-sm leading-5"
               >
                 {selfCare.description}
               </Text>
-            </LinearGradient>
+            </View>
           </Animated.View>
 
           {/* Activities Grid */}
@@ -256,8 +262,8 @@ export default function SelfCareScreen() {
             className="mt-8 px-6"
           >
             <Text
-              style={{ fontFamily: 'Quicksand_600SemiBold' }}
-              className="text-white text-lg mb-4"
+              style={{ fontFamily: 'Quicksand_600SemiBold', color: theme.text.primary }}
+              className="text-lg mb-4"
             >
               Self-Care Activities
             </Text>
@@ -270,22 +276,25 @@ export default function SelfCareScreen() {
                   style={{ width: '48%' }}
                   className="mb-3"
                 >
-                  <View className="bg-white/5 rounded-2xl p-4 border border-white/10">
+                  <View
+                    className="rounded-2xl p-4 border"
+                    style={{ backgroundColor: theme.bg.card, borderColor: theme.border.light }}
+                  >
                     <View
                       className="w-10 h-10 rounded-full items-center justify-center mb-3"
-                      style={{ backgroundColor: `${info.color}30` }}
+                      style={{ backgroundColor: `${info.color}20` }}
                     >
                       <activity.icon size={20} color={info.color} />
                     </View>
                     <Text
-                      style={{ fontFamily: 'Quicksand_600SemiBold' }}
-                      className="text-white text-sm"
+                      style={{ fontFamily: 'Quicksand_600SemiBold', color: theme.text.primary }}
+                      className="text-sm"
                     >
                       {activity.name}
                     </Text>
                     <Text
-                      style={{ fontFamily: 'Quicksand_400Regular' }}
-                      className="text-luna-300/70 text-xs mt-1"
+                      style={{ fontFamily: 'Quicksand_400Regular', color: theme.text.tertiary }}
+                      className="text-xs mt-1"
                     >
                       {activity.description}
                     </Text>
@@ -301,33 +310,40 @@ export default function SelfCareScreen() {
             className="mx-6 mt-6"
           >
             <Text
-              style={{ fontFamily: 'Quicksand_600SemiBold' }}
-              className="text-white text-lg mb-4"
+              style={{ fontFamily: 'Quicksand_600SemiBold', color: theme.text.primary }}
+              className="text-lg mb-4"
             >
               Emotional Support
             </Text>
-            <View className="bg-white/5 rounded-2xl border border-white/10 overflow-hidden">
+            <View
+              className="rounded-2xl border overflow-hidden"
+              style={{ backgroundColor: theme.bg.card, borderColor: theme.border.light }}
+            >
               {selfCare.emotions.map((emotion, index) => (
                 <View
                   key={emotion.feeling}
-                  className={`p-4 ${index > 0 ? 'border-t border-white/10' : ''}`}
+                  className={`p-4 ${index > 0 ? 'border-t' : ''}`}
+                  style={{ borderTopColor: theme.border.light }}
                 >
                   <View className="flex-row items-center justify-between mb-2">
                     <Text
-                      style={{ fontFamily: 'Quicksand_600SemiBold' }}
-                      className="text-white text-sm"
+                      style={{ fontFamily: 'Quicksand_600SemiBold', color: theme.text.primary }}
+                      className="text-sm"
                     >
                       {emotion.feeling}
                     </Text>
-                    <View className="bg-luna-500/20 px-2 py-1 rounded-full">
-                      <Text className="text-luna-400 text-xs">
+                    <View
+                      className="px-2 py-1 rounded-full"
+                      style={{ backgroundColor: `${theme.accent.purple}15` }}
+                    >
+                      <Text style={{ color: theme.accent.purple }} className="text-xs">
                         {emotion.normalcy}
                       </Text>
                     </View>
                   </View>
                   <Text
-                    style={{ fontFamily: 'Quicksand_400Regular' }}
-                    className="text-luna-300/70 text-xs"
+                    style={{ fontFamily: 'Quicksand_400Regular', color: theme.text.tertiary }}
+                    className="text-xs"
                   >
                     {emotion.tip}
                   </Text>
@@ -342,8 +358,8 @@ export default function SelfCareScreen() {
             className="mt-8"
           >
             <Text
-              style={{ fontFamily: 'Quicksand_600SemiBold' }}
-              className="text-white text-lg mb-4 px-6"
+              style={{ fontFamily: 'Quicksand_600SemiBold', color: theme.text.primary }}
+              className="text-lg mb-4 px-6"
             >
               Daily Affirmations
             </Text>
@@ -360,15 +376,15 @@ export default function SelfCareScreen() {
                   className="mr-3"
                 >
                   <LinearGradient
-                    colors={['rgba(236, 72, 153, 0.15)', 'rgba(147, 51, 234, 0.15)']}
+                    colors={['rgba(249, 168, 212, 0.2)', 'rgba(196, 181, 253, 0.2)']}
                     start={{ x: 0, y: 0 }}
                     end={{ x: 1, y: 1 }}
                     style={{ borderRadius: 16, padding: 16, width: 220 }}
                   >
-                    <Heart size={16} color="#f472b6" />
+                    <Heart size={16} color={theme.accent.pink} />
                     <Text
-                      style={{ fontFamily: 'CormorantGaramond_400Regular' }}
-                      className="text-white text-base mt-3 leading-6"
+                      style={{ fontFamily: 'CormorantGaramond_400Regular', color: theme.text.primary }}
+                      className="text-base mt-3 leading-6"
                     >
                       "{affirmation}"
                     </Text>
@@ -384,13 +400,13 @@ export default function SelfCareScreen() {
             className="mx-6 mt-8"
           >
             <Text
-              style={{ fontFamily: 'Quicksand_600SemiBold' }}
-              className="text-white text-lg mb-4"
+              style={{ fontFamily: 'Quicksand_600SemiBold', color: theme.text.primary }}
+              className="text-lg mb-4"
             >
               Journal Prompts
             </Text>
             <LinearGradient
-              colors={['rgba(192, 132, 252, 0.1)', 'rgba(236, 72, 153, 0.1)']}
+              colors={['rgba(249, 168, 212, 0.15)', 'rgba(196, 181, 253, 0.15)']}
               start={{ x: 0, y: 0 }}
               end={{ x: 1, y: 1 }}
               style={{ borderRadius: 20, padding: 20 }}
@@ -400,12 +416,15 @@ export default function SelfCareScreen() {
                   key={prompt}
                   className={`flex-row items-start ${index > 0 ? 'mt-4' : ''}`}
                 >
-                  <View className="w-6 h-6 rounded-full bg-white/10 items-center justify-center mr-3">
-                    <Text className="text-luna-400 text-xs">{index + 1}</Text>
+                  <View
+                    className="w-6 h-6 rounded-full items-center justify-center mr-3"
+                    style={{ backgroundColor: `${theme.accent.purple}20` }}
+                  >
+                    <Text style={{ color: theme.accent.purple }} className="text-xs">{index + 1}</Text>
                   </View>
                   <Text
-                    style={{ fontFamily: 'Quicksand_400Regular' }}
-                    className="text-luna-200/80 text-sm flex-1 leading-5"
+                    style={{ fontFamily: 'Quicksand_400Regular', color: theme.text.secondary }}
+                    className="text-sm flex-1 leading-5"
                   >
                     {prompt}
                   </Text>

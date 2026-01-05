@@ -7,6 +7,7 @@ A beautiful, comprehensive mobile app that teaches women how to eat, move, and c
 ### Cycle Tracking
 - Beautiful cycle wheel visualization showing current day and phase
 - Automatic phase detection (Menstrual, Follicular, Ovulatory, Luteal)
+- Educational hormone graph showing estrogen and progesterone curves
 - Next period countdown
 - Persistent data storage
 
@@ -37,6 +38,12 @@ A beautiful, comprehensive mobile app that teaches women how to eat, move, and c
 - Check off items as you shop
 - Persistent storage
 
+### Dark Mode
+- Toggle between light and dark themes
+- Perfect for nighttime tracking
+- Beautiful deep purple dark theme
+- Remembers your preference
+
 ## Tech Stack
 - Expo SDK 53 / React Native 0.76.7
 - TypeScript
@@ -47,7 +54,8 @@ A beautiful, comprehensive mobile app that teaches women how to eat, move, and c
 
 ## Design
 - Celestial/mystical feminine aesthetic
-- Deep purple and pink gradient backgrounds
+- Light ethereal theme with soft pinks and lavenders
+- Optional dark mode with deep purples
 - Custom fonts: Cormorant Garamond & Quicksand
 - Smooth animations and haptic feedback
 - Glass-morphic UI elements

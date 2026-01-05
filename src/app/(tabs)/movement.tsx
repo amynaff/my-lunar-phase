@@ -1,10 +1,11 @@
 import React from 'react';
-import { View, Text, ScrollView, Pressable, Image } from 'react-native';
+import { View, Text, ScrollView, Pressable } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Animated, { FadeInDown, FadeInUp } from 'react-native-reanimated';
 import { Flame, Clock, Zap, Heart, Dumbbell, Wind, Footprints } from 'lucide-react-native';
 import { useCycleStore, phaseInfo, CyclePhase } from '@/lib/cycle-store';
+import { useThemeStore, getTheme } from '@/lib/theme-store';
 import {
   useFonts,
   CormorantGaramond_400Regular,
@@ -110,6 +111,8 @@ const intensityColors: Record<string, string> = {
 export default function MovementScreen() {
   const insets = useSafeAreaInsets();
   const getCurrentPhase = useCycleStore(s => s.getCurrentPhase);
+  const themeMode = useThemeStore(s => s.mode);
+  const theme = getTheme(themeMode);
 
   const [fontsLoaded] = useFonts({
     CormorantGaramond_400Regular,
@@ -128,8 +131,8 @@ export default function MovementScreen() {
   return (
     <View className="flex-1">
       <LinearGradient
-        colors={['#0f0720', '#1e0a3c', '#2d1050', '#1e0a3c', '#0f0720']}
-        locations={[0, 0.3, 0.5, 0.7, 1]}
+        colors={theme.gradient}
+        locations={[0, 0.25, 0.5, 0.75, 1]}
         style={{ flex: 1 }}
       >
         <ScrollView
@@ -144,14 +147,14 @@ export default function MovementScreen() {
             className="px-6"
           >
             <Text
-              style={{ fontFamily: 'CormorantGaramond_400Regular' }}
-              className="text-luna-300/60 text-sm tracking-widest uppercase"
+              style={{ fontFamily: 'CormorantGaramond_400Regular', color: theme.text.muted }}
+              className="text-sm tracking-widest uppercase"
             >
               Movement Guide
             </Text>
             <Text
-              style={{ fontFamily: 'CormorantGaramond_600SemiBold' }}
-              className="text-white text-3xl mt-1"
+              style={{ fontFamily: 'CormorantGaramond_600SemiBold', color: theme.text.primary }}
+              className="text-3xl mt-1"
             >
               Move with Your Cycle
             </Text>
@@ -162,46 +165,49 @@ export default function MovementScreen() {
             entering={FadeInUp.delay(200).duration(600)}
             className="mx-6 mt-6"
           >
-            <LinearGradient
-              colors={[`${info.color}30`, `${info.color}10`]}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 1 }}
-              style={{ borderRadius: 24, padding: 20 }}
+            <View
+              className="rounded-3xl p-5 border"
+              style={{ backgroundColor: theme.bg.card, borderColor: theme.border.light }}
             >
               <View className="flex-row items-center mb-3">
-                <Text className="text-2xl mr-2">{info.emoji}</Text>
+                <View
+                  className="w-12 h-12 rounded-full items-center justify-center mr-3"
+                  style={{ backgroundColor: `${info.color}20` }}
+                >
+                  <Text className="text-2xl">{info.emoji}</Text>
+                </View>
                 <View>
                   <Text
-                    style={{ fontFamily: 'Quicksand_600SemiBold' }}
-                    className="text-white text-lg"
+                    style={{ fontFamily: 'Quicksand_600SemiBold', color: theme.text.primary }}
+                    className="text-lg"
                   >
                     {info.name} Phase
                   </Text>
                   <Text
-                    style={{ fontFamily: 'Quicksand_500Medium' }}
-                    className="text-luna-300 text-sm"
+                    style={{ fontFamily: 'Quicksand_500Medium', color: theme.text.accent }}
+                    className="text-sm"
                   >
                     {movement.recommendation}
                   </Text>
                 </View>
               </View>
               <Text
-                style={{ fontFamily: 'Quicksand_400Regular' }}
-                className="text-luna-200/80 text-sm leading-5"
+                style={{ fontFamily: 'Quicksand_400Regular', color: theme.text.secondary }}
+                className="text-sm leading-5"
               >
                 {movement.description}
               </Text>
 
               <View className="mt-4 flex-row items-center">
-                <Zap size={14} color="#f9a8d4" />
+                <Zap size={14} color={theme.accent.rose} />
                 <Text
-                  style={{ fontFamily: 'Quicksand_500Medium' }}
-                  className="text-luna-300 text-xs ml-2"
+                  style={{ fontFamily: 'Quicksand_500Medium', color: theme.text.accent }}
+                  className="text-xs ml-2"
                 >
                   {movement.energyLevel}
                 </Text>
               </View>
-            </LinearGradient>
+            </View>
           </Animated.View>
 
           {/* Workouts Section */}
@@ -210,8 +216,8 @@ export default function MovementScreen() {
             className="mt-8 px-6"
           >
             <Text
-              style={{ fontFamily: 'Quicksand_600SemiBold' }}
-              className="text-white text-lg mb-4"
+              style={{ fontFamily: 'Quicksand_600SemiBold', color: theme.text.primary }}
+              className="text-lg mb-4"
             >
               Recommended Workouts
             </Text>
@@ -221,32 +227,35 @@ export default function MovementScreen() {
                 key={workout.name}
                 entering={FadeInUp.delay(400 + index * 100).duration(500)}
               >
-                <Pressable className="bg-white/5 rounded-2xl p-4 mb-3 border border-white/10 flex-row items-center">
+                <View
+                  className="rounded-2xl p-4 mb-3 border flex-row items-center"
+                  style={{ backgroundColor: theme.bg.card, borderColor: theme.border.light }}
+                >
                   <View
                     className="w-14 h-14 rounded-2xl items-center justify-center mr-4"
-                    style={{ backgroundColor: `${info.color}30` }}
+                    style={{ backgroundColor: `${info.color}20` }}
                   >
                     <workout.icon size={24} color={info.color} />
                   </View>
                   <View className="flex-1">
                     <Text
-                      style={{ fontFamily: 'Quicksand_600SemiBold' }}
-                      className="text-white text-base"
+                      style={{ fontFamily: 'Quicksand_600SemiBold', color: theme.text.primary }}
+                      className="text-base"
                     >
                       {workout.name}
                     </Text>
                     <Text
-                      style={{ fontFamily: 'Quicksand_400Regular' }}
-                      className="text-luna-300/70 text-xs mt-1"
+                      style={{ fontFamily: 'Quicksand_400Regular', color: theme.text.tertiary }}
+                      className="text-xs mt-1"
                     >
                       {workout.description}
                     </Text>
                     <View className="flex-row items-center mt-2">
                       <View className="flex-row items-center mr-4">
-                        <Clock size={12} color="#a78bfa" />
+                        <Clock size={12} color={theme.accent.purple} />
                         <Text
-                          style={{ fontFamily: 'Quicksand_500Medium' }}
-                          className="text-luna-400 text-xs ml-1"
+                          style={{ fontFamily: 'Quicksand_500Medium', color: theme.accent.purple }}
+                          className="text-xs ml-1"
                         >
                           {workout.duration}
                         </Text>
@@ -264,7 +273,7 @@ export default function MovementScreen() {
                       </View>
                     </View>
                   </View>
-                </Pressable>
+                </View>
               </Animated.View>
             ))}
           </Animated.View>
@@ -275,23 +284,29 @@ export default function MovementScreen() {
             className="mx-6 mt-6"
           >
             <Text
-              style={{ fontFamily: 'Quicksand_600SemiBold' }}
-              className="text-white text-lg mb-4"
+              style={{ fontFamily: 'Quicksand_600SemiBold', color: theme.text.primary }}
+              className="text-lg mb-4"
             >
               Movement Tips
             </Text>
-            <View className="bg-white/5 rounded-2xl p-4 border border-white/10">
+            <View
+              className="rounded-2xl p-4 border"
+              style={{ backgroundColor: theme.bg.card, borderColor: theme.border.light }}
+            >
               {movement.tips.map((tip, index) => (
                 <View
                   key={tip}
                   className={`flex-row items-start ${index > 0 ? 'mt-3' : ''}`}
                 >
-                  <View className="w-6 h-6 rounded-full bg-cosmic-500/20 items-center justify-center mr-3 mt-0.5">
-                    <Heart size={12} color="#c084fc" />
+                  <View
+                    className="w-6 h-6 rounded-full items-center justify-center mr-3 mt-0.5"
+                    style={{ backgroundColor: `${theme.accent.purple}15` }}
+                  >
+                    <Heart size={12} color={theme.accent.purple} />
                   </View>
                   <Text
-                    style={{ fontFamily: 'Quicksand_400Regular' }}
-                    className="text-luna-200/80 text-sm flex-1 leading-5"
+                    style={{ fontFamily: 'Quicksand_400Regular', color: theme.text.secondary }}
+                    className="text-sm flex-1 leading-5"
                   >
                     {tip}
                   </Text>
@@ -306,14 +321,14 @@ export default function MovementScreen() {
             className="mx-6 mt-8"
           >
             <LinearGradient
-              colors={['rgba(192, 132, 252, 0.1)', 'rgba(236, 72, 153, 0.1)']}
+              colors={['rgba(249, 168, 212, 0.2)', 'rgba(196, 181, 253, 0.2)']}
               start={{ x: 0, y: 0 }}
               end={{ x: 1, y: 1 }}
               style={{ borderRadius: 20, padding: 20 }}
             >
               <Text
-                style={{ fontFamily: 'CormorantGaramond_400Regular' }}
-                className="text-white text-xl leading-7 text-center"
+                style={{ fontFamily: 'CormorantGaramond_400Regular', color: theme.text.primary }}
+                className="text-xl leading-7 text-center"
               >
                 "Movement should feel like a celebration of what your body can do, not a punishment for what you ate."
               </Text>

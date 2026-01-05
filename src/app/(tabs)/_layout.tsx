@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Pressable, Text, Platform } from 'react-native';
+import { View, Pressable, Text } from 'react-native';
 import { Tabs } from 'expo-router';
 import { BlurView } from 'expo-blur';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -17,6 +17,7 @@ import {
   ShoppingCart,
 } from 'lucide-react-native';
 import * as Haptics from 'expo-haptics';
+import { useThemeStore, getTheme } from '@/lib/theme-store';
 
 interface TabIconProps {
   icon: typeof Moon;
@@ -26,6 +27,9 @@ interface TabIconProps {
 }
 
 function TabIcon({ icon: Icon, label, focused, color }: TabIconProps) {
+  const themeMode = useThemeStore(s => s.mode);
+  const theme = getTheme(themeMode);
+
   const scale = useSharedValue(focused ? 1 : 0.9);
   const opacity = useSharedValue(focused ? 1 : 0.6);
 
@@ -46,16 +50,16 @@ function TabIcon({ icon: Icon, label, focused, color }: TabIconProps) {
         style={{
           width: 44,
           height: 44,
-          backgroundColor: focused ? 'rgba(249, 168, 212, 0.15)' : 'transparent',
+          backgroundColor: focused ? `${theme.accent.rose}20` : 'transparent',
         }}
       >
-        <Icon size={22} color={focused ? '#9d84ed' : '#b9a6f7'} strokeWidth={focused ? 2.5 : 2} />
+        <Icon size={22} color={focused ? theme.accent.purple : theme.text.muted} strokeWidth={focused ? 2.5 : 2} />
       </View>
       <Text
         style={{
           fontWeight: focused ? '600' : '400',
           fontSize: 10,
-          color: focused ? '#6d4fc4' : '#b9a6f7',
+          color: focused ? theme.text.secondary : theme.text.muted,
           marginTop: 2,
         }}
       >
@@ -67,6 +71,8 @@ function TabIcon({ icon: Icon, label, focused, color }: TabIconProps) {
 
 export default function TabLayout() {
   const insets = useSafeAreaInsets();
+  const themeMode = useThemeStore(s => s.mode);
+  const theme = getTheme(themeMode);
 
   const handleTabPress = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
@@ -87,21 +93,21 @@ export default function TabLayout() {
         tabBarBackground: () => (
           <BlurView
             intensity={80}
-            tint="light"
+            tint={themeMode === 'dark' ? 'dark' : 'light'}
             style={{
               position: 'absolute',
               top: 0,
               left: 0,
               right: 0,
               bottom: 0,
-              backgroundColor: 'rgba(255, 255, 255, 0.85)',
+              backgroundColor: theme.tabBar,
               borderTopWidth: 1,
-              borderTopColor: 'rgba(209, 199, 255, 0.3)',
+              borderTopColor: theme.border.light,
             }}
           />
         ),
-        tabBarActiveTintColor: '#9d84ed',
-        tabBarInactiveTintColor: '#b9a6f7',
+        tabBarActiveTintColor: theme.accent.purple,
+        tabBarInactiveTintColor: theme.text.muted,
         tabBarShowLabel: false,
       }}
       screenListeners={{
