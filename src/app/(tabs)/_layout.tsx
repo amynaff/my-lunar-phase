@@ -18,8 +18,6 @@ import {
 } from 'lucide-react-native';
 import * as Haptics from 'expo-haptics';
 
-const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
-
 interface TabIconProps {
   icon: typeof Moon;
   label: string;
@@ -29,11 +27,11 @@ interface TabIconProps {
 
 function TabIcon({ icon: Icon, label, focused, color }: TabIconProps) {
   const scale = useSharedValue(focused ? 1 : 0.9);
-  const opacity = useSharedValue(focused ? 1 : 0.5);
+  const opacity = useSharedValue(focused ? 1 : 0.6);
 
   React.useEffect(() => {
     scale.value = withSpring(focused ? 1 : 0.9, { damping: 15, stiffness: 150 });
-    opacity.value = withTiming(focused ? 1 : 0.5, { duration: 200 });
+    opacity.value = withTiming(focused ? 1 : 0.6, { duration: 200 });
   }, [focused]);
 
   const animatedStyle = useAnimatedStyle(() => ({
@@ -44,19 +42,22 @@ function TabIcon({ icon: Icon, label, focused, color }: TabIconProps) {
   return (
     <Animated.View style={animatedStyle} className="items-center justify-center">
       <View
-        className={`items-center justify-center rounded-full p-2 ${
-          focused ? 'bg-luna-500/20' : ''
-        }`}
+        className="items-center justify-center rounded-full"
         style={{
           width: 44,
           height: 44,
+          backgroundColor: focused ? 'rgba(249, 168, 212, 0.15)' : 'transparent',
         }}
       >
-        <Icon size={22} color={focused ? '#f472b6' : '#a78bfa'} strokeWidth={focused ? 2.5 : 2} />
+        <Icon size={22} color={focused ? '#9d84ed' : '#b9a6f7'} strokeWidth={focused ? 2.5 : 2} />
       </View>
       <Text
-        className={`text-xs mt-0.5 ${focused ? 'text-luna-400' : 'text-luna-400/50'}`}
-        style={{ fontWeight: focused ? '600' : '400', fontSize: 10 }}
+        style={{
+          fontWeight: focused ? '600' : '400',
+          fontSize: 10,
+          color: focused ? '#6d4fc4' : '#b9a6f7',
+          marginTop: 2,
+        }}
       >
         {label}
       </Text>
@@ -85,22 +86,22 @@ export default function TabLayout() {
         },
         tabBarBackground: () => (
           <BlurView
-            intensity={40}
-            tint="dark"
+            intensity={80}
+            tint="light"
             style={{
               position: 'absolute',
               top: 0,
               left: 0,
               right: 0,
               bottom: 0,
-              backgroundColor: 'rgba(15, 7, 32, 0.85)',
+              backgroundColor: 'rgba(255, 255, 255, 0.85)',
               borderTopWidth: 1,
-              borderTopColor: 'rgba(249, 168, 212, 0.1)',
+              borderTopColor: 'rgba(209, 199, 255, 0.3)',
             }}
           />
         ),
-        tabBarActiveTintColor: '#f472b6',
-        tabBarInactiveTintColor: '#a78bfa',
+        tabBarActiveTintColor: '#9d84ed',
+        tabBarInactiveTintColor: '#b9a6f7',
         tabBarShowLabel: false,
       }}
       screenListeners={{

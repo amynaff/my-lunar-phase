@@ -3,15 +3,12 @@ import { View, Text, ScrollView, Pressable, Dimensions, ActivityIndicator } from
 import { LinearGradient } from 'expo-linear-gradient';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Animated, {
-  useSharedValue,
-  useAnimatedStyle,
-  withSpring,
-  withDelay,
   FadeInDown,
   FadeInUp,
 } from 'react-native-reanimated';
-import { Moon, Sparkles, Heart, Calendar, ChevronRight } from 'lucide-react-native';
+import { Moon, Sparkles, Heart, Calendar, ChevronRight, Apple, Dumbbell } from 'lucide-react-native';
 import { CycleWheel } from '@/components/CycleWheel';
+import { CycleGraph } from '@/components/CycleGraph';
 import { useCycleStore, phaseInfo } from '@/lib/cycle-store';
 import { router } from 'expo-router';
 import {
@@ -48,7 +45,6 @@ export default function HomeScreen() {
   useEffect(() => {
     if (fontsLoaded) {
       SplashScreen.hideAsync();
-      // Small delay to ensure store is hydrated
       setTimeout(() => setIsReady(true), 100);
     }
   }, [fontsLoaded]);
@@ -61,7 +57,7 @@ export default function HomeScreen() {
 
   if (!fontsLoaded || !isReady) {
     return (
-      <View style={{ flex: 1, backgroundColor: '#0f0720', alignItems: 'center', justifyContent: 'center' }}>
+      <View style={{ flex: 1, backgroundColor: '#f8f7ff', alignItems: 'center', justifyContent: 'center' }}>
         <ActivityIndicator size="large" color="#f472b6" />
       </View>
     );
@@ -73,24 +69,30 @@ export default function HomeScreen() {
 
   const quickActions = [
     {
-      icon: Heart,
-      label: 'Self-Care',
+      icon: Apple,
+      label: 'Nutrition',
       color: '#f472b6',
-      route: '/(tabs)/selfcare',
+      route: '/(tabs)/nutrition',
     },
     {
-      icon: Sparkles,
-      label: 'Nutrition',
-      color: '#c084fc',
-      route: '/(tabs)/nutrition',
+      icon: Dumbbell,
+      label: 'Movement',
+      color: '#a78bfa',
+      route: '/(tabs)/movement',
+    },
+    {
+      icon: Heart,
+      label: 'Self-Care',
+      color: '#ff8aa6',
+      route: '/(tabs)/selfcare',
     },
   ];
 
   return (
     <View className="flex-1">
       <LinearGradient
-        colors={['#0f0720', '#1e0a3c', '#2d1050', '#1e0a3c', '#0f0720']}
-        locations={[0, 0.3, 0.5, 0.7, 1]}
+        colors={['#f8f7ff', '#f0edff', '#fdf2f8', '#f5f0ff', '#f8f7ff']}
+        locations={[0, 0.25, 0.5, 0.75, 1]}
         style={{ flex: 1 }}
       >
         <ScrollView
@@ -108,22 +110,22 @@ export default function HomeScreen() {
               <View>
                 <Text
                   style={{ fontFamily: 'CormorantGaramond_400Regular' }}
-                  className="text-luna-300/60 text-sm tracking-widest uppercase"
+                  className="text-moon-600 text-sm tracking-widest uppercase"
                 >
                   Welcome back
                 </Text>
                 <Text
                   style={{ fontFamily: 'CormorantGaramond_600SemiBold' }}
-                  className="text-white text-3xl mt-1"
+                  className="text-night-800 text-3xl mt-1"
                 >
                   Luna Flow
                 </Text>
               </View>
               <Pressable
-                className="w-10 h-10 rounded-full bg-white/10 items-center justify-center"
+                className="w-10 h-10 rounded-full bg-white/60 items-center justify-center border border-moon-200"
                 onPress={() => router.push('/settings')}
               >
-                <Moon size={20} color="#f9a8d4" />
+                <Moon size={20} color="#9d84ed" />
               </Pressable>
             </View>
           </Animated.View>
@@ -131,7 +133,7 @@ export default function HomeScreen() {
           {/* Cycle Wheel */}
           <Animated.View
             entering={FadeInUp.delay(300).duration(800)}
-            className="items-center mt-8"
+            className="items-center mt-6"
           >
             <CycleWheel />
           </Animated.View>
@@ -139,71 +141,70 @@ export default function HomeScreen() {
           {/* Phase Info Card */}
           <Animated.View
             entering={FadeInUp.delay(500).duration(600)}
-            className="mx-6 mt-8"
+            className="mx-6 mt-6"
           >
-            <LinearGradient
-              colors={['rgba(249, 168, 212, 0.15)', 'rgba(147, 51, 234, 0.1)']}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 1 }}
-              style={{ borderRadius: 24, padding: 1 }}
+            <View
+              className="rounded-3xl p-5 border border-moon-200/50"
+              style={{ backgroundColor: 'rgba(255,255,255,0.7)' }}
             >
-              <View className="bg-night-950/80 rounded-3xl p-5">
-                <View className="flex-row items-center mb-3">
-                  <View
-                    className="w-10 h-10 rounded-full items-center justify-center mr-3"
-                    style={{ backgroundColor: `${info.color}30` }}
-                  >
-                    <Text className="text-xl">{info.emoji}</Text>
-                  </View>
-                  <View className="flex-1">
-                    <Text
-                      style={{ fontFamily: 'Quicksand_600SemiBold' }}
-                      className="text-white text-lg"
-                    >
-                      {info.name} Phase
-                    </Text>
-                    <Text
-                      style={{ fontFamily: 'Quicksand_400Regular' }}
-                      className="text-luna-300/70 text-xs"
-                    >
-                      {info.energy}
-                    </Text>
-                  </View>
-                </View>
-
-                <Text
-                  style={{ fontFamily: 'Quicksand_400Regular' }}
-                  className="text-luna-200/80 text-sm leading-5"
+              <View className="flex-row items-center mb-3">
+                <View
+                  className="w-12 h-12 rounded-full items-center justify-center mr-3"
+                  style={{ backgroundColor: `${info.color}20` }}
                 >
-                  {info.description}
-                </Text>
-
-                <View className="mt-4 pt-4 border-t border-white/10">
-                  <View className="flex-row items-center">
-                    <Sparkles size={14} color="#f9a8d4" />
-                    <Text
-                      style={{ fontFamily: 'Quicksand_500Medium' }}
-                      className="text-luna-300 text-xs ml-2"
-                    >
-                      Your superpower: {info.superpower}
-                    </Text>
-                  </View>
+                  <Text className="text-2xl">{info.emoji}</Text>
+                </View>
+                <View className="flex-1">
+                  <Text
+                    style={{ fontFamily: 'Quicksand_600SemiBold' }}
+                    className="text-night-800 text-lg"
+                  >
+                    {info.name} Phase
+                  </Text>
+                  <Text
+                    style={{ fontFamily: 'Quicksand_400Regular' }}
+                    className="text-moon-600 text-xs"
+                  >
+                    {info.energy}
+                  </Text>
                 </View>
               </View>
-            </LinearGradient>
+
+              <Text
+                style={{ fontFamily: 'Quicksand_400Regular' }}
+                className="text-night-700 text-sm leading-5"
+              >
+                {info.description}
+              </Text>
+
+              <View className="mt-4 pt-4 border-t border-moon-200/50">
+                <View className="flex-row items-center">
+                  <Sparkles size={14} color="#9d84ed" />
+                  <Text
+                    style={{ fontFamily: 'Quicksand_500Medium' }}
+                    className="text-moon-700 text-xs ml-2"
+                  >
+                    Your superpower: {info.superpower}
+                  </Text>
+                </View>
+              </View>
+            </View>
           </Animated.View>
 
           {/* Next Period Countdown */}
           <Animated.View
-            entering={FadeInUp.delay(600).duration(600)}
+            entering={FadeInUp.delay(550).duration(600)}
             className="mx-6 mt-4"
           >
-            <Pressable className="flex-row items-center justify-between bg-white/5 rounded-2xl p-4 border border-white/10">
+            <View
+              className="flex-row items-center justify-between rounded-2xl p-4 border border-rose-200/50"
+              style={{ backgroundColor: 'rgba(255,245,247,0.8)' }}
+            >
               <View className="flex-row items-center">
-                <Calendar size={18} color="#f472b6" />
+                <Calendar size={18} color="#ff6289" />
                 <Text
                   style={{ fontFamily: 'Quicksand_500Medium' }}
-                  className="text-luna-200 text-sm ml-3"
+                  className="text-night-700 text-sm ml-3"
                 >
                   Next period in
                 </Text>
@@ -211,66 +212,68 @@ export default function HomeScreen() {
               <View className="flex-row items-center">
                 <Text
                   style={{ fontFamily: 'Quicksand_600SemiBold' }}
-                  className="text-white text-lg mr-1"
+                  className="text-rose-600 text-lg mr-1"
                 >
                   {daysUntilPeriod}
                 </Text>
                 <Text
                   style={{ fontFamily: 'Quicksand_400Regular' }}
-                  className="text-luna-300/70 text-sm"
+                  className="text-night-600 text-sm"
                 >
                   days
                 </Text>
               </View>
-            </Pressable>
+            </View>
+          </Animated.View>
+
+          {/* Cycle Graph - Educational */}
+          <Animated.View
+            entering={FadeInUp.delay(600).duration(600)}
+            className="mx-6 mt-6"
+          >
+            <CycleGraph />
           </Animated.View>
 
           {/* Quick Actions */}
           <Animated.View
             entering={FadeInUp.delay(700).duration(600)}
-            className="mt-8 px-6"
+            className="mt-6 px-6"
           >
             <Text
               style={{ fontFamily: 'Quicksand_600SemiBold' }}
-              className="text-white text-lg mb-4"
+              className="text-night-800 text-lg mb-4"
             >
               Today's Guidance
             </Text>
 
-            <View className="flex-row" style={{ gap: 12 }}>
+            <View className="flex-row" style={{ gap: 10 }}>
               {quickActions.map((action, index) => (
                 <AnimatedPressable
                   key={action.label}
-                  entering={FadeInUp.delay(800 + index * 100).duration(500)}
+                  entering={FadeInUp.delay(750 + index * 80).duration(500)}
                   className="flex-1"
                   onPress={() => router.push(action.route as any)}
                 >
-                  <LinearGradient
-                    colors={[`${action.color}20`, `${action.color}05`]}
-                    style={{ borderRadius: 20, padding: 16 }}
+                  <View
+                    className="rounded-2xl p-4 border items-center"
+                    style={{
+                      backgroundColor: `${action.color}10`,
+                      borderColor: `${action.color}30`,
+                    }}
                   >
                     <View
-                      className="w-12 h-12 rounded-full items-center justify-center mb-3"
-                      style={{ backgroundColor: `${action.color}30` }}
+                      className="w-11 h-11 rounded-full items-center justify-center mb-2"
+                      style={{ backgroundColor: `${action.color}20` }}
                     >
-                      <action.icon size={22} color={action.color} />
+                      <action.icon size={20} color={action.color} />
                     </View>
                     <Text
-                      style={{ fontFamily: 'Quicksand_500Medium' }}
-                      className="text-white text-sm"
+                      style={{ fontFamily: 'Quicksand_600SemiBold' }}
+                      className="text-night-800 text-xs"
                     >
                       {action.label}
                     </Text>
-                    <View className="flex-row items-center mt-1">
-                      <Text
-                        style={{ fontFamily: 'Quicksand_400Regular' }}
-                        className="text-luna-300/60 text-xs"
-                      >
-                        For {currentPhase}
-                      </Text>
-                      <ChevronRight size={12} color="#f9a8d4" className="ml-1" />
-                    </View>
-                  </LinearGradient>
+                  </View>
                 </AnimatedPressable>
               ))}
             </View>
@@ -282,17 +285,20 @@ export default function HomeScreen() {
             className="mx-6 mt-6"
           >
             <LinearGradient
-              colors={['rgba(236, 72, 153, 0.1)', 'rgba(168, 85, 247, 0.1)']}
+              colors={['rgba(249, 168, 212, 0.2)', 'rgba(196, 181, 253, 0.2)']}
               start={{ x: 0, y: 0 }}
               end={{ x: 1, y: 1 }}
               style={{ borderRadius: 20, padding: 20 }}
             >
-              <Text className="text-luna-400 text-xs uppercase tracking-widest mb-2">
+              <Text
+                className="text-xs uppercase tracking-widest mb-2"
+                style={{ fontFamily: 'Quicksand_600SemiBold', color: '#9d84ed' }}
+              >
                 Daily Affirmation
               </Text>
               <Text
                 style={{ fontFamily: 'CormorantGaramond_400Regular' }}
-                className="text-white text-xl leading-7"
+                className="text-night-800 text-xl leading-7"
               >
                 {getAffirmation(currentPhase)}
               </Text>
