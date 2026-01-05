@@ -1,5 +1,5 @@
-import React, { useEffect } from 'react';
-import { View, Text, ScrollView, Pressable, Dimensions } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { View, Text, ScrollView, Pressable, Dimensions, ActivityIndicator } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Animated, {
@@ -35,6 +35,7 @@ export default function HomeScreen() {
   const getCurrentPhase = useCycleStore(s => s.getCurrentPhase);
   const getDaysUntilNextPeriod = useCycleStore(s => s.getDaysUntilNextPeriod);
   const hasCompletedOnboarding = useCycleStore(s => s.hasCompletedOnboarding);
+  const [isReady, setIsReady] = useState(false);
 
   const [fontsLoaded] = useFonts({
     CormorantGaramond_400Regular,
@@ -47,17 +48,23 @@ export default function HomeScreen() {
   useEffect(() => {
     if (fontsLoaded) {
       SplashScreen.hideAsync();
+      // Small delay to ensure store is hydrated
+      setTimeout(() => setIsReady(true), 100);
     }
   }, [fontsLoaded]);
 
   useEffect(() => {
-    if (fontsLoaded && !hasCompletedOnboarding) {
+    if (isReady && !hasCompletedOnboarding) {
       router.replace('/onboarding');
     }
-  }, [hasCompletedOnboarding, fontsLoaded]);
+  }, [hasCompletedOnboarding, isReady]);
 
-  if (!fontsLoaded) {
-    return null;
+  if (!fontsLoaded || !isReady) {
+    return (
+      <View style={{ flex: 1, backgroundColor: '#0f0720', alignItems: 'center', justifyContent: 'center' }}>
+        <ActivityIndicator size="large" color="#f472b6" />
+      </View>
+    );
   }
 
   const currentPhase = getCurrentPhase();
