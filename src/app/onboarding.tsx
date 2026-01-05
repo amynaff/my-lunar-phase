@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
-import { View, Text, Pressable, Dimensions, Platform } from 'react-native';
+import { View, Text, Pressable, Dimensions, Platform, Modal, ScrollView } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Animated, {
   SlideInRight,
   SlideOutLeft,
 } from 'react-native-reanimated';
-import { Moon, Sparkles, ArrowRight, ChevronLeft } from 'lucide-react-native';
+import { Moon, Sparkles, ArrowRight, ChevronLeft, ChevronDown } from 'lucide-react-native';
 import { useCycleStore } from '@/lib/cycle-store';
 import { router } from 'expo-router';
 import * as Haptics from 'expo-haptics';
@@ -26,6 +26,20 @@ const { width, height } = Dimensions.get('window');
 
 const CYCLE_LENGTHS = [21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35];
 const PERIOD_LENGTHS = [3, 4, 5, 6, 7, 8];
+
+// Generate last 60 days for date selection
+const generateRecentDates = () => {
+  const dates: Date[] = [];
+  const today = new Date();
+  for (let i = 0; i < 60; i++) {
+    const date = new Date(today);
+    date.setDate(today.getDate() - i);
+    dates.push(date);
+  }
+  return dates;
+};
+
+const RECENT_DATES = generateRecentDates();
 
 export default function OnboardingScreen() {
   const insets = useSafeAreaInsets();
@@ -114,7 +128,7 @@ export default function OnboardingScreen() {
         <View className="items-center">
           <Pressable
             onPress={() => setShowDatePicker(true)}
-            className="rounded-2xl px-8 py-5 border"
+            className="rounded-2xl px-8 py-5 border flex-row items-center"
             style={{ backgroundColor: 'rgba(255,255,255,0.8)', borderColor: 'rgba(185, 166, 247, 0.3)' }}
           >
             <Text
@@ -123,45 +137,13 @@ export default function OnboardingScreen() {
             >
               {formatDate(lastPeriod)}
             </Text>
+            <ChevronDown size={20} color="#9d84ed" style={{ marginLeft: 8 }} />
           </Pressable>
-          {showDatePicker && (
-            <View className="mt-4 rounded-2xl overflow-hidden" style={{ backgroundColor: 'rgba(255,255,255,0.95)' }}>
-              <DateTimePicker
-                value={lastPeriod}
-                mode="date"
-                display={Platform.OS === 'ios' ? 'spinner' : 'default'}
-                onChange={(event, date) => {
-                  if (Platform.OS === 'android') {
-                    setShowDatePicker(false);
-                  }
-                  if (date) {
-                    setLastPeriod(date);
-                  }
-                }}
-                maximumDate={new Date()}
-                themeVariant="light"
-              />
-              {Platform.OS === 'ios' && (
-                <Pressable
-                  onPress={() => setShowDatePicker(false)}
-                  className="py-3 border-t"
-                  style={{ borderTopColor: 'rgba(185, 166, 247, 0.3)' }}
-                >
-                  <Text
-                    style={{ fontFamily: 'Quicksand_600SemiBold', color: '#9d84ed' }}
-                    className="text-center"
-                  >
-                    Done
-                  </Text>
-                </Pressable>
-              )}
-            </View>
-          )}
           <Text
             style={{ fontFamily: 'Quicksand_400Regular', color: '#8466db' }}
-            className="text-sm text-center mt-6"
+            className="text-sm text-center mt-4"
           >
-            Tap the date to change it
+            Tap to select a different date
           </Text>
         </View>
       ),
@@ -394,6 +376,79 @@ export default function OnboardingScreen() {
           )}
         </View>
       </LinearGradient>
+
+      {/* Date Picker Modal - works on all platforms including web */}
+      <Modal visible={showDatePicker} transparent animationType="slide">
+        <View className="flex-1 justify-end" style={{ backgroundColor: 'rgba(0,0,0,0.4)' }}>
+          <View className="rounded-t-3xl" style={{ backgroundColor: '#fff', maxHeight: height * 0.6 }}>
+            <View className="flex-row justify-between items-center p-4 border-b" style={{ borderBottomColor: 'rgba(185, 166, 247, 0.2)' }}>
+              <Pressable onPress={() => setShowDatePicker(false)}>
+                <Text style={{ fontFamily: 'Quicksand_500Medium', color: '#ff6289' }}>Cancel</Text>
+              </Pressable>
+              <Text style={{ fontFamily: 'Quicksand_600SemiBold', color: '#4a3485' }}>
+                Select Date
+              </Text>
+              <View style={{ width: 50 }} />
+            </View>
+            <ScrollView
+              className="p-4"
+              contentContainerStyle={{ paddingBottom: insets.bottom + 20 }}
+            >
+              {RECENT_DATES.map((date, index) => {
+                const isSelected =
+                  date.getDate() === lastPeriod.getDate() &&
+                  date.getMonth() === lastPeriod.getMonth() &&
+                  date.getFullYear() === lastPeriod.getFullYear();
+
+                const isToday = index === 0;
+                const daysAgo = index === 0 ? 'Today' : index === 1 ? 'Yesterday' : `${index} days ago`;
+
+                return (
+                  <Pressable
+                    key={index}
+                    onPress={() => {
+                      Haptics.selectionAsync();
+                      setLastPeriod(date);
+                      setShowDatePicker(false);
+                    }}
+                    className="p-4 rounded-xl mb-2 border flex-row items-center justify-between"
+                    style={{
+                      backgroundColor: isSelected ? '#9d84ed' : 'rgba(248,247,255,1)',
+                      borderColor: isSelected ? '#9d84ed' : 'rgba(185, 166, 247, 0.3)',
+                    }}
+                  >
+                    <View>
+                      <Text
+                        style={{
+                          fontFamily: 'Quicksand_600SemiBold',
+                          color: isSelected ? '#fff' : '#4a3485',
+                        }}
+                        className="text-base"
+                      >
+                        {formatDate(date)}
+                      </Text>
+                      <Text
+                        style={{
+                          fontFamily: 'Quicksand_400Regular',
+                          color: isSelected ? 'rgba(255,255,255,0.8)' : '#8466db',
+                        }}
+                        className="text-xs mt-0.5"
+                      >
+                        {daysAgo}
+                      </Text>
+                    </View>
+                    {isSelected && (
+                      <View className="w-6 h-6 rounded-full bg-white items-center justify-center">
+                        <View className="w-3 h-3 rounded-full" style={{ backgroundColor: '#9d84ed' }} />
+                      </View>
+                    )}
+                  </Pressable>
+                );
+              })}
+            </ScrollView>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 }
