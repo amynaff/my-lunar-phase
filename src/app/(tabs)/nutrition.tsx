@@ -36,7 +36,7 @@ const phaseNutrition: Record<CyclePhase, {
     focus: 'Replenish & Nourish',
     description: 'Focus on iron-rich foods to replenish blood loss. Warm, comforting foods support your body during this restorative time.',
     foods: [
-      { name: 'Dark Leafy Greens', benefit: 'Iron & magnesium to reduce cramps', category: 'Vegetables', image: 'https://images.unsplash.com/photo-1576045057995-568f588f82fb?w=200' },
+      { name: 'Dark Leafy Greens', benefit: 'Iron & magnesium to reduce cramps', category: 'Vegetables', image: 'https://images.unsplash.com/photo-1459411552884-841db9b3cc2a?w=200' },
       { name: 'Red Meat or Lentils', benefit: 'Replenish iron stores', category: 'Protein', image: 'https://images.unsplash.com/photo-1603048297172-c92544798d5a?w=200' },
       { name: 'Dark Chocolate', benefit: 'Magnesium & mood boost', category: 'Treats', image: 'https://images.unsplash.com/photo-1481391319762-47dff72954d9?w=200' },
       { name: 'Salmon', benefit: 'Omega-3s reduce inflammation', category: 'Protein', image: 'https://images.unsplash.com/photo-1467003909585-2f8a72700288?w=200' },
