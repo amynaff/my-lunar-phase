@@ -54,7 +54,7 @@ const phaseNutrition: Record<CyclePhase, {
       { name: 'Avocado', benefit: 'Healthy fats for hormone production', category: 'Healthy Fats', image: 'https://images.unsplash.com/photo-1523049673857-eb18f1d7b578?w=200' },
       { name: 'Eggs', benefit: 'Protein & B vitamins', category: 'Protein', image: 'https://images.unsplash.com/photo-1518569656558-1f25e69d93d7?w=200' },
       { name: 'Fermented Foods', benefit: 'Support gut health', category: 'Probiotics', image: 'https://images.unsplash.com/photo-1589927986089-35812388d1f4?w=200' },
-      { name: 'Broccoli', benefit: 'Estrogen metabolism support', category: 'Vegetables', image: 'https://images.unsplash.com/photo-1459411552884-841db9b3cc2a?w=200' },
+      { name: 'Broccoli', benefit: 'Estrogen metabolism support', category: 'Vegetables', image: 'https://images.unsplash.com/photo-1584270354949-c26b0d5b4a0c?w=200' },
       { name: 'Citrus Fruits', benefit: 'Vitamin C for energy', category: 'Fruits', image: 'https://images.unsplash.com/photo-1547514701-42782101795e?w=200' },
     ],
     avoid: ['Heavy, greasy foods', 'Excessive sugar'],
