@@ -78,7 +78,7 @@ const phaseNutrition: Record<CyclePhase, {
     focus: 'Stabilize & Comfort',
     description: 'Progesterone rises, cravings may appear. Complex carbs and magnesium-rich foods help stabilize mood and energy.',
     foods: [
-      { name: 'Sweet Potato', benefit: 'Complex carbs for serotonin', category: 'Vegetables', image: 'https://images.unsplash.com/photo-1518977676601-b53f82ber8f3?w=200' },
+      { name: 'Sweet Potato', benefit: 'Complex carbs for serotonin', category: 'Vegetables', image: 'https://images.unsplash.com/photo-1596097635121-14b63b7a0c19?w=200' },
       { name: 'Pumpkin Seeds', benefit: 'Magnesium for PMS relief', category: 'Seeds', image: 'https://images.unsplash.com/photo-1509622905150-fa66d3906e09?w=200' },
       { name: 'Turkey', benefit: 'Tryptophan for calm mood', category: 'Protein', image: 'https://images.unsplash.com/photo-1574672280600-4accfa5b6f98?w=200' },
       { name: 'Cauliflower', benefit: 'Supports liver detox', category: 'Vegetables', image: 'https://images.unsplash.com/photo-1568584711075-3d021a7c3ca3?w=200' },
