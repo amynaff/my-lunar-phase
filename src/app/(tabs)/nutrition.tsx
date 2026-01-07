@@ -1,9 +1,9 @@
-import React from 'react';
-import { View, Text, ScrollView, Pressable, Image } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, ScrollView, Pressable } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Animated, { FadeInDown, FadeInUp } from 'react-native-reanimated';
-import { Apple, Salad, Fish, Cookie, ShoppingCart, ChevronRight, Leaf, Sparkles } from 'lucide-react-native';
+import { ShoppingCart, Leaf, Sparkles, Pill, ChevronDown, ChevronUp, UtensilsCrossed } from 'lucide-react-native';
 import { useCycleStore, phaseInfo, CyclePhase } from '@/lib/cycle-store';
 import { useThemeStore, getTheme } from '@/lib/theme-store';
 import { router } from 'expo-router';
@@ -18,30 +18,63 @@ import {
   Quicksand_600SemiBold,
 } from '@expo-google-fonts/quicksand';
 
-interface FoodRecommendation {
+interface NutritionItem {
   name: string;
   benefit: string;
-  category: string;
-  image: string;
 }
 
-const phaseNutrition: Record<CyclePhase, {
+interface PhaseNutritionData {
   focus: string;
   description: string;
-  foods: FoodRecommendation[];
+  days: string;
+  foods: NutritionItem[];
+  herbs: NutritionItem[];
+  supplements: NutritionItem[];
   avoid: string[];
   tips: string[];
-}> = {
+}
+
+const phaseNutrition: Record<CyclePhase, PhaseNutritionData> = {
   menstrual: {
     focus: 'Replenish & Nourish',
     description: 'Focus on iron-rich foods to replenish blood loss. Warm, comforting foods support your body during this restorative time.',
+    days: 'Days 1-5',
     foods: [
-      { name: 'Dark Leafy Greens', benefit: 'Iron & magnesium to reduce cramps', category: 'Vegetables', image: 'https://images.unsplash.com/photo-1540420773420-3366772f4999?w=200' },
-      { name: 'Red Meat or Lentils', benefit: 'Replenish iron stores', category: 'Protein', image: 'https://images.unsplash.com/photo-1603048297172-c92544798d5a?w=200' },
-      { name: 'Dark Chocolate', benefit: 'Magnesium & mood boost', category: 'Treats', image: 'https://images.unsplash.com/photo-1481391319762-47dff72954d9?w=200' },
-      { name: 'Salmon', benefit: 'Omega-3s reduce inflammation', category: 'Protein', image: 'https://images.unsplash.com/photo-1467003909585-2f8a72700288?w=200' },
-      { name: 'Ginger Tea', benefit: 'Soothes cramps & nausea', category: 'Beverages', image: 'https://images.unsplash.com/photo-1597318181409-cf64d0b5d8a2?w=200' },
-      { name: 'Beets', benefit: 'Natural blood builder', category: 'Vegetables', image: 'https://images.unsplash.com/photo-1593105544559-ecb03bf76f82?w=200' },
+      { name: 'Red Meat', benefit: 'Grass-fed beef, organ meats (liver, heart)' },
+      { name: 'Leafy Greens', benefit: 'Organic spinach, kale, Swiss chard' },
+      { name: 'Lentils', benefit: 'Brown, green, or red lentils' },
+      { name: 'Ginger', benefit: 'Fresh ginger root for tea' },
+      { name: 'Dark Chocolate', benefit: '85% cacao or higher' },
+      { name: 'Blueberries', benefit: 'Fresh or frozen' },
+      { name: 'Bone Broth', benefit: 'Homemade or high-quality store-bought' },
+      { name: 'Turmeric', benefit: 'Fresh root or powder' },
+      { name: 'Pumpkin Seeds', benefit: 'Raw or roasted' },
+      { name: 'Warming Foods', benefit: 'Soups, stews, cooked meals' },
+      { name: 'Anti-Inflammatory Foods', benefit: 'Salmon, sardines, walnuts' },
+      { name: 'Seaweed', benefit: 'Nori, kelp, dulse' },
+      { name: 'Sesame Seeds', benefit: 'For seed cycling' },
+      { name: 'Molasses', benefit: 'Blackstrap molasses for iron' },
+      { name: 'Raisins', benefit: 'Iron-rich dried fruit' },
+    ],
+    herbs: [
+      { name: 'Raspberry Leaf', benefit: 'Uterine tonic' },
+      { name: 'Mugwort', benefit: 'Menstrual support' },
+      { name: 'Nettles', benefit: 'Iron and minerals' },
+      { name: 'Yellow Dock', benefit: 'Iron absorption' },
+      { name: 'Chamomile', benefit: 'Calming, anti-inflammatory' },
+      { name: 'Ginger', benefit: 'Pain relief, warming' },
+      { name: 'Turmeric', benefit: 'Anti-inflammatory' },
+      { name: 'Cramp Bark', benefit: 'Muscle relaxation' },
+      { name: 'Rose', benefit: 'Self-love, comfort' },
+    ],
+    supplements: [
+      { name: 'Iron', benefit: '18-27mg (with Vitamin C for absorption)' },
+      { name: 'Magnesium Glycinate', benefit: '400mg (reduces cramps)' },
+      { name: 'Vitamin D3', benefit: '2000 IU (mood support)' },
+      { name: 'Omega-3 Fish Oil', benefit: '1000mg EPA/DHA (anti-inflammatory)' },
+      { name: 'Vitamin C', benefit: 'Liposomal form (enhances iron absorption)' },
+      { name: 'Vitamin K', benefit: 'Supports blood clotting' },
+      { name: 'B-Complex', benefit: 'Energy support' },
     ],
     avoid: ['Excessive caffeine', 'Alcohol', 'Processed foods', 'Too much salt'],
     tips: ['Stay hydrated with warm beverages', 'Eat smaller, more frequent meals', 'Include warming spices like turmeric'],
@@ -49,13 +82,48 @@ const phaseNutrition: Record<CyclePhase, {
   follicular: {
     focus: 'Energize & Create',
     description: 'Estrogen is rising! Light, fresh foods support your increasing energy. Great time for trying new recipes and vibrant produce.',
+    days: 'Days 6-13',
     foods: [
-      { name: 'Fresh Berries', benefit: 'Antioxidants for cell renewal', category: 'Fruits', image: 'https://images.unsplash.com/photo-1464965911861-746a04b4bca6?w=200' },
-      { name: 'Avocado', benefit: 'Healthy fats for hormone production', category: 'Healthy Fats', image: 'https://images.unsplash.com/photo-1523049673857-eb18f1d7b578?w=200' },
-      { name: 'Eggs', benefit: 'Protein & B vitamins', category: 'Protein', image: 'https://images.unsplash.com/photo-1518569656558-1f25e69d93d7?w=200' },
-      { name: 'Fermented Foods', benefit: 'Support gut health', category: 'Probiotics', image: 'https://images.unsplash.com/photo-1589927986089-35812388d1f4?w=200' },
-      { name: 'Broccoli', benefit: 'Estrogen metabolism support', category: 'Vegetables', image: 'https://images.unsplash.com/photo-1584270354949-c26b0d5b4a0c?w=200' },
-      { name: 'Citrus Fruits', benefit: 'Vitamin C for energy', category: 'Fruits', image: 'https://images.unsplash.com/photo-1547514701-42782101795e?w=200' },
+      { name: 'Eggs', benefit: 'Pasture-raised, organic' },
+      { name: 'Wild Salmon', benefit: 'Fresh or canned' },
+      { name: 'Organic Chicken', benefit: 'Breast or thighs' },
+      { name: 'Broccoli', benefit: 'Fresh, steamed or roasted' },
+      { name: 'Kale', benefit: 'Raw or cooked' },
+      { name: 'Quinoa', benefit: 'Complete protein grain' },
+      { name: 'Steel-Cut Oats', benefit: 'Complex carbs' },
+      { name: 'Avocados', benefit: 'Healthy fats' },
+      { name: 'Raw Almonds', benefit: 'Vitamin E' },
+      { name: 'Kimchi or Sauerkraut', benefit: 'Fermented foods' },
+      { name: 'Brussels Sprouts', benefit: 'Cruciferous vegetable' },
+      { name: 'Cauliflower', benefit: 'Estrogen metabolism' },
+      { name: 'Brown Rice', benefit: 'Fiber and B-vitamins' },
+      { name: 'Tofu', benefit: 'Small amounts, organic' },
+      { name: 'Pumpkin Seeds', benefit: 'For seed cycling (continue)' },
+      { name: 'Flax Seeds', benefit: 'Ground, for seed cycling' },
+      { name: 'Tahini', benefit: 'Sesame seed paste' },
+      { name: 'Greek Yogurt', benefit: 'Probiotics' },
+    ],
+    herbs: [
+      { name: 'Nettles', benefit: 'Nutrient-dense' },
+      { name: 'Parsley', benefit: 'Fresh, high in vitamins' },
+      { name: 'Mustard Greens', benefit: 'Cruciferous support' },
+      { name: 'Sarsaparilla', benefit: 'Hormonal balance' },
+      { name: 'Irish Moss', benefit: 'Iodine source' },
+      { name: 'Alfalfa', benefit: 'Vitamin E' },
+      { name: 'Dandelion', benefit: 'Liver support' },
+      { name: 'Comfrey', benefit: 'Tissue building' },
+      { name: 'Maca', benefit: 'Energy and hormone balance' },
+      { name: 'Ashwagandha', benefit: 'Adaptogen for energy' },
+      { name: 'Holy Basil', benefit: 'Stress support' },
+    ],
+    supplements: [
+      { name: 'B-Complex Vitamins', benefit: '50-100mg (energy & hormone support)' },
+      { name: 'Vitamin E', benefit: '400 IU (follicle health)' },
+      { name: 'Probiotics', benefit: '10-50 billion CFU (gut health)' },
+      { name: 'Zinc', benefit: '15-30mg (hormone production)' },
+      { name: 'CoQ10', benefit: '100-200mg (cellular energy)' },
+      { name: 'Adaptogenic Herbs', benefit: 'Maca, Ashwagandha capsules' },
+      { name: 'Vitamin D', benefit: 'Continue 2000 IU' },
     ],
     avoid: ['Heavy, greasy foods', 'Excessive sugar'],
     tips: ['Try raw salads and fresh vegetables', 'Experiment with new healthy recipes', 'Sprouts and microgreens are excellent'],
@@ -63,13 +131,44 @@ const phaseNutrition: Record<CyclePhase, {
   ovulatory: {
     focus: 'Light & Vibrant',
     description: 'Peak energy time! Support your body with fiber-rich foods that help metabolize the estrogen surge. Light proteins keep you energized.',
+    days: 'Days 14-16',
     foods: [
-      { name: 'Raw Vegetables', benefit: 'Fiber to process excess estrogen', category: 'Vegetables', image: 'https://images.unsplash.com/photo-1540420773420-3366772f4999?w=200' },
-      { name: 'Quinoa', benefit: 'Complete protein & fiber', category: 'Grains', image: 'https://images.unsplash.com/photo-1586201375761-83865001e31c?w=200' },
-      { name: 'Light Fish', benefit: 'Lean protein for sustained energy', category: 'Protein', image: 'https://images.unsplash.com/photo-1510130387422-82bed34b37e9?w=200' },
-      { name: 'Almonds', benefit: 'Vitamin E for skin glow', category: 'Nuts', image: 'https://images.unsplash.com/photo-1508061253366-f7da158b6d46?w=200' },
-      { name: 'Coconut Water', benefit: 'Natural hydration', category: 'Beverages', image: 'https://images.unsplash.com/photo-1536591375623-7f1ea71ec76e?w=200' },
-      { name: 'Asparagus', benefit: 'Natural detoxifier', category: 'Vegetables', image: 'https://images.unsplash.com/photo-1515471209610-dae1c92d8777?w=200' },
+      { name: 'Mixed Berries', benefit: 'Blueberries, strawberries, raspberries' },
+      { name: 'Oysters', benefit: 'Fresh or canned (zinc-rich)' },
+      { name: 'Wild-Caught Fish', benefit: 'Salmon, mackerel, sardines' },
+      { name: 'Walnuts', benefit: 'Omega-3s and vitamin E' },
+      { name: 'Bell Peppers', benefit: 'All colors (antioxidants)' },
+      { name: 'Carrots', benefit: 'Beta-carotene' },
+      { name: 'Whole Grain Bread', benefit: 'Fiber-rich' },
+      { name: 'Chia Seeds', benefit: 'Omega-3s and fiber' },
+      { name: 'Dark Leafy Greens', benefit: 'Spinach, arugula, kale' },
+      { name: 'Colorful Vegetables', benefit: 'Rainbow variety' },
+      { name: 'Pumpkin Seeds', benefit: 'Zinc' },
+      { name: 'Hemp Seeds', benefit: 'Complete protein' },
+      { name: 'Sunflower Seeds', benefit: 'For seed cycling (switch to these)' },
+      { name: 'Sesame Seeds', benefit: 'For seed cycling (continue)' },
+      { name: 'Legumes', benefit: 'Lentils, chickpeas, black beans' },
+      { name: 'Whole Grains', benefit: 'Barley, farro, bulgur' },
+    ],
+    herbs: [
+      { name: 'Paprika', benefit: 'Zinc source' },
+      { name: 'Garlic', benefit: 'Immune support' },
+      { name: 'Cayenne', benefit: 'Circulation' },
+      { name: 'Comfrey', benefit: 'Tissue support' },
+      { name: 'Fenugreek', benefit: 'Niacin source' },
+      { name: 'Alfalfa', benefit: 'Manganese source' },
+      { name: 'Chaste Tree Berry (Vitex)', benefit: 'Progesterone support' },
+      { name: 'Ginkgo Biloba', benefit: 'Circulation' },
+      { name: 'Green Tea', benefit: 'Antioxidants' },
+    ],
+    supplements: [
+      { name: 'Zinc', benefit: '30mg (CRITICAL for ovulation)' },
+      { name: 'Vitamin E', benefit: '400 IU (protects egg)' },
+      { name: 'B6', benefit: '50-100mg (supports progesterone production)' },
+      { name: 'Omega-3 EPA/DHA', benefit: '1000mg (hormone production)' },
+      { name: 'CoQ10', benefit: '200-300mg (egg quality)' },
+      { name: 'Vitamin C', benefit: 'Antioxidant support' },
+      { name: 'Evening Primrose Oil', benefit: '1000mg (cervical mucus quality)' },
     ],
     avoid: ['Heavy carbs', 'Fried foods', 'Excess dairy'],
     tips: ['Focus on raw and lightly cooked foods', 'Great time for smoothies and juices', 'Stay well hydrated'],
@@ -77,18 +176,145 @@ const phaseNutrition: Record<CyclePhase, {
   luteal: {
     focus: 'Stabilize & Comfort',
     description: 'Progesterone rises, cravings may appear. Complex carbs and magnesium-rich foods help stabilize mood and energy.',
+    days: 'Days 17-28',
     foods: [
-      { name: 'Sweet Potato', benefit: 'Complex carbs for serotonin', category: 'Vegetables', image: 'https://images.unsplash.com/photo-1596097635121-14b63b7a0c19?w=200' },
-      { name: 'Pumpkin Seeds', benefit: 'Magnesium for PMS relief', category: 'Seeds', image: 'https://images.unsplash.com/photo-1509622905150-fa66d3906e09?w=200' },
-      { name: 'Turkey', benefit: 'Tryptophan for calm mood', category: 'Protein', image: 'https://images.unsplash.com/photo-1574672280600-4accfa5b6f98?w=200' },
-      { name: 'Cauliflower', benefit: 'Supports liver detox', category: 'Vegetables', image: 'https://images.unsplash.com/photo-1568584711075-3d021a7c3ca3?w=200' },
-      { name: 'Bananas', benefit: 'Potassium reduces bloating', category: 'Fruits', image: 'https://images.unsplash.com/photo-1481349518771-20055b2a7b24?w=200' },
-      { name: 'Chamomile Tea', benefit: 'Calming & anti-inflammatory', category: 'Beverages', image: 'https://images.unsplash.com/photo-1544787219-7f47ccb76574?w=200' },
+      { name: 'Sweet Potatoes', benefit: 'Complex carbs, B6' },
+      { name: 'Bananas', benefit: 'Potassium, B6, mood support' },
+      { name: 'Greek Yogurt', benefit: 'Calcium, probiotics' },
+      { name: 'Raw Almonds', benefit: 'Magnesium' },
+      { name: 'Baby Spinach', benefit: 'Magnesium, calcium' },
+      { name: 'Brown Rice', benefit: 'Complex carbs, fiber' },
+      { name: 'Dark Chocolate', benefit: '70%+ (magnesium)' },
+      { name: 'Chickpeas', benefit: 'Protein, fiber' },
+      { name: 'Pumpkin Seeds', benefit: 'Magnesium' },
+      { name: 'Cheese', benefit: 'Calcium-rich' },
+      { name: 'Sardines', benefit: 'Calcium and omega-3s' },
+      { name: 'Milk', benefit: 'Dairy or fortified alternatives' },
+      { name: 'Brussels Sprouts', benefit: 'Fiber' },
+      { name: 'Beets', benefit: 'Blood sugar support' },
+      { name: 'White Beans', benefit: 'Potassium' },
+      { name: 'Cantaloupe', benefit: 'Potassium' },
+      { name: 'Sunflower Seeds', benefit: 'Continue seed cycling' },
+      { name: 'Sesame Seeds', benefit: 'Continue seed cycling' },
+      { name: 'Bok Choy', benefit: 'Calcium and potassium' },
+      { name: 'Swiss Chard', benefit: 'Magnesium' },
+      { name: 'Avocado', benefit: 'Healthy fats' },
+    ],
+    herbs: [
+      { name: 'Raspberry Leaf Tea', benefit: 'Uterine support' },
+      { name: 'Rooibos Tea', benefit: 'Magnesium' },
+      { name: 'Lavender', benefit: 'Calming' },
+      { name: 'Vanilla', benefit: 'Comfort' },
+      { name: 'Cinnamon', benefit: 'Blood sugar stability' },
+      { name: 'Vitex/Chasteberry', benefit: 'Progesterone support, PMS relief' },
+      { name: 'Dong Quai', benefit: 'Hormone balance' },
+      { name: 'Evening Primrose', benefit: 'PMS symptoms' },
+      { name: 'Dandelion Root', benefit: 'Liver detox' },
+      { name: 'St. John\'s Wort', benefit: 'Mood support (check medication interactions)' },
+      { name: 'Saffron', benefit: 'Mood support' },
+      { name: 'Fenugreek', benefit: 'Satiety' },
+    ],
+    supplements: [
+      { name: 'Magnesium', benefit: '400-500mg (CRITICAL for PMS, cramps, anxiety, sleep)' },
+      { name: 'B6', benefit: '50-100mg (neurotransmitter support, mood)' },
+      { name: 'Calcium', benefit: '1000mg (with Vitamin D3 2000 IU)' },
+      { name: 'Evening Primrose Oil', benefit: '1000-1500mg (breast tenderness, PMS)' },
+      { name: 'Chasteberry/Vitex', benefit: 'Standardized extract (reduces PMS)' },
+      { name: 'L-Theanine', benefit: '200mg (calming, reduces irritability)' },
+      { name: 'Inositol', benefit: 'Supports insulin sensitivity' },
+      { name: 'Chromium', benefit: 'Blood sugar stability (with Cinnamon)' },
     ],
     avoid: ['Excessive salt', 'Refined sugar', 'Caffeine', 'Alcohol'],
     tips: ['Honor cravings with healthy alternatives', 'Eat regularly to stabilize blood sugar', 'Warm, cooked foods are comforting'],
   },
 };
+
+interface CollapsibleSectionProps {
+  title: string;
+  icon: React.ReactNode;
+  items: NutritionItem[];
+  theme: ReturnType<typeof getTheme>;
+  iconBgColor: string;
+  defaultExpanded?: boolean;
+}
+
+function CollapsibleSection({ title, icon, items, theme, iconBgColor, defaultExpanded = false }: CollapsibleSectionProps) {
+  const [expanded, setExpanded] = useState(defaultExpanded);
+
+  return (
+    <View
+      className="rounded-2xl border overflow-hidden mb-4"
+      style={{ backgroundColor: theme.bg.card, borderColor: theme.border.light }}
+    >
+      <Pressable
+        onPress={() => setExpanded(!expanded)}
+        className="flex-row items-center justify-between p-4"
+      >
+        <View className="flex-row items-center flex-1">
+          <View
+            className="w-10 h-10 rounded-full items-center justify-center mr-3"
+            style={{ backgroundColor: iconBgColor }}
+          >
+            {icon}
+          </View>
+          <View className="flex-1">
+            <Text
+              style={{ fontFamily: 'Quicksand_600SemiBold', color: theme.text.primary }}
+              className="text-base"
+            >
+              {title}
+            </Text>
+            <Text
+              style={{ fontFamily: 'Quicksand_400Regular', color: theme.text.tertiary }}
+              className="text-xs"
+            >
+              {items.length} items
+            </Text>
+          </View>
+        </View>
+        {expanded ? (
+          <ChevronUp size={20} color={theme.text.tertiary} />
+        ) : (
+          <ChevronDown size={20} color={theme.text.tertiary} />
+        )}
+      </Pressable>
+
+      {expanded && (
+        <View className="px-4 pb-4">
+          <View
+            className="h-px mb-3"
+            style={{ backgroundColor: theme.border.light }}
+          />
+          {items.map((item, index) => (
+            <View
+              key={item.name}
+              className={`flex-row items-start ${index > 0 ? 'mt-3' : ''}`}
+            >
+              <View
+                className="w-2 h-2 rounded-full mt-1.5 mr-3"
+                style={{ backgroundColor: theme.accent.pink }}
+              />
+              <View className="flex-1">
+                <Text
+                  style={{ fontFamily: 'Quicksand_600SemiBold', color: theme.text.primary }}
+                  className="text-sm"
+                >
+                  {item.name}
+                </Text>
+                <Text
+                  style={{ fontFamily: 'Quicksand_400Regular', color: theme.text.tertiary }}
+                  className="text-xs mt-0.5"
+                >
+                  {item.benefit}
+                </Text>
+              </View>
+            </View>
+          ))}
+        </View>
+      )}
+    </View>
+  );
+}
 
 export default function NutritionScreen() {
   const insets = useSafeAreaInsets();
@@ -164,19 +390,32 @@ export default function NutritionScreen() {
                 >
                   <Text className="text-2xl">{info.emoji}</Text>
                 </View>
-                <View>
+                <View className="flex-1">
                   <Text
                     style={{ fontFamily: 'Quicksand_600SemiBold', color: theme.text.primary }}
                     className="text-lg"
                   >
                     {info.name} Phase
                   </Text>
-                  <Text
-                    style={{ fontFamily: 'Quicksand_500Medium', color: theme.text.accent }}
-                    className="text-sm"
-                  >
-                    {nutrition.focus}
-                  </Text>
+                  <View className="flex-row items-center">
+                    <Text
+                      style={{ fontFamily: 'Quicksand_500Medium', color: theme.text.accent }}
+                      className="text-sm"
+                    >
+                      {nutrition.focus}
+                    </Text>
+                    <View
+                      className="ml-2 px-2 py-0.5 rounded-full"
+                      style={{ backgroundColor: `${theme.accent.purple}15` }}
+                    >
+                      <Text
+                        style={{ fontFamily: 'Quicksand_500Medium', color: theme.accent.purple }}
+                        className="text-xs"
+                      >
+                        {nutrition.days}
+                      </Text>
+                    </View>
+                  </View>
                 </View>
               </View>
               <Text
@@ -188,126 +427,10 @@ export default function NutritionScreen() {
             </View>
           </Animated.View>
 
-          {/* Foods Section */}
-          <Animated.View
-            entering={FadeInUp.delay(300).duration(600)}
-            className="mt-8"
-          >
-            <View className="px-6 flex-row items-center justify-between mb-4">
-              <Text
-                style={{ fontFamily: 'Quicksand_600SemiBold', color: theme.text.primary }}
-                className="text-lg"
-              >
-                Recommended Foods
-              </Text>
-              <Pressable
-                onPress={handleAddToGrocery}
-                className="flex-row items-center px-3 py-2 rounded-full"
-                style={{ backgroundColor: `${theme.accent.pink}15` }}
-              >
-                <ShoppingCart size={14} color={theme.accent.pink} />
-                <Text
-                  style={{ fontFamily: 'Quicksand_500Medium', color: theme.accent.pink }}
-                  className="text-xs ml-2"
-                >
-                  Add to List
-                </Text>
-              </Pressable>
-            </View>
-
-            <ScrollView
-              horizontal
-              showsHorizontalScrollIndicator={false}
-              contentContainerStyle={{ paddingHorizontal: 24 }}
-              style={{ flexGrow: 0 }}
-            >
-              {nutrition.foods.map((food, index) => (
-                <Animated.View
-                  key={food.name}
-                  entering={FadeInUp.delay(400 + index * 50).duration(500)}
-                  className="mr-4"
-                  style={{ width: 160 }}
-                >
-                  <View
-                    className="rounded-2xl overflow-hidden border"
-                    style={{ backgroundColor: theme.bg.card, borderColor: theme.border.light }}
-                  >
-                    <Image
-                      source={{ uri: food.image }}
-                      className="w-full h-24"
-                      style={{ backgroundColor: theme.bg.secondary }}
-                    />
-                    <View className="p-3">
-                      <Text
-                        style={{ fontFamily: 'Quicksand_600SemiBold', color: theme.text.primary }}
-                        className="text-sm"
-                        numberOfLines={1}
-                      >
-                        {food.name}
-                      </Text>
-                      <Text
-                        style={{ fontFamily: 'Quicksand_400Regular', color: theme.text.tertiary }}
-                        className="text-xs mt-1"
-                        numberOfLines={2}
-                      >
-                        {food.benefit}
-                      </Text>
-                      <View
-                        className="mt-2 self-start px-2 py-1 rounded-full"
-                        style={{ backgroundColor: `${theme.accent.purple}15` }}
-                      >
-                        <Text style={{ color: theme.accent.purple }} className="text-xs">
-                          {food.category}
-                        </Text>
-                      </View>
-                    </View>
-                  </View>
-                </Animated.View>
-              ))}
-            </ScrollView>
-          </Animated.View>
-
-          {/* Tips Section */}
-          <Animated.View
-            entering={FadeInUp.delay(600).duration(600)}
-            className="mx-6 mt-8"
-          >
-            <Text
-              style={{ fontFamily: 'Quicksand_600SemiBold', color: theme.text.primary }}
-              className="text-lg mb-4"
-            >
-              Nutrition Tips
-            </Text>
-            <View
-              className="rounded-2xl p-4 border"
-              style={{ backgroundColor: theme.bg.card, borderColor: theme.border.light }}
-            >
-              {nutrition.tips.map((tip, index) => (
-                <View
-                  key={tip}
-                  className={`flex-row items-start ${index > 0 ? 'mt-3' : ''}`}
-                >
-                  <View
-                    className="w-6 h-6 rounded-full items-center justify-center mr-3 mt-0.5"
-                    style={{ backgroundColor: `${theme.accent.pink}15` }}
-                  >
-                    <Leaf size={12} color={theme.accent.pink} />
-                  </View>
-                  <Text
-                    style={{ fontFamily: 'Quicksand_400Regular', color: theme.text.secondary }}
-                    className="text-sm flex-1 leading-5"
-                  >
-                    {tip}
-                  </Text>
-                </View>
-              ))}
-            </View>
-          </Animated.View>
-
           {/* Seed Cycling Protocol Section */}
           <Animated.View
-            entering={FadeInUp.delay(700).duration(600)}
-            className="mx-6 mt-8"
+            entering={FadeInUp.delay(300).duration(600)}
+            className="mx-6 mt-6"
           >
             <View className="flex-row items-center mb-4">
               <View
@@ -354,7 +477,7 @@ export default function NutritionScreen() {
                   <View className="flex-1 flex-row items-center">
                     <View
                       className="w-10 h-10 rounded-full items-center justify-center mr-3"
-                      style={{ backgroundColor: '#F97316' + '15' }}
+                      style={{ backgroundColor: '#F9731615' }}
                     >
                       <Text className="text-lg">🎃</Text>
                     </View>
@@ -379,7 +502,7 @@ export default function NutritionScreen() {
                   <View className="flex-1 flex-row items-center">
                     <View
                       className="w-10 h-10 rounded-full items-center justify-center mr-3"
-                      style={{ backgroundColor: '#A16207' + '15' }}
+                      style={{ backgroundColor: '#A1620715' }}
                     >
                       <Text className="text-lg">🌾</Text>
                     </View>
@@ -427,7 +550,7 @@ export default function NutritionScreen() {
                   <View className="flex-1 flex-row items-center">
                     <View
                       className="w-10 h-10 rounded-full items-center justify-center mr-3"
-                      style={{ backgroundColor: '#EAB308' + '15' }}
+                      style={{ backgroundColor: '#EAB30815' }}
                     >
                       <Text className="text-lg">🌻</Text>
                     </View>
@@ -452,7 +575,7 @@ export default function NutritionScreen() {
                   <View className="flex-1 flex-row items-center">
                     <View
                       className="w-10 h-10 rounded-full items-center justify-center mr-3"
-                      style={{ backgroundColor: '#D4A574' + '15' }}
+                      style={{ backgroundColor: '#D4A57415' }}
                     >
                       <Text className="text-lg">🫘</Text>
                     </View>
@@ -483,9 +606,99 @@ export default function NutritionScreen() {
             </Text>
           </Animated.View>
 
+          {/* Collapsible Sections */}
+          <Animated.View
+            entering={FadeInUp.delay(400).duration(600)}
+            className="mx-6 mt-8"
+          >
+            <View className="flex-row items-center justify-between mb-4">
+              <Text
+                style={{ fontFamily: 'Quicksand_600SemiBold', color: theme.text.primary }}
+                className="text-lg"
+              >
+                Phase Nutrition
+              </Text>
+              <Pressable
+                onPress={handleAddToGrocery}
+                className="flex-row items-center px-3 py-2 rounded-full"
+                style={{ backgroundColor: `${theme.accent.pink}15` }}
+              >
+                <ShoppingCart size={14} color={theme.accent.pink} />
+                <Text
+                  style={{ fontFamily: 'Quicksand_500Medium', color: theme.accent.pink }}
+                  className="text-xs ml-2"
+                >
+                  Add to List
+                </Text>
+              </Pressable>
+            </View>
+
+            <CollapsibleSection
+              title="Foods"
+              icon={<UtensilsCrossed size={18} color="#22C55E" />}
+              items={nutrition.foods}
+              theme={theme}
+              iconBgColor="#22C55E15"
+              defaultExpanded={true}
+            />
+
+            <CollapsibleSection
+              title="Herbs"
+              icon={<Leaf size={18} color="#10B981" />}
+              items={nutrition.herbs}
+              theme={theme}
+              iconBgColor="#10B98115"
+            />
+
+            <CollapsibleSection
+              title="Supplements"
+              icon={<Pill size={18} color="#8B5CF6" />}
+              items={nutrition.supplements}
+              theme={theme}
+              iconBgColor="#8B5CF615"
+            />
+          </Animated.View>
+
+          {/* Tips Section */}
+          <Animated.View
+            entering={FadeInUp.delay(500).duration(600)}
+            className="mx-6 mt-4"
+          >
+            <Text
+              style={{ fontFamily: 'Quicksand_600SemiBold', color: theme.text.primary }}
+              className="text-lg mb-4"
+            >
+              Nutrition Tips
+            </Text>
+            <View
+              className="rounded-2xl p-4 border"
+              style={{ backgroundColor: theme.bg.card, borderColor: theme.border.light }}
+            >
+              {nutrition.tips.map((tip, index) => (
+                <View
+                  key={tip}
+                  className={`flex-row items-start ${index > 0 ? 'mt-3' : ''}`}
+                >
+                  <View
+                    className="w-6 h-6 rounded-full items-center justify-center mr-3 mt-0.5"
+                    style={{ backgroundColor: `${theme.accent.pink}15` }}
+                  >
+                    <Leaf size={12} color={theme.accent.pink} />
+                  </View>
+                  <Text
+                    style={{ fontFamily: 'Quicksand_400Regular', color: theme.text.secondary }}
+                    className="text-sm flex-1 leading-5"
+                  >
+                    {tip}
+                  </Text>
+                </View>
+              ))}
+            </View>
+          </Animated.View>
+
           {/* Avoid Section */}
           <Animated.View
-            entering={FadeInUp.delay(800).duration(600)}
+            entering={FadeInUp.delay(600).duration(600)}
             className="mx-6 mt-6"
           >
             <Text
@@ -514,7 +727,7 @@ export default function NutritionScreen() {
 
           {/* CTA */}
           <Animated.View
-            entering={FadeInUp.delay(900).duration(600)}
+            entering={FadeInUp.delay(700).duration(600)}
             className="mx-6 mt-8"
           >
             <Pressable
