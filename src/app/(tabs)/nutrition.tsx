@@ -316,6 +316,224 @@ function CollapsibleSection({ title, icon, items, theme, iconBgColor, defaultExp
   );
 }
 
+interface SeedCyclingSectionProps {
+  theme: ReturnType<typeof getTheme>;
+  defaultExpanded?: boolean;
+}
+
+function SeedCyclingSection({ theme, defaultExpanded = false }: SeedCyclingSectionProps) {
+  const [expanded, setExpanded] = useState(defaultExpanded);
+
+  return (
+    <View
+      className="rounded-2xl border overflow-hidden mb-4"
+      style={{ backgroundColor: theme.bg.card, borderColor: theme.border.light }}
+    >
+      <Pressable
+        onPress={() => setExpanded(!expanded)}
+        className="flex-row items-center justify-between p-4"
+      >
+        <View className="flex-row items-center flex-1">
+          <View
+            className="w-10 h-10 rounded-full items-center justify-center mr-3"
+            style={{ backgroundColor: `${theme.accent.purple}15` }}
+          >
+            <Sparkles size={18} color={theme.accent.purple} />
+          </View>
+          <View className="flex-1">
+            <Text
+              style={{ fontFamily: 'Quicksand_600SemiBold', color: theme.text.primary }}
+              className="text-base"
+            >
+              Seed Cycling Protocol
+            </Text>
+            <Text
+              style={{ fontFamily: 'Quicksand_400Regular', color: theme.text.tertiary }}
+              className="text-xs"
+            >
+              4 seeds across cycle phases
+            </Text>
+          </View>
+        </View>
+        {expanded ? (
+          <ChevronUp size={20} color={theme.text.tertiary} />
+        ) : (
+          <ChevronDown size={20} color={theme.text.tertiary} />
+        )}
+      </Pressable>
+
+      {expanded && (
+        <View className="px-4 pb-4">
+          <View
+            className="h-px mb-3"
+            style={{ backgroundColor: theme.border.light }}
+          />
+
+          {/* Week 1-2: Follicular Phase */}
+          <View className="mb-4">
+            <View className="flex-row items-center mb-3">
+              <View
+                className="px-3 py-1 rounded-full mr-2"
+                style={{ backgroundColor: `${theme.accent.pink}15` }}
+              >
+                <Text
+                  style={{ fontFamily: 'Quicksand_600SemiBold', color: theme.accent.pink }}
+                  className="text-xs"
+                >
+                  Week 1-2
+                </Text>
+              </View>
+              <Text
+                style={{ fontFamily: 'Quicksand_500Medium', color: theme.text.secondary }}
+                className="text-xs"
+              >
+                Follicular Phase
+              </Text>
+            </View>
+
+            <View className="flex-row mb-2">
+              <View className="flex-1 flex-row items-center">
+                <View
+                  className="w-10 h-10 rounded-full items-center justify-center mr-3"
+                  style={{ backgroundColor: '#F9731615' }}
+                >
+                  <Text className="text-lg">🎃</Text>
+                </View>
+                <View className="flex-1">
+                  <Text
+                    style={{ fontFamily: 'Quicksand_600SemiBold', color: theme.text.primary }}
+                    className="text-sm"
+                  >
+                    Pumpkin Seeds
+                  </Text>
+                  <Text
+                    style={{ fontFamily: 'Quicksand_400Regular', color: theme.text.tertiary }}
+                    className="text-xs"
+                  >
+                    1-2 tbsp ground daily
+                  </Text>
+                </View>
+              </View>
+            </View>
+
+            <View className="flex-row">
+              <View className="flex-1 flex-row items-center">
+                <View
+                  className="w-10 h-10 rounded-full items-center justify-center mr-3"
+                  style={{ backgroundColor: '#A1620715' }}
+                >
+                  <Text className="text-lg">🌾</Text>
+                </View>
+                <View className="flex-1">
+                  <Text
+                    style={{ fontFamily: 'Quicksand_600SemiBold', color: theme.text.primary }}
+                    className="text-sm"
+                  >
+                    Flax Seeds
+                  </Text>
+                  <Text
+                    style={{ fontFamily: 'Quicksand_400Regular', color: theme.text.tertiary }}
+                    className="text-xs"
+                  >
+                    1-2 tbsp ground daily
+                  </Text>
+                </View>
+              </View>
+            </View>
+          </View>
+
+          {/* Divider */}
+          <View
+            className="h-px mb-4"
+            style={{ backgroundColor: theme.border.light }}
+          />
+
+          {/* Week 3-4: Ovulation & Luteal Phase */}
+          <View>
+            <View className="flex-row items-center mb-3">
+              <View
+                className="px-3 py-1 rounded-full mr-2"
+                style={{ backgroundColor: `${theme.accent.purple}15` }}
+              >
+                <Text
+                  style={{ fontFamily: 'Quicksand_600SemiBold', color: theme.accent.purple }}
+                  className="text-xs"
+                >
+                  Week 3-4
+                </Text>
+              </View>
+              <Text
+                style={{ fontFamily: 'Quicksand_500Medium', color: theme.text.secondary }}
+                className="text-xs"
+              >
+                Ovulation & Luteal Phase
+              </Text>
+            </View>
+
+            <View className="flex-row mb-2">
+              <View className="flex-1 flex-row items-center">
+                <View
+                  className="w-10 h-10 rounded-full items-center justify-center mr-3"
+                  style={{ backgroundColor: '#EAB30815' }}
+                >
+                  <Text className="text-lg">🌻</Text>
+                </View>
+                <View className="flex-1">
+                  <Text
+                    style={{ fontFamily: 'Quicksand_600SemiBold', color: theme.text.primary }}
+                    className="text-sm"
+                  >
+                    Sunflower Seeds
+                  </Text>
+                  <Text
+                    style={{ fontFamily: 'Quicksand_400Regular', color: theme.text.tertiary }}
+                    className="text-xs"
+                  >
+                    1-2 tbsp ground daily
+                  </Text>
+                </View>
+              </View>
+            </View>
+
+            <View className="flex-row">
+              <View className="flex-1 flex-row items-center">
+                <View
+                  className="w-10 h-10 rounded-full items-center justify-center mr-3"
+                  style={{ backgroundColor: '#D4A57415' }}
+                >
+                  <Text className="text-lg">🫘</Text>
+                </View>
+                <View className="flex-1">
+                  <Text
+                    style={{ fontFamily: 'Quicksand_600SemiBold', color: theme.text.primary }}
+                    className="text-sm"
+                  >
+                    Sesame Seeds
+                  </Text>
+                  <Text
+                    style={{ fontFamily: 'Quicksand_400Regular', color: theme.text.tertiary }}
+                    className="text-xs"
+                  >
+                    1-2 tbsp ground daily
+                  </Text>
+                </View>
+              </View>
+            </View>
+          </View>
+
+          {/* Tip */}
+          <Text
+            style={{ fontFamily: 'Quicksand_400Regular', color: theme.text.tertiary }}
+            className="text-xs mt-4 text-center italic"
+          >
+            Grind seeds fresh for maximum nutrient absorption
+          </Text>
+        </View>
+      )}
+    </View>
+  );
+}
+
 export default function NutritionScreen() {
   const insets = useSafeAreaInsets();
   const getCurrentPhase = useCycleStore(s => s.getCurrentPhase);
@@ -427,188 +645,9 @@ export default function NutritionScreen() {
             </View>
           </Animated.View>
 
-          {/* Seed Cycling Protocol Section */}
-          <Animated.View
-            entering={FadeInUp.delay(300).duration(600)}
-            className="mx-6 mt-6"
-          >
-            <View className="flex-row items-center mb-4">
-              <View
-                className="w-8 h-8 rounded-full items-center justify-center mr-3"
-                style={{ backgroundColor: `${theme.accent.purple}15` }}
-              >
-                <Sparkles size={16} color={theme.accent.purple} />
-              </View>
-              <Text
-                style={{ fontFamily: 'Quicksand_600SemiBold', color: theme.text.primary }}
-                className="text-lg"
-              >
-                Seed Cycling Protocol
-              </Text>
-            </View>
-
-            <View
-              className="rounded-2xl overflow-hidden border"
-              style={{ backgroundColor: theme.bg.card, borderColor: theme.border.light }}
-            >
-              {/* Week 1-2: Follicular Phase */}
-              <View className="p-4 border-b" style={{ borderColor: theme.border.light }}>
-                <View className="flex-row items-center mb-3">
-                  <View
-                    className="px-3 py-1 rounded-full mr-2"
-                    style={{ backgroundColor: `${theme.accent.pink}15` }}
-                  >
-                    <Text
-                      style={{ fontFamily: 'Quicksand_600SemiBold', color: theme.accent.pink }}
-                      className="text-xs"
-                    >
-                      Week 1-2
-                    </Text>
-                  </View>
-                  <Text
-                    style={{ fontFamily: 'Quicksand_500Medium', color: theme.text.secondary }}
-                    className="text-xs"
-                  >
-                    Follicular Phase
-                  </Text>
-                </View>
-
-                <View className="flex-row mb-2">
-                  <View className="flex-1 flex-row items-center">
-                    <View
-                      className="w-10 h-10 rounded-full items-center justify-center mr-3"
-                      style={{ backgroundColor: '#F9731615' }}
-                    >
-                      <Text className="text-lg">🎃</Text>
-                    </View>
-                    <View className="flex-1">
-                      <Text
-                        style={{ fontFamily: 'Quicksand_600SemiBold', color: theme.text.primary }}
-                        className="text-sm"
-                      >
-                        Pumpkin Seeds
-                      </Text>
-                      <Text
-                        style={{ fontFamily: 'Quicksand_400Regular', color: theme.text.tertiary }}
-                        className="text-xs"
-                      >
-                        1-2 tbsp ground daily
-                      </Text>
-                    </View>
-                  </View>
-                </View>
-
-                <View className="flex-row">
-                  <View className="flex-1 flex-row items-center">
-                    <View
-                      className="w-10 h-10 rounded-full items-center justify-center mr-3"
-                      style={{ backgroundColor: '#A1620715' }}
-                    >
-                      <Text className="text-lg">🌾</Text>
-                    </View>
-                    <View className="flex-1">
-                      <Text
-                        style={{ fontFamily: 'Quicksand_600SemiBold', color: theme.text.primary }}
-                        className="text-sm"
-                      >
-                        Flax Seeds
-                      </Text>
-                      <Text
-                        style={{ fontFamily: 'Quicksand_400Regular', color: theme.text.tertiary }}
-                        className="text-xs"
-                      >
-                        1-2 tbsp ground daily
-                      </Text>
-                    </View>
-                  </View>
-                </View>
-              </View>
-
-              {/* Week 3-4: Ovulation & Luteal Phase */}
-              <View className="p-4">
-                <View className="flex-row items-center mb-3">
-                  <View
-                    className="px-3 py-1 rounded-full mr-2"
-                    style={{ backgroundColor: `${theme.accent.purple}15` }}
-                  >
-                    <Text
-                      style={{ fontFamily: 'Quicksand_600SemiBold', color: theme.accent.purple }}
-                      className="text-xs"
-                    >
-                      Week 3-4
-                    </Text>
-                  </View>
-                  <Text
-                    style={{ fontFamily: 'Quicksand_500Medium', color: theme.text.secondary }}
-                    className="text-xs"
-                  >
-                    Ovulation & Luteal Phase
-                  </Text>
-                </View>
-
-                <View className="flex-row mb-2">
-                  <View className="flex-1 flex-row items-center">
-                    <View
-                      className="w-10 h-10 rounded-full items-center justify-center mr-3"
-                      style={{ backgroundColor: '#EAB30815' }}
-                    >
-                      <Text className="text-lg">🌻</Text>
-                    </View>
-                    <View className="flex-1">
-                      <Text
-                        style={{ fontFamily: 'Quicksand_600SemiBold', color: theme.text.primary }}
-                        className="text-sm"
-                      >
-                        Sunflower Seeds
-                      </Text>
-                      <Text
-                        style={{ fontFamily: 'Quicksand_400Regular', color: theme.text.tertiary }}
-                        className="text-xs"
-                      >
-                        1-2 tbsp ground daily
-                      </Text>
-                    </View>
-                  </View>
-                </View>
-
-                <View className="flex-row">
-                  <View className="flex-1 flex-row items-center">
-                    <View
-                      className="w-10 h-10 rounded-full items-center justify-center mr-3"
-                      style={{ backgroundColor: '#D4A57415' }}
-                    >
-                      <Text className="text-lg">🫘</Text>
-                    </View>
-                    <View className="flex-1">
-                      <Text
-                        style={{ fontFamily: 'Quicksand_600SemiBold', color: theme.text.primary }}
-                        className="text-sm"
-                      >
-                        Sesame Seeds
-                      </Text>
-                      <Text
-                        style={{ fontFamily: 'Quicksand_400Regular', color: theme.text.tertiary }}
-                        className="text-xs"
-                      >
-                        1-2 tbsp ground daily
-                      </Text>
-                    </View>
-                  </View>
-                </View>
-              </View>
-            </View>
-
-            <Text
-              style={{ fontFamily: 'Quicksand_400Regular', color: theme.text.tertiary }}
-              className="text-xs mt-3 text-center italic"
-            >
-              Grind seeds fresh for maximum nutrient absorption
-            </Text>
-          </Animated.View>
-
           {/* Collapsible Sections */}
           <Animated.View
-            entering={FadeInUp.delay(400).duration(600)}
+            entering={FadeInUp.delay(300).duration(600)}
             className="mx-6 mt-8"
           >
             <View className="flex-row items-center justify-between mb-4">
@@ -641,6 +680,8 @@ export default function NutritionScreen() {
               iconBgColor="#22C55E15"
               defaultExpanded={true}
             />
+
+            <SeedCyclingSection theme={theme} />
 
             <CollapsibleSection
               title="Herbs"
