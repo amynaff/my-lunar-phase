@@ -280,14 +280,15 @@ export default function OnboardingScreen() {
       >
         {/* Header with back button */}
         <View
-          style={{ paddingTop: insets.top + 16 }}
+          style={{ paddingTop: insets.top + 16, zIndex: 100 }}
           className="px-6 flex-row items-center"
         >
           {step > 0 ? (
             <Pressable
               onPress={handleBack}
+              hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
               className="w-10 h-10 rounded-full items-center justify-center border"
-              style={{ backgroundColor: 'rgba(255,255,255,0.6)', borderColor: 'rgba(185, 166, 247, 0.3)' }}
+              style={{ backgroundColor: 'rgba(255,255,255,0.6)', borderColor: 'rgba(185, 166, 247, 0.3)', zIndex: 10 }}
             >
               <ChevronLeft size={20} color="#9d84ed" />
             </Pressable>
