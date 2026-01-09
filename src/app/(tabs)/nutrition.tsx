@@ -3,7 +3,7 @@ import { View, Text, ScrollView, Pressable } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Animated, { FadeInDown, FadeInUp } from 'react-native-reanimated';
-import { ShoppingCart, Leaf, Sparkles, Pill, ChevronDown, ChevronUp, UtensilsCrossed } from 'lucide-react-native';
+import { ShoppingCart, Leaf, Sparkles, Pill, ChevronDown, ChevronUp, UtensilsCrossed, Heart, AlertCircle } from 'lucide-react-native';
 import { useCycleStore, phaseInfo, CyclePhase } from '@/lib/cycle-store';
 import { useThemeStore, getTheme } from '@/lib/theme-store';
 import { router } from 'expo-router';
@@ -32,6 +32,12 @@ interface PhaseNutritionData {
   supplements: NutritionItem[];
   avoid: string[];
   tips: string[];
+  fertilityInfo?: {
+    title: string;
+    description: string;
+    keyPoints: string[];
+    contraceptionNote: string;
+  };
 }
 
 const phaseNutrition: Record<CyclePhase, PhaseNutritionData> = {
@@ -172,6 +178,18 @@ const phaseNutrition: Record<CyclePhase, PhaseNutritionData> = {
     ],
     avoid: ['Heavy carbs', 'Fried foods', 'Excess dairy'],
     tips: ['Focus on raw and lightly cooked foods', 'Great time for smoothies and juices', 'Stay well hydrated'],
+    fertilityInfo: {
+      title: 'Fertility Awareness',
+      description: 'Ovulation is your most fertile time. An egg is released and can be fertilized for 12-24 hours. Understanding this window is essential whether you\'re trying to conceive or avoid pregnancy.',
+      keyPoints: [
+        'Peak fertility occurs 1-2 days before and on ovulation day',
+        'Sperm can survive up to 5 days in fertile cervical mucus',
+        'Your fertile window is approximately 6 days long',
+        'Cervical mucus becomes clear, stretchy, and egg-white-like',
+        'Basal body temperature rises slightly after ovulation',
+      ],
+      contraceptionNote: 'To avoid pregnancy, use contraception consistently during your fertile window (5 days before ovulation through ovulation day). Fertility awareness methods require daily tracking and are most effective when combined with barrier methods during fertile days.',
+    },
   },
   luteal: {
     focus: 'Stabilize & Comfort',
@@ -319,6 +337,111 @@ function CollapsibleSection({ title, icon, items, theme, iconBgColor, defaultExp
 interface SeedCyclingSectionProps {
   theme: ReturnType<typeof getTheme>;
   defaultExpanded?: boolean;
+}
+
+interface FertilityInfoSectionProps {
+  fertilityInfo: NonNullable<PhaseNutritionData['fertilityInfo']>;
+  theme: ReturnType<typeof getTheme>;
+}
+
+function FertilityInfoSection({ fertilityInfo, theme }: FertilityInfoSectionProps) {
+  const [expanded, setExpanded] = useState(false);
+
+  return (
+    <View
+      className="rounded-2xl border overflow-hidden mb-4"
+      style={{ backgroundColor: theme.bg.card, borderColor: theme.border.light }}
+    >
+      <Pressable
+        onPress={() => setExpanded(!expanded)}
+        className="flex-row items-center justify-between p-4"
+      >
+        <View className="flex-row items-center flex-1">
+          <View
+            className="w-10 h-10 rounded-full items-center justify-center mr-3"
+            style={{ backgroundColor: '#F472B615' }}
+          >
+            <Heart size={18} color="#F472B6" />
+          </View>
+          <View className="flex-1">
+            <Text
+              style={{ fontFamily: 'Quicksand_600SemiBold', color: theme.text.primary }}
+              className="text-base"
+            >
+              {fertilityInfo.title}
+            </Text>
+            <Text
+              style={{ fontFamily: 'Quicksand_400Regular', color: theme.text.tertiary }}
+              className="text-xs"
+            >
+              Important fertility window info
+            </Text>
+          </View>
+        </View>
+        {expanded ? (
+          <ChevronUp size={20} color={theme.text.tertiary} />
+        ) : (
+          <ChevronDown size={20} color={theme.text.tertiary} />
+        )}
+      </Pressable>
+
+      {expanded && (
+        <View className="px-4 pb-4">
+          <View
+            className="h-px mb-3"
+            style={{ backgroundColor: theme.border.light }}
+          />
+
+          {/* Description */}
+          <Text
+            style={{ fontFamily: 'Quicksand_400Regular', color: theme.text.secondary }}
+            className="text-sm leading-5 mb-4"
+          >
+            {fertilityInfo.description}
+          </Text>
+
+          {/* Key Points */}
+          <Text
+            style={{ fontFamily: 'Quicksand_600SemiBold', color: theme.text.primary }}
+            className="text-sm mb-3"
+          >
+            Key Facts
+          </Text>
+          {fertilityInfo.keyPoints.map((point, index) => (
+            <View
+              key={index}
+              className={`flex-row items-start ${index > 0 ? 'mt-2' : ''}`}
+            >
+              <View
+                className="w-2 h-2 rounded-full mt-1.5 mr-3"
+                style={{ backgroundColor: '#F472B6' }}
+              />
+              <Text
+                style={{ fontFamily: 'Quicksand_400Regular', color: theme.text.secondary }}
+                className="text-sm flex-1 leading-5"
+              >
+                {point}
+              </Text>
+            </View>
+          ))}
+
+          {/* Contraception Note */}
+          <View
+            className="mt-4 p-3 rounded-xl flex-row"
+            style={{ backgroundColor: '#FEF3C715', borderWidth: 1, borderColor: '#FCD34D30' }}
+          >
+            <AlertCircle size={16} color="#F59E0B" style={{ marginTop: 2 }} />
+            <Text
+              style={{ fontFamily: 'Quicksand_400Regular', color: theme.text.secondary }}
+              className="text-xs flex-1 ml-2 leading-5"
+            >
+              {fertilityInfo.contraceptionNote}
+            </Text>
+          </View>
+        </View>
+      )}
+    </View>
+  );
 }
 
 function SeedCyclingSection({ theme, defaultExpanded = false }: SeedCyclingSectionProps) {
@@ -644,6 +767,19 @@ export default function NutritionScreen() {
               </Text>
             </View>
           </Animated.View>
+
+          {/* Fertility Awareness Section - Only shown during Ovulatory phase */}
+          {nutrition.fertilityInfo && (
+            <Animated.View
+              entering={FadeInUp.delay(250).duration(600)}
+              className="mx-6 mt-6"
+            >
+              <FertilityInfoSection
+                fertilityInfo={nutrition.fertilityInfo}
+                theme={theme}
+              />
+            </Animated.View>
+          )}
 
           {/* Collapsible Sections */}
           <Animated.View
