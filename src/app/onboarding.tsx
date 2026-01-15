@@ -86,6 +86,15 @@ export default function OnboardingScreen() {
 
   if (!fontsLoaded) return null;
 
+  // Helper function - must be defined before getSteps
+  const formatDate = (date: Date) => {
+    return date.toLocaleDateString('en-US', {
+      month: 'long',
+      day: 'numeric',
+      year: 'numeric',
+    });
+  };
+
   // Dynamic steps based on life stage
   const getSteps = () => {
     const baseSteps = [
@@ -576,14 +585,6 @@ export default function OnboardingScreen() {
 
     completeOnboarding();
     router.replace('/(tabs)');
-  };
-
-  const formatDate = (date: Date) => {
-    return date.toLocaleDateString('en-US', {
-      month: 'long',
-      day: 'numeric',
-      year: 'numeric',
-    });
   };
 
   const currentStep = steps[step];
