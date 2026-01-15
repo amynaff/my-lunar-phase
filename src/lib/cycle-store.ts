@@ -3,12 +3,14 @@ import { persist, createJSONStorage } from 'zustand/middleware';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export type CyclePhase = 'menstrual' | 'follicular' | 'ovulatory' | 'luteal';
+export type LifeStage = 'regular' | 'perimenopause' | 'menopause';
 
 export interface CycleData {
   lastPeriodStart: Date | null;
   cycleLength: number; // typically 28 days
   periodLength: number; // typically 5 days
   hasCompletedOnboarding: boolean;
+  lifeStage: LifeStage;
 }
 
 export interface GroceryItem {
@@ -25,6 +27,7 @@ interface CycleStore {
   cycleLength: number;
   periodLength: number;
   hasCompletedOnboarding: boolean;
+  lifeStage: LifeStage;
 
   // Grocery list
   groceryList: GroceryItem[];
@@ -33,6 +36,7 @@ interface CycleStore {
   setLastPeriodStart: (date: Date) => void;
   setCycleLength: (days: number) => void;
   setPeriodLength: (days: number) => void;
+  setLifeStage: (stage: LifeStage) => void;
   completeOnboarding: () => void;
   resetOnboarding: () => void;
 
@@ -131,13 +135,15 @@ export const useCycleStore = create<CycleStore>()(
       cycleLength: 28,
       periodLength: 5,
       hasCompletedOnboarding: false,
+      lifeStage: 'regular' as LifeStage,
       groceryList: [],
 
       setLastPeriodStart: (date: Date) => set({ lastPeriodStart: date.toISOString() }),
       setCycleLength: (days: number) => set({ cycleLength: days }),
       setPeriodLength: (days: number) => set({ periodLength: days }),
+      setLifeStage: (stage: LifeStage) => set({ lifeStage: stage }),
       completeOnboarding: () => set({ hasCompletedOnboarding: true }),
-      resetOnboarding: () => set({ hasCompletedOnboarding: false, lastPeriodStart: null }),
+      resetOnboarding: () => set({ hasCompletedOnboarding: false, lastPeriodStart: null, lifeStage: 'regular' }),
 
       addGroceryItem: (item) => set((state) => ({
         groceryList: [...state.groceryList, { ...item, id: Date.now().toString() }]
@@ -286,3 +292,74 @@ export const phaseInfo: Record<CyclePhase, {
     superpower: 'Focus & attention to detail',
   },
 };
+
+// Life stage information for display
+export const lifeStageInfo: Record<LifeStage, {
+  name: string;
+  emoji: string;
+  color: string;
+  description: string;
+  ageRange: string;
+}> = {
+  regular: {
+    name: 'Regular Cycles',
+    emoji: '🌙',
+    color: '#9d84ed',
+    description: 'Your monthly rhythm guides your wellness journey.',
+    ageRange: 'Reproductive years',
+  },
+  perimenopause: {
+    name: 'Perimenopause',
+    emoji: '🌗',
+    color: '#f59e0b',
+    description: 'A powerful transition. Your body is preparing for a new chapter.',
+    ageRange: 'Usually 40s-50s',
+  },
+  menopause: {
+    name: 'Menopause',
+    emoji: '✨',
+    color: '#8b5cf6',
+    description: 'A time of wisdom and freedom. Embrace your second spring.',
+    ageRange: '12+ months without period',
+  },
+};
+
+// Perimenopause symptoms for tracking
+export const perimenopauseSymptoms = [
+  { id: 'hot_flashes', name: 'Hot Flashes', emoji: '🔥', category: 'vasomotor' },
+  { id: 'night_sweats', name: 'Night Sweats', emoji: '💧', category: 'vasomotor' },
+  { id: 'irregular_periods', name: 'Irregular Periods', emoji: '📅', category: 'menstrual' },
+  { id: 'heavy_bleeding', name: 'Heavy Bleeding', emoji: '🩸', category: 'menstrual' },
+  { id: 'mood_swings', name: 'Mood Swings', emoji: '🎭', category: 'mood' },
+  { id: 'anxiety', name: 'Anxiety', emoji: '😰', category: 'mood' },
+  { id: 'brain_fog', name: 'Brain Fog', emoji: '🌫️', category: 'cognitive' },
+  { id: 'sleep_issues', name: 'Sleep Issues', emoji: '😴', category: 'sleep' },
+  { id: 'fatigue', name: 'Fatigue', emoji: '🔋', category: 'energy' },
+  { id: 'joint_pain', name: 'Joint Pain', emoji: '🦴', category: 'physical' },
+  { id: 'weight_changes', name: 'Weight Changes', emoji: '⚖️', category: 'physical' },
+  { id: 'low_libido', name: 'Low Libido', emoji: '💜', category: 'intimate' },
+  { id: 'vaginal_dryness', name: 'Vaginal Dryness', emoji: '🌵', category: 'intimate' },
+  { id: 'headaches', name: 'Headaches', emoji: '🤕', category: 'physical' },
+  { id: 'heart_palpitations', name: 'Heart Palpitations', emoji: '💓', category: 'vasomotor' },
+];
+
+// Menopause symptoms for tracking (similar but some different focus)
+export const menopauseSymptoms = [
+  { id: 'hot_flashes', name: 'Hot Flashes', emoji: '🔥', category: 'vasomotor' },
+  { id: 'night_sweats', name: 'Night Sweats', emoji: '💧', category: 'vasomotor' },
+  { id: 'mood_changes', name: 'Mood Changes', emoji: '🎭', category: 'mood' },
+  { id: 'anxiety', name: 'Anxiety', emoji: '😰', category: 'mood' },
+  { id: 'depression', name: 'Low Mood', emoji: '😔', category: 'mood' },
+  { id: 'brain_fog', name: 'Brain Fog', emoji: '🌫️', category: 'cognitive' },
+  { id: 'memory_issues', name: 'Memory Issues', emoji: '🧠', category: 'cognitive' },
+  { id: 'sleep_issues', name: 'Sleep Issues', emoji: '😴', category: 'sleep' },
+  { id: 'fatigue', name: 'Fatigue', emoji: '🔋', category: 'energy' },
+  { id: 'joint_pain', name: 'Joint Pain', emoji: '🦴', category: 'physical' },
+  { id: 'bone_health', name: 'Bone Health Concerns', emoji: '💪', category: 'physical' },
+  { id: 'weight_changes', name: 'Weight Changes', emoji: '⚖️', category: 'physical' },
+  { id: 'low_libido', name: 'Low Libido', emoji: '💜', category: 'intimate' },
+  { id: 'vaginal_dryness', name: 'Vaginal Dryness', emoji: '🌵', category: 'intimate' },
+  { id: 'urinary_issues', name: 'Urinary Changes', emoji: '🚿', category: 'physical' },
+  { id: 'skin_changes', name: 'Skin Changes', emoji: '✨', category: 'physical' },
+  { id: 'hair_changes', name: 'Hair Changes', emoji: '💇', category: 'physical' },
+];

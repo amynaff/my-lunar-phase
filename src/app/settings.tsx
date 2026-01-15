@@ -13,10 +13,13 @@ import {
   Heart,
   Info,
   ChevronRight,
-  Palette,
+  Crown,
+  Leaf,
+  Check,
 } from 'lucide-react-native';
-import { useCycleStore, phaseInfo } from '@/lib/cycle-store';
+import { useCycleStore, phaseInfo, LifeStage, lifeStageInfo } from '@/lib/cycle-store';
 import { useThemeStore, getTheme } from '@/lib/theme-store';
+import { useSubscriptionStore } from '@/lib/subscription-store';
 import { router } from 'expo-router';
 import * as Haptics from 'expo-haptics';
 import DateTimePicker from '@react-native-community/datetimepicker';
@@ -34,14 +37,22 @@ import {
 const CYCLE_LENGTHS = [21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35];
 const PERIOD_LENGTHS = [3, 4, 5, 6, 7, 8];
 
+const lifeStageOptions: { stage: LifeStage; icon: typeof Moon; color: string }[] = [
+  { stage: 'regular', icon: Moon, color: '#9d84ed' },
+  { stage: 'perimenopause', icon: Leaf, color: '#f59e0b' },
+  { stage: 'menopause', icon: Sun, color: '#8b5cf6' },
+];
+
 export default function SettingsScreen() {
   const insets = useSafeAreaInsets();
   const lastPeriodStart = useCycleStore(s => s.lastPeriodStart);
   const cycleLength = useCycleStore(s => s.cycleLength);
   const periodLength = useCycleStore(s => s.periodLength);
+  const lifeStage = useCycleStore(s => s.lifeStage);
   const setLastPeriodStart = useCycleStore(s => s.setLastPeriodStart);
   const setCycleLength = useCycleStore(s => s.setCycleLength);
   const setPeriodLength = useCycleStore(s => s.setPeriodLength);
+  const setLifeStage = useCycleStore(s => s.setLifeStage);
   const resetOnboarding = useCycleStore(s => s.resetOnboarding);
   const getCurrentPhase = useCycleStore(s => s.getCurrentPhase);
   const getDayOfCycle = useCycleStore(s => s.getDayOfCycle);
@@ -50,9 +61,13 @@ export default function SettingsScreen() {
   const toggleMode = useThemeStore(s => s.toggleMode);
   const theme = getTheme(themeMode);
 
+  const tier = useSubscriptionStore(s => s.tier);
+  const isPremium = tier === 'premium';
+
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [showCycleLengthPicker, setShowCycleLengthPicker] = useState(false);
   const [showPeriodLengthPicker, setShowPeriodLengthPicker] = useState(false);
+  const [showLifeStagePicker, setShowLifeStagePicker] = useState(false);
   const [tempDate, setTempDate] = useState<Date>(
     lastPeriodStart ? new Date(lastPeriodStart) : new Date()
   );
@@ -70,6 +85,7 @@ export default function SettingsScreen() {
   const currentPhase = getCurrentPhase();
   const dayOfCycle = getDayOfCycle();
   const info = phaseInfo[currentPhase];
+  const stageInfo = lifeStageInfo[lifeStage];
 
   const handleReset = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
@@ -127,6 +143,13 @@ export default function SettingsScreen() {
     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
   };
 
+  const handleLifeStageSelect = (stage: LifeStage) => {
+    Haptics.selectionAsync();
+    setLifeStage(stage);
+    setShowLifeStagePicker(false);
+    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+  };
+
   const formatDate = (dateString: string | null) => {
     if (!dateString) return 'Not set';
     return new Date(dateString).toLocaleDateString('en-US', {
@@ -135,6 +158,17 @@ export default function SettingsScreen() {
       year: 'numeric',
     });
   };
+
+  // Get stage-specific accent color
+  const getStageColor = () => {
+    switch (lifeStage) {
+      case 'perimenopause': return '#f59e0b';
+      case 'menopause': return '#8b5cf6';
+      default: return theme.accent.purple;
+    }
+  };
+
+  const stageColor = getStageColor();
 
   return (
     <View className="flex-1">
@@ -166,48 +200,143 @@ export default function SettingsScreen() {
                 className="w-10 h-10 rounded-full items-center justify-center border"
                 style={{ backgroundColor: theme.bg.card, borderColor: theme.border.light }}
               >
-                <X size={20} color={theme.accent.purple} />
+                <X size={20} color={stageColor} />
               </Pressable>
             </View>
           </Animated.View>
 
-          {/* Current Cycle Info */}
+          {/* Subscription Status */}
           <Animated.View
-            entering={FadeInUp.delay(200).duration(600)}
+            entering={FadeInUp.delay(150).duration(600)}
             className="mx-6 mt-8"
           >
-            <View
-              className="rounded-3xl p-5 border"
-              style={{ backgroundColor: theme.bg.card, borderColor: theme.border.light }}
+            <Pressable
+              onPress={() => {
+                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                if (!isPremium) {
+                  router.push('/paywall');
+                }
+              }}
             >
-              <View className="flex-row items-center">
-                <View
-                  className="w-12 h-12 rounded-full items-center justify-center mr-4"
-                  style={{ backgroundColor: `${info.color}20` }}
-                >
-                  <Text className="text-2xl">{info.emoji}</Text>
+              <LinearGradient
+                colors={isPremium ? ['#fcd34d', '#f59e0b'] : ['rgba(249, 168, 212, 0.2)', 'rgba(196, 181, 253, 0.2)']}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 0 }}
+                style={{ borderRadius: 20, padding: 16, borderWidth: 1, borderColor: isPremium ? '#f59e0b' : 'rgba(249, 168, 212, 0.3)' }}
+              >
+                <View className="flex-row items-center justify-between">
+                  <View className="flex-row items-center">
+                    <View
+                      className="w-10 h-10 rounded-full items-center justify-center mr-3"
+                      style={{ backgroundColor: isPremium ? 'rgba(255,255,255,0.3)' : 'rgba(249, 168, 212, 0.2)' }}
+                    >
+                      <Crown size={20} color={isPremium ? '#fff' : '#f9a8d4'} />
+                    </View>
+                    <View>
+                      <Text
+                        style={{ fontFamily: 'Quicksand_600SemiBold', color: isPremium ? '#fff' : theme.text.primary }}
+                        className="text-base"
+                      >
+                        {isPremium ? 'Premium Member' : 'Free Plan'}
+                      </Text>
+                      <Text
+                        style={{ fontFamily: 'Quicksand_400Regular', color: isPremium ? 'rgba(255,255,255,0.8)' : theme.text.tertiary }}
+                        className="text-xs"
+                      >
+                        {isPremium ? 'All features unlocked' : 'Tap to upgrade'}
+                      </Text>
+                    </View>
+                  </View>
+                  {!isPremium && <ChevronRight size={18} color={theme.text.muted} />}
                 </View>
-                <View>
-                  <Text
-                    style={{ fontFamily: 'Quicksand_600SemiBold', color: theme.text.primary }}
-                    className="text-lg"
+              </LinearGradient>
+            </Pressable>
+          </Animated.View>
+
+          {/* Life Stage Selection */}
+          <Animated.View
+            entering={FadeInUp.delay(200).duration(600)}
+            className="mx-6 mt-6"
+          >
+            <Text
+              style={{ fontFamily: 'Quicksand_600SemiBold', color: theme.text.accent }}
+              className="text-xs uppercase tracking-wider mb-4"
+            >
+              Life Stage
+            </Text>
+            <Pressable
+              onPress={() => setShowLifeStagePicker(true)}
+            >
+              <View
+                className="rounded-2xl p-4 border flex-row items-center justify-between"
+                style={{ backgroundColor: theme.bg.card, borderColor: theme.border.light }}
+              >
+                <View className="flex-row items-center">
+                  <View
+                    className="w-10 h-10 rounded-full items-center justify-center mr-3"
+                    style={{ backgroundColor: `${stageColor}20` }}
                   >
-                    {info.name} Phase
-                  </Text>
-                  <Text
-                    style={{ fontFamily: 'Quicksand_400Regular', color: theme.text.tertiary }}
-                    className="text-sm"
+                    <Text className="text-lg">{stageInfo.emoji}</Text>
+                  </View>
+                  <View>
+                    <Text
+                      style={{ fontFamily: 'Quicksand_600SemiBold', color: theme.text.primary }}
+                      className="text-base"
+                    >
+                      {stageInfo.name}
+                    </Text>
+                    <Text
+                      style={{ fontFamily: 'Quicksand_400Regular', color: theme.text.tertiary }}
+                      className="text-xs"
+                    >
+                      {stageInfo.ageRange}
+                    </Text>
+                  </View>
+                </View>
+                <ChevronRight size={18} color={theme.text.muted} />
+              </View>
+            </Pressable>
+          </Animated.View>
+
+          {/* Current Cycle Info - Only show for regular/perimenopause */}
+          {lifeStage !== 'menopause' && (
+            <Animated.View
+              entering={FadeInUp.delay(250).duration(600)}
+              className="mx-6 mt-6"
+            >
+              <View
+                className="rounded-3xl p-5 border"
+                style={{ backgroundColor: theme.bg.card, borderColor: theme.border.light }}
+              >
+                <View className="flex-row items-center">
+                  <View
+                    className="w-12 h-12 rounded-full items-center justify-center mr-4"
+                    style={{ backgroundColor: `${info.color}20` }}
                   >
-                    Day {dayOfCycle} of {cycleLength}
-                  </Text>
+                    <Text className="text-2xl">{info.emoji}</Text>
+                  </View>
+                  <View>
+                    <Text
+                      style={{ fontFamily: 'Quicksand_600SemiBold', color: theme.text.primary }}
+                      className="text-lg"
+                    >
+                      {info.name} Phase
+                    </Text>
+                    <Text
+                      style={{ fontFamily: 'Quicksand_400Regular', color: theme.text.tertiary }}
+                      className="text-sm"
+                    >
+                      Day {dayOfCycle} of {cycleLength}
+                    </Text>
+                  </View>
                 </View>
               </View>
-            </View>
-          </Animated.View>
+            </Animated.View>
+          )}
 
           {/* Appearance Settings */}
           <Animated.View
-            entering={FadeInUp.delay(250).duration(600)}
+            entering={FadeInUp.delay(300).duration(600)}
             className="mx-6 mt-6"
           >
             <Text
@@ -237,123 +366,116 @@ export default function SettingsScreen() {
                 <Switch
                   value={themeMode === 'dark'}
                   onValueChange={handleThemeToggle}
-                  trackColor={{ false: theme.border.medium, true: theme.accent.purple }}
+                  trackColor={{ false: theme.border.medium, true: stageColor }}
                   thumbColor={themeMode === 'dark' ? theme.accent.lavender : '#ffffff'}
                   ios_backgroundColor={theme.border.medium}
                 />
               </View>
             </View>
-            <Text
-              style={{ fontFamily: 'Quicksand_400Regular', color: theme.text.muted }}
-              className="text-xs mt-2 ml-1"
-            >
-              Perfect for nighttime tracking
-            </Text>
           </Animated.View>
 
-          {/* Cycle Settings - Editable */}
-          <Animated.View
-            entering={FadeInUp.delay(300).duration(600)}
-            className="mx-6 mt-6"
-          >
-            <Text
-              style={{ fontFamily: 'Quicksand_600SemiBold', color: theme.text.accent }}
-              className="text-xs uppercase tracking-wider mb-4"
+          {/* Cycle Settings - Only show for regular/perimenopause */}
+          {lifeStage !== 'menopause' && (
+            <Animated.View
+              entering={FadeInUp.delay(350).duration(600)}
+              className="mx-6 mt-6"
             >
-              Cycle Information
-            </Text>
-            <View
-              className="rounded-2xl border overflow-hidden"
-              style={{ backgroundColor: theme.bg.card, borderColor: theme.border.light }}
-            >
-              {/* Last Period Start - Tappable */}
-              <Pressable
-                onPress={() => {
-                  setTempDate(lastPeriodStart ? new Date(lastPeriodStart) : new Date());
-                  setShowDatePicker(true);
-                }}
-                className="p-4 flex-row items-center justify-between"
+              <Text
+                style={{ fontFamily: 'Quicksand_600SemiBold', color: theme.text.accent }}
+                className="text-xs uppercase tracking-wider mb-4"
               >
-                <View className="flex-row items-center">
-                  <Calendar size={18} color={theme.accent.pink} />
-                  <Text
-                    style={{ fontFamily: 'Quicksand_500Medium', color: theme.text.primary }}
-                    className="text-sm ml-3"
-                  >
-                    Last Period Start
-                  </Text>
-                </View>
-                <View className="flex-row items-center">
-                  <Text
-                    style={{ fontFamily: 'Quicksand_500Medium', color: theme.accent.purple }}
-                    className="text-sm mr-2"
-                  >
-                    {formatDate(lastPeriodStart)}
-                  </Text>
-                  <ChevronRight size={16} color={theme.text.muted} />
-                </View>
-              </Pressable>
-
-              {/* Cycle Length - Tappable */}
-              <Pressable
-                onPress={() => setShowCycleLengthPicker(true)}
-                className="p-4 flex-row items-center justify-between border-t"
-                style={{ borderTopColor: theme.border.light }}
+                Cycle Information
+              </Text>
+              <View
+                className="rounded-2xl border overflow-hidden"
+                style={{ backgroundColor: theme.bg.card, borderColor: theme.border.light }}
               >
-                <View className="flex-row items-center">
-                  <Clock size={18} color={theme.accent.purple} />
-                  <Text
-                    style={{ fontFamily: 'Quicksand_500Medium', color: theme.text.primary }}
-                    className="text-sm ml-3"
-                  >
-                    Cycle Length
-                  </Text>
-                </View>
-                <View className="flex-row items-center">
-                  <Text
-                    style={{ fontFamily: 'Quicksand_500Medium', color: theme.accent.purple }}
-                    className="text-sm mr-2"
-                  >
-                    {cycleLength} days
-                  </Text>
-                  <ChevronRight size={16} color={theme.text.muted} />
-                </View>
-              </Pressable>
+                {/* Last Period Start */}
+                <Pressable
+                  onPress={() => {
+                    setTempDate(lastPeriodStart ? new Date(lastPeriodStart) : new Date());
+                    setShowDatePicker(true);
+                  }}
+                  className="p-4 flex-row items-center justify-between"
+                >
+                  <View className="flex-row items-center">
+                    <Calendar size={18} color={stageColor} />
+                    <Text
+                      style={{ fontFamily: 'Quicksand_500Medium', color: theme.text.primary }}
+                      className="text-sm ml-3"
+                    >
+                      Last Period Start
+                    </Text>
+                  </View>
+                  <View className="flex-row items-center">
+                    <Text
+                      style={{ fontFamily: 'Quicksand_500Medium', color: stageColor }}
+                      className="text-sm mr-2"
+                    >
+                      {formatDate(lastPeriodStart)}
+                    </Text>
+                    <ChevronRight size={16} color={theme.text.muted} />
+                  </View>
+                </Pressable>
 
-              {/* Period Length - Tappable */}
-              <Pressable
-                onPress={() => setShowPeriodLengthPicker(true)}
-                className="p-4 flex-row items-center justify-between border-t"
-                style={{ borderTopColor: theme.border.light }}
-              >
-                <View className="flex-row items-center">
-                  <Moon size={18} color={theme.accent.rose} />
-                  <Text
-                    style={{ fontFamily: 'Quicksand_500Medium', color: theme.text.primary }}
-                    className="text-sm ml-3"
+                {/* Cycle Length - Only for regular cycles */}
+                {lifeStage === 'regular' && (
+                  <Pressable
+                    onPress={() => setShowCycleLengthPicker(true)}
+                    className="p-4 flex-row items-center justify-between border-t"
+                    style={{ borderTopColor: theme.border.light }}
                   >
-                    Period Length
-                  </Text>
-                </View>
-                <View className="flex-row items-center">
-                  <Text
-                    style={{ fontFamily: 'Quicksand_500Medium', color: theme.accent.purple }}
-                    className="text-sm mr-2"
-                  >
-                    {periodLength} days
-                  </Text>
-                  <ChevronRight size={16} color={theme.text.muted} />
-                </View>
-              </Pressable>
-            </View>
+                    <View className="flex-row items-center">
+                      <Clock size={18} color={stageColor} />
+                      <Text
+                        style={{ fontFamily: 'Quicksand_500Medium', color: theme.text.primary }}
+                        className="text-sm ml-3"
+                      >
+                        Cycle Length
+                      </Text>
+                    </View>
+                    <View className="flex-row items-center">
+                      <Text
+                        style={{ fontFamily: 'Quicksand_500Medium', color: stageColor }}
+                        className="text-sm mr-2"
+                      >
+                        {cycleLength} days
+                      </Text>
+                      <ChevronRight size={16} color={theme.text.muted} />
+                    </View>
+                  </Pressable>
+                )}
 
-            <Text
-              style={{ fontFamily: 'Quicksand_400Regular', color: theme.text.muted }}
-              className="text-xs mt-2 ml-1"
-            >
-              Tap any field to edit
-            </Text>
-          </Animated.View>
+                {/* Period Length - Only for regular cycles */}
+                {lifeStage === 'regular' && (
+                  <Pressable
+                    onPress={() => setShowPeriodLengthPicker(true)}
+                    className="p-4 flex-row items-center justify-between border-t"
+                    style={{ borderTopColor: theme.border.light }}
+                  >
+                    <View className="flex-row items-center">
+                      <Moon size={18} color={theme.accent.rose} />
+                      <Text
+                        style={{ fontFamily: 'Quicksand_500Medium', color: theme.text.primary }}
+                        className="text-sm ml-3"
+                      >
+                        Period Length
+                      </Text>
+                    </View>
+                    <View className="flex-row items-center">
+                      <Text
+                        style={{ fontFamily: 'Quicksand_500Medium', color: stageColor }}
+                        className="text-sm mr-2"
+                      >
+                        {periodLength} days
+                      </Text>
+                      <ChevronRight size={16} color={theme.text.muted} />
+                    </View>
+                  </Pressable>
+                )}
+              </View>
+            </Animated.View>
+          )}
 
           {/* Actions */}
           <Animated.View
@@ -380,7 +502,7 @@ export default function SettingsScreen() {
                     style={{ fontFamily: 'Quicksand_500Medium', color: theme.text.primary }}
                     className="text-sm ml-3"
                   >
-                    Reset Cycle Data
+                    Reset & Start Over
                   </Text>
                 </View>
                 <ChevronRight size={16} color={theme.text.muted} />
@@ -409,7 +531,7 @@ export default function SettingsScreen() {
                   style={{ fontFamily: 'Quicksand_400Regular', color: theme.text.secondary }}
                   className="text-sm ml-3 flex-1"
                 >
-                  Luna Flow helps you understand and work with your menstrual cycle, not against it.
+                  Luna Flow helps you understand and work with your body's natural rhythms at every stage of life.
                 </Text>
               </View>
             </View>
@@ -433,7 +555,7 @@ export default function SettingsScreen() {
               style={{ fontFamily: 'Quicksand_400Regular', color: theme.text.muted }}
               className="text-xs mt-2"
             >
-              Version 1.0.0
+              Version 1.1.0
             </Text>
           </Animated.View>
         </ScrollView>
@@ -455,7 +577,7 @@ export default function SettingsScreen() {
                   Select Date
                 </Text>
                 <Pressable onPress={handleConfirmDate}>
-                  <Text style={{ fontFamily: 'Quicksand_600SemiBold', color: theme.accent.purple }}>Done</Text>
+                  <Text style={{ fontFamily: 'Quicksand_600SemiBold', color: stageColor }}>Done</Text>
                 </Pressable>
               </View>
               <DateTimePicker
@@ -484,6 +606,74 @@ export default function SettingsScreen() {
         />
       )}
 
+      {/* Life Stage Picker Modal */}
+      <Modal visible={showLifeStagePicker} transparent animationType="slide">
+        <View className="flex-1 justify-end" style={{ backgroundColor: theme.overlay }}>
+          <View className="rounded-t-3xl" style={{ backgroundColor: theme.bg.cardSolid }}>
+            <View className="flex-row justify-between items-center p-4 border-b" style={{ borderBottomColor: theme.border.light }}>
+              <Pressable onPress={() => setShowLifeStagePicker(false)}>
+                <Text style={{ fontFamily: 'Quicksand_500Medium', color: theme.accent.pink }}>Cancel</Text>
+              </Pressable>
+              <Text style={{ fontFamily: 'Quicksand_600SemiBold', color: theme.text.primary }}>
+                Life Stage
+              </Text>
+              <View style={{ width: 50 }} />
+            </View>
+            <View className="p-4">
+              {lifeStageOptions.map((option) => {
+                const optionInfo = lifeStageInfo[option.stage];
+                const isSelected = lifeStage === option.stage;
+                const IconComponent = option.icon;
+
+                return (
+                  <Pressable
+                    key={option.stage}
+                    onPress={() => handleLifeStageSelect(option.stage)}
+                    className="p-4 rounded-2xl mb-3 border flex-row items-center justify-between"
+                    style={{
+                      backgroundColor: isSelected ? `${option.color}15` : theme.bg.secondary,
+                      borderColor: isSelected ? option.color : theme.border.light,
+                    }}
+                  >
+                    <View className="flex-row items-center">
+                      <View
+                        className="w-12 h-12 rounded-full items-center justify-center mr-4"
+                        style={{ backgroundColor: `${option.color}20` }}
+                      >
+                        <IconComponent size={24} color={option.color} />
+                      </View>
+                      <View>
+                        <Text
+                          style={{ fontFamily: 'Quicksand_600SemiBold', color: theme.text.primary }}
+                          className="text-base"
+                        >
+                          {optionInfo.name}
+                        </Text>
+                        <Text
+                          style={{ fontFamily: 'Quicksand_400Regular', color: theme.text.tertiary }}
+                          className="text-xs"
+                        >
+                          {optionInfo.ageRange}
+                        </Text>
+                      </View>
+                    </View>
+                    {isSelected && (
+                      <View
+                        className="w-6 h-6 rounded-full items-center justify-center"
+                        style={{ backgroundColor: option.color }}
+                      >
+                        <Check size={14} color="#fff" />
+                      </View>
+                    )}
+                  </Pressable>
+                );
+              })}
+            </View>
+            <View style={{ height: insets.bottom + 16 }} />
+          </View>
+        </View>
+      </Modal>
+
       {/* Cycle Length Picker Modal */}
       <Modal visible={showCycleLengthPicker} transparent animationType="slide">
         <View className="flex-1 justify-end" style={{ backgroundColor: theme.overlay }}>
@@ -505,8 +695,8 @@ export default function SettingsScreen() {
                     onPress={() => handleCycleLengthSelect(length)}
                     className="w-14 h-14 rounded-full items-center justify-center m-1.5 border"
                     style={{
-                      backgroundColor: cycleLength === length ? theme.accent.purple : theme.bg.secondary,
-                      borderColor: cycleLength === length ? theme.accent.purple : theme.border.light,
+                      backgroundColor: cycleLength === length ? stageColor : theme.bg.secondary,
+                      borderColor: cycleLength === length ? stageColor : theme.border.light,
                     }}
                   >
                     <Text
