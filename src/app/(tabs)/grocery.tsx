@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { View, Text, ScrollView, Pressable, TextInput } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -15,8 +15,9 @@ import {
   Trash2,
   Sparkles,
   X,
+  Moon,
 } from 'lucide-react-native';
-import { useCycleStore, phaseInfo, CyclePhase } from '@/lib/cycle-store';
+import { useCycleStore, phaseInfo, CyclePhase, getMoonPhase, moonPhaseInfo, getMoonPhaseCycleEquivalent, LifeStage } from '@/lib/cycle-store';
 import { useThemeStore, getTheme } from '@/lib/theme-store';
 import * as Haptics from 'expo-haptics';
 import {
@@ -37,6 +38,12 @@ const phaseColors: Record<CyclePhase, string> = {
   luteal: '#9333ea',
 };
 
+const lifeStageAccentColors: Record<LifeStage, string> = {
+  regular: '#ec4899',
+  perimenopause: '#f59e0b',
+  menopause: '#8b5cf6',
+};
+
 export default function GroceryScreen() {
   const insets = useSafeAreaInsets();
   const groceryList = useCycleStore(s => s.groceryList);
@@ -46,6 +53,7 @@ export default function GroceryScreen() {
   const addGroceryItem = useCycleStore(s => s.addGroceryItem);
   const getCurrentPhase = useCycleStore(s => s.getCurrentPhase);
   const addPhaseGroceries = useCycleStore(s => s.addPhaseGroceries);
+  const lifeStage = useCycleStore(s => s.lifeStage);
   const themeMode = useThemeStore(s => s.mode);
   const theme = getTheme(themeMode);
 
@@ -60,10 +68,32 @@ export default function GroceryScreen() {
     Quicksand_600SemiBold,
   });
 
+  // Calculate moon phase and corresponding cycle phase for peri/menopause
+  const moonPhaseData = useMemo(() => {
+    const currentMoonPhase = getMoonPhase();
+    const moonInfo = moonPhaseInfo[currentMoonPhase];
+    const equivalentCyclePhase = getMoonPhaseCycleEquivalent(currentMoonPhase);
+    return { moonPhase: currentMoonPhase, moonInfo, equivalentCyclePhase };
+  }, []);
+
+  const isUsingMoonPhase = lifeStage === 'perimenopause' || lifeStage === 'menopause';
+
   if (!fontsLoaded) return null;
 
-  const currentPhase = getCurrentPhase();
+  // For regular cycles, use the actual cycle phase
+  // For peri/menopause, use moon phase equivalent
+  const currentPhase = isUsingMoonPhase ? moonPhaseData.equivalentCyclePhase : getCurrentPhase();
   const info = phaseInfo[currentPhase];
+  const accentColor = isUsingMoonPhase ? lifeStageAccentColors[lifeStage] : info.color;
+
+  // Display info based on life stage
+  const displayTitle = isUsingMoonPhase
+    ? `Add ${moonPhaseData.moonInfo.name} Foods`
+    : `Add ${info.name} Phase Foods`;
+
+  const displaySubtitle = isUsingMoonPhase
+    ? `${moonPhaseData.moonInfo.emoji} Aligned with today's moon`
+    : 'Recommended for your current phase';
 
   const handleToggle = (id: string) => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
@@ -128,7 +158,7 @@ export default function GroceryScreen() {
               style={{ fontFamily: 'CormorantGaramond_400Regular', color: theme.text.muted }}
               className="text-sm tracking-widest uppercase"
             >
-              Shopping
+              {isUsingMoonPhase ? 'Moon-Synced Shopping' : 'Shopping'}
             </Text>
             <Text
               style={{ fontFamily: 'CormorantGaramond_600SemiBold', color: theme.text.primary }}
@@ -149,34 +179,69 @@ export default function GroceryScreen() {
             >
               <View
                 className="p-4 flex-row items-center justify-between rounded-2xl border"
-                style={{ backgroundColor: `${info.color}10`, borderColor: `${info.color}30` }}
+                style={{ backgroundColor: `${accentColor}10`, borderColor: `${accentColor}30` }}
               >
                 <View className="flex-row items-center flex-1">
                   <View
                     className="w-10 h-10 rounded-full items-center justify-center mr-3"
-                    style={{ backgroundColor: `${info.color}20` }}
+                    style={{ backgroundColor: `${accentColor}20` }}
                   >
-                    <Sparkles size={20} color={info.color} />
+                    {isUsingMoonPhase ? (
+                      <Moon size={20} color={accentColor} />
+                    ) : (
+                      <Sparkles size={20} color={accentColor} />
+                    )}
                   </View>
                   <View className="flex-1">
                     <Text
                       style={{ fontFamily: 'Quicksand_600SemiBold', color: theme.text.primary }}
                       className="text-sm"
                     >
-                      Add {info.name} Phase Foods
+                      {displayTitle}
                     </Text>
                     <Text
                       style={{ fontFamily: 'Quicksand_400Regular', color: theme.text.tertiary }}
                       className="text-xs"
                     >
-                      Recommended for your current phase
+                      {displaySubtitle}
                     </Text>
                   </View>
                 </View>
-                <Plus size={20} color={info.color} />
+                <Plus size={20} color={accentColor} />
               </View>
             </Pressable>
           </Animated.View>
+
+          {/* Moon Phase Info Card - Only for peri/menopause */}
+          {isUsingMoonPhase && (
+            <Animated.View
+              entering={FadeInUp.delay(220).duration(600)}
+              className="mx-6 mt-3"
+            >
+              <View
+                className="p-3 rounded-xl border"
+                style={{ backgroundColor: `${accentColor}08`, borderColor: `${accentColor}20` }}
+              >
+                <View className="flex-row items-center">
+                  <Text className="text-2xl mr-2">{moonPhaseData.moonInfo.emoji}</Text>
+                  <View className="flex-1">
+                    <Text
+                      style={{ fontFamily: 'Quicksand_500Medium', color: accentColor }}
+                      className="text-xs"
+                    >
+                      {moonPhaseData.moonInfo.name} • {moonPhaseData.moonInfo.energy}
+                    </Text>
+                    <Text
+                      style={{ fontFamily: 'Quicksand_400Regular', color: theme.text.muted }}
+                      className="text-xs mt-0.5"
+                    >
+                      Foods aligned with {info.name.toLowerCase()} phase energy
+                    </Text>
+                  </View>
+                </View>
+              </View>
+            </Animated.View>
+          )}
 
           {/* Stats */}
           <Animated.View
@@ -414,9 +479,13 @@ export default function GroceryScreen() {
             >
               <View
                 className="w-20 h-20 rounded-full items-center justify-center mb-4"
-                style={{ backgroundColor: `${theme.accent.pink}15` }}
+                style={{ backgroundColor: `${accentColor}15` }}
               >
-                <ShoppingCart size={32} color={theme.accent.pink} />
+                {isUsingMoonPhase ? (
+                  <Moon size={32} color={accentColor} />
+                ) : (
+                  <ShoppingCart size={32} color={accentColor} />
+                )}
               </View>
               <Text
                 style={{ fontFamily: 'Quicksand_600SemiBold', color: theme.text.primary }}
@@ -428,7 +497,9 @@ export default function GroceryScreen() {
                 style={{ fontFamily: 'Quicksand_400Regular', color: theme.text.muted }}
                 className="text-sm text-center"
               >
-                Add foods from the Nutrition tab or{'\n'}tap above to add phase-specific items
+                {isUsingMoonPhase
+                  ? `Add foods aligned with the ${moonPhaseData.moonInfo.name}\nor tap above to add moon-synced items`
+                  : 'Add foods from the Nutrition tab or\ntap above to add phase-specific items'}
               </Text>
             </Animated.View>
           )}

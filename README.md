@@ -64,6 +64,14 @@ A beautiful, comprehensive mobile app that helps women understand and work with 
 
 ### Smart Grocery List
 - Add phase-specific recommended foods with one tap
+- **Moon Phase Syncing** (for perimenopause/menopause users):
+  - Calculates current moon phase automatically
+  - Maps moon phases to cycle phase energies:
+    - New Moon / Waning Crescent → Menstrual phase energy (rest, restore)
+    - Waxing Crescent / First Quarter → Follicular phase energy (fresh starts, creativity)
+    - Waxing Gibbous / Full Moon → Ovulatory phase energy (peak energy, social)
+    - Waning Gibbous / Last Quarter → Luteal phase energy (completion, winding down)
+  - Foods aligned with lunar rhythms when monthly cycle is irregular or absent
 - Custom item addition
 - Organized by category
 - Check off items as you shop

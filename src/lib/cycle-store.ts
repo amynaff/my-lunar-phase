@@ -4,6 +4,107 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export type CyclePhase = 'menstrual' | 'follicular' | 'ovulatory' | 'luteal';
 export type LifeStage = 'regular' | 'perimenopause' | 'menopause';
+export type MoonPhase = 'new_moon' | 'waxing_crescent' | 'first_quarter' | 'waxing_gibbous' | 'full_moon' | 'waning_gibbous' | 'last_quarter' | 'waning_crescent';
+
+// Moon phase calculation based on lunar cycle (29.53 days)
+export const getMoonPhase = (date: Date = new Date()): MoonPhase => {
+  // Known new moon: January 6, 2000
+  const knownNewMoon = new Date(2000, 0, 6, 18, 14, 0);
+  const lunarCycle = 29.53058867; // days
+
+  const daysSinceNewMoon = (date.getTime() - knownNewMoon.getTime()) / (1000 * 60 * 60 * 24);
+  const moonAge = daysSinceNewMoon % lunarCycle;
+
+  // Divide the lunar cycle into 8 phases
+  if (moonAge < 1.85) return 'new_moon';
+  if (moonAge < 7.38) return 'waxing_crescent';
+  if (moonAge < 9.23) return 'first_quarter';
+  if (moonAge < 14.77) return 'waxing_gibbous';
+  if (moonAge < 16.61) return 'full_moon';
+  if (moonAge < 22.15) return 'waning_gibbous';
+  if (moonAge < 23.99) return 'last_quarter';
+  return 'waning_crescent';
+};
+
+// Moon phase information with corresponding cycle phase energy
+export const moonPhaseInfo: Record<MoonPhase, {
+  name: string;
+  emoji: string;
+  color: string;
+  description: string;
+  energy: string;
+  correspondingCyclePhase: CyclePhase;
+}> = {
+  new_moon: {
+    name: 'New Moon',
+    emoji: '🌑',
+    color: '#1e1b4b',
+    description: 'A time for rest, reflection, and setting intentions.',
+    energy: 'Inward & Restorative',
+    correspondingCyclePhase: 'menstrual',
+  },
+  waxing_crescent: {
+    name: 'Waxing Crescent',
+    emoji: '🌒',
+    color: '#4c1d95',
+    description: 'Fresh energy emerges. Plant seeds for new beginnings.',
+    energy: 'Rising & Hopeful',
+    correspondingCyclePhase: 'follicular',
+  },
+  first_quarter: {
+    name: 'First Quarter',
+    emoji: '🌓',
+    color: '#6d28d9',
+    description: 'Take action on your intentions. Build momentum.',
+    energy: 'Active & Determined',
+    correspondingCyclePhase: 'follicular',
+  },
+  waxing_gibbous: {
+    name: 'Waxing Gibbous',
+    emoji: '🌔',
+    color: '#7c3aed',
+    description: 'Refine and adjust. Trust the process.',
+    energy: 'Building & Refining',
+    correspondingCyclePhase: 'ovulatory',
+  },
+  full_moon: {
+    name: 'Full Moon',
+    emoji: '🌕',
+    color: '#f5f3ff',
+    description: 'Peak energy and illumination. Celebrate your progress.',
+    energy: 'High & Radiant',
+    correspondingCyclePhase: 'ovulatory',
+  },
+  waning_gibbous: {
+    name: 'Waning Gibbous',
+    emoji: '🌖',
+    color: '#8b5cf6',
+    description: 'Share your wisdom. Practice gratitude.',
+    energy: 'Generous & Grateful',
+    correspondingCyclePhase: 'luteal',
+  },
+  last_quarter: {
+    name: 'Last Quarter',
+    emoji: '🌗',
+    color: '#a78bfa',
+    description: 'Release what no longer serves you. Forgive and let go.',
+    energy: 'Releasing & Clearing',
+    correspondingCyclePhase: 'luteal',
+  },
+  waning_crescent: {
+    name: 'Waning Crescent',
+    emoji: '🌘',
+    color: '#c4b5fd',
+    description: 'Rest and surrender. Prepare for renewal.',
+    energy: 'Restful & Surrendering',
+    correspondingCyclePhase: 'menstrual',
+  },
+};
+
+// Get the cycle phase equivalent for the current moon phase (for peri/menopause)
+export const getMoonPhaseCycleEquivalent = (moonPhase: MoonPhase): CyclePhase => {
+  return moonPhaseInfo[moonPhase].correspondingCyclePhase;
+};
 
 export interface CycleData {
   lastPeriodStart: Date | null;
