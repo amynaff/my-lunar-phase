@@ -44,6 +44,13 @@ A beautiful, comprehensive mobile app that helps women understand and work with 
 ### Nutrition Guide
 - Phase-specific food recommendations with benefits
 - Life stage-optimized suggestions
+- **Menstrual Phase (Days 1-5) - Comprehensive Guide:**
+  - **Iron (15-18mg/day)**: Meat, fish, poultry, seaweed, seeds (pumpkin, sesame, sunflower), miso, garbanzos, millet, lentils, molasses, raisins
+  - **Folic Acid (800mcg/day)**: Raw & cooked greens, beets, orange juice, brewers yeast, beans, miso with seaweed, avocado
+  - **Vitamin C (500-1000mg)**: Dark greens, citrus, apricots, cherries with bioflavonoids
+  - **Supportive Herbs**: Raspberry leaf, mugwort, nettles, yellow dock (iron); rosehips (vitamin C); fenugreek seeds (folic acid)
+  - **Vitamins & Minerals**: Vitamin C, Calcium (200mg), Magnesium (100mg)
+  - **Important Notes**: Iron blocked by caffeine, cook in iron pots, extra rest is essential
 - Perimenopause/menopause focused nutrition
 - Tips for optimal eating during each phase
 - One-tap add to grocery list

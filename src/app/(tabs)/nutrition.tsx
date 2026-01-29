@@ -3,7 +3,7 @@ import { View, Text, ScrollView, Pressable } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Animated, { FadeInDown, FadeInUp } from 'react-native-reanimated';
-import { ShoppingCart, Leaf, Sparkles, ChevronDown, ChevronUp, UtensilsCrossed, Heart, AlertCircle, Sun } from 'lucide-react-native';
+import { ShoppingCart, Leaf, Sparkles, ChevronDown, ChevronUp, UtensilsCrossed, Heart, AlertCircle, Sun, Pill, Flower2, Beaker, Info } from 'lucide-react-native';
 import { useCycleStore, phaseInfo, CyclePhase, lifeStageInfo } from '@/lib/cycle-store';
 import { useThemeStore, getTheme } from '@/lib/theme-store';
 import { router } from 'expo-router';
@@ -23,11 +23,27 @@ interface NutritionItem {
   benefit: string;
 }
 
+interface NutrientCategory {
+  nutrient: string;
+  dailyAmount: string;
+  purpose: string;
+  foods: NutritionItem[];
+}
+
+interface HerbInfo {
+  name: string;
+  benefit: string;
+}
+
 interface PhaseNutritionData {
   focus: string;
   description: string;
   days: string;
   foods: NutritionItem[];
+  nutrients?: NutrientCategory[];
+  herbs?: HerbInfo[];
+  herbNotes?: string[];
+  supplements?: { name: string; amount: string; note?: string }[];
   avoid: string[];
   tips: string[];
   fertilityInfo?: {
@@ -42,22 +58,94 @@ interface PhaseNutritionData {
 const phaseNutrition: Record<CyclePhase, PhaseNutritionData> = {
   menstrual: {
     focus: 'Replenish & Nourish',
-    description: 'Focus on iron-rich foods to replenish blood loss. Warm, comforting foods support your body during this restorative time.',
+    description: 'Focus on iron-rich foods to replenish blood loss. Estrogen and progesterone are at their lowest. This is a time for rest, reflection, and gentle self-care.',
     days: 'Days 1-5',
     foods: [
-      { name: 'Red Meat', benefit: 'Grass-fed beef for iron' },
-      { name: 'Leafy Greens', benefit: 'Spinach, kale, Swiss chard' },
-      { name: 'Lentils', benefit: 'Plant-based iron and protein' },
-      { name: 'Ginger', benefit: 'Fresh ginger for tea and cooking' },
-      { name: 'Dark Chocolate', benefit: '85% cacao for magnesium' },
-      { name: 'Bone Broth', benefit: 'Minerals and collagen' },
-      { name: 'Salmon', benefit: 'Omega-3s for inflammation' },
+      { name: 'Red Meat', benefit: 'Grass-fed beef for heme iron' },
+      { name: 'Fish & Poultry', benefit: 'Easily absorbed iron and protein' },
+      { name: 'Leafy Greens', benefit: 'Raw & cooked spinach, kale, chard' },
+      { name: 'Lentils & Beans', benefit: 'Plant-based iron and protein' },
+      { name: 'Cooked Beets', benefit: 'Blood-building nutrients & folic acid' },
+      { name: 'Seaweed & Miso', benefit: 'Iron and minerals' },
       { name: 'Pumpkin Seeds', benefit: 'Zinc and iron' },
-      { name: 'Beets', benefit: 'Blood-building nutrients' },
-      { name: 'Warming Soups', benefit: 'Comfort and hydration' },
+      { name: 'Sesame Seeds', benefit: 'Iron and calcium' },
+      { name: 'Sunflower Seeds', benefit: 'Iron and vitamin E' },
+      { name: 'Millet & Garbanzos', benefit: 'Iron-rich grains and legumes' },
+      { name: 'Molasses', benefit: 'Concentrated iron source' },
+      { name: 'Raisins', benefit: 'Natural iron and energy' },
+      { name: 'Orange Juice', benefit: 'Vitamin C for iron absorption' },
+      { name: 'Avocado', benefit: 'Folic acid and healthy fats' },
+      { name: 'Dark Greens & Citrus', benefit: 'Vitamin C with bioflavonoids' },
+      { name: 'Apricots & Cherries', benefit: 'Vitamin C and antioxidants' },
     ],
-    avoid: ['Excessive caffeine', 'Alcohol', 'Processed foods', 'Too much salt'],
-    tips: ['Stay hydrated with warm beverages', 'Eat smaller, more frequent meals', 'Include warming spices like turmeric'],
+    nutrients: [
+      {
+        nutrient: 'Iron',
+        dailyAmount: '15-18mg/day',
+        purpose: 'Replenish blood loss, prevent fatigue',
+        foods: [
+          { name: 'Meat, Fish, Poultry', benefit: 'Heme iron - best absorbed' },
+          { name: 'Seaweed', benefit: 'Marine minerals and iron' },
+          { name: 'Pumpkin Seeds', benefit: 'Plant-based iron' },
+          { name: 'Sesame Seeds', benefit: 'Iron and calcium' },
+          { name: 'Sunflower Seeds', benefit: 'Iron and vitamin E' },
+          { name: 'Miso & Garbanzos', benefit: 'Fermented iron sources' },
+          { name: 'Millet & Lentils', benefit: 'Whole grain and legume iron' },
+          { name: 'Molasses & Raisins', benefit: 'Concentrated natural iron' },
+        ],
+      },
+      {
+        nutrient: 'Folic Acid',
+        dailyAmount: '800mcg/day',
+        purpose: 'Cell renewal and energy',
+        foods: [
+          { name: 'Raw & Cooked Greens', benefit: 'Leafy greens are folic acid powerhouses' },
+          { name: 'Cooked Beets', benefit: 'Blood-building and folate rich' },
+          { name: 'Orange Juice', benefit: 'Natural folate source' },
+          { name: 'Brewers Yeast', benefit: 'B-vitamin complex' },
+          { name: 'Beans', benefit: 'Plant-based folate' },
+          { name: 'Miso with Seaweed', benefit: 'Fermented folate' },
+          { name: 'Avocado', benefit: 'Creamy folate source' },
+        ],
+      },
+      {
+        nutrient: 'Vitamin C',
+        dailyAmount: '500-1000mg',
+        purpose: 'Helps iron absorption',
+        foods: [
+          { name: 'Dark Greens', benefit: 'Vitamin C with minerals' },
+          { name: 'Local Fruits', benefit: 'Seasonal vitamin C' },
+          { name: 'Citrus Fruits', benefit: 'Classic vitamin C source' },
+          { name: 'Apricots & Cherries', benefit: 'With bioflavonoids' },
+        ],
+      },
+    ],
+    supplements: [
+      { name: 'Vitamin C', amount: '500-1000mg', note: 'Helps iron absorption' },
+      { name: 'Calcium', amount: '200mg' },
+      { name: 'Magnesium', amount: '100mg', note: 'For cramps and relaxation' },
+    ],
+    herbs: [
+      { name: 'Raspberry Leaf', benefit: 'Iron-rich, uterine tonic' },
+      { name: 'Mugwort', benefit: 'Traditional menstrual support' },
+      { name: 'Nettles', benefit: 'Iron and minerals' },
+      { name: 'Yellow Dock', benefit: 'Iron absorption' },
+      { name: 'Rosehips', benefit: 'Natural vitamin C' },
+      { name: 'Fenugreek Seeds', benefit: 'Folic acid source' },
+    ],
+    herbNotes: [
+      'Iron availability is blocked by caffeine - avoid coffee/tea with meals',
+      'Cook in iron pots to increase iron content',
+      'Extra rest and "dream time" is important during this phase',
+    ],
+    avoid: ['Caffeine with meals (blocks iron)', 'Excessive alcohol', 'Processed foods', 'Too much salt'],
+    tips: [
+      'Food sources of iron are best absorbed - especially with vitamin C',
+      'Cook in cast iron pots to boost iron intake',
+      'Avoid caffeine around meals as it blocks iron absorption',
+      'Extra rest and sleep supports your body during menstruation',
+      'Stay hydrated with warm beverages and herbal teas',
+    ],
   },
   follicular: {
     focus: 'Energize & Create',
@@ -384,6 +472,219 @@ function SeedCyclingSection({ theme }: { theme: ReturnType<typeof getTheme> }) {
   );
 }
 
+// Nutrient Categories Section (Iron, Folic Acid, Vitamin C)
+function NutrientCategoriesSection({ nutrients, theme }: { nutrients: NutrientCategory[]; theme: ReturnType<typeof getTheme> }) {
+  const [expandedNutrient, setExpandedNutrient] = useState<string | null>('Iron');
+
+  const getNutrientColor = (nutrient: string) => {
+    switch (nutrient) {
+      case 'Iron': return '#be185d';
+      case 'Folic Acid': return '#059669';
+      case 'Vitamin C': return '#f59e0b';
+      default: return theme.accent.pink;
+    }
+  };
+
+  const getNutrientIcon = (nutrient: string) => {
+    switch (nutrient) {
+      case 'Iron': return <Beaker size={18} color={getNutrientColor(nutrient)} />;
+      case 'Folic Acid': return <Leaf size={18} color={getNutrientColor(nutrient)} />;
+      case 'Vitamin C': return <Sun size={18} color={getNutrientColor(nutrient)} />;
+      default: return <Pill size={18} color={getNutrientColor(nutrient)} />;
+    }
+  };
+
+  return (
+    <View className="mb-4">
+      <Text style={{ fontFamily: 'Quicksand_600SemiBold', color: theme.text.primary }} className="text-base mb-3">
+        Key Nutrients for Days 1-5
+      </Text>
+      {nutrients.map((nutrient) => {
+        const color = getNutrientColor(nutrient.nutrient);
+        const isExpanded = expandedNutrient === nutrient.nutrient;
+
+        return (
+          <View
+            key={nutrient.nutrient}
+            className="rounded-2xl border overflow-hidden mb-3"
+            style={{ backgroundColor: theme.bg.card, borderColor: theme.border.light }}
+          >
+            <Pressable
+              onPress={() => setExpandedNutrient(isExpanded ? null : nutrient.nutrient)}
+              className="flex-row items-center justify-between p-4"
+            >
+              <View className="flex-row items-center flex-1">
+                <View
+                  className="w-10 h-10 rounded-full items-center justify-center mr-3"
+                  style={{ backgroundColor: `${color}15` }}
+                >
+                  {getNutrientIcon(nutrient.nutrient)}
+                </View>
+                <View className="flex-1">
+                  <View className="flex-row items-center">
+                    <Text style={{ fontFamily: 'Quicksand_600SemiBold', color: theme.text.primary }} className="text-base">
+                      {nutrient.nutrient}
+                    </Text>
+                    <View className="ml-2 px-2 py-0.5 rounded-full" style={{ backgroundColor: `${color}15` }}>
+                      <Text style={{ fontFamily: 'Quicksand_500Medium', color }} className="text-xs">
+                        {nutrient.dailyAmount}
+                      </Text>
+                    </View>
+                  </View>
+                  <Text style={{ fontFamily: 'Quicksand_400Regular', color: theme.text.tertiary }} className="text-xs">
+                    {nutrient.purpose}
+                  </Text>
+                </View>
+              </View>
+              {isExpanded ? <ChevronUp size={20} color={theme.text.tertiary} /> : <ChevronDown size={20} color={theme.text.tertiary} />}
+            </Pressable>
+
+            {isExpanded && (
+              <View className="px-4 pb-4">
+                <View className="h-px mb-3" style={{ backgroundColor: theme.border.light }} />
+                {nutrient.foods.map((food, index) => (
+                  <View key={food.name} className={`flex-row items-start ${index > 0 ? 'mt-3' : ''}`}>
+                    <View className="w-2 h-2 rounded-full mt-1.5 mr-3" style={{ backgroundColor: color }} />
+                    <View className="flex-1">
+                      <Text style={{ fontFamily: 'Quicksand_600SemiBold', color: theme.text.primary }} className="text-sm">
+                        {food.name}
+                      </Text>
+                      <Text style={{ fontFamily: 'Quicksand_400Regular', color: theme.text.tertiary }} className="text-xs mt-0.5">
+                        {food.benefit}
+                      </Text>
+                    </View>
+                  </View>
+                ))}
+              </View>
+            )}
+          </View>
+        );
+      })}
+    </View>
+  );
+}
+
+// Herbs Section
+function HerbsSection({ herbs, herbNotes, theme }: { herbs: HerbInfo[]; herbNotes?: string[]; theme: ReturnType<typeof getTheme> }) {
+  const [expanded, setExpanded] = useState(false);
+
+  return (
+    <View
+      className="rounded-2xl border overflow-hidden mb-4"
+      style={{ backgroundColor: theme.bg.card, borderColor: theme.border.light }}
+    >
+      <Pressable onPress={() => setExpanded(!expanded)} className="flex-row items-center justify-between p-4">
+        <View className="flex-row items-center flex-1">
+          <View className="w-10 h-10 rounded-full items-center justify-center mr-3" style={{ backgroundColor: '#16a34a15' }}>
+            <Flower2 size={18} color="#16a34a" />
+          </View>
+          <View className="flex-1">
+            <Text style={{ fontFamily: 'Quicksand_600SemiBold', color: theme.text.primary }} className="text-base">
+              Supportive Herbs
+            </Text>
+            <Text style={{ fontFamily: 'Quicksand_400Regular', color: theme.text.tertiary }} className="text-xs">
+              {herbs.length} herbs for this phase
+            </Text>
+          </View>
+        </View>
+        {expanded ? <ChevronUp size={20} color={theme.text.tertiary} /> : <ChevronDown size={20} color={theme.text.tertiary} />}
+      </Pressable>
+
+      {expanded && (
+        <View className="px-4 pb-4">
+          <View className="h-px mb-3" style={{ backgroundColor: theme.border.light }} />
+          {herbs.map((herb, index) => (
+            <View key={herb.name} className={`flex-row items-start ${index > 0 ? 'mt-3' : ''}`}>
+              <View className="w-2 h-2 rounded-full mt-1.5 mr-3" style={{ backgroundColor: '#16a34a' }} />
+              <View className="flex-1">
+                <Text style={{ fontFamily: 'Quicksand_600SemiBold', color: theme.text.primary }} className="text-sm">
+                  {herb.name}
+                </Text>
+                <Text style={{ fontFamily: 'Quicksand_400Regular', color: theme.text.tertiary }} className="text-xs mt-0.5">
+                  {herb.benefit}
+                </Text>
+              </View>
+            </View>
+          ))}
+
+          {herbNotes && herbNotes.length > 0 && (
+            <View className="mt-4 p-3 rounded-xl" style={{ backgroundColor: '#fef3c715', borderWidth: 1, borderColor: '#fcd34d30' }}>
+              <View className="flex-row items-center mb-2">
+                <Info size={14} color="#f59e0b" />
+                <Text style={{ fontFamily: 'Quicksand_600SemiBold', color: '#f59e0b' }} className="text-xs ml-2">
+                  Important Notes
+                </Text>
+              </View>
+              {herbNotes.map((note, index) => (
+                <Text key={index} style={{ fontFamily: 'Quicksand_400Regular', color: theme.text.secondary }} className="text-xs leading-5 mt-1">
+                  • {note}
+                </Text>
+              ))}
+            </View>
+          )}
+        </View>
+      )}
+    </View>
+  );
+}
+
+// Supplements Section
+function SupplementsSection({ supplements, theme }: { supplements: { name: string; amount: string; note?: string }[]; theme: ReturnType<typeof getTheme> }) {
+  const [expanded, setExpanded] = useState(false);
+
+  return (
+    <View
+      className="rounded-2xl border overflow-hidden mb-4"
+      style={{ backgroundColor: theme.bg.card, borderColor: theme.border.light }}
+    >
+      <Pressable onPress={() => setExpanded(!expanded)} className="flex-row items-center justify-between p-4">
+        <View className="flex-row items-center flex-1">
+          <View className="w-10 h-10 rounded-full items-center justify-center mr-3" style={{ backgroundColor: '#8b5cf615' }}>
+            <Pill size={18} color="#8b5cf6" />
+          </View>
+          <View className="flex-1">
+            <Text style={{ fontFamily: 'Quicksand_600SemiBold', color: theme.text.primary }} className="text-base">
+              Vitamins & Minerals
+            </Text>
+            <Text style={{ fontFamily: 'Quicksand_400Regular', color: theme.text.tertiary }} className="text-xs">
+              Recommended supplementation
+            </Text>
+          </View>
+        </View>
+        {expanded ? <ChevronUp size={20} color={theme.text.tertiary} /> : <ChevronDown size={20} color={theme.text.tertiary} />}
+      </Pressable>
+
+      {expanded && (
+        <View className="px-4 pb-4">
+          <View className="h-px mb-3" style={{ backgroundColor: theme.border.light }} />
+          {supplements.map((supp, index) => (
+            <View key={supp.name} className={`flex-row items-start ${index > 0 ? 'mt-3' : ''}`}>
+              <View className="w-2 h-2 rounded-full mt-1.5 mr-3" style={{ backgroundColor: '#8b5cf6' }} />
+              <View className="flex-1">
+                <View className="flex-row items-center">
+                  <Text style={{ fontFamily: 'Quicksand_600SemiBold', color: theme.text.primary }} className="text-sm">
+                    {supp.name}
+                  </Text>
+                  <View className="ml-2 px-2 py-0.5 rounded-full" style={{ backgroundColor: '#8b5cf615' }}>
+                    <Text style={{ fontFamily: 'Quicksand_500Medium', color: '#8b5cf6' }} className="text-xs">
+                      {supp.amount}
+                    </Text>
+                  </View>
+                </View>
+                {supp.note && (
+                  <Text style={{ fontFamily: 'Quicksand_400Regular', color: theme.text.tertiary }} className="text-xs mt-0.5">
+                    {supp.note}
+                  </Text>
+                )}
+              </View>
+            </View>
+          ))}
+        </View>
+      )}
+    </View>
+  );
+}
+
 function FertilityInfoSection({ fertilityInfo, theme }: { fertilityInfo: NonNullable<PhaseNutritionData['fertilityInfo']>; theme: ReturnType<typeof getTheme> }) {
   const [expanded, setExpanded] = useState(false);
 
@@ -511,11 +812,18 @@ export default function NutritionScreen() {
             </Animated.View>
           )}
 
+          {/* Nutrient Categories for Menstrual Phase */}
+          {currentPhase === 'menstrual' && nutrition.nutrients && (
+            <Animated.View entering={FadeInUp.delay(280).duration(600)} className="mx-6 mt-6">
+              <NutrientCategoriesSection nutrients={nutrition.nutrients} theme={theme} />
+            </Animated.View>
+          )}
+
           {/* Foods */}
           <Animated.View entering={FadeInUp.delay(300).duration(600)} className="mx-6 mt-6">
             <View className="flex-row items-center justify-between mb-4">
               <Text style={{ fontFamily: 'Quicksand_600SemiBold', color: theme.text.primary }} className="text-lg">
-                Phase Nutrition
+                {currentPhase === 'menstrual' ? 'All Recommended Foods' : 'Phase Nutrition'}
               </Text>
               <Pressable onPress={handleAddToGrocery} className="flex-row items-center px-3 py-2 rounded-full" style={{ backgroundColor: `${theme.accent.pink}15` }}>
                 <ShoppingCart size={14} color={theme.accent.pink} />
@@ -531,8 +839,17 @@ export default function NutritionScreen() {
               items={nutrition.foods}
               theme={theme}
               iconBgColor="#22C55E15"
-              defaultExpanded={true}
+              defaultExpanded={currentPhase !== 'menstrual'}
             />
+
+            {/* Herbs & Supplements for Menstrual Phase */}
+            {currentPhase === 'menstrual' && nutrition.herbs && (
+              <HerbsSection herbs={nutrition.herbs} herbNotes={nutrition.herbNotes} theme={theme} />
+            )}
+
+            {currentPhase === 'menstrual' && nutrition.supplements && (
+              <SupplementsSection supplements={nutrition.supplements} theme={theme} />
+            )}
 
             <SeedCyclingSection theme={theme} />
           </Animated.View>

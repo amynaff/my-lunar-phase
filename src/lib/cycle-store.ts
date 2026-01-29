@@ -159,21 +159,44 @@ interface CycleStore {
 // Phase-specific grocery suggestions (foods only, no supplements/herbs)
 const phaseGroceries: Record<CyclePhase, Array<{ name: string; category: string }>> = {
   menstrual: [
+    // Iron-rich proteins
     { name: 'Grass-fed beef', category: 'Protein' },
-    { name: 'Spinach', category: 'Vegetables' },
-    { name: 'Lentils', category: 'Protein' },
-    { name: 'Ginger root', category: 'Produce' },
-    { name: 'Dark chocolate 85%', category: 'Treats' },
-    { name: 'Blueberries', category: 'Fruits' },
-    { name: 'Bone broth', category: 'Beverages' },
-    { name: 'Turmeric', category: 'Spices' },
-    { name: 'Pumpkin seeds', category: 'Seeds' },
     { name: 'Salmon', category: 'Protein' },
-    { name: 'Walnuts', category: 'Nuts' },
-    { name: 'Seaweed', category: 'Vegetables' },
+    { name: 'Fish (any)', category: 'Protein' },
+    { name: 'Chicken or poultry', category: 'Protein' },
+    // Iron-rich plant foods
+    { name: 'Lentils', category: 'Protein' },
+    { name: 'Garbanzos (chickpeas)', category: 'Protein' },
+    { name: 'Millet', category: 'Grains' },
+    { name: 'Beans', category: 'Protein' },
+    // Leafy greens (iron & folic acid)
+    { name: 'Spinach', category: 'Vegetables' },
+    { name: 'Kale', category: 'Vegetables' },
+    { name: 'Swiss chard', category: 'Vegetables' },
+    { name: 'Dark leafy greens', category: 'Vegetables' },
+    // Seeds (iron)
+    { name: 'Pumpkin seeds', category: 'Seeds' },
     { name: 'Sesame seeds', category: 'Seeds' },
-    { name: 'Molasses', category: 'Pantry' },
+    { name: 'Sunflower seeds', category: 'Seeds' },
+    // Folic acid foods
+    { name: 'Beets', category: 'Vegetables' },
+    { name: 'Avocados', category: 'Produce' },
+    { name: 'Orange juice', category: 'Beverages' },
+    { name: 'Brewers yeast', category: 'Pantry' },
+    // Seaweed & miso (iron & minerals)
+    { name: 'Seaweed (nori, wakame)', category: 'Vegetables' },
+    { name: 'Miso paste', category: 'Pantry' },
+    // Vitamin C (iron absorption)
+    { name: 'Oranges', category: 'Fruits' },
+    { name: 'Lemons', category: 'Fruits' },
+    { name: 'Apricots', category: 'Fruits' },
+    { name: 'Cherries', category: 'Fruits' },
+    // Other iron-rich
+    { name: 'Molasses (blackstrap)', category: 'Pantry' },
     { name: 'Raisins', category: 'Fruits' },
+    // Supportive
+    { name: 'Ginger root', category: 'Produce' },
+    { name: 'Turmeric', category: 'Spices' },
   ],
   follicular: [
     { name: 'Eggs', category: 'Protein' },
