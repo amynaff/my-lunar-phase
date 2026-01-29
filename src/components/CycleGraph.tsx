@@ -9,6 +9,7 @@ import Svg, {
   Line,
   G,
   Text as SvgText,
+  Rect,
 } from 'react-native-svg';
 import Animated, { FadeIn } from 'react-native-reanimated';
 import { useCycleStore } from '@/lib/cycle-store';
@@ -16,39 +17,38 @@ import { useThemeStore, getTheme } from '@/lib/theme-store';
 
 const { width } = Dimensions.get('window');
 const GRAPH_WIDTH = width - 48;
-const GRAPH_HEIGHT = 180;
-const PADDING = { top: 30, bottom: 40, left: 10, right: 10 };
+const GRAPH_HEIGHT = 220;
+const PADDING = { top: 45, bottom: 55, left: 15, right: 15 };
 const CHART_WIDTH = GRAPH_WIDTH - PADDING.left - PADDING.right;
 const CHART_HEIGHT = GRAPH_HEIGHT - PADDING.top - PADDING.bottom;
 
 // Phase colors - works for both light and dark mode
 const getPhaseColors = (isDark: boolean) => ({
   menstrual: {
-    main: '#ff8aa6',
-    light: isDark ? 'rgba(255, 138, 166, 0.15)' : '#ffd6df',
-    gradient: ['#ffb3c4', '#ff8aa6']
+    main: '#be185d',
+    light: isDark ? 'rgba(190, 24, 93, 0.2)' : 'rgba(190, 24, 93, 0.12)',
+    text: '#be185d',
   },
   follicular: {
-    main: '#f9a8d4',
-    light: isDark ? 'rgba(249, 168, 212, 0.15)' : '#fce7f3',
-    gradient: ['#fbcfe8', '#f9a8d4']
+    main: '#ec4899',
+    light: isDark ? 'rgba(236, 72, 153, 0.2)' : 'rgba(236, 72, 153, 0.12)',
+    text: '#ec4899',
   },
   ovulatory: {
-    main: '#c4b5fd',
-    light: isDark ? 'rgba(196, 181, 253, 0.15)' : '#ede5ff',
-    gradient: ['#ddd2fe', '#c4b5fd']
+    main: '#f472b6',
+    light: isDark ? 'rgba(244, 114, 182, 0.25)' : 'rgba(244, 114, 182, 0.15)',
+    text: '#db2777',
   },
   luteal: {
-    main: '#b9a6f7',
-    light: isDark ? 'rgba(185, 166, 247, 0.15)' : '#e4deff',
-    gradient: ['#d1c7ff', '#b9a6f7']
+    main: '#a855f7',
+    light: isDark ? 'rgba(168, 85, 247, 0.2)' : 'rgba(168, 85, 247, 0.12)',
+    text: '#a855f7',
   },
 });
 
-// Hormone curve data points (simplified representation)
-// Estrogen peaks at ovulation, Progesterone peaks in luteal phase
+// More accurate hormone curve data based on the chart
 const generateHormoneData = (cycleLength: number) => {
-  const points = 100;
+  const points = 200;
   const estrogen: number[] = [];
   const progesterone: number[] = [];
 
@@ -56,36 +56,53 @@ const generateHormoneData = (cycleLength: number) => {
     const x = i / points;
     const dayOfCycle = x * cycleLength;
 
-    // Estrogen: low during menstrual, rises in follicular, peaks at ovulation, drops then slight rise in luteal
+    // ESTROGEN curve - matches the chart more accurately
+    // Low during menstrual, rises during follicular, PEAKS at ovulation (day 13-14),
+    // drops sharply, then has a secondary smaller rise mid-luteal
     let estrogenVal = 0;
-    if (dayOfCycle <= 5) {
-      // Menstrual - low
-      estrogenVal = 0.2 + (dayOfCycle / 5) * 0.1;
-    } else if (dayOfCycle <= 13) {
-      // Follicular - rising
-      estrogenVal = 0.3 + ((dayOfCycle - 5) / 8) * 0.6;
-    } else if (dayOfCycle <= 16) {
-      // Ovulatory - peak then drop
-      const ovProgress = (dayOfCycle - 13) / 3;
-      estrogenVal = ovProgress < 0.5 ? 0.9 + ovProgress * 0.2 : 1.0 - (ovProgress - 0.5) * 0.6;
-    } else {
-      // Luteal - moderate with slight rise
-      const lutealProgress = (dayOfCycle - 16) / (cycleLength - 16);
-      estrogenVal = 0.5 + Math.sin(lutealProgress * Math.PI) * 0.15;
-    }
-    estrogen.push(estrogenVal);
 
-    // Progesterone: very low until ovulation, then rises and peaks mid-luteal, drops before period
-    let progesteroneVal = 0;
-    if (dayOfCycle <= 14) {
-      // Low before ovulation
-      progesteroneVal = 0.1;
+    if (dayOfCycle <= 5) {
+      // Menstrual - low and slowly rising
+      estrogenVal = 0.15 + (dayOfCycle / 5) * 0.1;
+    } else if (dayOfCycle <= 13) {
+      // Follicular - steadily rising to peak
+      const progress = (dayOfCycle - 5) / 8;
+      estrogenVal = 0.25 + progress * 0.7;
+    } else if (dayOfCycle <= 14) {
+      // Ovulation peak
+      estrogenVal = 0.95 + Math.sin((dayOfCycle - 13) * Math.PI) * 0.05;
+    } else if (dayOfCycle <= 17) {
+      // Sharp drop after ovulation
+      const dropProgress = (dayOfCycle - 14) / 3;
+      estrogenVal = 1.0 - dropProgress * 0.55;
+    } else if (dayOfCycle <= 24) {
+      // Secondary rise in mid-luteal
+      const riseProgress = (dayOfCycle - 17) / 7;
+      estrogenVal = 0.45 + Math.sin(riseProgress * Math.PI) * 0.2;
     } else {
-      // Rise after ovulation, peak mid-luteal, drop before period
-      const lutealProgress = (dayOfCycle - 14) / (cycleLength - 14);
-      progesteroneVal = 0.1 + Math.sin(lutealProgress * Math.PI) * 0.8;
+      // Drop before period
+      const dropProgress = (dayOfCycle - 24) / (cycleLength - 24);
+      estrogenVal = 0.45 - dropProgress * 0.3;
     }
-    progesterone.push(progesteroneVal);
+    estrogen.push(Math.max(0.1, estrogenVal));
+
+    // PROGESTERONE curve - matches the chart
+    // Very low until ovulation, then rises dramatically, peaks around day 21-22, drops before period
+    let progesteroneVal = 0;
+
+    if (dayOfCycle <= 14) {
+      // Low before ovulation (barely visible)
+      progesteroneVal = 0.08 + Math.sin((dayOfCycle / 14) * Math.PI * 0.5) * 0.02;
+    } else if (dayOfCycle <= 22) {
+      // Rise after ovulation to peak
+      const riseProgress = (dayOfCycle - 14) / 8;
+      progesteroneVal = 0.1 + Math.pow(riseProgress, 0.7) * 0.85;
+    } else {
+      // Drop before period
+      const dropProgress = (dayOfCycle - 22) / (cycleLength - 22);
+      progesteroneVal = 0.95 - Math.pow(dropProgress, 0.8) * 0.85;
+    }
+    progesterone.push(Math.max(0.05, progesteroneVal));
   }
 
   return { estrogen, progesterone };
@@ -96,7 +113,7 @@ const createSmoothPath = (data: number[], width: number, height: number, yOffset
 
   const points = data.map((val, i) => ({
     x: (i / (data.length - 1)) * width,
-    y: height - val * height * 0.85 + yOffset,
+    y: height - val * height * 0.9 + yOffset,
   }));
 
   let path = `M ${points[0].x} ${points[0].y}`;
@@ -107,7 +124,7 @@ const createSmoothPath = (data: number[], width: number, height: number, yOffset
     const p2 = points[i + 1];
     const p3 = points[Math.min(points.length - 1, i + 2)];
 
-    const tension = 0.3;
+    const tension = 0.25;
     const cp1x = p1.x + (p2.x - p0.x) * tension;
     const cp1y = p1.y + (p2.y - p0.y) * tension;
     const cp2x = p2.x - (p3.x - p1.x) * tension;
@@ -117,6 +134,14 @@ const createSmoothPath = (data: number[], width: number, height: number, yOffset
   }
 
   return path;
+};
+
+// Create a filled area path under the curve
+const createFilledPath = (data: number[], width: number, height: number, yOffset: number = 0): string => {
+  const linePath = createSmoothPath(data, width, height, yOffset);
+  if (!linePath) return '';
+
+  return `${linePath} L ${width} ${height + yOffset} L 0 ${height + yOffset} Z`;
 };
 
 interface Props {
@@ -136,17 +161,25 @@ export function CycleGraph({ showLabels = true }: Props) {
 
   const estrogenPath = createSmoothPath(estrogen, CHART_WIDTH, CHART_HEIGHT, PADDING.top);
   const progesteronePath = createSmoothPath(progesterone, CHART_WIDTH, CHART_HEIGHT, PADDING.top);
+  const estrogenFilledPath = createFilledPath(estrogen, CHART_WIDTH, CHART_HEIGHT, PADDING.top);
+  const progesteroneFilledPath = createFilledPath(progesterone, CHART_WIDTH, CHART_HEIGHT, PADDING.top);
 
-  // Phase boundaries (as percentages)
+  // Phase boundaries matching the chart (adjusted for Days 1-5, 6-13, 13-15, 16-28)
   const phases = [
-    { name: 'Menstrual', start: 0, end: 5 / cycleLength, color: phaseColors.menstrual },
-    { name: 'Follicular', start: 5 / cycleLength, end: 13 / cycleLength, color: phaseColors.follicular },
-    { name: 'Ovulatory', start: 13 / cycleLength, end: 17 / cycleLength, color: phaseColors.ovulatory },
-    { name: 'Luteal', start: 17 / cycleLength, end: 1, color: phaseColors.luteal },
+    { name: 'Menstrual', days: '1-5', start: 0, end: 5 / cycleLength, color: phaseColors.menstrual },
+    { name: 'Follicular', days: '6-13', start: 5 / cycleLength, end: 13 / cycleLength, color: phaseColors.follicular },
+    { name: 'Ovulatory', days: '13-15', start: 13 / cycleLength, end: 15 / cycleLength, color: phaseColors.ovulatory },
+    { name: 'Luteal', days: '16-28', start: 15 / cycleLength, end: 1, color: phaseColors.luteal },
   ];
 
   // Current day marker position
   const currentDayX = PADDING.left + ((dayOfCycle - 1) / cycleLength) * CHART_WIDTH;
+
+  // Ovulation marker position (around day 14)
+  const ovulationX = PADDING.left + (13.5 / cycleLength) * CHART_WIDTH;
+
+  // Key day markers to show
+  const keyDays = [1, 5, 13, 15, 21, cycleLength];
 
   return (
     <Animated.View entering={FadeIn.duration(800)}>
@@ -156,65 +189,118 @@ export function CycleGraph({ showLabels = true }: Props) {
       >
         <Text
           style={{ fontFamily: 'Quicksand_600SemiBold', color: theme.text.primary }}
-          className="text-base mb-3 text-center"
+          className="text-base mb-1 text-center"
         >
           Your Cycle Hormones
+        </Text>
+        <Text
+          style={{ fontFamily: 'Quicksand_400Regular', color: theme.text.tertiary }}
+          className="text-xs mb-3 text-center"
+        >
+          Estrogen & Progesterone throughout your cycle
         </Text>
 
         <Svg width={GRAPH_WIDTH} height={GRAPH_HEIGHT}>
           <Defs>
             <SvgGradient id="estrogenGrad" x1="0" y1="0" x2="0" y2="1">
-              <Stop offset="0%" stopColor="#f9a8d4" stopOpacity="0.8" />
-              <Stop offset="100%" stopColor="#f9a8d4" stopOpacity="0" />
+              <Stop offset="0%" stopColor="#ec4899" stopOpacity="0.4" />
+              <Stop offset="100%" stopColor="#ec4899" stopOpacity="0.05" />
             </SvgGradient>
             <SvgGradient id="progesteroneGrad" x1="0" y1="0" x2="0" y2="1">
-              <Stop offset="0%" stopColor="#c4b5fd" stopOpacity="0.8" />
-              <Stop offset="100%" stopColor="#c4b5fd" stopOpacity="0" />
+              <Stop offset="0%" stopColor="#a855f7" stopOpacity="0.4" />
+              <Stop offset="100%" stopColor="#a855f7" stopOpacity="0.05" />
             </SvgGradient>
           </Defs>
 
           {/* Phase background regions */}
-          {phases.map((phase, i) => (
+          {phases.map((phase) => (
             <G key={phase.name}>
-              <Path
-                d={`M ${PADDING.left + phase.start * CHART_WIDTH} ${PADDING.top}
-                    L ${PADDING.left + phase.end * CHART_WIDTH} ${PADDING.top}
-                    L ${PADDING.left + phase.end * CHART_WIDTH} ${PADDING.top + CHART_HEIGHT}
-                    L ${PADDING.left + phase.start * CHART_WIDTH} ${PADDING.top + CHART_HEIGHT} Z`}
+              <Rect
+                x={PADDING.left + phase.start * CHART_WIDTH}
+                y={PADDING.top}
+                width={(phase.end - phase.start) * CHART_WIDTH}
+                height={CHART_HEIGHT}
                 fill={phase.color.light}
-                opacity={isDark ? 1 : 0.5}
               />
-              {/* Phase label at bottom */}
-              <SvgText
-                x={PADDING.left + ((phase.start + phase.end) / 2) * CHART_WIDTH}
-                y={GRAPH_HEIGHT - 8}
-                fontSize={9}
-                fill={theme.text.secondary}
-                textAnchor="middle"
-                fontWeight="500"
-              >
-                {phase.name}
-              </SvgText>
+              {/* Phase divider line */}
+              {phase.start > 0 && (
+                <Line
+                  x1={PADDING.left + phase.start * CHART_WIDTH}
+                  y1={PADDING.top}
+                  x2={PADDING.left + phase.start * CHART_WIDTH}
+                  y2={PADDING.top + CHART_HEIGHT}
+                  stroke={isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)'}
+                  strokeWidth={1}
+                />
+              )}
             </G>
           ))}
 
-          {/* Estrogen curve */}
+          {/* Filled area under estrogen curve */}
+          <Path
+            d={estrogenFilledPath}
+            fill="url(#estrogenGrad)"
+          />
+
+          {/* Filled area under progesterone curve */}
+          <Path
+            d={progesteroneFilledPath}
+            fill="url(#progesteroneGrad)"
+          />
+
+          {/* Estrogen curve - solid pink line */}
           <Path
             d={estrogenPath}
-            stroke="#f472b6"
+            stroke="#ec4899"
             strokeWidth={2.5}
             fill="none"
             strokeLinecap="round"
           />
 
-          {/* Progesterone curve */}
+          {/* Progesterone curve - solid purple line */}
           <Path
             d={progesteronePath}
-            stroke="#a78bfa"
+            stroke="#a855f7"
             strokeWidth={2.5}
             fill="none"
             strokeLinecap="round"
-            strokeDasharray="6,4"
+          />
+
+          {/* Ovulation marker - egg symbol */}
+          <Circle
+            cx={ovulationX}
+            cy={PADDING.top + 8}
+            r={8}
+            fill={isDark ? '#fbbf24' : '#fcd34d'}
+            stroke="#f59e0b"
+            strokeWidth={1.5}
+          />
+          <Circle
+            cx={ovulationX}
+            cy={PADDING.top + 8}
+            r={3}
+            fill="#f59e0b"
+          />
+          <SvgText
+            x={ovulationX}
+            y={PADDING.top - 8}
+            fontSize={8}
+            fill="#f59e0b"
+            textAnchor="middle"
+            fontWeight="600"
+          >
+            Ovulation
+          </SvgText>
+
+          {/* Fertile window indicator */}
+          <Rect
+            x={PADDING.left + (10 / cycleLength) * CHART_WIDTH}
+            y={PADDING.top + CHART_HEIGHT - 4}
+            width={(5 / cycleLength) * CHART_WIDTH}
+            height={4}
+            rx={2}
+            fill="#f472b6"
+            opacity={0.6}
           />
 
           {/* Current day indicator */}
@@ -223,40 +309,117 @@ export function CycleGraph({ showLabels = true }: Props) {
             y1={PADDING.top}
             x2={currentDayX}
             y2={PADDING.top + CHART_HEIGHT}
-            stroke="#ff6289"
+            stroke="#ef4444"
             strokeWidth={2}
-            strokeDasharray="4,4"
+            strokeDasharray="4,3"
           />
           <Circle
             cx={currentDayX}
-            cy={PADDING.top - 8}
-            r={6}
-            fill="#ff6289"
+            cy={PADDING.top - 12}
+            r={10}
+            fill="#ef4444"
           />
           <SvgText
             x={currentDayX}
-            y={PADDING.top - 18}
-            fontSize={10}
-            fill="#ff6289"
+            y={PADDING.top - 8}
+            fontSize={9}
+            fill="#ffffff"
             textAnchor="middle"
+            fontWeight="700"
+          >
+            {dayOfCycle}
+          </SvgText>
+
+          {/* Day markers along bottom */}
+          {keyDays.map((day) => {
+            const x = PADDING.left + ((day - 1) / cycleLength) * CHART_WIDTH;
+            return (
+              <G key={day}>
+                <Line
+                  x1={x}
+                  y1={PADDING.top + CHART_HEIGHT}
+                  x2={x}
+                  y2={PADDING.top + CHART_HEIGHT + 4}
+                  stroke={isDark ? 'rgba(255,255,255,0.3)' : 'rgba(0,0,0,0.2)'}
+                  strokeWidth={1}
+                />
+                <SvgText
+                  x={x}
+                  y={PADDING.top + CHART_HEIGHT + 14}
+                  fontSize={8}
+                  fill={theme.text.tertiary}
+                  textAnchor="middle"
+                >
+                  {day}
+                </SvgText>
+              </G>
+            );
+          })}
+
+          {/* Phase labels at bottom */}
+          {phases.map((phase) => (
+            <G key={`label-${phase.name}`}>
+              <SvgText
+                x={PADDING.left + ((phase.start + phase.end) / 2) * CHART_WIDTH}
+                y={GRAPH_HEIGHT - 22}
+                fontSize={9}
+                fill={phase.color.text}
+                textAnchor="middle"
+                fontWeight="600"
+              >
+                {phase.name}
+              </SvgText>
+              <SvgText
+                x={PADDING.left + ((phase.start + phase.end) / 2) * CHART_WIDTH}
+                y={GRAPH_HEIGHT - 10}
+                fontSize={7}
+                fill={theme.text.tertiary}
+                textAnchor="middle"
+              >
+                Days {phase.days}
+              </SvgText>
+            </G>
+          ))}
+
+          {/* Hormone labels on the curves */}
+          <SvgText
+            x={PADDING.left + (11 / cycleLength) * CHART_WIDTH}
+            y={PADDING.top + 25}
+            fontSize={8}
+            fill="#ec4899"
             fontWeight="600"
           >
-            Day {dayOfCycle}
+            Estrogen
+          </SvgText>
+          <SvgText
+            x={PADDING.left + (20 / cycleLength) * CHART_WIDTH}
+            y={PADDING.top + 25}
+            fontSize={8}
+            fill="#a855f7"
+            fontWeight="600"
+          >
+            Progesterone
           </SvgText>
         </Svg>
 
         {/* Legend */}
-        <View className="flex-row justify-center mt-2" style={{ gap: 16 }}>
+        <View className="flex-row justify-center mt-1" style={{ gap: 20 }}>
           <View className="flex-row items-center">
-            <View className="w-4 h-1 rounded-full mr-2" style={{ backgroundColor: '#f472b6' }} />
+            <View className="w-3 h-3 rounded-full mr-1.5" style={{ backgroundColor: '#ec4899' }} />
             <Text style={{ fontFamily: 'Quicksand_500Medium', color: theme.text.secondary }} className="text-xs">
               Estrogen
             </Text>
           </View>
           <View className="flex-row items-center">
-            <View className="w-4 h-1 rounded-full mr-2" style={{ backgroundColor: '#a78bfa' }} />
+            <View className="w-3 h-3 rounded-full mr-1.5" style={{ backgroundColor: '#a855f7' }} />
             <Text style={{ fontFamily: 'Quicksand_500Medium', color: theme.text.secondary }} className="text-xs">
               Progesterone
+            </Text>
+          </View>
+          <View className="flex-row items-center">
+            <View className="w-3 h-3 rounded-full mr-1.5" style={{ backgroundColor: '#fcd34d', borderWidth: 1, borderColor: '#f59e0b' }} />
+            <Text style={{ fontFamily: 'Quicksand_500Medium', color: theme.text.secondary }} className="text-xs">
+              Ovulation
             </Text>
           </View>
         </View>
