@@ -68,6 +68,15 @@ A beautiful, comprehensive mobile app that helps women understand and work with 
   - **Supportive Herbs**: Kelp, cayenne, comfrey, fenugreek, alfalfa
   - **Evening Supplements**: Calcium, magnesium, potassium (take in P.M.)
   - **Important Notes**: Extra calcium needed as estrogen drops, be gentle during fertility cycles
+- **Luteal Phase (Days 16-28) - Progesterone Guide:**
+  - **Calcium (150-1500mg/day)**: Tofu, dark greens, carob, seaweed (hijiki), seeds, soybeans, tahini, spirulina, yogurt, cheese, brewers yeast
+  - **Magnesium (600mg-1g)**: Carob, tofu, figs, apricots, kelp, blackstrap molasses, dates
+  - **Phosphorus (2:1 ratio, 50g protein/day)**: Animal products, lecithin, yeast, nuts, seeds, wheat germ
+  - **Potassium**: Greens, spirulina, bananas, avocados, potatoes, fresh carrot juice, sunflower seeds (interdependent with B6)
+  - **Supportive Herbs**: Alfalfa, borage, chamomile, comfrey (calcium); raspberry leaves steeped in milk (magnesium); dandelion root, fennel, licorice, mint (potassium)
+  - **Supplements**: Calcium (extra as estrogen drops), Magnesium, B6 (50mg or injection for PMS), Zinc (15mg - helps absorb B6)
+  - **PMS Relief**: Wild yam cream massage, regular aerobic exercise, nettle/dandelion tea, ankle massage, cut salt
+  - **Important Notes**: Good time for light eating (broths, juices), no caffeine, fats help calcium absorption, "Be gentle with yourself, daughter of the moon goddess"
 - Perimenopause/menopause focused nutrition
 - Tips for optimal eating during each phase
 - One-tap add to grocery list

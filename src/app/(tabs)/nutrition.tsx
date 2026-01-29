@@ -404,22 +404,132 @@ const phaseNutrition: Record<CyclePhase, PhaseNutritionData> = {
   },
   luteal: {
     focus: 'Stabilize & Comfort',
-    description: 'Progesterone rises, cravings may appear. Complex carbs and magnesium-rich foods help stabilize mood.',
-    days: 'Days 18-28',
+    description: 'Progesterone rises as estrogen drops. This is the time for calcium, magnesium, and potassium. Eat light, honor cravings wisely. Be gentle with yourself, daughter of the moon goddess.',
+    days: 'Days 16-28',
     foods: [
-      { name: 'Sweet Potatoes', benefit: 'Complex carbs and B6' },
-      { name: 'Bananas', benefit: 'Potassium and mood support' },
-      { name: 'Greek Yogurt', benefit: 'Calcium and probiotics' },
-      { name: 'Almonds', benefit: 'Magnesium for cramps' },
-      { name: 'Dark Chocolate', benefit: '70%+ for magnesium' },
-      { name: 'Chickpeas', benefit: 'Protein and fiber' },
-      { name: 'Brown Rice', benefit: 'Complex carbs' },
-      { name: 'Sunflower Seeds', benefit: 'Continue seed cycling' },
-      { name: 'Sesame Seeds', benefit: 'Continue seed cycling' },
-      { name: 'Leafy Greens', benefit: 'Magnesium and calcium' },
+      // Calcium sources
+      { name: 'Tofu', benefit: 'Excellent calcium source' },
+      { name: 'Dark Greens', benefit: 'Calcium and minerals' },
+      { name: 'Carob', benefit: 'Calcium-rich chocolate alternative' },
+      { name: 'Seaweed (Hijiki)', benefit: 'High calcium sea vegetable' },
+      { name: 'Seeds', benefit: 'Sesame for calcium' },
+      { name: 'Soybeans', benefit: 'Plant calcium' },
+      { name: 'Tahini', benefit: 'Calcium from sesame' },
+      { name: 'Spirulina', benefit: 'Calcium superfood' },
+      { name: 'Yogurt & Cheese', benefit: 'Dairy calcium' },
+      { name: 'Brewers Yeast', benefit: 'Calcium and B vitamins' },
+      // Magnesium sources
+      { name: 'Figs', benefit: 'Magnesium and fiber' },
+      { name: 'Apricots', benefit: 'Magnesium and potassium' },
+      { name: 'Kelp', benefit: 'Magnesium from the sea' },
+      { name: 'Blackstrap Molasses', benefit: 'Concentrated magnesium' },
+      { name: 'Dates', benefit: 'Natural magnesium' },
+      // Phosphorus sources (2:1 ratio with calcium)
+      { name: 'Animal Protein', benefit: 'Phosphorus - 50g/day protein' },
+      { name: 'Lecithin', benefit: 'Phosphorus and brain support' },
+      { name: 'Nuts & Seeds', benefit: 'Phosphorus and healthy fats' },
+      { name: 'Wheat Germ', benefit: 'Phosphorus and vitamin E' },
+      // Potassium sources (interdependent with B6)
+      { name: 'Greens', benefit: 'Potassium powerhouse' },
+      { name: 'Bananas', benefit: 'Potassium classic' },
+      { name: 'Avocados', benefit: 'Potassium and healthy fats' },
+      { name: 'Potatoes', benefit: 'Potassium-rich comfort food' },
+      { name: 'Fresh Carrot Juice', benefit: 'Potassium and vitamins' },
+      { name: 'Sunflower Seeds', benefit: 'Potassium - seed cycling' },
+      { name: 'Sesame Seeds', benefit: 'Seed cycling continues' },
     ],
-    avoid: ['Excessive salt', 'Refined sugar', 'Caffeine', 'Alcohol'],
-    tips: ['Honor cravings with healthy alternatives', 'Eat regularly to stabilize blood sugar', 'Warm, cooked foods are comforting'],
+    nutrients: [
+      {
+        nutrient: 'Calcium',
+        dailyAmount: '150-1500mg/day',
+        purpose: 'Bone health, muscle function, PMS relief',
+        foods: [
+          { name: 'Tofu', benefit: 'Plant-based calcium champion' },
+          { name: 'Dark Greens & Grains', benefit: 'Whole food calcium' },
+          { name: 'Seaweed (Hijiki)', benefit: 'Sea vegetable calcium' },
+          { name: 'Seeds & Soybeans', benefit: 'Plant calcium sources' },
+          { name: 'Tahini & Spirulina', benefit: 'Concentrated calcium' },
+          { name: 'Yogurt & Cheese', benefit: 'Dairy calcium' },
+          { name: 'Brewers Yeast', benefit: 'Calcium with B vitamins' },
+        ],
+      },
+      {
+        nutrient: 'Magnesium',
+        dailyAmount: '600mg-1g',
+        purpose: 'Cramp relief, mood stabilization, sleep',
+        foods: [
+          { name: 'Carob', benefit: 'Chocolate alternative with magnesium' },
+          { name: 'Tofu', benefit: 'Plant-based magnesium' },
+          { name: 'Figs & Apricots', benefit: 'Fruit magnesium' },
+          { name: 'Kelp', benefit: 'Sea vegetable magnesium' },
+          { name: 'Blackstrap Molasses', benefit: 'Concentrated source' },
+          { name: 'Dates', benefit: 'Sweet magnesium' },
+        ],
+      },
+      {
+        nutrient: 'Phosphorus',
+        dailyAmount: '2:1 ratio (50g protein/day)',
+        purpose: 'Works with calcium for bones and energy',
+        foods: [
+          { name: 'Animal Products', benefit: 'Complete phosphorus' },
+          { name: 'Lecithin', benefit: 'Brain and nerve support' },
+          { name: 'Yeast', benefit: 'B vitamins with phosphorus' },
+          { name: 'Nuts & Seeds', benefit: 'Plant phosphorus' },
+          { name: 'Wheat Germ', benefit: 'Nutrient-dense phosphorus' },
+        ],
+      },
+      {
+        nutrient: 'Potassium',
+        dailyAmount: 'As needed',
+        purpose: 'Interdependent with B6 - need increases this phase',
+        foods: [
+          { name: 'Greens', benefit: 'Potassium with minerals' },
+          { name: 'Spirulina', benefit: 'Superfood potassium' },
+          { name: 'Bananas & Avocados', benefit: 'Classic potassium sources' },
+          { name: 'Potatoes', benefit: 'Comfort food potassium' },
+          { name: 'Fresh Carrot Juice', benefit: 'Liquid potassium' },
+          { name: 'Sunflower Seeds', benefit: 'Seed cycling potassium' },
+        ],
+      },
+    ],
+    supplements: [
+      { name: 'Calcium', amount: '150-1500mg/day', note: 'Extra needed as estrogen drops' },
+      { name: 'Magnesium', amount: '600mg-1g', note: 'For cramps, mood, and sleep' },
+      { name: 'Vitamin B6', amount: '50mg', note: 'Can do B6 injection if severe PMS' },
+      { name: 'Zinc', amount: '15mg/day', note: 'Helps absorb B6' },
+    ],
+    herbs: [
+      { name: 'Alfalfa', benefit: 'Calcium source' },
+      { name: 'Borage', benefit: 'Calcium and GLA for PMS' },
+      { name: 'Chamomile', benefit: 'Calcium and calming' },
+      { name: 'Comfrey', benefit: 'Calcium herb' },
+      { name: 'Raspberry Leaves', benefit: 'Magnesium - steep in milk' },
+      { name: 'Dandelion Root', benefit: 'Potassium and liver support' },
+      { name: 'Fennel Seeds', benefit: 'Potassium and digestion' },
+      { name: 'Licorice Root', benefit: 'Potassium and adrenal support' },
+      { name: 'Mint', benefit: 'Potassium and soothing' },
+      { name: 'Nettle Tea', benefit: 'Minerals and water balance' },
+    ],
+    herbNotes: [
+      'First time in cycle to consider light fasting - eat light, veg broths, juices',
+      'Wild yam cream massage can help with PMS symptoms',
+      'Regular aerobic exercise helps balance hormones',
+      'Drink nettle or dandelion tea for water retention',
+      'Massage ankles to help with water retention',
+      'Cut down on salt to reduce bloating',
+      'No caffeine during this phase',
+      'Fats make calcium more available - don\'t avoid healthy fats',
+    ],
+    avoid: ['Excessive salt (causes water retention)', 'Caffeine', 'Refined sugar', 'Alcohol'],
+    tips: [
+      'This is a good time for light eating - broths, juices, light meals',
+      'Estrogen drops twice - extra calcium helps both times',
+      'Potassium needs increase because B6 needs increase',
+      'Massage wild yam cream into body for PMS relief',
+      'Regular aerobic exercise helps balance this phase',
+      'Be gentle with yourself - you are a lunar primate!',
+      'Herbs, minerals, and B vitamins support you throughout your cycle',
+    ],
   },
 };
 
@@ -712,8 +822,8 @@ function NutrientCategoriesSection({ nutrients, phase, theme }: { nutrients: Nut
     switch (phase) {
       case 'menstrual': return 'Key Nutrients for Days 1-5';
       case 'follicular': return 'Key Nutrients for Days 6-13';
-      case 'ovulatory': return 'Key Nutrients for Days 14-17';
-      case 'luteal': return 'Key Nutrients for Days 18-28';
+      case 'ovulatory': return 'Key Nutrients for Days 13-15';
+      case 'luteal': return 'Key Nutrients for Days 16-28';
       default: return 'Key Nutrients';
     }
   };
