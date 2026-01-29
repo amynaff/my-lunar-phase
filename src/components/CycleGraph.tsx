@@ -164,7 +164,7 @@ export function CycleGraph({ showLabels = true }: Props) {
 
   // Phase boundaries matching the chart (adjusted for Days 1-5, 6-13, 13-15, 16-28)
   const phases = [
-    { name: 'Menstrual', days: '1-5', start: 0, end: 5 / cycleLength, color: phaseColors.menstrual },
+    { name: 'Menses', days: '1-5', start: 0, end: 5 / cycleLength, color: phaseColors.menstrual },
     { name: 'Follicular', days: '6-13', start: 5 / cycleLength, end: 13 / cycleLength, color: phaseColors.follicular },
     { name: 'Ovulation', days: '13-15', start: 13 / cycleLength, end: 15 / cycleLength, color: phaseColors.ovulatory },
     { name: 'Luteal', days: '16-28', start: 15 / cycleLength, end: 1, color: phaseColors.luteal },
@@ -356,15 +356,12 @@ export function CycleGraph({ showLabels = true }: Props) {
 
           {/* Phase labels at bottom */}
           {phases.map((phase) => {
-            const phaseWidth = phase.end - phase.start;
-            const isNarrow = phaseWidth < 0.1;
-
             return (
               <G key={`label-${phase.name}`}>
                 <SvgText
                   x={PADDING.left + ((phase.start + phase.end) / 2) * CHART_WIDTH}
                   y={GRAPH_HEIGHT - 22}
-                  fontSize={isNarrow ? 7 : 9}
+                  fontSize={9}
                   fill={phase.color.text}
                   textAnchor="middle"
                   fontWeight="600"
