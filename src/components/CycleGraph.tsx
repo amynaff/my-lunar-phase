@@ -361,7 +361,7 @@ export function CycleGraph({ showLabels = true }: Props) {
                 <SvgText
                   x={PADDING.left + ((phase.start + phase.end) / 2) * CHART_WIDTH}
                   y={GRAPH_HEIGHT - 22}
-                  fontSize={9}
+                  fontSize={8}
                   fill={phase.color.text}
                   textAnchor="middle"
                   fontWeight="600"
@@ -371,7 +371,7 @@ export function CycleGraph({ showLabels = true }: Props) {
                 <SvgText
                   x={PADDING.left + ((phase.start + phase.end) / 2) * CHART_WIDTH}
                   y={GRAPH_HEIGHT - 10}
-                  fontSize={7}
+                  fontSize={6}
                   fill={theme.text.tertiary}
                   textAnchor="middle"
                 >
