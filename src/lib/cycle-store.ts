@@ -234,20 +234,36 @@ const phaseGroceries: Record<CyclePhase, Array<{ name: string; category: string 
     { name: 'Fenugreek seeds', category: 'Seeds' },
   ],
   ovulatory: [
-    { name: 'Mixed berries', category: 'Fruits' },
-    { name: 'Oysters', category: 'Protein' },
-    { name: 'Wild fish', category: 'Protein' },
-    { name: 'Walnuts', category: 'Nuts' },
-    { name: 'Bell peppers (all colors)', category: 'Vegetables' },
-    { name: 'Carrots', category: 'Vegetables' },
-    { name: 'Whole grain bread', category: 'Grains' },
-    { name: 'Chia seeds', category: 'Seeds' },
-    { name: 'Leafy greens', category: 'Vegetables' },
+    // Vitamin B6 sources (eat raw when possible)
+    { name: 'Fish (fresh)', category: 'Protein' },
+    { name: 'Mixed nuts', category: 'Nuts' },
+    { name: 'Avocados', category: 'Produce' },
+    { name: 'Bananas', category: 'Fruits' },
+    { name: 'Sprouted soybeans', category: 'Produce' },
+    // Zinc sources
+    { name: 'Chicken', category: 'Protein' },
+    { name: 'Tuna', category: 'Protein' },
     { name: 'Pumpkin seeds', category: 'Seeds' },
-    { name: 'Hemp seeds', category: 'Seeds' },
+    { name: 'White cornmeal', category: 'Grains' },
+    { name: 'Paprika', category: 'Spices' },
+    { name: 'Garlic', category: 'Produce' },
+    // Niacin sources
+    { name: 'Tofu', category: 'Protein' },
+    { name: 'Soybeans', category: 'Protein' },
     { name: 'Sunflower seeds', category: 'Seeds' },
+    { name: 'Peanut butter', category: 'Pantry' },
+    { name: 'Spirulina', category: 'Supplements' },
+    // Manganese sources
+    { name: 'Walnuts', category: 'Nuts' },
+    { name: 'Spinach', category: 'Vegetables' },
+    // Kelp & greens
+    { name: 'Kelp', category: 'Vegetables' },
+    { name: 'Dandelion greens', category: 'Vegetables' },
+    { name: 'Parsley', category: 'Produce' },
+    { name: 'Watercress', category: 'Vegetables' },
+    { name: 'Blueberries', category: 'Fruits' },
+    // Seed cycling switch
     { name: 'Sesame seeds', category: 'Seeds' },
-    { name: 'Legumes', category: 'Protein' },
   ],
   luteal: [
     { name: 'Sweet potatoes', category: 'Vegetables' },

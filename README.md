@@ -59,6 +59,15 @@ A beautiful, comprehensive mobile app that helps women understand and work with 
   - **Lecithin (1 TBS/day)**: = 12g linoleic acid, 250mg choline, 250mg inositol
   - **Supportive Herbs**: Dong Quai (8 days - high iron, B12, E), Black Cohosh (regulates estrogen), nettles, sarsaparilla, parsley, Irish moss, alfalfa, dandelion, fenugreek
   - **Important Notes**: Best days for dairy, take extra calcium in first week, "celebration of being" phase
+- **Ovulatory Phase (Days 13-15) - Peak Fertility Guide:**
+  - **Vitamin B6 (50-100mg)**: Fish, nuts, avocado, banana, sprouted soybeans - DESTROYED BY COOKING, eat raw
+  - **Zinc (15-30mg/day)**: Chicken, tuna, pumpkin seeds, white cornmeal, paprika, garlic - vegetarians need supplements
+  - **Niacin**: Chicken, tofu, soybeans, sunflower seeds, peanut butter, spirulina
+  - **Manganese (2-4mg/day)**: Walnuts, spinach, alfalfa
+  - **Kelp & Greens**: Dandelion greens, parsley, rice bran, watercress, blueberries
+  - **Supportive Herbs**: Kelp, cayenne, comfrey, fenugreek, alfalfa
+  - **Evening Supplements**: Calcium, magnesium, potassium (take in P.M.)
+  - **Important Notes**: Extra calcium needed as estrogen drops, be gentle during fertility cycles
 - Perimenopause/menopause focused nutrition
 - Tips for optimal eating during each phase
 - One-tap add to grocery list
