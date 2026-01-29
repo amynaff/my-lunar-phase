@@ -46,9 +46,9 @@ const getPhaseColors = (isDark: boolean) => ({
   },
 });
 
-// More accurate hormone curve data based on the chart
+// More accurate hormone curve data based on the chart - smooth rounded curves
 const generateHormoneData = (cycleLength: number) => {
-  const points = 200;
+  const points = 300; // More points for smoother curves
   const estrogen: number[] = [];
   const progesterone: number[] = [];
 
@@ -56,51 +56,49 @@ const generateHormoneData = (cycleLength: number) => {
     const x = i / points;
     const dayOfCycle = x * cycleLength;
 
-    // ESTROGEN curve - matches the chart more accurately
-    // Low during menstrual, rises during follicular, PEAKS at ovulation (day 13-14),
-    // drops sharply, then has a secondary smaller rise mid-luteal
+    // ESTROGEN curve - smooth bell curve rising to peak at ovulation
+    // Uses smooth sine-based transitions for rounded appearance
     let estrogenVal = 0;
 
     if (dayOfCycle <= 5) {
-      // Menstrual - low and slowly rising
-      estrogenVal = 0.15 + (dayOfCycle / 5) * 0.1;
-    } else if (dayOfCycle <= 13) {
-      // Follicular - steadily rising to peak
-      const progress = (dayOfCycle - 5) / 8;
-      estrogenVal = 0.25 + progress * 0.7;
+      // Menstrual - low, gentle rise using smooth curve
+      const t = dayOfCycle / 5;
+      estrogenVal = 0.12 + 0.08 * Math.sin(t * Math.PI * 0.5);
     } else if (dayOfCycle <= 14) {
-      // Ovulation peak
-      estrogenVal = 0.95 + Math.sin((dayOfCycle - 13) * Math.PI) * 0.05;
-    } else if (dayOfCycle <= 17) {
-      // Sharp drop after ovulation
-      const dropProgress = (dayOfCycle - 14) / 3;
-      estrogenVal = 1.0 - dropProgress * 0.55;
+      // Follicular to ovulation peak - smooth rise using sine ease
+      const t = (dayOfCycle - 5) / 9;
+      // Sine easing for smooth rounded rise
+      estrogenVal = 0.2 + 0.8 * Math.sin(t * Math.PI * 0.5);
+    } else if (dayOfCycle <= 18) {
+      // Drop after ovulation - smooth curve down
+      const t = (dayOfCycle - 14) / 4;
+      estrogenVal = 1.0 - 0.55 * Math.sin(t * Math.PI * 0.5);
     } else if (dayOfCycle <= 24) {
-      // Secondary rise in mid-luteal
-      const riseProgress = (dayOfCycle - 17) / 7;
-      estrogenVal = 0.45 + Math.sin(riseProgress * Math.PI) * 0.2;
+      // Secondary smaller rise in mid-luteal - gentle bump
+      const t = (dayOfCycle - 18) / 6;
+      estrogenVal = 0.45 + 0.18 * Math.sin(t * Math.PI);
     } else {
-      // Drop before period
-      const dropProgress = (dayOfCycle - 24) / (cycleLength - 24);
-      estrogenVal = 0.45 - dropProgress * 0.3;
+      // Final drop before period - smooth descent
+      const t = (dayOfCycle - 24) / (cycleLength - 24);
+      estrogenVal = 0.45 - 0.30 * Math.sin(t * Math.PI * 0.5);
     }
     estrogen.push(Math.max(0.1, estrogenVal));
 
-    // PROGESTERONE curve - matches the chart
-    // Very low until ovulation, then rises dramatically, peaks around day 21-22, drops before period
+    // PROGESTERONE curve - smooth bell curve after ovulation
+    // Flat and low before ovulation, then smooth rise and fall
     let progesteroneVal = 0;
 
     if (dayOfCycle <= 14) {
-      // Low before ovulation (barely visible)
-      progesteroneVal = 0.08 + Math.sin((dayOfCycle / 14) * Math.PI * 0.5) * 0.02;
-    } else if (dayOfCycle <= 22) {
-      // Rise after ovulation to peak
-      const riseProgress = (dayOfCycle - 14) / 8;
-      progesteroneVal = 0.1 + Math.pow(riseProgress, 0.7) * 0.85;
+      // Low and flat before ovulation
+      progesteroneVal = 0.08;
+    } else if (dayOfCycle <= 21) {
+      // Smooth rise after ovulation using sine ease
+      const t = (dayOfCycle - 14) / 7;
+      progesteroneVal = 0.08 + 0.87 * Math.sin(t * Math.PI * 0.5);
     } else {
-      // Drop before period
-      const dropProgress = (dayOfCycle - 22) / (cycleLength - 22);
-      progesteroneVal = 0.95 - Math.pow(dropProgress, 0.8) * 0.85;
+      // Smooth drop before period using sine ease
+      const t = (dayOfCycle - 21) / (cycleLength - 21);
+      progesteroneVal = 0.95 - 0.85 * Math.sin(t * Math.PI * 0.5);
     }
     progesterone.push(Math.max(0.05, progesteroneVal));
   }
@@ -166,10 +164,10 @@ export function CycleGraph({ showLabels = true }: Props) {
 
   // Phase boundaries matching the chart (adjusted for Days 1-5, 6-13, 13-15, 16-28)
   const phases = [
-    { name: 'Menstrual', shortName: 'Menstrual', days: '1-5', start: 0, end: 5 / cycleLength, color: phaseColors.menstrual },
-    { name: 'Follicular', shortName: 'Follic.', days: '6-13', start: 5 / cycleLength, end: 13 / cycleLength, color: phaseColors.follicular },
-    { name: 'Ovulatory', shortName: 'Ovul.', days: '13-15', start: 13 / cycleLength, end: 15 / cycleLength, color: phaseColors.ovulatory },
-    { name: 'Luteal', shortName: 'Luteal', days: '16-28', start: 15 / cycleLength, end: 1, color: phaseColors.luteal },
+    { name: 'Menstrual', days: '1-5', start: 0, end: 5 / cycleLength, color: phaseColors.menstrual },
+    { name: 'Follicular', days: '6-13', start: 5 / cycleLength, end: 13 / cycleLength, color: phaseColors.follicular },
+    { name: 'Ovulation', days: '13-15', start: 13 / cycleLength, end: 15 / cycleLength, color: phaseColors.ovulatory },
+    { name: 'Luteal', days: '16-28', start: 15 / cycleLength, end: 1, color: phaseColors.luteal },
   ];
 
   // Current day marker position
@@ -357,14 +355,29 @@ export function CycleGraph({ showLabels = true }: Props) {
           })}
 
           {/* Phase labels at bottom */}
-          {phases.map((phase) => {
-            // Calculate if this is a narrow phase (less than 15% of the width)
+          {phases.map((phase, index) => {
+            // Calculate if this is a narrow phase (less than 10% of the width)
             const phaseWidth = phase.end - phase.start;
-            const isNarrow = phaseWidth < 0.15;
-            const displayName = isNarrow ? phase.shortName : phase.name;
+            const isNarrow = phaseWidth < 0.1;
+            // For narrow phases between wider ones, use a slash separator approach
+            const prevPhase = index > 0 ? phases[index - 1] : null;
+            const showSlashBefore = isNarrow && prevPhase && (prevPhase.end - prevPhase.start) >= 0.2;
 
             return (
               <G key={`label-${phase.name}`}>
+                {/* Add slash separator before narrow Ovulation phase */}
+                {showSlashBefore && (
+                  <SvgText
+                    x={PADDING.left + phase.start * CHART_WIDTH - 4}
+                    y={GRAPH_HEIGHT - 22}
+                    fontSize={9}
+                    fill={theme.text.tertiary}
+                    textAnchor="middle"
+                    fontWeight="400"
+                  >
+                    /
+                  </SvgText>
+                )}
                 <SvgText
                   x={PADDING.left + ((phase.start + phase.end) / 2) * CHART_WIDTH}
                   y={GRAPH_HEIGHT - 22}
@@ -373,7 +386,7 @@ export function CycleGraph({ showLabels = true }: Props) {
                   textAnchor="middle"
                   fontWeight="600"
                 >
-                  {displayName}
+                  {phase.name}
                 </SvgText>
                 <SvgText
                   x={PADDING.left + ((phase.start + phase.end) / 2) * CHART_WIDTH}
