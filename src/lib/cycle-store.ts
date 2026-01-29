@@ -199,22 +199,39 @@ const phaseGroceries: Record<CyclePhase, Array<{ name: string; category: string 
     { name: 'Turmeric', category: 'Spices' },
   ],
   follicular: [
-    { name: 'Eggs', category: 'Protein' },
+    // Iodine sources
+    { name: 'Fish (any)', category: 'Protein' },
+    { name: 'Seaweed (kelp, dulse)', category: 'Vegetables' },
+    { name: 'Lemons', category: 'Fruits' },
+    // Vitamin E sources
+    { name: 'Wheat germ oil', category: 'Oils' },
+    { name: 'Whole grains', category: 'Grains' },
+    { name: 'Sweet potatoes', category: 'Vegetables' },
+    { name: 'Mixed nuts', category: 'Nuts' },
+    // Linoleic acid sources
+    { name: 'Raw safflower oil', category: 'Oils' },
+    { name: 'Fertile eggs (pasture-raised)', category: 'Protein' },
+    { name: 'Liver', category: 'Protein' },
+    { name: 'Walnuts', category: 'Nuts' },
+    { name: 'Sunflower seeds', category: 'Seeds' },
+    { name: 'Pumpkin seeds', category: 'Seeds' },
+    // Protein sources
     { name: 'Wild salmon', category: 'Protein' },
-    { name: 'Chicken breast', category: 'Protein' },
-    { name: 'Broccoli', category: 'Vegetables' },
-    { name: 'Kale', category: 'Vegetables' },
-    { name: 'Quinoa', category: 'Grains' },
-    { name: 'Oats', category: 'Grains' },
-    { name: 'Avocados', category: 'Produce' },
-    { name: 'Almonds', category: 'Nuts' },
-    { name: 'Kimchi/Sauerkraut', category: 'Fermented' },
-    { name: 'Brussels sprouts', category: 'Vegetables' },
-    { name: 'Cauliflower', category: 'Vegetables' },
-    { name: 'Brown rice', category: 'Grains' },
-    { name: 'Flax seeds', category: 'Seeds' },
+    { name: 'Chicken', category: 'Protein' },
+    { name: 'Tofu', category: 'Protein' },
+    { name: 'Legumes', category: 'Protein' },
     { name: 'Tahini', category: 'Pantry' },
+    // Best days for dairy
     { name: 'Greek yogurt', category: 'Dairy' },
+    { name: 'Cheese', category: 'Dairy' },
+    { name: 'Milk', category: 'Dairy' },
+    // Greens
+    { name: 'Dark leafy greens', category: 'Vegetables' },
+    { name: 'Parsley', category: 'Produce' },
+    { name: 'Dandelion greens', category: 'Vegetables' },
+    // Lecithin
+    { name: 'Lecithin granules', category: 'Supplements' },
+    { name: 'Fenugreek seeds', category: 'Seeds' },
   ],
   ovulatory: [
     { name: 'Mixed berries', category: 'Fruits' },

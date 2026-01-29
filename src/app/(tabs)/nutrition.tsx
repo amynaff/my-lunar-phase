@@ -149,22 +149,124 @@ const phaseNutrition: Record<CyclePhase, PhaseNutritionData> = {
   },
   follicular: {
     focus: 'Energize & Create',
-    description: 'Estrogen is rising! Light, fresh foods support your increasing energy. Great time for trying new recipes.',
+    description: 'Estrogen is rising! This is the celebration phase. Light, fresh foods and quality protein support your increasing energy. Best days to eat dairy.',
     days: 'Days 6-13',
     foods: [
-      { name: 'Eggs', benefit: 'Pasture-raised for protein' },
-      { name: 'Wild Salmon', benefit: 'Omega-3s and protein' },
-      { name: 'Broccoli', benefit: 'Estrogen metabolism' },
-      { name: 'Quinoa', benefit: 'Complete protein grain' },
-      { name: 'Avocados', benefit: 'Healthy fats' },
-      { name: 'Fermented Foods', benefit: 'Kimchi, sauerkraut for gut' },
-      { name: 'Cruciferous Veggies', benefit: 'Brussels sprouts, cauliflower' },
-      { name: 'Flax Seeds', benefit: 'Seed cycling - 1-2 tbsp' },
-      { name: 'Greek Yogurt', benefit: 'Probiotics and calcium' },
-      { name: 'Fresh Salads', benefit: 'Light and energizing' },
+      // Iodine sources
+      { name: 'Fish', benefit: 'Iodine and protein' },
+      { name: 'Seaweed', benefit: 'Rich iodine source' },
+      { name: 'Kelp', benefit: '1 tsp daily for iodine' },
+      { name: 'Dulse', benefit: '2oz for iodine' },
+      { name: 'Lemons', benefit: 'Iodine and vitamin C' },
+      // Vitamin E sources
+      { name: 'Wheat Germ Oil', benefit: 'Vitamin E powerhouse' },
+      { name: 'Whole Grains', benefit: 'Vitamin E and fiber' },
+      { name: 'Greens', benefit: 'Vitamin E and minerals' },
+      { name: 'Sweet Potatoes', benefit: 'Vitamin E and complex carbs' },
+      { name: 'Seeds & Nuts', benefit: 'Vitamin E and healthy fats' },
+      // Linoleic acid sources
+      { name: 'Raw Safflower Oil', benefit: '3 tsp/day for linoleic acid' },
+      { name: 'Fertile Egg Yolks', benefit: 'Linoleic acid and choline' },
+      { name: 'Liver', benefit: 'Linoleic acid and B vitamins' },
+      { name: 'Walnuts', benefit: 'Linoleic acid and omega-3s' },
+      { name: 'Sunflower Seeds', benefit: 'Linoleic acid' },
+      { name: 'Pumpkin Seeds', benefit: 'Linoleic acid and zinc' },
+      // Protein sources
+      { name: 'Meat & Fish', benefit: '50g protein/day minimum' },
+      { name: 'Tofu', benefit: 'Plant protein' },
+      { name: 'Eggs', benefit: 'Complete protein' },
+      { name: 'Legumes', benefit: 'Protein and fiber' },
+      { name: 'Tahini', benefit: 'Protein and calcium' },
+      { name: 'Greek Yogurt', benefit: 'Best days for dairy' },
+      // Lecithin
+      { name: 'Lecithin', benefit: '1 TBS = 12g linoleic acid, 250mg choline' },
     ],
-    avoid: ['Heavy, greasy foods', 'Excessive sugar'],
-    tips: ['Try raw salads and fresh vegetables', 'Experiment with new healthy recipes', 'Sprouts and microgreens are excellent'],
+    nutrients: [
+      {
+        nutrient: 'Iodine',
+        dailyAmount: '4mg/day',
+        purpose: 'Supports thyroid and estrogen metabolism',
+        foods: [
+          { name: 'Fish', benefit: 'Natural iodine source' },
+          { name: 'Seaweed', benefit: 'Concentrated iodine' },
+          { name: 'Kelp', benefit: '1 tsp daily' },
+          { name: 'Dulse', benefit: '2oz serving' },
+          { name: 'Lemons', benefit: 'Iodine with vitamin C' },
+        ],
+      },
+      {
+        nutrient: 'Vitamin E',
+        dailyAmount: '200-800 IU/day',
+        purpose: 'Antioxidant, supports hormone balance',
+        foods: [
+          { name: 'Wheat Germ Oil', benefit: 'Richest vitamin E source' },
+          { name: 'Whole Grains', benefit: 'Natural vitamin E' },
+          { name: 'Greens', benefit: 'Vitamin E with minerals' },
+          { name: 'Sweet Potatoes', benefit: 'Vitamin E and beta-carotene' },
+          { name: 'Seeds & Nuts', benefit: 'Vitamin E and healthy fats' },
+        ],
+      },
+      {
+        nutrient: 'Linoleic Acid',
+        dailyAmount: '3 tsp oils/day',
+        purpose: 'Essential fatty acid for hormone production',
+        foods: [
+          { name: 'Raw Unrefined Oils', benefit: 'Safflower oil is ideal' },
+          { name: 'Fertile Egg Yolks', benefit: 'Rich in linoleic acid' },
+          { name: 'Liver', benefit: 'Concentrated source' },
+          { name: 'Mayo (homemade)', benefit: 'From quality oils' },
+          { name: 'Walnuts', benefit: 'Plant-based source' },
+          { name: 'Sunflower & Pumpkin Seeds', benefit: 'Seeds are excellent' },
+        ],
+      },
+      {
+        nutrient: 'Protein',
+        dailyAmount: '50g/day minimum',
+        purpose: 'Building blocks for hormones and tissues',
+        foods: [
+          { name: 'Meat & Fish', benefit: 'Complete proteins' },
+          { name: 'Grains + Legumes', benefit: 'Complimentary protein combo' },
+          { name: 'Tofu & Eggs', benefit: 'Versatile proteins' },
+          { name: 'Seeds & Tahini', benefit: 'Plant proteins' },
+          { name: 'Greens', benefit: 'Surprising protein source' },
+        ],
+      },
+    ],
+    supplements: [
+      { name: 'Lecithin', amount: '1 TBS/day', note: '= 12g linoleic acid, 250mg choline, 250mg inositol' },
+      { name: 'Calcium', amount: 'Extra', note: 'Take extra calcium in the first week' },
+      { name: 'Vitamin E', amount: '200-800 IU/day' },
+      { name: 'Iodine', amount: '4mg/day', note: 'If not getting from food' },
+    ],
+    herbs: [
+      { name: 'Dong Quai (Don Quai)', benefit: 'Chinese root tonic - high iron, B12, vitamin E - take for 8 days' },
+      { name: 'Black Cohosh', benefit: 'Balances and regulates estrogen' },
+      { name: 'Nettles', benefit: 'Iodine source' },
+      { name: 'Sarsaparilla', benefit: 'Iodine and hormone support' },
+      { name: 'Parsley', benefit: 'Iodine and minerals' },
+      { name: 'Mustard Greens', benefit: 'Iodine source' },
+      { name: 'Irish Moss', benefit: 'Iodine-rich seaweed' },
+      { name: 'Alfalfa', benefit: 'Vitamin E source' },
+      { name: 'Dandelion Leaves', benefit: 'Vitamin E and liver support' },
+      { name: 'Comfrey Leaves', benefit: 'Vitamin E source' },
+      { name: 'Fenugreek Seeds', benefit: 'Lecithin source' },
+    ],
+    herbNotes: [
+      'Take Dong Quai for 8 days during this phase (high in iron, B12, vitamin E)',
+      'Black Cohosh helps balance and regulate estrogen levels',
+      'In the first week, take extra calcium',
+      'This is the "flex point" that regulates fertility',
+      'Best days to eat dairy products',
+    ],
+    avoid: ['Heavy, greasy foods', 'Excessive sugar', 'Processed foods'],
+    tips: [
+      'This is the celebration phase - energy is rising!',
+      'Best days to eat dairy products',
+      'Focus on complimentary protein combinations (grains + legumes)',
+      'Take extra calcium in the first week of this phase',
+      'Raw unrefined oils are essential - try 3 tsp safflower oil daily',
+      'Sprouts and microgreens are excellent additions',
+    ],
   },
   ovulatory: {
     focus: 'Light & Vibrant',
@@ -472,15 +574,19 @@ function SeedCyclingSection({ theme }: { theme: ReturnType<typeof getTheme> }) {
   );
 }
 
-// Nutrient Categories Section (Iron, Folic Acid, Vitamin C)
-function NutrientCategoriesSection({ nutrients, theme }: { nutrients: NutrientCategory[]; theme: ReturnType<typeof getTheme> }) {
-  const [expandedNutrient, setExpandedNutrient] = useState<string | null>('Iron');
+// Nutrient Categories Section (supports any phase nutrients)
+function NutrientCategoriesSection({ nutrients, phase, theme }: { nutrients: NutrientCategory[]; phase: CyclePhase; theme: ReturnType<typeof getTheme> }) {
+  const [expandedNutrient, setExpandedNutrient] = useState<string | null>(nutrients[0]?.nutrient || null);
 
   const getNutrientColor = (nutrient: string) => {
     switch (nutrient) {
       case 'Iron': return '#be185d';
       case 'Folic Acid': return '#059669';
       case 'Vitamin C': return '#f59e0b';
+      case 'Iodine': return '#0891b2';
+      case 'Vitamin E': return '#84cc16';
+      case 'Linoleic Acid': return '#f97316';
+      case 'Protein': return '#ec4899';
       default: return theme.accent.pink;
     }
   };
@@ -490,14 +596,28 @@ function NutrientCategoriesSection({ nutrients, theme }: { nutrients: NutrientCa
       case 'Iron': return <Beaker size={18} color={getNutrientColor(nutrient)} />;
       case 'Folic Acid': return <Leaf size={18} color={getNutrientColor(nutrient)} />;
       case 'Vitamin C': return <Sun size={18} color={getNutrientColor(nutrient)} />;
+      case 'Iodine': return <Beaker size={18} color={getNutrientColor(nutrient)} />;
+      case 'Vitamin E': return <Sparkles size={18} color={getNutrientColor(nutrient)} />;
+      case 'Linoleic Acid': return <Heart size={18} color={getNutrientColor(nutrient)} />;
+      case 'Protein': return <UtensilsCrossed size={18} color={getNutrientColor(nutrient)} />;
       default: return <Pill size={18} color={getNutrientColor(nutrient)} />;
+    }
+  };
+
+  const getPhaseTitle = () => {
+    switch (phase) {
+      case 'menstrual': return 'Key Nutrients for Days 1-5';
+      case 'follicular': return 'Key Nutrients for Days 6-13';
+      case 'ovulatory': return 'Key Nutrients for Days 14-17';
+      case 'luteal': return 'Key Nutrients for Days 18-28';
+      default: return 'Key Nutrients';
     }
   };
 
   return (
     <View className="mb-4">
       <Text style={{ fontFamily: 'Quicksand_600SemiBold', color: theme.text.primary }} className="text-base mb-3">
-        Key Nutrients for Days 1-5
+        {getPhaseTitle()}
       </Text>
       {nutrients.map((nutrient) => {
         const color = getNutrientColor(nutrient.nutrient);
@@ -812,10 +932,10 @@ export default function NutritionScreen() {
             </Animated.View>
           )}
 
-          {/* Nutrient Categories for Menstrual Phase */}
-          {currentPhase === 'menstrual' && nutrition.nutrients && (
+          {/* Nutrient Categories for phases with nutrient data */}
+          {nutrition.nutrients && (
             <Animated.View entering={FadeInUp.delay(280).duration(600)} className="mx-6 mt-6">
-              <NutrientCategoriesSection nutrients={nutrition.nutrients} theme={theme} />
+              <NutrientCategoriesSection nutrients={nutrition.nutrients} phase={currentPhase} theme={theme} />
             </Animated.View>
           )}
 
@@ -823,7 +943,7 @@ export default function NutritionScreen() {
           <Animated.View entering={FadeInUp.delay(300).duration(600)} className="mx-6 mt-6">
             <View className="flex-row items-center justify-between mb-4">
               <Text style={{ fontFamily: 'Quicksand_600SemiBold', color: theme.text.primary }} className="text-lg">
-                {currentPhase === 'menstrual' ? 'All Recommended Foods' : 'Phase Nutrition'}
+                {nutrition.nutrients ? 'All Recommended Foods' : 'Phase Nutrition'}
               </Text>
               <Pressable onPress={handleAddToGrocery} className="flex-row items-center px-3 py-2 rounded-full" style={{ backgroundColor: `${theme.accent.pink}15` }}>
                 <ShoppingCart size={14} color={theme.accent.pink} />
@@ -839,15 +959,15 @@ export default function NutritionScreen() {
               items={nutrition.foods}
               theme={theme}
               iconBgColor="#22C55E15"
-              defaultExpanded={currentPhase !== 'menstrual'}
+              defaultExpanded={!nutrition.nutrients}
             />
 
-            {/* Herbs & Supplements for Menstrual Phase */}
-            {currentPhase === 'menstrual' && nutrition.herbs && (
+            {/* Herbs & Supplements for phases with data */}
+            {nutrition.herbs && (
               <HerbsSection herbs={nutrition.herbs} herbNotes={nutrition.herbNotes} theme={theme} />
             )}
 
-            {currentPhase === 'menstrual' && nutrition.supplements && (
+            {nutrition.supplements && (
               <SupplementsSection supplements={nutrition.supplements} theme={theme} />
             )}
 

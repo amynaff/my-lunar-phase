@@ -51,6 +51,14 @@ A beautiful, comprehensive mobile app that helps women understand and work with 
   - **Supportive Herbs**: Raspberry leaf, mugwort, nettles, yellow dock (iron); rosehips (vitamin C); fenugreek seeds (folic acid)
   - **Vitamins & Minerals**: Vitamin C, Calcium (200mg), Magnesium (100mg)
   - **Important Notes**: Iron blocked by caffeine, cook in iron pots, extra rest is essential
+- **Follicular Phase (Days 6-13) - Estrogen Rising Guide:**
+  - **Iodine (4mg/day)**: Fish, seaweed, kelp (1 tsp), dulse (2oz), lemons
+  - **Vitamin E (200-800 IU/day)**: Wheat germ oil, whole grains, greens, sweet potatoes, seeds & nuts
+  - **Linoleic Acid (3 tsp oils/day)**: Raw safflower oil, fertile egg yolks, liver, walnuts, sunflower & pumpkin seeds
+  - **Protein (50g/day min)**: Meat & fish, grains, tofu, eggs, legumes, seeds, tahini - complimentary protein combos
+  - **Lecithin (1 TBS/day)**: = 12g linoleic acid, 250mg choline, 250mg inositol
+  - **Supportive Herbs**: Dong Quai (8 days - high iron, B12, E), Black Cohosh (regulates estrogen), nettles, sarsaparilla, parsley, Irish moss, alfalfa, dandelion, fenugreek
+  - **Important Notes**: Best days for dairy, take extra calcium in first week, "celebration of being" phase
 - Perimenopause/menopause focused nutrition
 - Tips for optimal eating during each phase
 - One-tap add to grocery list
