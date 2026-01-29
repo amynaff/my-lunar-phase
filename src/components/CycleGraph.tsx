@@ -166,10 +166,10 @@ export function CycleGraph({ showLabels = true }: Props) {
 
   // Phase boundaries matching the chart (adjusted for Days 1-5, 6-13, 13-15, 16-28)
   const phases = [
-    { name: 'Menstrual', days: '1-5', start: 0, end: 5 / cycleLength, color: phaseColors.menstrual },
-    { name: 'Follicular', days: '6-13', start: 5 / cycleLength, end: 13 / cycleLength, color: phaseColors.follicular },
-    { name: 'Ovulatory', days: '13-15', start: 13 / cycleLength, end: 15 / cycleLength, color: phaseColors.ovulatory },
-    { name: 'Luteal', days: '16-28', start: 15 / cycleLength, end: 1, color: phaseColors.luteal },
+    { name: 'Menstrual', shortName: 'Menstrual', days: '1-5', start: 0, end: 5 / cycleLength, color: phaseColors.menstrual },
+    { name: 'Follicular', shortName: 'Follic.', days: '6-13', start: 5 / cycleLength, end: 13 / cycleLength, color: phaseColors.follicular },
+    { name: 'Ovulatory', shortName: 'Ovul.', days: '13-15', start: 13 / cycleLength, end: 15 / cycleLength, color: phaseColors.ovulatory },
+    { name: 'Luteal', shortName: 'Luteal', days: '16-28', start: 15 / cycleLength, end: 1, color: phaseColors.luteal },
   ];
 
   // Current day marker position
@@ -357,29 +357,36 @@ export function CycleGraph({ showLabels = true }: Props) {
           })}
 
           {/* Phase labels at bottom */}
-          {phases.map((phase) => (
-            <G key={`label-${phase.name}`}>
-              <SvgText
-                x={PADDING.left + ((phase.start + phase.end) / 2) * CHART_WIDTH}
-                y={GRAPH_HEIGHT - 22}
-                fontSize={9}
-                fill={phase.color.text}
-                textAnchor="middle"
-                fontWeight="600"
-              >
-                {phase.name}
-              </SvgText>
-              <SvgText
-                x={PADDING.left + ((phase.start + phase.end) / 2) * CHART_WIDTH}
-                y={GRAPH_HEIGHT - 10}
-                fontSize={7}
-                fill={theme.text.tertiary}
-                textAnchor="middle"
-              >
-                Days {phase.days}
-              </SvgText>
-            </G>
-          ))}
+          {phases.map((phase) => {
+            // Calculate if this is a narrow phase (less than 15% of the width)
+            const phaseWidth = phase.end - phase.start;
+            const isNarrow = phaseWidth < 0.15;
+            const displayName = isNarrow ? phase.shortName : phase.name;
+
+            return (
+              <G key={`label-${phase.name}`}>
+                <SvgText
+                  x={PADDING.left + ((phase.start + phase.end) / 2) * CHART_WIDTH}
+                  y={GRAPH_HEIGHT - 22}
+                  fontSize={isNarrow ? 7 : 9}
+                  fill={phase.color.text}
+                  textAnchor="middle"
+                  fontWeight="600"
+                >
+                  {displayName}
+                </SvgText>
+                <SvgText
+                  x={PADDING.left + ((phase.start + phase.end) / 2) * CHART_WIDTH}
+                  y={GRAPH_HEIGHT - 10}
+                  fontSize={7}
+                  fill={theme.text.tertiary}
+                  textAnchor="middle"
+                >
+                  {phase.days}
+                </SvgText>
+              </G>
+            );
+          })}
 
           {/* Hormone labels on the curves */}
           <SvgText
