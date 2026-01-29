@@ -355,29 +355,12 @@ export function CycleGraph({ showLabels = true }: Props) {
           })}
 
           {/* Phase labels at bottom */}
-          {phases.map((phase, index) => {
-            // Calculate if this is a narrow phase (less than 10% of the width)
+          {phases.map((phase) => {
             const phaseWidth = phase.end - phase.start;
             const isNarrow = phaseWidth < 0.1;
-            // For narrow phases between wider ones, use a slash separator approach
-            const prevPhase = index > 0 ? phases[index - 1] : null;
-            const showSlashBefore = isNarrow && prevPhase && (prevPhase.end - prevPhase.start) >= 0.2;
 
             return (
               <G key={`label-${phase.name}`}>
-                {/* Add slash separator before narrow Ovulation phase */}
-                {showSlashBefore && (
-                  <SvgText
-                    x={PADDING.left + phase.start * CHART_WIDTH - 4}
-                    y={GRAPH_HEIGHT - 22}
-                    fontSize={9}
-                    fill={theme.text.tertiary}
-                    textAnchor="middle"
-                    fontWeight="400"
-                  >
-                    /
-                  </SvgText>
-                )}
                 <SvgText
                   x={PADDING.left + ((phase.start + phase.end) / 2) * CHART_WIDTH}
                   y={GRAPH_HEIGHT - 22}
