@@ -318,11 +318,11 @@ export default function MovementScreen() {
               style={{ borderRadius: 24, padding: 20, borderWidth: 1, borderColor: 'rgba(245, 158, 11, 0.3)' }}
             >
               <View className="flex-row items-center mb-3">
-                <View className="w-12 h-12 rounded-full items-center justify-center mr-3" style={{ backgroundColor: 'rgba(245, 158, 11, 0.2)' }}>
+                <View className="w-12 h-12 rounded-full items-center justify-center mr-3 flex-shrink-0" style={{ backgroundColor: 'rgba(245, 158, 11, 0.2)' }}>
                   <Leaf size={24} color="#f59e0b" />
                 </View>
-                <View>
-                  <Text style={{ fontFamily: 'Quicksand_600SemiBold', color: theme.text.primary }} className="text-lg">
+                <View className="flex-1">
+                  <Text style={{ fontFamily: 'Quicksand_600SemiBold', color: theme.text.primary }} className="text-base">
                     {perimenopauseMovement.recommendation}
                   </Text>
                   <Text style={{ fontFamily: 'Quicksand_400Regular', color: '#92400e' }} className="text-xs">
