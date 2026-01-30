@@ -284,6 +284,30 @@ export default function GroceryScreen() {
             </View>
           </Animated.View>
 
+          {/* Delete All Button */}
+          {groceryList.length > 0 && (
+            <Animated.View
+              entering={FadeInUp.delay(270).duration(600)}
+              className="mx-6 mt-3"
+            >
+              <Pressable
+                onPress={() => {
+                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+                  clearGroceryList();
+                }}
+                className="flex-row items-center justify-center py-2"
+              >
+                <Trash2 size={14} color={theme.accent.blush} />
+                <Text
+                  style={{ fontFamily: 'Quicksand_500Medium', color: theme.accent.blush }}
+                  className="text-xs ml-1.5"
+                >
+                  Delete All Items
+                </Text>
+              </Pressable>
+            </Animated.View>
+          )}
+
           {/* Add Custom Item */}
           <Animated.View
             entering={FadeInUp.delay(300).duration(600)}
