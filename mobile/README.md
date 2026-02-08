@@ -32,6 +32,14 @@ A beautiful, comprehensive mobile app that helps women understand and work with 
 
 ## Features
 
+### Luna AI Assistant
+- **Powered by Grok AI** - Personalized wellness companion
+- Context-aware responses based on your life stage and current phase/moon
+- Get advice on nutrition, movement, self-care, and symptom management
+- Conversation history within sessions
+- Quick topic suggestions for easy interaction
+- Warm, supportive, and evidence-based guidance
+
 ### Cycle Tracking (Regular & Perimenopause)
 - Beautiful cycle wheel visualization showing current day and phase
 - Automatic phase detection (Menstrual, Follicular, Ovulatory, Luteal)

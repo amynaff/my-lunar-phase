@@ -6,7 +6,7 @@ import Animated, {
   FadeInDown,
   FadeInUp,
 } from 'react-native-reanimated';
-import { Moon, Sparkles, Heart, Calendar, ChevronRight, Apple, Dumbbell, Crown, Flame, Sun, Leaf, Info } from 'lucide-react-native';
+import { Moon, Sparkles, Heart, Calendar, ChevronRight, Apple, Dumbbell, Crown, Flame, Sun, Leaf, Info, MessageCircle } from 'lucide-react-native';
 import { CycleWheel } from '@/components/CycleWheel';
 import { CycleGraph } from '@/components/CycleGraph';
 import { MoonPhaseCard, moonCycleEducation } from '@/components/MoonPhaseCard';
@@ -645,6 +645,55 @@ export default function HomeScreen() {
                 </AnimatedPressable>
               ))}
             </View>
+          </Animated.View>
+
+          {/* Luna AI Assistant */}
+          <Animated.View
+            entering={FadeInUp.delay(800).duration(600)}
+            className="mx-6 mt-6"
+          >
+            <Pressable
+              onPress={() => {
+                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                router.push('/luna-ai');
+              }}
+            >
+              <LinearGradient
+                colors={[`${stageTheme.color}20`, `${stageTheme.color}10`]}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 1 }}
+                style={{ borderRadius: 20, padding: 16, borderWidth: 1, borderColor: `${stageTheme.color}30` }}
+              >
+                <View className="flex-row items-center">
+                  <View
+                    className="w-12 h-12 rounded-full items-center justify-center mr-4"
+                    style={{ backgroundColor: `${stageTheme.color}25` }}
+                  >
+                    <Sparkles size={22} color={stageTheme.color} />
+                  </View>
+                  <View className="flex-1">
+                    <Text
+                      style={{ fontFamily: 'Quicksand_600SemiBold', color: theme.text.primary }}
+                      className="text-base"
+                    >
+                      Ask Luna AI
+                    </Text>
+                    <Text
+                      style={{ fontFamily: 'Quicksand_400Regular', color: theme.text.tertiary }}
+                      className="text-xs mt-0.5"
+                    >
+                      Get personalized wellness advice
+                    </Text>
+                  </View>
+                  <View
+                    className="w-8 h-8 rounded-full items-center justify-center"
+                    style={{ backgroundColor: `${stageTheme.color}20` }}
+                  >
+                    <MessageCircle size={16} color={stageTheme.color} />
+                  </View>
+                </View>
+              </LinearGradient>
+            </Pressable>
           </Animated.View>
 
           {/* Daily Affirmation */}
