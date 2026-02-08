@@ -3,8 +3,9 @@ import { View, Text, ScrollView, Pressable } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Animated, { FadeInDown, FadeInUp } from 'react-native-reanimated';
-import { ShoppingCart, Leaf, Sparkles, ChevronDown, ChevronUp, UtensilsCrossed, Heart, AlertCircle, Sun, Pill, Flower2, Beaker, Info } from 'lucide-react-native';
-import { useCycleStore, phaseInfo, CyclePhase, lifeStageInfo } from '@/lib/cycle-store';
+import { ShoppingCart, Leaf, Sparkles, ChevronDown, ChevronUp, UtensilsCrossed, Heart, AlertCircle, Sun, Pill, Flower2, Beaker, Info, Moon } from 'lucide-react-native';
+import { useCycleStore, phaseInfo, CyclePhase, lifeStageInfo, getMoonPhase, moonPhaseInfo, getMoonPhaseCycleEquivalent } from '@/lib/cycle-store';
+import { MoonPhaseCard, moonCycleEducation } from '@/components/MoonPhaseCard';
 import { useThemeStore, getTheme } from '@/lib/theme-store';
 import { router } from 'expo-router';
 import {
@@ -1225,46 +1226,76 @@ export default function NutritionScreen() {
         </>
       );
     } else if (lifeStage === 'perimenopause') {
+      const currentMoon = getMoonPhase();
+      const moonInfo = moonPhaseInfo[currentMoon];
+      const moonCyclePhase = getMoonPhaseCycleEquivalent(currentMoon);
+      const moonCycleInfo = phaseInfo[moonCyclePhase];
+      const moonPhaseNutrition = phaseNutrition[moonCyclePhase];
+
       return (
         <>
-          {/* Stage Card */}
+          {/* Moon Phase Guidance Card */}
           <Animated.View entering={FadeInUp.delay(200).duration(600)} className="mx-6 mt-6">
-            <LinearGradient
-              colors={['rgba(251, 191, 36, 0.15)', 'rgba(245, 158, 11, 0.1)']}
-              style={{ borderRadius: 24, padding: 20, borderWidth: 1, borderColor: 'rgba(245, 158, 11, 0.3)' }}
-            >
-              <View className="flex-row items-center mb-3">
-                <View className="w-12 h-12 rounded-full items-center justify-center mr-3" style={{ backgroundColor: 'rgba(245, 158, 11, 0.2)' }}>
-                  <Text className="text-2xl">{stageInfo.emoji}</Text>
-                </View>
-                <View className="flex-1">
-                  <Text style={{ fontFamily: 'Quicksand_600SemiBold', color: theme.text.primary }} className="text-lg">
-                    {perimenopauseNutrition.focus}
-                  </Text>
-                  <Text style={{ fontFamily: 'Quicksand_400Regular', color: '#92400e' }} className="text-xs">
-                    Nutrition for your transition
-                  </Text>
-                </View>
-              </View>
-              <Text style={{ fontFamily: 'Quicksand_400Regular', color: theme.text.secondary }} className="text-sm leading-5">
-                {perimenopauseNutrition.description}
-              </Text>
-            </LinearGradient>
+            <MoonPhaseCard compact showEducation={false} />
           </Animated.View>
 
-          {/* Foods & Focus Areas */}
+          {/* Moon-Based Nutrition */}
+          <Animated.View entering={FadeInUp.delay(250).duration(600)} className="mx-6 mt-4">
+            <View
+              className="rounded-2xl p-4 border"
+              style={{ backgroundColor: `${moonInfo.color}10`, borderColor: `${moonInfo.color}30` }}
+            >
+              <View className="flex-row items-center mb-2">
+                <Moon size={16} color={accentColor} />
+                <Text
+                  style={{ fontFamily: 'Quicksand_600SemiBold', color: accentColor }}
+                  className="text-xs uppercase tracking-wider ml-2"
+                >
+                  Eating with the Moon
+                </Text>
+              </View>
+              <Text
+                style={{ fontFamily: 'Quicksand_400Regular', color: theme.text.secondary }}
+                className="text-sm leading-5"
+              >
+                During the {moonInfo.name.toLowerCase()}, your body resonates with {moonCycleInfo.name.toLowerCase()} energy.
+                The nutrition below supports this natural rhythm while addressing perimenopause needs.
+              </Text>
+            </View>
+          </Animated.View>
+
+          {/* Moon Phase Nutrition (from cycle phases) */}
           <Animated.View entering={FadeInUp.delay(300).duration(600)} className="mx-6 mt-6">
-            <Text style={{ fontFamily: 'Quicksand_600SemiBold', color: theme.text.primary }} className="text-lg mb-4">
-              Perimenopause Nutrition
+            <Text style={{ fontFamily: 'Quicksand_600SemiBold', color: theme.text.primary }} className="text-lg mb-2">
+              {moonInfo.emoji} {moonInfo.name} Nutrition
+            </Text>
+            <Text style={{ fontFamily: 'Quicksand_400Regular', color: theme.text.tertiary }} className="text-xs mb-4">
+              Based on {moonCycleInfo.name.toLowerCase()} phase energy
             </Text>
 
             <CollapsibleSection
-              title="Recommended Foods"
+              title={`${moonCycleInfo.name} Foods`}
+              icon={<UtensilsCrossed size={18} color={moonCycleInfo.color} />}
+              items={moonPhaseNutrition.foods.slice(0, 10)}
+              theme={theme}
+              iconBgColor={`${moonCycleInfo.color}15`}
+              defaultExpanded={true}
+            />
+          </Animated.View>
+
+          {/* Perimenopause-Specific Foods */}
+          <Animated.View entering={FadeInUp.delay(350).duration(600)} className="mx-6 mt-4">
+            <Text style={{ fontFamily: 'Quicksand_600SemiBold', color: theme.text.primary }} className="text-lg mb-4">
+              Perimenopause Essentials
+            </Text>
+
+            <CollapsibleSection
+              title="Hormone Support Foods"
               icon={<UtensilsCrossed size={18} color="#22C55E" />}
               items={perimenopauseNutrition.foods}
               theme={theme}
               iconBgColor="#22C55E15"
-              defaultExpanded={true}
+              defaultExpanded={false}
             />
 
             <FocusAreasSection focusAreas={perimenopauseNutrition.focusAreas} theme={theme} accentColor={accentColor} />
@@ -1308,37 +1339,69 @@ export default function NutritionScreen() {
       );
     } else {
       // Menopause
+      const currentMoon = getMoonPhase();
+      const moonInfo = moonPhaseInfo[currentMoon];
+      const moonCyclePhase = getMoonPhaseCycleEquivalent(currentMoon);
+      const moonCycleInfo = phaseInfo[moonCyclePhase];
+      const moonPhaseNutrition = phaseNutrition[moonCyclePhase];
+
       return (
         <>
-          {/* Stage Card */}
+          {/* Moon Phase Guidance Card */}
           <Animated.View entering={FadeInUp.delay(200).duration(600)} className="mx-6 mt-6">
+            <MoonPhaseCard compact showEducation={false} />
+          </Animated.View>
+
+          {/* Moon-Based Nutrition Explanation */}
+          <Animated.View entering={FadeInUp.delay(250).duration(600)} className="mx-6 mt-4">
             <LinearGradient
-              colors={['rgba(139, 92, 246, 0.15)', 'rgba(167, 139, 250, 0.1)']}
-              style={{ borderRadius: 24, padding: 20, borderWidth: 1, borderColor: 'rgba(139, 92, 246, 0.3)' }}
+              colors={['rgba(139, 92, 246, 0.12)', 'rgba(196, 181, 253, 0.08)']}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+              style={{ borderRadius: 16, padding: 16, borderWidth: 1, borderColor: 'rgba(139, 92, 246, 0.25)' }}
             >
-              <View className="flex-row items-center mb-3">
-                <View className="w-12 h-12 rounded-full items-center justify-center mr-3" style={{ backgroundColor: 'rgba(139, 92, 246, 0.2)' }}>
-                  <Sun size={24} color="#8b5cf6" />
-                </View>
-                <View className="flex-1">
-                  <Text style={{ fontFamily: 'Quicksand_600SemiBold', color: theme.text.primary }} className="text-lg">
-                    {menopauseNutrition.focus}
-                  </Text>
-                  <Text style={{ fontFamily: 'Quicksand_400Regular', color: '#5b21b6' }} className="text-xs">
-                    Nutrition for your new chapter
-                  </Text>
-                </View>
+              <View className="flex-row items-center mb-2">
+                <Sparkles size={16} color="#8b5cf6" />
+                <Text
+                  style={{ fontFamily: 'Quicksand_600SemiBold', color: '#8b5cf6' }}
+                  className="text-xs uppercase tracking-wider ml-2"
+                >
+                  Lunar Nutrition Guide
+                </Text>
               </View>
-              <Text style={{ fontFamily: 'Quicksand_400Regular', color: theme.text.secondary }} className="text-sm leading-5">
-                {menopauseNutrition.description}
+              <Text
+                style={{ fontFamily: 'Quicksand_400Regular', color: theme.text.secondary }}
+                className="text-sm leading-5"
+              >
+                Without a menstrual cycle, the moon becomes your guide for nutrition rhythms. During the {moonInfo.name.toLowerCase()},
+                focus on foods that support {moonCycleInfo.name.toLowerCase()} energy - this creates a beautiful connection with nature's cycles.
               </Text>
             </LinearGradient>
           </Animated.View>
 
-          {/* Foods & Focus Areas */}
+          {/* Moon Phase Nutrition */}
           <Animated.View entering={FadeInUp.delay(300).duration(600)} className="mx-6 mt-6">
+            <Text style={{ fontFamily: 'Quicksand_600SemiBold', color: theme.text.primary }} className="text-lg mb-2">
+              {moonInfo.emoji} {moonInfo.name} Nutrition
+            </Text>
+            <Text style={{ fontFamily: 'Quicksand_400Regular', color: theme.text.tertiary }} className="text-xs mb-4">
+              {moonCycleInfo.name} phase foods for lunar alignment
+            </Text>
+
+            <CollapsibleSection
+              title={`${moonCycleInfo.name} Foods`}
+              icon={<UtensilsCrossed size={18} color={moonCycleInfo.color} />}
+              items={moonPhaseNutrition.foods.slice(0, 10)}
+              theme={theme}
+              iconBgColor={`${moonCycleInfo.color}15`}
+              defaultExpanded={true}
+            />
+          </Animated.View>
+
+          {/* Menopause-Specific Foods */}
+          <Animated.View entering={FadeInUp.delay(350).duration(600)} className="mx-6 mt-4">
             <Text style={{ fontFamily: 'Quicksand_600SemiBold', color: theme.text.primary }} className="text-lg mb-4">
-              Menopause Nutrition
+              Menopause Essentials
             </Text>
 
             <CollapsibleSection
@@ -1347,7 +1410,7 @@ export default function NutritionScreen() {
               items={menopauseNutrition.foods}
               theme={theme}
               iconBgColor="#22C55E15"
-              defaultExpanded={true}
+              defaultExpanded={false}
             />
 
             <FocusAreasSection focusAreas={menopauseNutrition.focusAreas} theme={theme} accentColor={accentColor} />
@@ -1395,8 +1458,8 @@ export default function NutritionScreen() {
   // Get title based on life stage
   const getTitle = () => {
     switch (lifeStage) {
-      case 'perimenopause': return 'Eat for Your Transition';
-      case 'menopause': return 'Nourish Your Body';
+      case 'perimenopause': return 'Eat with the Moon';
+      case 'menopause': return 'Lunar Nourishment';
       default: return 'Eat for Your Cycle';
     }
   };

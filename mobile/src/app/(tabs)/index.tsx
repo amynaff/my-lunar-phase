@@ -6,10 +6,11 @@ import Animated, {
   FadeInDown,
   FadeInUp,
 } from 'react-native-reanimated';
-import { Moon, Sparkles, Heart, Calendar, ChevronRight, Apple, Dumbbell, Crown, Flame, Sun, Leaf } from 'lucide-react-native';
+import { Moon, Sparkles, Heart, Calendar, ChevronRight, Apple, Dumbbell, Crown, Flame, Sun, Leaf, Info } from 'lucide-react-native';
 import { CycleWheel } from '@/components/CycleWheel';
 import { CycleGraph } from '@/components/CycleGraph';
-import { useCycleStore, phaseInfo, lifeStageInfo, perimenopauseSymptoms, menopauseSymptoms } from '@/lib/cycle-store';
+import { MoonPhaseCard, moonCycleEducation } from '@/components/MoonPhaseCard';
+import { useCycleStore, phaseInfo, lifeStageInfo, perimenopauseSymptoms, menopauseSymptoms, getMoonPhase, moonPhaseInfo, getMoonPhaseCycleEquivalent } from '@/lib/cycle-store';
 import { useThemeStore, getTheme } from '@/lib/theme-store';
 import { useSubscriptionStore } from '@/lib/subscription-store';
 import { router } from 'expo-router';
@@ -222,54 +223,87 @@ export default function HomeScreen() {
         </>
       );
     } else if (lifeStage === 'perimenopause') {
+      const currentMoon = getMoonPhase();
+      const moonInfo = moonPhaseInfo[currentMoon];
+      const moonCyclePhase = getMoonPhaseCycleEquivalent(currentMoon);
+      const moonCycleInfo = phaseInfo[moonCyclePhase];
+      const moonPractices = moonCycleEducation.phases[currentMoon];
+
       return (
         <>
-          {/* Perimenopause Status Card */}
-          <Animated.View
-            entering={FadeInUp.delay(300).duration(600)}
-            className="mx-6 mt-6"
-          >
-            <LinearGradient
-              colors={['rgba(251, 191, 36, 0.15)', 'rgba(245, 158, 11, 0.1)']}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 1 }}
-              style={{ borderRadius: 24, padding: 20, borderWidth: 1, borderColor: 'rgba(245, 158, 11, 0.3)' }}
-            >
-              <View className="flex-row items-center mb-3">
-                <View
-                  className="w-14 h-14 rounded-full items-center justify-center mr-4"
-                  style={{ backgroundColor: 'rgba(245, 158, 11, 0.2)' }}
-                >
-                  <Leaf size={28} color="#f59e0b" />
-                </View>
-                <View className="flex-1">
-                  <Text
-                    style={{ fontFamily: 'Quicksand_600SemiBold', color: theme.text.primary }}
-                    className="text-lg"
-                  >
-                    Your Transition Journey
-                  </Text>
-                  <Text
-                    style={{ fontFamily: 'Quicksand_400Regular', color: '#92400e' }}
-                    className="text-xs mt-0.5"
-                  >
-                    Embracing change with grace
-                  </Text>
-                </View>
-              </View>
+          {/* Moon Phase Card - Primary focus for perimenopause */}
+          <View className="mx-6 mt-6">
+            <MoonPhaseCard showEducation={true} />
+          </View>
 
+          {/* Moon-Based Guidance Banner */}
+          <Animated.View
+            entering={FadeInUp.delay(400).duration(600)}
+            className="mx-6 mt-4"
+          >
+            <View
+              className="rounded-2xl p-4 border"
+              style={{ backgroundColor: `${moonInfo.color}10`, borderColor: `${moonInfo.color}30` }}
+            >
+              <View className="flex-row items-center mb-2">
+                <Info size={16} color={stageTheme.color} />
+                <Text
+                  style={{ fontFamily: 'Quicksand_600SemiBold', color: stageTheme.color }}
+                  className="text-xs uppercase tracking-wider ml-2"
+                >
+                  Why Follow the Moon?
+                </Text>
+              </View>
               <Text
                 style={{ fontFamily: 'Quicksand_400Regular', color: theme.text.secondary }}
                 className="text-sm leading-5"
               >
-                {stageInfo.description} Track your symptoms to understand patterns and feel more in control.
+                As your cycle becomes irregular during perimenopause, the moon offers a beautiful, natural rhythm to guide your wellness. The 29-day lunar cycle mirrors the menstrual cycle, helping you stay connected to nature's rhythms.
               </Text>
-            </LinearGradient>
+            </View>
+          </Animated.View>
+
+          {/* Today's Moon-Based Practices */}
+          <Animated.View
+            entering={FadeInUp.delay(500).duration(600)}
+            className="mx-6 mt-4"
+          >
+            <View
+              className="rounded-2xl p-5 border"
+              style={{ backgroundColor: theme.bg.card, borderColor: theme.border.light }}
+            >
+              <Text
+                style={{ fontFamily: 'Quicksand_600SemiBold', color: moonCycleInfo.color }}
+                className="text-xs uppercase tracking-wider mb-3"
+              >
+                {moonInfo.emoji} Today's Focus: {moonPractices.focus}
+              </Text>
+              <View style={{ gap: 10 }}>
+                {moonPractices.practices.slice(0, 3).map((practice, index) => (
+                  <View key={index} className="flex-row items-start">
+                    <View
+                      className="w-5 h-5 rounded-full items-center justify-center mr-3 mt-0.5"
+                      style={{ backgroundColor: `${moonCycleInfo.color}20` }}
+                    >
+                      <Text style={{ fontFamily: 'Quicksand_600SemiBold', color: moonCycleInfo.color, fontSize: 10 }}>
+                        {index + 1}
+                      </Text>
+                    </View>
+                    <Text
+                      style={{ fontFamily: 'Quicksand_400Regular', color: theme.text.secondary, flex: 1 }}
+                      className="text-sm leading-5"
+                    >
+                      {practice}
+                    </Text>
+                  </View>
+                ))}
+              </View>
+            </View>
           </Animated.View>
 
           {/* Symptom Quick Track */}
           <Animated.View
-            entering={FadeInUp.delay(450).duration(600)}
+            entering={FadeInUp.delay(600).duration(600)}
             className="mx-6 mt-4"
           >
             <Pressable
@@ -327,117 +361,128 @@ export default function HomeScreen() {
               </View>
             </Pressable>
           </Animated.View>
+        </>
+      );
+    } else {
+      // Menopause - Full moon phase guidance
+      const currentMoon = getMoonPhase();
+      const moonInfo = moonPhaseInfo[currentMoon];
+      const moonCyclePhase = getMoonPhaseCycleEquivalent(currentMoon);
+      const moonCycleInfo = phaseInfo[moonCyclePhase];
+      const moonPractices = moonCycleEducation.phases[currentMoon];
 
-          {/* Last period if still tracking */}
+      return (
+        <>
+          {/* Moon Phase Card - Primary focus for menopause */}
+          <View className="mx-6 mt-6">
+            <MoonPhaseCard showEducation={true} />
+          </View>
+
+          {/* Nature's Rhythm Explanation */}
           <Animated.View
-            entering={FadeInUp.delay(550).duration(600)}
+            entering={FadeInUp.delay(400).duration(600)}
             className="mx-6 mt-4"
           >
-            <View
-              className="flex-row items-center justify-between rounded-2xl p-4 border"
-              style={{ backgroundColor: `${stageTheme.color}10`, borderColor: `${stageTheme.color}30` }}
+            <LinearGradient
+              colors={['rgba(139, 92, 246, 0.12)', 'rgba(196, 181, 253, 0.08)']}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+              style={{ borderRadius: 20, padding: 16, borderWidth: 1, borderColor: 'rgba(139, 92, 246, 0.25)' }}
             >
-              <View className="flex-row items-center">
-                <Calendar size={18} color={stageTheme.color} />
+              <View className="flex-row items-center mb-2">
+                <Sparkles size={16} color="#8b5cf6" />
                 <Text
-                  style={{ fontFamily: 'Quicksand_500Medium', color: theme.text.primary }}
-                  className="text-sm ml-3"
+                  style={{ fontFamily: 'Quicksand_600SemiBold', color: '#8b5cf6' }}
+                  className="text-xs uppercase tracking-wider ml-2"
                 >
-                  Next period estimate
+                  Connect with Nature
                 </Text>
               </View>
-              <View className="flex-row items-center">
-                <Text
-                  style={{ fontFamily: 'Quicksand_600SemiBold', color: stageTheme.color }}
-                  className="text-base mr-1"
-                >
-                  ~{daysUntilPeriod}
-                </Text>
-                <Text
-                  style={{ fontFamily: 'Quicksand_400Regular', color: theme.text.secondary }}
-                  className="text-sm"
-                >
-                  days
-                </Text>
-              </View>
-            </View>
+              <Text
+                style={{ fontFamily: 'Quicksand_400Regular', color: theme.text.secondary }}
+                className="text-sm leading-5"
+              >
+                Without a menstrual cycle, the moon becomes your guide. Ancient wisdom and modern women alike have found peace in following the lunar rhythm - a 29-day cycle that mirrors the menstrual cycle and connects you to nature's eternal flow.
+              </Text>
+            </LinearGradient>
           </Animated.View>
 
-          {/* Educational Card */}
+          {/* Today's Moon-Based Practices */}
           <Animated.View
-            entering={FadeInUp.delay(650).duration(600)}
-            className="mx-6 mt-6"
+            entering={FadeInUp.delay(500).duration(600)}
+            className="mx-6 mt-4"
           >
             <View
               className="rounded-2xl p-5 border"
               style={{ backgroundColor: theme.bg.card, borderColor: theme.border.light }}
             >
               <Text
-                style={{ fontFamily: 'Quicksand_600SemiBold', color: stageTheme.color }}
+                style={{ fontFamily: 'Quicksand_600SemiBold', color: moonCycleInfo.color }}
                 className="text-xs uppercase tracking-wider mb-3"
               >
-                Did you know?
+                {moonInfo.emoji} Today's Focus: {moonPractices.focus}
               </Text>
-              <Text
-                style={{ fontFamily: 'Quicksand_400Regular', color: theme.text.secondary }}
-                className="text-sm leading-5"
-              >
-                Perimenopause typically lasts 4-8 years. During this time, estrogen levels fluctuate significantly, which can cause symptoms to come and go. Tracking helps you identify patterns and prepare.
-              </Text>
+              <View style={{ gap: 10 }}>
+                {moonPractices.practices.map((practice, index) => (
+                  <View key={index} className="flex-row items-start">
+                    <View
+                      className="w-5 h-5 rounded-full items-center justify-center mr-3 mt-0.5"
+                      style={{ backgroundColor: `${moonCycleInfo.color}20` }}
+                    >
+                      <Text style={{ fontFamily: 'Quicksand_600SemiBold', color: moonCycleInfo.color, fontSize: 10 }}>
+                        {index + 1}
+                      </Text>
+                    </View>
+                    <Text
+                      style={{ fontFamily: 'Quicksand_400Regular', color: theme.text.secondary, flex: 1 }}
+                      className="text-sm leading-5"
+                    >
+                      {practice}
+                    </Text>
+                  </View>
+                ))}
+              </View>
             </View>
           </Animated.View>
-        </>
-      );
-    } else {
-      // Menopause
-      return (
-        <>
-          {/* Menopause Status Card */}
-          <Animated.View
-            entering={FadeInUp.delay(300).duration(600)}
-            className="mx-6 mt-6"
-          >
-            <LinearGradient
-              colors={['rgba(139, 92, 246, 0.15)', 'rgba(167, 139, 250, 0.1)']}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 1 }}
-              style={{ borderRadius: 24, padding: 20, borderWidth: 1, borderColor: 'rgba(139, 92, 246, 0.3)' }}
-            >
-              <View className="flex-row items-center mb-3">
-                <View
-                  className="w-14 h-14 rounded-full items-center justify-center mr-4"
-                  style={{ backgroundColor: 'rgba(139, 92, 246, 0.2)' }}
-                >
-                  <Sun size={28} color="#8b5cf6" />
-                </View>
-                <View className="flex-1">
-                  <Text
-                    style={{ fontFamily: 'Quicksand_600SemiBold', color: theme.text.primary }}
-                    className="text-lg"
-                  >
-                    Your Second Spring
-                  </Text>
-                  <Text
-                    style={{ fontFamily: 'Quicksand_400Regular', color: '#5b21b6' }}
-                    className="text-xs mt-0.5"
-                  >
-                    Wisdom & freedom
-                  </Text>
-                </View>
-              </View>
 
-              <Text
-                style={{ fontFamily: 'Quicksand_400Regular', color: theme.text.secondary }}
-                className="text-sm leading-5"
-              >
-                {stageInfo.description} Focus on nourishing your body and embracing this powerful new chapter.
-              </Text>
-            </LinearGradient>
+          {/* Health Focus Areas */}
+          <Animated.View
+            entering={FadeInUp.delay(600).duration(600)}
+            className="mx-6 mt-4"
+          >
+            <Text
+              style={{ fontFamily: 'Quicksand_600SemiBold', color: theme.text.primary }}
+              className="text-base mb-3"
+            >
+              Menopause Wellness Focus
+            </Text>
+            <View className="flex-row flex-wrap" style={{ gap: 10 }}>
+              {[
+                { emoji: '💪', label: 'Bone Health' },
+                { emoji: '❤️', label: 'Heart Health' },
+                { emoji: '🧠', label: 'Brain Health' },
+                { emoji: '😴', label: 'Sleep Quality' },
+              ].map((item) => (
+                <View
+                  key={item.label}
+                  className="flex-row items-center px-4 py-3 rounded-2xl border"
+                  style={{ backgroundColor: theme.bg.card, borderColor: theme.border.light }}
+                >
+                  <Text className="text-lg mr-2">{item.emoji}</Text>
+                  <Text
+                    style={{ fontFamily: 'Quicksand_500Medium', color: theme.text.primary }}
+                    className="text-sm"
+                  >
+                    {item.label}
+                  </Text>
+                </View>
+              ))}
+            </View>
           </Animated.View>
 
           {/* Symptom Quick Track */}
           <Animated.View
-            entering={FadeInUp.delay(450).duration(600)}
+            entering={FadeInUp.delay(700).duration(600)}
             className="mx-6 mt-4"
           >
             <Pressable
@@ -494,65 +539,6 @@ export default function HomeScreen() {
                 </View>
               </View>
             </Pressable>
-          </Animated.View>
-
-          {/* Health Focus Areas */}
-          <Animated.View
-            entering={FadeInUp.delay(550).duration(600)}
-            className="mx-6 mt-6"
-          >
-            <Text
-              style={{ fontFamily: 'Quicksand_600SemiBold', color: theme.text.primary }}
-              className="text-base mb-3"
-            >
-              Focus Areas for Menopause
-            </Text>
-            <View className="flex-row flex-wrap" style={{ gap: 10 }}>
-              {[
-                { emoji: '💪', label: 'Bone Health' },
-                { emoji: '❤️', label: 'Heart Health' },
-                { emoji: '🧠', label: 'Brain Health' },
-                { emoji: '😴', label: 'Sleep Quality' },
-              ].map((item) => (
-                <View
-                  key={item.label}
-                  className="flex-row items-center px-4 py-3 rounded-2xl border"
-                  style={{ backgroundColor: theme.bg.card, borderColor: theme.border.light }}
-                >
-                  <Text className="text-lg mr-2">{item.emoji}</Text>
-                  <Text
-                    style={{ fontFamily: 'Quicksand_500Medium', color: theme.text.primary }}
-                    className="text-sm"
-                  >
-                    {item.label}
-                  </Text>
-                </View>
-              ))}
-            </View>
-          </Animated.View>
-
-          {/* Educational Card */}
-          <Animated.View
-            entering={FadeInUp.delay(650).duration(600)}
-            className="mx-6 mt-6"
-          >
-            <View
-              className="rounded-2xl p-5 border"
-              style={{ backgroundColor: theme.bg.card, borderColor: theme.border.light }}
-            >
-              <Text
-                style={{ fontFamily: 'Quicksand_600SemiBold', color: stageTheme.color }}
-                className="text-xs uppercase tracking-wider mb-3"
-              >
-                Your body's wisdom
-              </Text>
-              <Text
-                style={{ fontFamily: 'Quicksand_400Regular', color: theme.text.secondary }}
-                className="text-sm leading-5"
-              >
-                After menopause, your body finds a new hormonal balance. While estrogen levels are lower, your body adapts. Focus on strength training, calcium-rich foods, and heart-healthy habits to thrive.
-              </Text>
-            </View>
           </Animated.View>
         </>
       );

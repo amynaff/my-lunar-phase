@@ -12,6 +12,9 @@ A beautiful, comprehensive mobile app that helps women understand and work with 
 - Phase-synced guidance
 
 ### Perimenopause
+- **Moon Phase Guidance** - Follow the moon's 29-day cycle as your cycles become irregular
+- MoonPhaseCard showing current lunar phase with corresponding energy
+- Daily practices aligned with lunar rhythms
 - Symptom tracking for hot flashes, mood swings, sleep issues, and more
 - Irregular cycle support with flexible tracking
 - Educational content about the transition
@@ -19,7 +22,9 @@ A beautiful, comprehensive mobile app that helps women understand and work with 
 - Pattern recognition for symptoms
 
 ### Menopause
-- Post-menstrual wellness guidance
+- **Full Moon Phase Integration** - Connect with nature through lunar rhythms
+- MoonPhaseCard as primary guidance for daily wellness
+- Moon-synced nutrition, movement, and self-care recommendations
 - Focus areas: bone health, heart health, brain health, sleep quality
 - Symptom tracking and management
 - Tailored nutrition and movement recommendations

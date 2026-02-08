@@ -3,8 +3,9 @@ import { View, Text, ScrollView } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Animated, { FadeInDown, FadeInUp } from 'react-native-reanimated';
-import { Flame, Clock, Zap, Heart, Dumbbell, Wind, Footprints, Sun, Leaf } from 'lucide-react-native';
-import { useCycleStore, phaseInfo, CyclePhase, lifeStageInfo } from '@/lib/cycle-store';
+import { Flame, Clock, Zap, Heart, Dumbbell, Wind, Footprints, Sun, Leaf, Moon, Sparkles } from 'lucide-react-native';
+import { useCycleStore, phaseInfo, CyclePhase, lifeStageInfo, getMoonPhase, moonPhaseInfo, getMoonPhaseCycleEquivalent } from '@/lib/cycle-store';
+import { MoonPhaseCard, moonCycleEducation } from '@/components/MoonPhaseCard';
 import { useThemeStore, getTheme } from '@/lib/theme-store';
 import {
   useFonts,
@@ -200,8 +201,8 @@ export default function MovementScreen() {
   // Get title based on life stage
   const getTitle = () => {
     switch (lifeStage) {
-      case 'perimenopause': return 'Move Through Transition';
-      case 'menopause': return 'Move for Vitality';
+      case 'perimenopause': return 'Move with the Moon';
+      case 'menopause': return 'Lunar Movement';
       default: return 'Move with Your Cycle';
     }
   };
@@ -309,43 +310,88 @@ export default function MovementScreen() {
         </>
       );
     } else if (lifeStage === 'perimenopause') {
+      const currentMoon = getMoonPhase();
+      const moonInfo = moonPhaseInfo[currentMoon];
+      const moonCyclePhase = getMoonPhaseCycleEquivalent(currentMoon);
+      const moonCycleInfo = phaseInfo[moonCyclePhase];
+      const moonPhaseMovement = phaseMovement[moonCyclePhase];
+      const moonPractices = moonCycleEducation.phases[currentMoon];
+
       return (
         <>
-          {/* Stage Card */}
+          {/* Moon Phase Card */}
           <Animated.View entering={FadeInUp.delay(200).duration(600)} className="mx-6 mt-6">
-            <LinearGradient
-              colors={['rgba(251, 191, 36, 0.15)', 'rgba(245, 158, 11, 0.1)']}
-              style={{ borderRadius: 24, padding: 20, borderWidth: 1, borderColor: 'rgba(245, 158, 11, 0.3)' }}
+            <MoonPhaseCard compact showEducation={false} />
+          </Animated.View>
+
+          {/* Moon-Based Movement Guidance */}
+          <Animated.View entering={FadeInUp.delay(250).duration(600)} className="mx-6 mt-4">
+            <View
+              className="rounded-2xl p-4 border"
+              style={{ backgroundColor: `${moonInfo.color}10`, borderColor: `${moonInfo.color}30` }}
             >
-              <View className="flex-row items-center mb-3">
-                <View className="w-12 h-12 rounded-full items-center justify-center mr-3 flex-shrink-0" style={{ backgroundColor: 'rgba(245, 158, 11, 0.2)' }}>
-                  <Leaf size={24} color="#f59e0b" />
+              <View className="flex-row items-center mb-2">
+                <Moon size={16} color={accentColor} />
+                <Text
+                  style={{ fontFamily: 'Quicksand_600SemiBold', color: accentColor }}
+                  className="text-xs uppercase tracking-wider ml-2"
+                >
+                  Movement with the Moon
+                </Text>
+              </View>
+              <Text
+                style={{ fontFamily: 'Quicksand_400Regular', color: theme.text.secondary }}
+                className="text-sm leading-5"
+              >
+                The {moonInfo.name.toLowerCase()} brings {moonInfo.energy.toLowerCase()} energy.
+                Honor this by matching your movement to {moonCycleInfo.name.toLowerCase()} phase intensity while building strength for perimenopause.
+              </Text>
+            </View>
+          </Animated.View>
+
+          {/* Moon Phase Movement */}
+          <Animated.View entering={FadeInUp.delay(300).duration(600)} className="mx-6 mt-6">
+            <Text style={{ fontFamily: 'Quicksand_600SemiBold', color: theme.text.primary }} className="text-lg mb-2">
+              {moonInfo.emoji} {moonInfo.name} Movement
+            </Text>
+            <Text style={{ fontFamily: 'Quicksand_400Regular', color: theme.text.tertiary }} className="text-xs mb-4">
+              {moonPhaseMovement.recommendation} - {moonPhaseMovement.energyLevel}
+            </Text>
+
+            {moonPhaseMovement.workouts.slice(0, 3).map((workout, index) => (
+              <View key={workout.name} className="rounded-2xl p-4 mb-3 border flex-row items-center" style={{ backgroundColor: theme.bg.card, borderColor: theme.border.light }}>
+                <View className="w-14 h-14 rounded-2xl items-center justify-center mr-4" style={{ backgroundColor: `${moonCycleInfo.color}20` }}>
+                  <workout.icon size={24} color={moonCycleInfo.color} />
                 </View>
                 <View className="flex-1">
                   <Text style={{ fontFamily: 'Quicksand_600SemiBold', color: theme.text.primary }} className="text-base">
-                    {perimenopauseMovement.recommendation}
+                    {workout.name}
                   </Text>
-                  <Text style={{ fontFamily: 'Quicksand_400Regular', color: '#92400e' }} className="text-xs">
-                    Movement for your transition
+                  <Text style={{ fontFamily: 'Quicksand_400Regular', color: theme.text.tertiary }} className="text-xs mt-1">
+                    {workout.description}
                   </Text>
+                  <View className="flex-row items-center mt-2">
+                    <View className="flex-row items-center mr-4">
+                      <Clock size={12} color={moonCycleInfo.color} />
+                      <Text style={{ fontFamily: 'Quicksand_500Medium', color: moonCycleInfo.color }} className="text-xs ml-1">
+                        {workout.duration}
+                      </Text>
+                    </View>
+                    <View className="px-2 py-1 rounded-full" style={{ backgroundColor: `${intensityColors[workout.intensity]}20` }}>
+                      <Text style={{ fontFamily: 'Quicksand_500Medium', color: intensityColors[workout.intensity] }} className="text-xs">
+                        {workout.intensity}
+                      </Text>
+                    </View>
+                  </View>
                 </View>
               </View>
-              <Text style={{ fontFamily: 'Quicksand_400Regular', color: theme.text.secondary }} className="text-sm leading-5">
-                {perimenopauseMovement.description}
-              </Text>
-              <View className="mt-4 flex-row items-center">
-                <Zap size={14} color="#f59e0b" />
-                <Text style={{ fontFamily: 'Quicksand_500Medium', color: '#92400e' }} className="text-xs ml-2">
-                  {perimenopauseMovement.energyLevel}
-                </Text>
-              </View>
-            </LinearGradient>
+            ))}
           </Animated.View>
 
           {/* Focus Areas */}
-          <Animated.View entering={FadeInUp.delay(300).duration(600)} className="mx-6 mt-6">
+          <Animated.View entering={FadeInUp.delay(400).duration(600)} className="mx-6 mt-4">
             <Text style={{ fontFamily: 'Quicksand_600SemiBold', color: theme.text.primary }} className="text-lg mb-4">
-              Key Focus Areas
+              Perimenopause Focus Areas
             </Text>
             <View className="flex-row flex-wrap" style={{ gap: 10 }}>
               {perimenopauseMovement.focusAreas.map((area) => (
@@ -361,43 +407,8 @@ export default function MovementScreen() {
             </View>
           </Animated.View>
 
-          {/* Workouts */}
-          <Animated.View entering={FadeInUp.delay(400).duration(600)} className="mt-6 px-6">
-            <Text style={{ fontFamily: 'Quicksand_600SemiBold', color: theme.text.primary }} className="text-lg mb-4">
-              Recommended Workouts
-            </Text>
-            {perimenopauseMovement.workouts.map((workout, index) => (
-              <View key={workout.name} className="rounded-2xl p-4 mb-3 border flex-row items-center" style={{ backgroundColor: theme.bg.card, borderColor: theme.border.light }}>
-                <View className="w-14 h-14 rounded-2xl items-center justify-center mr-4" style={{ backgroundColor: `${accentColor}20` }}>
-                  <workout.icon size={24} color={accentColor} />
-                </View>
-                <View className="flex-1">
-                  <Text style={{ fontFamily: 'Quicksand_600SemiBold', color: theme.text.primary }} className="text-base">
-                    {workout.name}
-                  </Text>
-                  <Text style={{ fontFamily: 'Quicksand_400Regular', color: theme.text.tertiary }} className="text-xs mt-1">
-                    {workout.description}
-                  </Text>
-                  <View className="flex-row items-center mt-2">
-                    <View className="flex-row items-center mr-4">
-                      <Clock size={12} color={accentColor} />
-                      <Text style={{ fontFamily: 'Quicksand_500Medium', color: accentColor }} className="text-xs ml-1">
-                        {workout.duration}
-                      </Text>
-                    </View>
-                    <View className="px-2 py-1 rounded-full" style={{ backgroundColor: `${intensityColors[workout.intensity]}20` }}>
-                      <Text style={{ fontFamily: 'Quicksand_500Medium', color: intensityColors[workout.intensity] }} className="text-xs">
-                        {workout.intensity}
-                      </Text>
-                    </View>
-                  </View>
-                </View>
-              </View>
-            ))}
-          </Animated.View>
-
           {/* Tips */}
-          <Animated.View entering={FadeInUp.delay(600).duration(600)} className="mx-6 mt-6">
+          <Animated.View entering={FadeInUp.delay(500).duration(600)} className="mx-6 mt-6">
             <Text style={{ fontFamily: 'Quicksand_600SemiBold', color: theme.text.primary }} className="text-lg mb-4">
               Movement Tips
             </Text>
@@ -418,43 +429,90 @@ export default function MovementScreen() {
       );
     } else {
       // Menopause
+      const currentMoon = getMoonPhase();
+      const moonInfo = moonPhaseInfo[currentMoon];
+      const moonCyclePhase = getMoonPhaseCycleEquivalent(currentMoon);
+      const moonCycleInfo = phaseInfo[moonCyclePhase];
+      const moonPhaseMovement = phaseMovement[moonCyclePhase];
+      const moonPractices = moonCycleEducation.phases[currentMoon];
+
       return (
         <>
-          {/* Stage Card */}
+          {/* Moon Phase Card */}
           <Animated.View entering={FadeInUp.delay(200).duration(600)} className="mx-6 mt-6">
+            <MoonPhaseCard compact showEducation={false} />
+          </Animated.View>
+
+          {/* Moon-Based Movement Explanation */}
+          <Animated.View entering={FadeInUp.delay(250).duration(600)} className="mx-6 mt-4">
             <LinearGradient
-              colors={['rgba(139, 92, 246, 0.15)', 'rgba(167, 139, 250, 0.1)']}
-              style={{ borderRadius: 24, padding: 20, borderWidth: 1, borderColor: 'rgba(139, 92, 246, 0.3)' }}
+              colors={['rgba(139, 92, 246, 0.12)', 'rgba(196, 181, 253, 0.08)']}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+              style={{ borderRadius: 16, padding: 16, borderWidth: 1, borderColor: 'rgba(139, 92, 246, 0.25)' }}
             >
-              <View className="flex-row items-center mb-3">
-                <View className="w-12 h-12 rounded-full items-center justify-center mr-3 flex-shrink-0" style={{ backgroundColor: 'rgba(139, 92, 246, 0.2)' }}>
-                  <Sun size={24} color="#8b5cf6" />
-                </View>
-                <View className="flex-1">
-                  <Text style={{ fontFamily: 'Quicksand_600SemiBold', color: theme.text.primary }} className="text-base">
-                    {menopauseMovement.recommendation}
-                  </Text>
-                  <Text style={{ fontFamily: 'Quicksand_400Regular', color: '#5b21b6' }} className="text-xs">
-                    Movement for vitality
-                  </Text>
-                </View>
-              </View>
-              <Text style={{ fontFamily: 'Quicksand_400Regular', color: theme.text.secondary }} className="text-sm leading-5">
-                {menopauseMovement.description}
-              </Text>
-              <View className="mt-4 flex-row items-center">
-                <Zap size={14} color="#8b5cf6" />
-                <Text style={{ fontFamily: 'Quicksand_500Medium', color: '#5b21b6' }} className="text-xs ml-2">
-                  {menopauseMovement.energyLevel}
+              <View className="flex-row items-center mb-2">
+                <Sparkles size={16} color="#8b5cf6" />
+                <Text
+                  style={{ fontFamily: 'Quicksand_600SemiBold', color: '#8b5cf6' }}
+                  className="text-xs uppercase tracking-wider ml-2"
+                >
+                  Lunar Movement Guide
                 </Text>
               </View>
+              <Text
+                style={{ fontFamily: 'Quicksand_400Regular', color: theme.text.secondary }}
+                className="text-sm leading-5"
+              >
+                The {moonInfo.name.toLowerCase()} invites {moonInfo.energy.toLowerCase()} energy.
+                Let the moon guide your intensity while focusing on the strength, balance, and bone health essential for menopause.
+              </Text>
             </LinearGradient>
           </Animated.View>
 
-          {/* Focus Areas */}
+          {/* Moon Phase Movement */}
           <Animated.View entering={FadeInUp.delay(300).duration(600)} className="mx-6 mt-6">
+            <Text style={{ fontFamily: 'Quicksand_600SemiBold', color: theme.text.primary }} className="text-lg mb-2">
+              {moonInfo.emoji} {moonInfo.name} Movement
+            </Text>
+            <Text style={{ fontFamily: 'Quicksand_400Regular', color: theme.text.tertiary }} className="text-xs mb-4">
+              {moonPhaseMovement.recommendation} - {moonPhaseMovement.energyLevel}
+            </Text>
+
+            {moonPhaseMovement.workouts.slice(0, 3).map((workout, index) => (
+              <View key={workout.name} className="rounded-2xl p-4 mb-3 border flex-row items-center" style={{ backgroundColor: theme.bg.card, borderColor: theme.border.light }}>
+                <View className="w-14 h-14 rounded-2xl items-center justify-center mr-4" style={{ backgroundColor: `${moonCycleInfo.color}20` }}>
+                  <workout.icon size={24} color={moonCycleInfo.color} />
+                </View>
+                <View className="flex-1">
+                  <Text style={{ fontFamily: 'Quicksand_600SemiBold', color: theme.text.primary }} className="text-base">
+                    {workout.name}
+                  </Text>
+                  <Text style={{ fontFamily: 'Quicksand_400Regular', color: theme.text.tertiary }} className="text-xs mt-1">
+                    {workout.description}
+                  </Text>
+                  <View className="flex-row items-center mt-2">
+                    <View className="flex-row items-center mr-4">
+                      <Clock size={12} color={moonCycleInfo.color} />
+                      <Text style={{ fontFamily: 'Quicksand_500Medium', color: moonCycleInfo.color }} className="text-xs ml-1">
+                        {workout.duration}
+                      </Text>
+                    </View>
+                    <View className="px-2 py-1 rounded-full" style={{ backgroundColor: `${intensityColors[workout.intensity]}20` }}>
+                      <Text style={{ fontFamily: 'Quicksand_500Medium', color: intensityColors[workout.intensity] }} className="text-xs">
+                        {workout.intensity}
+                      </Text>
+                    </View>
+                  </View>
+                </View>
+              </View>
+            ))}
+          </Animated.View>
+
+          {/* Focus Areas */}
+          <Animated.View entering={FadeInUp.delay(400).duration(600)} className="mx-6 mt-4">
             <Text style={{ fontFamily: 'Quicksand_600SemiBold', color: theme.text.primary }} className="text-lg mb-4">
-              Key Focus Areas
+              Menopause Focus Areas
             </Text>
             <View className="flex-row flex-wrap" style={{ gap: 10 }}>
               {menopauseMovement.focusAreas.map((area) => (
@@ -470,43 +528,8 @@ export default function MovementScreen() {
             </View>
           </Animated.View>
 
-          {/* Workouts */}
-          <Animated.View entering={FadeInUp.delay(400).duration(600)} className="mt-6 px-6">
-            <Text style={{ fontFamily: 'Quicksand_600SemiBold', color: theme.text.primary }} className="text-lg mb-4">
-              Recommended Workouts
-            </Text>
-            {menopauseMovement.workouts.map((workout, index) => (
-              <View key={workout.name} className="rounded-2xl p-4 mb-3 border flex-row items-center" style={{ backgroundColor: theme.bg.card, borderColor: theme.border.light }}>
-                <View className="w-14 h-14 rounded-2xl items-center justify-center mr-4" style={{ backgroundColor: `${accentColor}20` }}>
-                  <workout.icon size={24} color={accentColor} />
-                </View>
-                <View className="flex-1">
-                  <Text style={{ fontFamily: 'Quicksand_600SemiBold', color: theme.text.primary }} className="text-base">
-                    {workout.name}
-                  </Text>
-                  <Text style={{ fontFamily: 'Quicksand_400Regular', color: theme.text.tertiary }} className="text-xs mt-1">
-                    {workout.description}
-                  </Text>
-                  <View className="flex-row items-center mt-2">
-                    <View className="flex-row items-center mr-4">
-                      <Clock size={12} color={accentColor} />
-                      <Text style={{ fontFamily: 'Quicksand_500Medium', color: accentColor }} className="text-xs ml-1">
-                        {workout.duration}
-                      </Text>
-                    </View>
-                    <View className="px-2 py-1 rounded-full" style={{ backgroundColor: `${intensityColors[workout.intensity]}20` }}>
-                      <Text style={{ fontFamily: 'Quicksand_500Medium', color: intensityColors[workout.intensity] }} className="text-xs">
-                        {workout.intensity}
-                      </Text>
-                    </View>
-                  </View>
-                </View>
-              </View>
-            ))}
-          </Animated.View>
-
           {/* Tips */}
-          <Animated.View entering={FadeInUp.delay(600).duration(600)} className="mx-6 mt-6">
+          <Animated.View entering={FadeInUp.delay(500).duration(600)} className="mx-6 mt-6">
             <Text style={{ fontFamily: 'Quicksand_600SemiBold', color: theme.text.primary }} className="text-lg mb-4">
               Movement Tips
             </Text>

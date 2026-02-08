@@ -21,7 +21,8 @@ import {
   Wind,
   Users,
 } from 'lucide-react-native';
-import { useCycleStore, phaseInfo, CyclePhase, lifeStageInfo } from '@/lib/cycle-store';
+import { useCycleStore, phaseInfo, CyclePhase, lifeStageInfo, getMoonPhase, moonPhaseInfo, getMoonPhaseCycleEquivalent } from '@/lib/cycle-store';
+import { MoonPhaseCard, moonCycleEducation } from '@/components/MoonPhaseCard';
 import { useThemeStore, getTheme } from '@/lib/theme-store';
 import {
   useFonts,
@@ -268,8 +269,8 @@ export default function SelfCareScreen() {
   // Get title based on life stage
   const getTitle = () => {
     switch (lifeStage) {
-      case 'perimenopause': return 'Support Your Transition';
-      case 'menopause': return 'Embrace Your Wisdom';
+      case 'perimenopause': return 'Lunar Self-Care';
+      case 'menopause': return 'Moon-Guided Wellness';
       default: return 'Nurture Your Soul';
     }
   };
@@ -371,41 +372,78 @@ export default function SelfCareScreen() {
       const selfCare = lifeStage === 'perimenopause' ? perimenopauseSelfCare : menopauseSelfCare;
       const iconComponent = lifeStage === 'perimenopause' ? Leaf : Sun;
 
+      // Get moon phase info for peri/menopause
+      const currentMoon = getMoonPhase();
+      const moonInfo = moonPhaseInfo[currentMoon];
+      const moonCyclePhase = getMoonPhaseCycleEquivalent(currentMoon);
+      const moonCycleInfo = phaseInfo[moonCyclePhase];
+      const moonPhaseSelfCare = phaseSelfCare[moonCyclePhase];
+      const moonPractices = moonCycleEducation.phases[currentMoon];
+
       return (
         <>
-          {/* Stage Card */}
+          {/* Moon Phase Card */}
           <Animated.View entering={FadeInUp.delay(200).duration(600)} className="mx-6 mt-6">
-            <LinearGradient
-              colors={getGradientColors()}
-              style={{ borderRadius: 24, padding: 20, borderWidth: 1, borderColor: `${accentColor}30` }}
-            >
-              <View className="flex-row items-center mb-3">
-                <View className="w-12 h-12 rounded-full items-center justify-center mr-3" style={{ backgroundColor: `${accentColor}20` }}>
-                  {React.createElement(iconComponent, { size: 24, color: accentColor })}
-                </View>
-                <View>
-                  <Text style={{ fontFamily: 'Quicksand_600SemiBold', color: theme.text.primary }} className="text-lg">
-                    {selfCare.theme}
-                  </Text>
-                  <Text style={{ fontFamily: 'Quicksand_400Regular', color: lifeStage === 'perimenopause' ? '#92400e' : '#5b21b6' }} className="text-xs">
-                    {stageInfo.name}
-                  </Text>
-                </View>
-              </View>
-              <Text style={{ fontFamily: 'Quicksand_400Regular', color: theme.text.secondary }} className="text-sm leading-5">
-                {selfCare.description}
-              </Text>
-            </LinearGradient>
+            <MoonPhaseCard compact showEducation={false} />
           </Animated.View>
 
-          {/* Activities Grid */}
-          <Animated.View entering={FadeInUp.delay(300).duration(600)} className="mt-8 px-6">
+          {/* Moon-Based Self-Care Guidance */}
+          <Animated.View entering={FadeInUp.delay(250).duration(600)} className="mx-6 mt-4">
+            <View
+              className="rounded-2xl p-4 border"
+              style={{ backgroundColor: `${moonInfo.color}10`, borderColor: `${moonInfo.color}30` }}
+            >
+              <View className="flex-row items-center mb-2">
+                <Moon size={16} color={accentColor} />
+                <Text
+                  style={{ fontFamily: 'Quicksand_600SemiBold', color: accentColor }}
+                  className="text-xs uppercase tracking-wider ml-2"
+                >
+                  {moonPractices.focus}
+                </Text>
+              </View>
+              <Text
+                style={{ fontFamily: 'Quicksand_400Regular', color: theme.text.secondary }}
+                className="text-sm leading-5"
+              >
+                The {moonInfo.name.toLowerCase()} invites {moonInfo.energy.toLowerCase()} energy.
+                Let this guide your self-care today alongside your {lifeStage === 'perimenopause' ? 'transition' : 'menopause'} practices.
+              </Text>
+            </View>
+          </Animated.View>
+
+          {/* Moon Phase Practices */}
+          <Animated.View entering={FadeInUp.delay(300).duration(600)} className="mt-6 px-6">
             <Text style={{ fontFamily: 'Quicksand_600SemiBold', color: theme.text.primary }} className="text-lg mb-4">
-              Self-Care Activities
+              {moonInfo.emoji} {moonInfo.name} Self-Care
+            </Text>
+            <View className="flex-row flex-wrap justify-between">
+              {moonPhaseSelfCare.activities.slice(0, 4).map((activity, index) => (
+                <Animated.View key={activity.name} entering={FadeInUp.delay(350 + index * 50).duration(500)} style={{ width: '48%' }} className="mb-3">
+                  <View className="rounded-2xl p-4 border" style={{ backgroundColor: theme.bg.card, borderColor: theme.border.light }}>
+                    <View className="w-10 h-10 rounded-full items-center justify-center mb-3" style={{ backgroundColor: `${moonCycleInfo.color}20` }}>
+                      <activity.icon size={20} color={moonCycleInfo.color} />
+                    </View>
+                    <Text style={{ fontFamily: 'Quicksand_600SemiBold', color: theme.text.primary }} className="text-sm">
+                      {activity.name}
+                    </Text>
+                    <Text style={{ fontFamily: 'Quicksand_400Regular', color: theme.text.tertiary }} className="text-xs mt-1">
+                      {activity.description}
+                    </Text>
+                  </View>
+                </Animated.View>
+              ))}
+            </View>
+          </Animated.View>
+
+          {/* Life Stage Activities */}
+          <Animated.View entering={FadeInUp.delay(500).duration(600)} className="mt-4 px-6">
+            <Text style={{ fontFamily: 'Quicksand_600SemiBold', color: theme.text.primary }} className="text-lg mb-4">
+              {lifeStage === 'perimenopause' ? 'Perimenopause' : 'Menopause'} Self-Care
             </Text>
             <View className="flex-row flex-wrap justify-between">
               {selfCare.activities.map((activity, index) => (
-                <Animated.View key={activity.name} entering={FadeInUp.delay(400 + index * 50).duration(500)} style={{ width: '48%' }} className="mb-3">
+                <Animated.View key={activity.name} entering={FadeInUp.delay(550 + index * 50).duration(500)} style={{ width: '48%' }} className="mb-3">
                   <View className="rounded-2xl p-4 border" style={{ backgroundColor: theme.bg.card, borderColor: theme.border.light }}>
                     <View className="w-10 h-10 rounded-full items-center justify-center mb-3" style={{ backgroundColor: `${accentColor}20` }}>
                       <activity.icon size={20} color={accentColor} />
@@ -423,7 +461,7 @@ export default function SelfCareScreen() {
           </Animated.View>
 
           {/* Emotional Support */}
-          <Animated.View entering={FadeInUp.delay(600).duration(600)} className="mx-6 mt-6">
+          <Animated.View entering={FadeInUp.delay(700).duration(600)} className="mx-6 mt-6">
             <Text style={{ fontFamily: 'Quicksand_600SemiBold', color: theme.text.primary }} className="text-lg mb-4">
               Emotional Support
             </Text>
