@@ -579,6 +579,17 @@ export default function HomeScreen() {
                 </Text>
               </View>
               <View className="flex-row items-center">
+                {/* Luna AI Button */}
+                <Pressable
+                  className="w-10 h-10 rounded-full items-center justify-center border mr-2"
+                  style={{ backgroundColor: `${stageTheme.color}15`, borderColor: `${stageTheme.color}30` }}
+                  onPress={() => {
+                    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                    router.push('/luna-ai');
+                  }}
+                >
+                  <Sparkles size={18} color={stageTheme.color} />
+                </Pressable>
                 {!isPremium && (
                   <Pressable
                     className="w-10 h-10 rounded-full items-center justify-center border mr-2"
