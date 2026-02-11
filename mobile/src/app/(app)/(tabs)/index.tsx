@@ -13,6 +13,7 @@ import { MoonPhaseCard, moonCycleEducation } from '@/components/MoonPhaseCard';
 import { useCycleStore, phaseInfo, lifeStageInfo, perimenopauseSymptoms, menopauseSymptoms, getMoonPhase, moonPhaseInfo, getMoonPhaseCycleEquivalent } from '@/lib/cycle-store';
 import { useThemeStore, getTheme } from '@/lib/theme-store';
 import { useSubscriptionStore } from '@/lib/subscription-store';
+import { api } from '@/lib/api/api';
 import { router } from 'expo-router';
 import {
   useFonts,
@@ -63,6 +64,23 @@ export default function HomeScreen() {
       router.replace('/onboarding');
     }
   }, [hasCompletedOnboarding, isReady]);
+
+  // Sync cycle data to backend for partner feature
+  useEffect(() => {
+    if (!isReady || !hasCompletedOnboarding) return;
+    const phase = getCurrentPhase();
+    const currentMoon = getMoonPhase();
+    const moonInfo = moonPhaseInfo[currentMoon];
+    api.post('/api/partner/sync', {
+      lifeStage,
+      currentPhase: phase,
+      dayOfCycle: lifeStage === 'regular' ? useCycleStore.getState().getDayOfCycle() : undefined,
+      cycleLength: lifeStage === 'regular' ? useCycleStore.getState().cycleLength : undefined,
+      moonPhase: lifeStage !== 'regular' ? moonInfo.name : undefined,
+    }).catch(() => {
+      // Silently fail - partner sync is not critical
+    });
+  }, [isReady, hasCompletedOnboarding, lifeStage]);
 
   if (!fontsLoaded || !isReady) {
     return (

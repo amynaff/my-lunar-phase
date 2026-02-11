@@ -6,32 +6,36 @@ import { useColorScheme } from '@/lib/useColorScheme';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { KeyboardProvider } from 'react-native-keyboard-controller';
+import { useSession } from '@/lib/auth/use-session';
 
 export const unstable_settings = {
-  // Ensure that reloading on `/modal` keeps a back button present.
-  initialRouteName: '(tabs)',
+  initialRouteName: '(app)',
 };
 
-// Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
 
 const queryClient = new QueryClient();
 
 function RootLayoutNav({ colorScheme }: { colorScheme: 'light' | 'dark' | null | undefined }) {
+  const { data: session, isLoading } = useSession();
+
+  if (isLoading) return null;
+
   return (
     <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <Stack>
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="onboarding" options={{ headerShown: false }} />
-        <Stack.Screen name="settings" options={{ headerShown: false, presentation: 'modal' }} />
-        <Stack.Screen name="paywall" options={{ headerShown: false, presentation: 'modal' }} />
-        <Stack.Screen name="modal" options={{ presentation: 'modal' }} />
+      <Stack screenOptions={{ headerShown: false }}>
+        <Stack.Protected guard={!!session?.user}>
+          <Stack.Screen name="(app)" />
+        </Stack.Protected>
+
+        <Stack.Protected guard={!session?.user}>
+          <Stack.Screen name="sign-in" />
+          <Stack.Screen name="verify-otp" />
+        </Stack.Protected>
       </Stack>
     </ThemeProvider>
   );
 }
-
-
 
 export default function RootLayout() {
   const colorScheme = useColorScheme();

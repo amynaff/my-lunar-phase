@@ -16,10 +16,14 @@ import {
   Crown,
   Leaf,
   Check,
+  Users,
+  LogOut,
 } from 'lucide-react-native';
 import { useCycleStore, phaseInfo, LifeStage, lifeStageInfo } from '@/lib/cycle-store';
 import { useThemeStore, getTheme } from '@/lib/theme-store';
 import { useSubscriptionStore } from '@/lib/subscription-store';
+import { authClient } from '@/lib/auth/auth-client';
+import { useInvalidateSession } from '@/lib/auth/use-session';
 import { router } from 'expo-router';
 import * as Haptics from 'expo-haptics';
 import DateTimePicker from '@react-native-community/datetimepicker';
@@ -45,6 +49,7 @@ const lifeStageOptions: { stage: LifeStage; icon: typeof Moon; color: string }[]
 
 export default function SettingsScreen() {
   const insets = useSafeAreaInsets();
+  const invalidateSession = useInvalidateSession();
   const lastPeriodStart = useCycleStore(s => s.lastPeriodStart);
   const cycleLength = useCycleStore(s => s.cycleLength);
   const periodLength = useCycleStore(s => s.periodLength);
@@ -477,6 +482,54 @@ export default function SettingsScreen() {
             </Animated.View>
           )}
 
+          {/* Partner Support */}
+          <Animated.View
+            entering={FadeInUp.delay(380).duration(600)}
+            className="mx-6 mt-6"
+          >
+            <Text
+              style={{ fontFamily: 'Quicksand_600SemiBold', color: theme.text.accent }}
+              className="text-xs uppercase tracking-wider mb-4"
+            >
+              Partner Support
+            </Text>
+            <Pressable
+              onPress={() => {
+                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                router.push('/(app)/partner-settings');
+              }}
+            >
+              <View
+                className="rounded-2xl p-4 border flex-row items-center justify-between"
+                style={{ backgroundColor: theme.bg.card, borderColor: theme.border.light }}
+              >
+                <View className="flex-row items-center">
+                  <View
+                    className="w-10 h-10 rounded-full items-center justify-center mr-3"
+                    style={{ backgroundColor: `${theme.accent.rose}20` }}
+                  >
+                    <Users size={20} color={theme.accent.rose} />
+                  </View>
+                  <View>
+                    <Text
+                      style={{ fontFamily: 'Quicksand_600SemiBold', color: theme.text.primary }}
+                      className="text-base"
+                    >
+                      Partner Support
+                    </Text>
+                    <Text
+                      style={{ fontFamily: 'Quicksand_400Regular', color: theme.text.tertiary }}
+                      className="text-xs"
+                    >
+                      Invite someone to support your journey
+                    </Text>
+                  </View>
+                </View>
+                <ChevronRight size={18} color={theme.text.muted} />
+              </View>
+            </Pressable>
+          </Animated.View>
+
           {/* Actions */}
           <Animated.View
             entering={FadeInUp.delay(400).duration(600)}
@@ -503,6 +556,39 @@ export default function SettingsScreen() {
                     className="text-sm ml-3"
                   >
                     Reset & Start Over
+                  </Text>
+                </View>
+                <ChevronRight size={16} color={theme.text.muted} />
+              </Pressable>
+              <Pressable
+                onPress={() => {
+                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+                  Alert.alert(
+                    'Sign Out',
+                    'Are you sure you want to sign out?',
+                    [
+                      { text: 'Cancel', style: 'cancel' },
+                      {
+                        text: 'Sign Out',
+                        style: 'destructive',
+                        onPress: async () => {
+                          await authClient.signOut();
+                          await invalidateSession();
+                        },
+                      },
+                    ]
+                  );
+                }}
+                className="p-4 flex-row items-center justify-between border-t"
+                style={{ borderTopColor: theme.border.light }}
+              >
+                <View className="flex-row items-center">
+                  <LogOut size={18} color={theme.accent.pink} />
+                  <Text
+                    style={{ fontFamily: 'Quicksand_500Medium', color: theme.text.primary }}
+                    className="text-sm ml-3"
+                  >
+                    Sign Out
                   </Text>
                 </View>
                 <ChevronRight size={16} color={theme.text.muted} />
