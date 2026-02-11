@@ -32,6 +32,15 @@ A beautiful, comprehensive mobile app that helps women understand and work with 
 
 ## Features
 
+### Partner Support System
+- **Invite your partner** - Generate a unique invite code to share with someone who supports you
+- **Secure connection** - Partner accepts the code to connect, no personal data exposed
+- **Supportive insights** - Partner sees your current phase, how you may feel, and actionable tips on how to be supportive
+- **Privacy-first** - You control what's shared; partner only sees phase info and supportive guidance, not raw health data
+- **Life stage aware** - Tips adapt based on regular cycles, perimenopause, or menopause
+- **Real-time sync** - Your cycle data automatically syncs so your partner always has current info
+- **Beautiful partner view** - Clean, caring interface designed to help partners understand and support you
+
 ### Luna AI Assistant
 - **Powered by Grok AI** - Personalized wellness companion
 - Context-aware responses based on your life stage and current phase/moon
@@ -39,6 +48,11 @@ A beautiful, comprehensive mobile app that helps women understand and work with 
 - Conversation history within sessions
 - Quick topic suggestions for easy interaction
 - Warm, supportive, and evidence-based guidance
+
+### User Accounts & Authentication
+- **Email OTP sign-in** - Secure, passwordless authentication
+- **Data syncing** - Your cycle data syncs securely to enable partner support
+- **Privacy focused** - All sensitive data encrypted and only shared with explicit permission
 
 ### Cycle Tracking (Regular & Perimenopause)
 - Beautiful cycle wheel visualization showing current day and phase
