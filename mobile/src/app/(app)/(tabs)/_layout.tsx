@@ -48,17 +48,18 @@ function TabIcon({ icon: Icon, label, focused, color }: TabIconProps) {
       <View
         className="items-center justify-center rounded-full"
         style={{
-          width: 44,
-          height: 44,
+          width: 32,
+          height: 32,
           backgroundColor: focused ? `${theme.accent.rose}20` : 'transparent',
         }}
       >
-        <Icon size={22} color={focused ? theme.accent.purple : theme.text.muted} strokeWidth={focused ? 2.5 : 2} />
+        <Icon size={20} color={focused ? theme.accent.purple : theme.text.muted} strokeWidth={focused ? 2.5 : 2} />
       </View>
       <Text
+        numberOfLines={1}
         style={{
           fontWeight: focused ? '600' : '400',
-          fontSize: 10,
+          fontSize: 9,
           color: focused ? theme.text.secondary : theme.text.muted,
           marginTop: 2,
         }}
@@ -87,7 +88,7 @@ export default function TabLayout() {
           backgroundColor: 'transparent',
           borderTopWidth: 0,
           elevation: 0,
-          height: 70 + insets.bottom,
+          height: 56 + insets.bottom,
           paddingBottom: insets.bottom,
         },
         tabBarBackground: () => (
