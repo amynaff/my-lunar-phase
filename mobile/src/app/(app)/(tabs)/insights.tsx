@@ -115,7 +115,7 @@ export default function InsightsScreen() {
           <ScrollView
             className="flex-1"
             showsVerticalScrollIndicator={false}
-            contentContainerStyle={{ paddingBottom: 120 }}
+            contentContainerStyle={{ paddingBottom: 140 }}
             refreshControl={
               <RefreshControl
                 refreshing={refreshing}
