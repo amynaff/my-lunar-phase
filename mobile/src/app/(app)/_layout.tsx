@@ -11,6 +11,7 @@ export default function AppLayout() {
       <Stack.Screen name="modal" options={{ presentation: "modal" }} />
       <Stack.Screen name="partner-settings" options={{ presentation: "modal" }} />
       <Stack.Screen name="partner-view" />
+      <Stack.Screen name="log-mood" options={{ presentation: "modal" }} />
     </Stack>
   );
 }

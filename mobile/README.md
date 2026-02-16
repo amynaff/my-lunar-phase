@@ -122,6 +122,17 @@ A beautiful, comprehensive mobile app that helps women understand and work with 
 - Journal prompts for reflection
 - Understanding why you feel certain ways
 
+### Mood & Energy Heatmap
+- **Calendar view** showing mood and energy levels across the month
+- **Visual patterns** help predict what to expect next cycle
+- **Dual tracking** - toggle between mood and energy views
+- **Phase correlation** - see how your mood/energy relates to cycle phases
+- **Daily logging** - quick and easy mood/energy entry with notes
+- **Statistics** - average mood and energy by cycle phase
+- **Sync to cloud** - entries saved to your account for cross-device access
+- **Color-coded heatmap** - intuitive visualization of your patterns
+- **Historical insights** - navigate to any month to see past data
+
 ### Smart Grocery List
 - Add phase-specific recommended foods with one tap
 - **Moon Phase Syncing** (for perimenopause/menopause users):

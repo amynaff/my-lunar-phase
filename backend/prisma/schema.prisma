@@ -25,6 +25,9 @@ model User {
   sharedCycleData SharedCycleData?
   partnershipAsUser    Partnership? @relation("PartnershipUser")
   partnershipAsPartner Partnership? @relation("PartnershipPartner")
+
+  // Mood tracking
+  moodEntries     MoodEntry[]
 }
 
 model Session {
@@ -96,4 +99,24 @@ model SharedCycleData {
   cycleLength     Int?
   moonPhase       String?
   lastUpdated     DateTime @default(now())
+}
+
+// ==================== Mood & Energy Tracking ====================
+
+model MoodEntry {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  date        DateTime
+  mood        Int      // 1-5 scale (1=very low, 5=very high)
+  energy      Int      // 1-5 scale (1=very low, 5=very high)
+  notes       String?
+  cyclePhase  String?  // Phase at time of entry
+  dayOfCycle  Int?     // Day of cycle at time of entry
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@unique([userId, date])
+  @@index([userId])
+  @@index([date])
 }
