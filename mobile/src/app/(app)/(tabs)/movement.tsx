@@ -226,13 +226,13 @@ export default function MovementScreen() {
         <>
           {/* Phase Card */}
           <Animated.View entering={FadeInUp.delay(200).duration(600)} className="mx-6 mt-6">
-            <View className="rounded-3xl p-5 border" style={{ backgroundColor: theme.bg.card, borderColor: theme.border.light }}>
+            <View className="rounded-2xl p-4 border" style={{ backgroundColor: theme.bg.card, borderColor: theme.border.light }}>
               <View className="flex-row items-center mb-3">
-                <View className="w-12 h-12 rounded-full items-center justify-center mr-3" style={{ backgroundColor: `${info.color}20` }}>
-                  <Text className="text-2xl">{info.emoji}</Text>
+                <View className="w-10 h-10 rounded-full items-center justify-center mr-3" style={{ backgroundColor: `${info.color}20` }}>
+                  <Text className="text-xl">{info.emoji}</Text>
                 </View>
-                <View>
-                  <Text style={{ fontFamily: 'Quicksand_600SemiBold', color: theme.text.primary }} className="text-lg">
+                <View className="flex-1">
+                  <Text style={{ fontFamily: 'Quicksand_600SemiBold', color: theme.text.primary }} className="text-base">
                     {info.name} Phase
                   </Text>
                   <Text style={{ fontFamily: 'Quicksand_500Medium', color: theme.text.accent }} className="text-sm">
@@ -243,7 +243,7 @@ export default function MovementScreen() {
               <Text style={{ fontFamily: 'Quicksand_400Regular', color: theme.text.secondary }} className="text-sm leading-5">
                 {movement.description}
               </Text>
-              <View className="mt-4 flex-row items-center">
+              <View className="mt-3 flex-row items-center">
                 <Zap size={14} color={theme.accent.rose} />
                 <Text style={{ fontFamily: 'Quicksand_500Medium', color: theme.text.accent }} className="text-xs ml-2">
                   {movement.energyLevel}
