@@ -47,20 +47,20 @@ function TabIcon({ icon: Icon, label, focused, color }: TabIconProps) {
       <View
         className="items-center justify-center rounded-full"
         style={{
-          width: 40,
-          height: 40,
-          backgroundColor: focused ? `${theme.accent.rose}20` : 'transparent',
+          width: 36,
+          height: 36,
+          backgroundColor: focused ? `${theme.accent.rose}15` : 'transparent',
         }}
       >
-        <Icon size={22} color={focused ? theme.accent.purple : theme.text.muted} strokeWidth={focused ? 2.5 : 2} />
+        <Icon size={20} color={focused ? theme.accent.purple : theme.text.muted} strokeWidth={focused ? 2.5 : 2} />
       </View>
       <Text
         numberOfLines={1}
         style={{
           fontWeight: focused ? '600' : '400',
-          fontSize: 10,
+          fontSize: 9,
           color: focused ? theme.text.secondary : theme.text.muted,
-          marginTop: 2,
+          marginTop: 3,
         }}
       >
         {label}
@@ -87,8 +87,8 @@ export default function TabLayout() {
           backgroundColor: 'transparent',
           borderTopWidth: 0,
           elevation: 0,
-          height: 65 + insets.bottom,
-          paddingBottom: insets.bottom,
+          height: 70 + insets.bottom,
+          paddingBottom: insets.bottom + 4,
         },
         tabBarBackground: () => (
           <BlurView
