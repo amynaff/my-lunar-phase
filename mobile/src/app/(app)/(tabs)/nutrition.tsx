@@ -643,7 +643,7 @@ const menopauseNutrition = {
   ],
   supplements: [
     { name: 'Full-Spectrum Magnesium', amount: '300-400mg', note: 'Critical for bones, heart, sleep, and over 300 body processes' },
-    { name: 'Calcium + Vitamin D3', amount: '1200mg Ca / 2000-4000 IU D3', note: 'Essential duo for bone health - split calcium into 2 doses' },
+    { name: 'Calcium + Vitamin D3', amount: '1200mg Ca\n2000-4000 IU D3', note: 'Essential duo for bone health - split calcium into 2 doses' },
     { name: 'Vitamin K2 (MK-7)', amount: '100-200mcg', note: 'Ensures calcium goes to bones, not arteries - take with D3' },
     { name: 'Omega-3 (EPA/DHA)', amount: '1000-2000mg', note: 'Heart, brain, joints, and mood - wild-caught fish oil or algae' },
     { name: 'Vitamin B12', amount: '1000-2500mcg', note: 'Absorption decreases with age - sublingual or methylcobalamin best' },
