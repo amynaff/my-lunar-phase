@@ -153,10 +153,10 @@ export default function OnboardingScreen() {
                   >
                     <View className="flex-row items-center">
                       <View
-                        className="w-14 h-14 rounded-full items-center justify-center mr-4"
+                        className="w-12 h-12 rounded-full items-center justify-center mr-3"
                         style={{ backgroundColor: isSelected ? 'rgba(255,255,255,0.3)' : `${option.gradient[1]}20` }}
                       >
-                        <IconComponent size={28} color={isSelected ? '#fff' : option.gradient[1]} />
+                        <IconComponent size={24} color={isSelected ? '#fff' : option.gradient[1]} />
                       </View>
                       <View className="flex-1">
                         <Text
@@ -164,7 +164,7 @@ export default function OnboardingScreen() {
                             fontFamily: 'Quicksand_600SemiBold',
                             color: isSelected ? '#fff' : '#4a3485',
                           }}
-                          className="text-base"
+                          className="text-sm"
                         >
                           {info.name}
                         </Text>
