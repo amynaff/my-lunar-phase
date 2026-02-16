@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useMemo, useRef } from "react";
 import { View, Text, ScrollView, Pressable, RefreshControl } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -25,14 +25,16 @@ export default function InsightsScreen() {
   const [currentMonth, setCurrentMonth] = useState(new Date().getMonth());
   const [refreshing, setRefreshing] = useState(false);
 
-  // Local store
+  // Local store - get entries object directly
   const entries = useMoodStore((s) => s.entries);
-  const setEntries = useMoodStore((s) => s.setEntries);
 
-  // Get entries for current month view
-  const monthEntries = useMoodStore((s) =>
-    s.getEntriesForMonth(currentYear, currentMonth)
-  );
+  // Compute month entries from entries object (memoized)
+  const monthEntries = useMemo(() => {
+    return Object.values(entries).filter((entry) => {
+      const entryDate = new Date(entry.date);
+      return entryDate.getFullYear() === currentYear && entryDate.getMonth() === currentMonth;
+    });
+  }, [entries, currentYear, currentMonth]);
 
   // Fetch entries from server
   const { data: serverEntries, refetch: refetchEntries } = useQuery({
@@ -51,21 +53,30 @@ export default function InsightsScreen() {
     queryFn: () => moodApi.getStats(),
   });
 
-  // Sync server entries to local store
+  // Track if we've synced this data already
+  const lastSyncedRef = useRef<string | null>(null);
+
+  // Sync server entries to local store (only when data actually changes)
   useEffect(() => {
-    if (serverEntries) {
-      const localEntries: LocalMoodEntry[] = serverEntries.map((e) => ({
-        date: e.date.split("T")[0],
-        mood: e.mood,
-        energy: e.energy,
-        notes: e.notes ?? undefined,
-        cyclePhase: e.cyclePhase ?? undefined,
-        dayOfCycle: e.dayOfCycle ?? undefined,
-        synced: true,
-      }));
-      setEntries(localEntries);
-    }
-  }, [serverEntries, setEntries]);
+    if (!serverEntries || serverEntries.length === 0) return;
+
+    // Create a key from the data to check if it changed
+    const dataKey = serverEntries.map(e => `${e.id}-${e.updatedAt}`).join(',');
+    if (lastSyncedRef.current === dataKey) return;
+
+    lastSyncedRef.current = dataKey;
+
+    const localEntries: LocalMoodEntry[] = serverEntries.map((e) => ({
+      date: e.date.split("T")[0],
+      mood: e.mood,
+      energy: e.energy,
+      notes: e.notes ?? undefined,
+      cyclePhase: e.cyclePhase ?? undefined,
+      dayOfCycle: e.dayOfCycle ?? undefined,
+      synced: true,
+    }));
+    useMoodStore.getState().setEntries(localEntries);
+  }, [serverEntries]);
 
   const handleDayPress = (date: Date) => {
     router.push({
