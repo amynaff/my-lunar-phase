@@ -303,8 +303,8 @@ export default function SettingsScreen() {
             </Pressable>
           </Animated.View>
 
-          {/* Current Cycle Info - Only show for regular/perimenopause */}
-          {lifeStage !== 'menopause' && (
+          {/* Current Cycle Info - Only show for regular cycles */}
+          {lifeStage === 'regular' && (
             <Animated.View
               entering={FadeInUp.delay(250).duration(600)}
               className="mx-6 mt-6"
