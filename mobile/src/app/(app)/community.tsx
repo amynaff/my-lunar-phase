@@ -402,13 +402,8 @@ export default function CommunityScreen() {
           </Animated.View>
 
           {/* Category Filter */}
-          <Animated.View entering={FadeInUp.delay(200).duration(600)}>
-            <ScrollView
-              horizontal
-              showsHorizontalScrollIndicator={false}
-              contentContainerStyle={{ paddingHorizontal: 24, paddingRight: 40 }}
-              className="mb-3"
-            >
+          <Animated.View entering={FadeInUp.delay(200).duration(600)} className="px-6 mb-3">
+            <View className="flex-row flex-wrap">
               {CATEGORIES.map((cat) => {
                 const isSelected = selectedCategory === cat.id;
                 const CategoryIcon = cat.icon;
@@ -419,7 +414,7 @@ export default function CommunityScreen() {
                       Haptics.selectionAsync();
                       setSelectedCategory(cat.id);
                     }}
-                    className="mr-2 px-3 py-1.5 rounded-full flex-row items-center"
+                    className="mr-2 mb-2 px-3 py-1.5 rounded-full flex-row items-center"
                     style={{
                       backgroundColor: isSelected ? `${cat.color}20` : theme.bg.card,
                       borderWidth: 1,
@@ -436,7 +431,7 @@ export default function CommunityScreen() {
                   </Pressable>
                 );
               })}
-            </ScrollView>
+            </View>
           </Animated.View>
 
           {/* Life Stage Filter */}
