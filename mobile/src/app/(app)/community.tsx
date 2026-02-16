@@ -22,19 +22,19 @@ import {
 } from '@expo-google-fonts/cormorant-garamond';
 
 const CATEGORIES = [
-  { id: 'all', name: 'All Stories', icon: Users, color: '#8b5cf6' },
+  { id: 'all', name: 'All', icon: Users, color: '#8b5cf6' },
   { id: 'symptoms', name: 'Symptoms', icon: Sparkles, color: '#ec4899' },
   { id: 'nutrition', name: 'Nutrition', icon: Apple, color: '#22c55e' },
   { id: 'movement', name: 'Movement', icon: Dumbbell, color: '#f59e0b' },
   { id: 'lifestyle', name: 'Lifestyle', icon: Leaf, color: '#06b6d4' },
-  { id: 'success', name: 'Success Stories', icon: Trophy, color: '#eab308' },
+  { id: 'success', name: 'Success', icon: Trophy, color: '#eab308' },
 ];
 
 const LIFE_STAGE_FILTERS = [
-  { id: 'all', name: 'All Stages' },
-  { id: 'regular', name: 'Regular Cycles' },
-  { id: 'perimenopause', name: 'Perimenopause' },
-  { id: 'menopause', name: 'Menopause' },
+  { id: 'all', name: 'All' },
+  { id: 'regular', name: 'Regular' },
+  { id: 'perimenopause', name: 'Peri' },
+  { id: 'menopause', name: 'Meno' },
 ];
 
 function StoryCard({ story, onHeart, theme }: { story: CommunityStory; onHeart: () => void; theme: ReturnType<typeof getTheme> }) {
@@ -406,7 +406,8 @@ export default function CommunityScreen() {
             <ScrollView
               horizontal
               showsHorizontalScrollIndicator={false}
-              className="px-6 mb-4"
+              contentContainerStyle={{ paddingHorizontal: 24, paddingRight: 40 }}
+              className="mb-3"
             >
               {CATEGORIES.map((cat) => {
                 const isSelected = selectedCategory === cat.id;
@@ -418,17 +419,17 @@ export default function CommunityScreen() {
                       Haptics.selectionAsync();
                       setSelectedCategory(cat.id);
                     }}
-                    className="mr-2 px-3 py-2 rounded-full flex-row items-center"
+                    className="mr-2 px-3 py-1.5 rounded-full flex-row items-center"
                     style={{
                       backgroundColor: isSelected ? `${cat.color}20` : theme.bg.card,
                       borderWidth: 1,
                       borderColor: isSelected ? cat.color : theme.border.light,
                     }}
                   >
-                    <CategoryIcon size={14} color={isSelected ? cat.color : theme.text.muted} />
+                    <CategoryIcon size={12} color={isSelected ? cat.color : theme.text.muted} />
                     <Text
                       style={{ fontFamily: 'Quicksand_500Medium', color: isSelected ? cat.color : theme.text.secondary }}
-                      className="text-xs ml-1.5"
+                      className="text-xs ml-1"
                     >
                       {cat.name}
                     </Text>
@@ -439,12 +440,8 @@ export default function CommunityScreen() {
           </Animated.View>
 
           {/* Life Stage Filter */}
-          <Animated.View entering={FadeInUp.delay(250).duration(600)}>
-            <ScrollView
-              horizontal
-              showsHorizontalScrollIndicator={false}
-              className="px-6 mb-6"
-            >
+          <Animated.View entering={FadeInUp.delay(250).duration(600)} className="px-6 mb-5">
+            <View className="flex-row">
               {LIFE_STAGE_FILTERS.map((stage) => {
                 const isSelected = selectedStage === stage.id;
                 return (
@@ -470,7 +467,7 @@ export default function CommunityScreen() {
                   </Pressable>
                 );
               })}
-            </ScrollView>
+            </View>
           </Animated.View>
 
           {/* Stories */}
