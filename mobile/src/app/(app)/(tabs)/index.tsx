@@ -6,7 +6,7 @@ import Animated, {
   FadeInDown,
   FadeInUp,
 } from 'react-native-reanimated';
-import { Moon, Sparkles, Heart, Calendar, ChevronRight, Apple, Dumbbell, Crown, Flame, Sun, Leaf, Info, MessageCircle } from 'lucide-react-native';
+import { Moon, Sparkles, Heart, Calendar, ChevronRight, Apple, Dumbbell, Crown, Flame, Sun, Leaf, Info, MessageCircle, BarChart3 } from 'lucide-react-native';
 import { CycleWheel } from '@/components/CycleWheel';
 import { CycleGraph } from '@/components/CycleGraph';
 import { MoonPhaseCard, moonCycleEducation } from '@/components/MoonPhaseCard';
@@ -113,6 +113,12 @@ export default function HomeScreen() {
       label: 'Self-Care',
       color: theme.accent.blush,
       route: '/(tabs)/selfcare',
+    },
+    {
+      icon: BarChart3,
+      label: 'Track',
+      color: theme.accent.lavender,
+      route: '/(tabs)/insights',
     },
   ];
 

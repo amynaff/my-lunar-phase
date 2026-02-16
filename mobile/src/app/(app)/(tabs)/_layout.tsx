@@ -14,7 +14,6 @@ import {
   Apple,
   Heart,
   Dumbbell,
-  BarChart3,
 } from 'lucide-react-native';
 import * as Haptics from 'expo-haptics';
 import { useThemeStore, getTheme } from '@/lib/theme-store';
@@ -48,18 +47,18 @@ function TabIcon({ icon: Icon, label, focused, color }: TabIconProps) {
       <View
         className="items-center justify-center rounded-full"
         style={{
-          width: 32,
-          height: 32,
+          width: 40,
+          height: 40,
           backgroundColor: focused ? `${theme.accent.rose}20` : 'transparent',
         }}
       >
-        <Icon size={20} color={focused ? theme.accent.purple : theme.text.muted} strokeWidth={focused ? 2.5 : 2} />
+        <Icon size={22} color={focused ? theme.accent.purple : theme.text.muted} strokeWidth={focused ? 2.5 : 2} />
       </View>
       <Text
         numberOfLines={1}
         style={{
           fontWeight: focused ? '600' : '400',
-          fontSize: 9,
+          fontSize: 10,
           color: focused ? theme.text.secondary : theme.text.muted,
           marginTop: 2,
         }}
@@ -88,7 +87,7 @@ export default function TabLayout() {
           backgroundColor: 'transparent',
           borderTopWidth: 0,
           elevation: 0,
-          height: 56 + insets.bottom,
+          height: 65 + insets.bottom,
           paddingBottom: insets.bottom,
         },
         tabBarBackground: () => (
@@ -129,7 +128,7 @@ export default function TabLayout() {
         options={{
           title: 'Nutrition',
           tabBarIcon: ({ focused, color }) => (
-            <TabIcon icon={Apple} label="Food" focused={focused} color={color} />
+            <TabIcon icon={Apple} label="Nutrition" focused={focused} color={color} />
           ),
         }}
       />
@@ -138,7 +137,7 @@ export default function TabLayout() {
         options={{
           title: 'Movement',
           tabBarIcon: ({ focused, color }) => (
-            <TabIcon icon={Dumbbell} label="Move" focused={focused} color={color} />
+            <TabIcon icon={Dumbbell} label="Movement" focused={focused} color={color} />
           ),
         }}
       />
@@ -154,10 +153,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="insights"
         options={{
-          title: 'Insights',
-          tabBarIcon: ({ focused, color }) => (
-            <TabIcon icon={BarChart3} label="Track" focused={focused} color={color} />
-          ),
+          href: null,
         }}
       />
     </Tabs>
