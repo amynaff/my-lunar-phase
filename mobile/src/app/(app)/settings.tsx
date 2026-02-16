@@ -18,6 +18,8 @@ import {
   Check,
   Users,
   LogOut,
+  Shield,
+  MessageCircle,
 } from 'lucide-react-native';
 import { useCycleStore, phaseInfo, LifeStage, lifeStageInfo } from '@/lib/cycle-store';
 import { useThemeStore, getTheme } from '@/lib/theme-store';
@@ -528,6 +530,69 @@ export default function SettingsScreen() {
                   </View>
                 </View>
                 <ChevronRight size={18} color={theme.text.muted} />
+              </View>
+            </Pressable>
+          </Animated.View>
+
+          {/* Community Stories */}
+          <Animated.View
+            entering={FadeInUp.delay(390).duration(600)}
+            className="mx-6 mt-6"
+          >
+            <Text
+              style={{ fontFamily: 'Quicksand_600SemiBold', color: theme.text.accent }}
+              className="text-xs uppercase tracking-wider mb-4"
+            >
+              Community
+            </Text>
+            <Pressable
+              onPress={() => {
+                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                router.push('/(app)/community');
+              }}
+            >
+              <View
+                className="rounded-2xl p-4 border"
+                style={{ backgroundColor: theme.bg.card, borderColor: theme.border.light }}
+              >
+                <View className="flex-row items-center justify-between">
+                  <View className="flex-row items-center flex-1 mr-2">
+                    <View
+                      className="w-10 h-10 rounded-full items-center justify-center mr-3"
+                      style={{ backgroundColor: `${theme.accent.purple}20` }}
+                    >
+                      <MessageCircle size={18} color={theme.accent.purple} />
+                    </View>
+                    <View className="flex-1">
+                      <Text
+                        style={{ fontFamily: 'Quicksand_600SemiBold', color: theme.text.primary }}
+                        className="text-base"
+                      >
+                        Women's Stories
+                      </Text>
+                      <Text
+                        style={{ fontFamily: 'Quicksand_400Regular', color: theme.text.tertiary }}
+                        className="text-xs"
+                      >
+                        Read & share experiences
+                      </Text>
+                    </View>
+                  </View>
+                  <ChevronRight size={18} color={theme.text.muted} />
+                </View>
+                {/* Privacy Notice */}
+                <View
+                  className="flex-row items-center mt-3 pt-3"
+                  style={{ borderTopWidth: 1, borderTopColor: theme.border.light }}
+                >
+                  <Shield size={12} color={theme.accent.purple} />
+                  <Text
+                    style={{ fontFamily: 'Quicksand_400Regular', color: theme.text.muted }}
+                    className="text-xs ml-2"
+                  >
+                    100% anonymous - we never collect personal data
+                  </Text>
+                </View>
               </View>
             </Pressable>
           </Animated.View>

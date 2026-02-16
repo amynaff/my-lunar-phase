@@ -7,6 +7,7 @@ import { sampleRouter } from "./routes/sample";
 import { aiChatRouter } from "./routes/ai-chat";
 import { partnerRouter } from "./routes/partner";
 import { moodRouter } from "./routes/mood";
+import { communityRouter } from "./routes/community";
 import { logger } from "hono/logger";
 
 const app = new Hono<{
@@ -67,6 +68,7 @@ app.route("/api/sample", sampleRouter);
 app.route("/api/ai-chat", aiChatRouter);
 app.route("/api/partner", partnerRouter);
 app.route("/api/mood", moodRouter);
+app.route("/api/community", communityRouter);
 
 const port = Number(process.env.PORT) || 3000;
 

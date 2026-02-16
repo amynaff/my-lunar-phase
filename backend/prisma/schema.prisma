@@ -120,3 +120,21 @@ model MoodEntry {
   @@index([userId])
   @@index([date])
 }
+
+// ==================== Community Stories (Anonymous) ====================
+
+model CommunityStory {
+  id          String   @id @default(cuid())
+  // No userId - completely anonymous, no way to trace back
+  category    String   // 'symptoms', 'nutrition', 'movement', 'lifestyle', 'success'
+  lifeStage   String   // 'regular', 'perimenopause', 'menopause' - for filtering
+  title       String
+  content     String
+  hearts      Int      @default(0)  // Community appreciation count
+  isApproved  Boolean  @default(true)  // For moderation if needed
+  createdAt   DateTime @default(now())
+
+  @@index([category])
+  @@index([lifeStage])
+  @@index([createdAt])
+}
