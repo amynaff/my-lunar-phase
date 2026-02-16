@@ -503,15 +503,26 @@ export default function CommunityScreen() {
             setShowNewStoryModal(true);
           }}
           className="absolute right-6"
-          style={{ bottom: insets.bottom + 24 }}
+          style={{ bottom: insets.bottom + 100 }}
         >
           <LinearGradient
             colors={['#f9a8d4', '#c4b5fd']}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 1 }}
-            style={{ width: 56, height: 56, borderRadius: 28, alignItems: 'center', justifyContent: 'center' }}
+            style={{
+              width: 52,
+              height: 52,
+              borderRadius: 26,
+              alignItems: 'center',
+              justifyContent: 'center',
+              shadowColor: '#000',
+              shadowOffset: { width: 0, height: 4 },
+              shadowOpacity: 0.3,
+              shadowRadius: 8,
+              elevation: 8,
+            }}
           >
-            <Plus size={24} color="#fff" />
+            <Plus size={22} color="#fff" />
           </LinearGradient>
         </Pressable>
 
