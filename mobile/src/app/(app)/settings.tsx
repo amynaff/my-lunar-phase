@@ -634,7 +634,7 @@ export default function SettingsScreen() {
                 style={{ fontFamily: 'Quicksand_400Regular', color: theme.text.muted }}
                 className="text-xs ml-2"
               >
-                Made with love for women everywhere
+                Made with love by a woman for women everywhere
               </Text>
             </View>
             <Text
