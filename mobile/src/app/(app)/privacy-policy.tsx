@@ -1,10 +1,11 @@
 import React from 'react';
-import { View, Text, ScrollView, Pressable } from 'react-native';
+import { View, Text, ScrollView, Pressable, Linking } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Animated, { FadeInDown, FadeInUp } from 'react-native-reanimated';
-import { ArrowLeft, Shield, Lock, Eye, Database, Heart } from 'lucide-react-native';
+import { ArrowLeft, Shield, Lock, Eye, Database, Heart, Mail } from 'lucide-react-native';
 import { router } from 'expo-router';
+import * as Haptics from 'expo-haptics';
 import { useThemeStore, getTheme } from '@/lib/theme-store';
 import {
   useFonts,
@@ -171,10 +172,28 @@ export default function PrivacyPolicyScreen() {
               </Text>
               <Text
                 style={{ fontFamily: 'Quicksand_400Regular', color: theme.text.secondary }}
-                className="text-sm"
+                className="text-sm mb-4"
               >
                 If you have any questions about our privacy practices, please reach out to us. We're happy to explain anything in more detail.
               </Text>
+              <Pressable
+                onPress={() => {
+                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                  Linking.openURL('mailto:lunaflowapp@proton.me?subject=Luna Flow Support');
+                }}
+              >
+                <LinearGradient
+                  colors={['#f9a8d4', '#c4b5fd']}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 0 }}
+                  style={{ borderRadius: 12, padding: 12, flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}
+                >
+                  <Mail size={16} color="#fff" />
+                  <Text style={{ fontFamily: 'Quicksand_600SemiBold' }} className="text-white text-sm ml-2">
+                    Contact Us
+                  </Text>
+                </LinearGradient>
+              </Pressable>
             </View>
           </Animated.View>
 
