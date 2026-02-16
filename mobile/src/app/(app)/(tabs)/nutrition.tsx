@@ -555,6 +555,35 @@ const perimenopauseNutrition = {
     { name: 'Bone Broth', benefit: 'Collagen and minerals' },
     { name: 'Dark Chocolate', benefit: '70%+ for mood and magnesium' },
   ],
+  herbs: [
+    { name: 'Black Cohosh', benefit: 'Reduces hot flashes and night sweats - most studied herb for menopause' },
+    { name: 'Vitex (Chasteberry)', benefit: 'Balances progesterone, helps irregular cycles' },
+    { name: 'Maca Root', benefit: 'Supports hormone balance, energy, and libido' },
+    { name: 'Ashwagandha', benefit: 'Adaptogen for stress, mood, and adrenal support' },
+    { name: 'Red Clover', benefit: 'Phytoestrogens for hot flashes and bone health' },
+    { name: 'Evening Primrose Oil', benefit: 'GLA for hot flashes and breast tenderness' },
+    { name: 'Dong Quai', benefit: 'Traditional Chinese herb for hormone balance' },
+    { name: 'Sage', benefit: 'Reduces excessive sweating and hot flashes' },
+    { name: 'Rhodiola', benefit: 'Adaptogen for energy, focus, and stress resilience' },
+    { name: 'Valerian Root', benefit: 'Natural sleep support without grogginess' },
+  ],
+  herbNotes: [
+    'Start with one herb at a time to assess your response',
+    'Black Cohosh is most effective for hot flashes - give it 8-12 weeks',
+    'Avoid Black Cohosh if you have liver conditions',
+    'Vitex works best taken in the morning on an empty stomach',
+    'Adaptogens like Ashwagandha and Rhodiola help your body handle stress',
+  ],
+  supplements: [
+    { name: 'Full-Spectrum Magnesium', amount: '300-400mg', note: 'Essential for sleep, mood, muscles, and hot flashes - glycinate or threonate best absorbed' },
+    { name: 'Vitamin D3', amount: '2000-4000 IU', note: 'Critical for bone health, mood, and immune function - test levels yearly' },
+    { name: 'B-Complex', amount: 'Daily', note: 'Supports energy, mood, and hormone metabolism - especially B6, B12, folate' },
+    { name: 'Omega-3 (EPA/DHA)', amount: '1000-2000mg', note: 'Reduces inflammation, supports mood, heart, and brain' },
+    { name: 'Calcium', amount: '1000-1200mg', note: 'Split doses for better absorption - take with D3 and K2' },
+    { name: 'Vitamin K2 (MK-7)', amount: '100-200mcg', note: 'Directs calcium to bones, not arteries - take with D3' },
+    { name: 'Vitamin E', amount: '400 IU', note: 'Natural form (d-alpha) for hot flashes and skin health' },
+    { name: 'Iron', amount: 'If needed', note: 'Only supplement if deficient - heavy periods can cause low iron' },
+  ],
   focusAreas: [
     { title: 'Hot Flash Relief', foods: 'Cold water, cooling foods like cucumber, avoid spicy foods, limit caffeine and alcohol' },
     { title: 'Bone Health', foods: 'Calcium-rich foods, vitamin D, leafy greens, sardines with bones' },
@@ -592,6 +621,36 @@ const menopauseNutrition = {
     { name: 'Avocados', benefit: 'Healthy fats and potassium' },
     { name: 'Broccoli', benefit: 'Calcium and fiber' },
     { name: 'Oranges', benefit: 'Vitamin C for collagen' },
+  ],
+  herbs: [
+    { name: 'Black Cohosh', benefit: 'Continues to help with any lingering hot flashes' },
+    { name: 'Red Clover', benefit: 'Isoflavones support bone density and heart health' },
+    { name: 'Sage', benefit: 'Reduces night sweats and supports cognitive function' },
+    { name: 'Ginkgo Biloba', benefit: 'Improves circulation, memory, and cognitive clarity' },
+    { name: 'St. John\'s Wort', benefit: 'Natural mood support - do not combine with antidepressants' },
+    { name: 'Ashwagandha', benefit: 'Reduces cortisol, supports thyroid and energy' },
+    { name: 'Turmeric/Curcumin', benefit: 'Powerful anti-inflammatory for joints and heart' },
+    { name: 'Ginger', benefit: 'Digestive support and anti-inflammatory' },
+    { name: 'Milk Thistle', benefit: 'Liver support for hormone metabolism' },
+    { name: 'Hawthorn', benefit: 'Heart tonic - supports cardiovascular health' },
+  ],
+  herbNotes: [
+    'Continue adaptogens like Ashwagandha for ongoing stress support',
+    'Turmeric absorbs better with black pepper and fat',
+    'St. John\'s Wort interacts with many medications - check with your doctor',
+    'Ginkgo may thin blood - stop before surgery',
+    'Hawthorn is excellent for long-term heart health support',
+  ],
+  supplements: [
+    { name: 'Full-Spectrum Magnesium', amount: '300-400mg', note: 'Critical for bones, heart, sleep, and over 300 body processes' },
+    { name: 'Calcium + Vitamin D3', amount: '1200mg Ca / 2000-4000 IU D3', note: 'Essential duo for bone health - split calcium into 2 doses' },
+    { name: 'Vitamin K2 (MK-7)', amount: '100-200mcg', note: 'Ensures calcium goes to bones, not arteries - take with D3' },
+    { name: 'Omega-3 (EPA/DHA)', amount: '1000-2000mg', note: 'Heart, brain, joints, and mood - wild-caught fish oil or algae' },
+    { name: 'Vitamin B12', amount: '1000-2500mcg', note: 'Absorption decreases with age - sublingual or methylcobalamin best' },
+    { name: 'CoQ10', amount: '100-200mg', note: 'Heart health and cellular energy - especially if on statins' },
+    { name: 'Collagen Peptides', amount: '10-15g', note: 'Supports skin elasticity, joints, and bone matrix' },
+    { name: 'Probiotics', amount: 'Multi-strain', note: 'Gut health affects hormone metabolism and immunity' },
+    { name: 'Boron', amount: '3mg', note: 'Trace mineral that helps calcium and magnesium absorption' },
   ],
   focusAreas: [
     { title: 'Bone Health', foods: 'Calcium-rich foods (dairy, leafy greens, fortified foods), vitamin D, vitamin K' },
@@ -1299,6 +1358,12 @@ export default function NutritionScreen() {
             />
 
             <FocusAreasSection focusAreas={perimenopauseNutrition.focusAreas} theme={theme} accentColor={accentColor} />
+
+            {/* Herbs for Perimenopause */}
+            <HerbsSection herbs={perimenopauseNutrition.herbs} herbNotes={perimenopauseNutrition.herbNotes} theme={theme} />
+
+            {/* Supplements for Perimenopause */}
+            <SupplementsSection supplements={perimenopauseNutrition.supplements} theme={theme} />
           </Animated.View>
 
           {/* Tips */}
@@ -1414,6 +1479,12 @@ export default function NutritionScreen() {
             />
 
             <FocusAreasSection focusAreas={menopauseNutrition.focusAreas} theme={theme} accentColor={accentColor} />
+
+            {/* Herbs for Menopause */}
+            <HerbsSection herbs={menopauseNutrition.herbs} herbNotes={menopauseNutrition.herbNotes} theme={theme} />
+
+            {/* Supplements for Menopause */}
+            <SupplementsSection supplements={menopauseNutrition.supplements} theme={theme} />
           </Animated.View>
 
           {/* Tips */}
