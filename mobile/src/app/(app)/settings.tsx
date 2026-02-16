@@ -310,15 +310,15 @@ export default function SettingsScreen() {
               className="mx-6 mt-6"
             >
               <View
-                className="rounded-3xl p-5 border"
+                className="rounded-2xl p-4 border"
                 style={{ backgroundColor: theme.bg.card, borderColor: theme.border.light }}
               >
                 <View className="flex-row items-center">
                   <View
-                    className="w-12 h-12 rounded-full items-center justify-center mr-4"
+                    className="w-10 h-10 rounded-full items-center justify-center mr-3"
                     style={{ backgroundColor: `${info.color}20` }}
                   >
-                    <Text className="text-2xl">{info.emoji}</Text>
+                    <Text className="text-xl">{info.emoji}</Text>
                   </View>
                   <View>
                     <Text
