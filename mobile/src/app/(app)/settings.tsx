@@ -503,14 +503,14 @@ export default function SettingsScreen() {
                 className="rounded-2xl p-4 border flex-row items-center justify-between"
                 style={{ backgroundColor: theme.bg.card, borderColor: theme.border.light }}
               >
-                <View className="flex-row items-center">
+                <View className="flex-row items-center flex-1 mr-2">
                   <View
                     className="w-10 h-10 rounded-full items-center justify-center mr-3"
                     style={{ backgroundColor: `${theme.accent.rose}20` }}
                   >
                     <Users size={20} color={theme.accent.rose} />
                   </View>
-                  <View>
+                  <View className="flex-1">
                     <Text
                       style={{ fontFamily: 'Quicksand_600SemiBold', color: theme.text.primary }}
                       className="text-base"
@@ -521,7 +521,7 @@ export default function SettingsScreen() {
                       style={{ fontFamily: 'Quicksand_400Regular', color: theme.text.tertiary }}
                       className="text-xs"
                     >
-                      Invite someone to support your journey
+                      Invite someone to support you
                     </Text>
                   </View>
                 </View>
