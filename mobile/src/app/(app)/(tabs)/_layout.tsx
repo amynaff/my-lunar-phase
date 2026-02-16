@@ -128,7 +128,7 @@ export default function TabLayout() {
         options={{
           title: 'Nutrition',
           tabBarIcon: ({ focused, color }) => (
-            <TabIcon icon={Apple} label="Nutrition" focused={focused} color={color} />
+            <TabIcon icon={Apple} label="Food" focused={focused} color={color} />
           ),
         }}
       />
@@ -137,7 +137,7 @@ export default function TabLayout() {
         options={{
           title: 'Movement',
           tabBarIcon: ({ focused, color }) => (
-            <TabIcon icon={Dumbbell} label="Movement" focused={focused} color={color} />
+            <TabIcon icon={Dumbbell} label="Move" focused={focused} color={color} />
           ),
         }}
       />
@@ -155,7 +155,7 @@ export default function TabLayout() {
         options={{
           title: 'Insights',
           tabBarIcon: ({ focused, color }) => (
-            <TabIcon icon={BarChart3} label="Insights" focused={focused} color={color} />
+            <TabIcon icon={BarChart3} label="Track" focused={focused} color={color} />
           ),
         }}
       />
