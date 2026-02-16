@@ -323,13 +323,13 @@ export default function SettingsScreen() {
                   <View>
                     <Text
                       style={{ fontFamily: 'Quicksand_600SemiBold', color: theme.text.primary }}
-                      className="text-lg"
+                      className="text-base"
                     >
                       {info.name} Phase
                     </Text>
                     <Text
                       style={{ fontFamily: 'Quicksand_400Regular', color: theme.text.tertiary }}
-                      className="text-sm"
+                      className="text-xs"
                     >
                       Day {dayOfCycle} of {cycleLength}
                     </Text>
@@ -403,22 +403,24 @@ export default function SettingsScreen() {
                   }}
                   className="p-4 flex-row items-center justify-between"
                 >
-                  <View className="flex-row items-center">
+                  <View className="flex-row items-center flex-1">
                     <Calendar size={18} color={stageColor} />
-                    <Text
-                      style={{ fontFamily: 'Quicksand_500Medium', color: theme.text.primary }}
-                      className="text-sm ml-3"
-                    >
-                      Last Period Start
-                    </Text>
+                    <View className="ml-3">
+                      <Text
+                        style={{ fontFamily: 'Quicksand_500Medium', color: theme.text.primary }}
+                        className="text-sm"
+                      >
+                        Last Period Start
+                      </Text>
+                      <Text
+                        style={{ fontFamily: 'Quicksand_500Medium', color: stageColor }}
+                        className="text-xs mt-0.5"
+                      >
+                        {formatDate(lastPeriodStart)}
+                      </Text>
+                    </View>
                   </View>
                   <View className="flex-row items-center">
-                    <Text
-                      style={{ fontFamily: 'Quicksand_500Medium', color: stageColor }}
-                      className="text-sm mr-2"
-                    >
-                      {formatDate(lastPeriodStart)}
-                    </Text>
                     <ChevronRight size={16} color={theme.text.muted} />
                   </View>
                 </Pressable>
