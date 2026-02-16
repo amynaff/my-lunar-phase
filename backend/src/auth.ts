@@ -56,5 +56,6 @@ export const auth = betterAuth({
       secure: true,
       partitioned: true,
     },
+    trustedProxyHeaders: true,
   },
 });
