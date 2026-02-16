@@ -164,7 +164,7 @@ export default function OnboardingScreen() {
                             fontFamily: 'Quicksand_600SemiBold',
                             color: isSelected ? '#fff' : '#4a3485',
                           }}
-                          className="text-lg"
+                          className="text-base"
                         >
                           {info.name}
                         </Text>
