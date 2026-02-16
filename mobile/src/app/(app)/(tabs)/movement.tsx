@@ -260,8 +260,8 @@ export default function MovementScreen() {
             {movement.workouts.map((workout, index) => (
               <Animated.View key={workout.name} entering={FadeInUp.delay(400 + index * 100).duration(500)}>
                 <View className="rounded-2xl p-4 mb-3 border flex-row items-center" style={{ backgroundColor: theme.bg.card, borderColor: theme.border.light }}>
-                  <View className="w-14 h-14 rounded-2xl items-center justify-center mr-4" style={{ backgroundColor: `${info.color}20` }}>
-                    <workout.icon size={24} color={info.color} />
+                  <View className="w-11 h-11 rounded-xl items-center justify-center mr-3" style={{ backgroundColor: `${info.color}20` }}>
+                    <workout.icon size={20} color={info.color} />
                   </View>
                   <View className="flex-1">
                     <Text style={{ fontFamily: 'Quicksand_600SemiBold', color: theme.text.primary }} className="text-base">
@@ -360,8 +360,8 @@ export default function MovementScreen() {
 
             {moonPhaseMovement.workouts.slice(0, 3).map((workout, index) => (
               <View key={workout.name} className="rounded-2xl p-4 mb-3 border flex-row items-center" style={{ backgroundColor: theme.bg.card, borderColor: theme.border.light }}>
-                <View className="w-14 h-14 rounded-2xl items-center justify-center mr-4" style={{ backgroundColor: `${moonCycleInfo.color}20` }}>
-                  <workout.icon size={24} color={moonCycleInfo.color} />
+                <View className="w-11 h-11 rounded-xl items-center justify-center mr-3" style={{ backgroundColor: `${moonCycleInfo.color}20` }}>
+                  <workout.icon size={20} color={moonCycleInfo.color} />
                 </View>
                 <View className="flex-1">
                   <Text style={{ fontFamily: 'Quicksand_600SemiBold', color: theme.text.primary }} className="text-base">
@@ -481,8 +481,8 @@ export default function MovementScreen() {
 
             {moonPhaseMovement.workouts.slice(0, 3).map((workout, index) => (
               <View key={workout.name} className="rounded-2xl p-4 mb-3 border flex-row items-center" style={{ backgroundColor: theme.bg.card, borderColor: theme.border.light }}>
-                <View className="w-14 h-14 rounded-2xl items-center justify-center mr-4" style={{ backgroundColor: `${moonCycleInfo.color}20` }}>
-                  <workout.icon size={24} color={moonCycleInfo.color} />
+                <View className="w-11 h-11 rounded-xl items-center justify-center mr-3" style={{ backgroundColor: `${moonCycleInfo.color}20` }}>
+                  <workout.icon size={20} color={moonCycleInfo.color} />
                 </View>
                 <View className="flex-1">
                   <Text style={{ fontFamily: 'Quicksand_600SemiBold', color: theme.text.primary }} className="text-base">

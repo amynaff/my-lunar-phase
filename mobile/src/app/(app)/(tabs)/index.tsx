@@ -160,15 +160,15 @@ export default function HomeScreen() {
             >
               <View className="flex-row items-center mb-3">
                 <View
-                  className="w-12 h-12 rounded-full items-center justify-center mr-3"
+                  className="w-10 h-10 rounded-full items-center justify-center mr-3"
                   style={{ backgroundColor: `${info.color}20` }}
                 >
-                  <Text className="text-2xl">{info.emoji}</Text>
+                  <Text className="text-xl">{info.emoji}</Text>
                 </View>
                 <View className="flex-1">
                   <Text
                     style={{ fontFamily: 'Quicksand_600SemiBold', color: theme.text.primary }}
-                    className="text-lg"
+                    className="text-base"
                   >
                     {info.name} Phase
                   </Text>
@@ -605,30 +605,30 @@ export default function HomeScreen() {
               <View className="flex-row items-center">
                 {/* Luna AI Button */}
                 <Pressable
-                  className="w-10 h-10 rounded-full items-center justify-center border mr-2"
+                  className="w-9 h-9 rounded-full items-center justify-center border mr-2"
                   style={{ backgroundColor: `${stageTheme.color}15`, borderColor: `${stageTheme.color}30` }}
                   onPress={() => {
                     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
                     router.push('/luna-ai');
                   }}
                 >
-                  <Sparkles size={18} color={stageTheme.color} />
+                  <Sparkles size={16} color={stageTheme.color} />
                 </Pressable>
                 {!isPremium && (
                   <Pressable
-                    className="w-10 h-10 rounded-full items-center justify-center border mr-2"
+                    className="w-9 h-9 rounded-full items-center justify-center border mr-2"
                     style={{ backgroundColor: 'rgba(249, 168, 212, 0.1)', borderColor: 'rgba(249, 168, 212, 0.3)' }}
                     onPress={() => router.push('/paywall')}
                   >
-                    <Crown size={18} color="#f9a8d4" />
+                    <Crown size={16} color="#f9a8d4" />
                   </Pressable>
                 )}
                 <Pressable
-                  className="w-10 h-10 rounded-full items-center justify-center border"
+                  className="w-9 h-9 rounded-full items-center justify-center border"
                   style={{ backgroundColor: theme.bg.card, borderColor: theme.border.light }}
                   onPress={() => router.push('/settings')}
                 >
-                  <stageTheme.icon size={20} color={stageTheme.color} />
+                  <stageTheme.icon size={18} color={stageTheme.color} />
                 </Pressable>
               </View>
             </View>
@@ -701,10 +701,10 @@ export default function HomeScreen() {
               >
                 <View className="flex-row items-center">
                   <View
-                    className="w-12 h-12 rounded-full items-center justify-center mr-4"
+                    className="w-10 h-10 rounded-full items-center justify-center mr-3"
                     style={{ backgroundColor: `${stageTheme.color}25` }}
                   >
-                    <Sparkles size={22} color={stageTheme.color} />
+                    <Sparkles size={18} color={stageTheme.color} />
                   </View>
                   <View className="flex-1">
                     <Text
