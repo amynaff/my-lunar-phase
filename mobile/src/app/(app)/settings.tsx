@@ -687,6 +687,25 @@ export default function SettingsScreen() {
                   Luna Flow helps you understand and work with your body's natural rhythms at every stage of life.
                 </Text>
               </View>
+              <View style={{ height: 1, backgroundColor: theme.border.light }} />
+              <Pressable
+                onPress={() => {
+                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                  router.push('/(app)/privacy-policy');
+                }}
+                className="p-4 flex-row items-center justify-between"
+              >
+                <View className="flex-row items-center">
+                  <Shield size={18} color={theme.accent.purple} />
+                  <Text
+                    style={{ fontFamily: 'Quicksand_500Medium', color: theme.text.primary }}
+                    className="text-sm ml-3"
+                  >
+                    Privacy Policy
+                  </Text>
+                </View>
+                <ChevronRight size={16} color={theme.text.muted} />
+              </Pressable>
             </View>
           </Animated.View>
 
