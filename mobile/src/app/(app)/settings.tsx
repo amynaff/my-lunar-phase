@@ -20,6 +20,7 @@ import {
   LogOut,
   Shield,
   MessageCircle,
+  FlaskConical,
 } from 'lucide-react-native';
 import { useCycleStore, phaseInfo, LifeStage, lifeStageInfo } from '@/lib/cycle-store';
 import { useThemeStore, getTheme } from '@/lib/theme-store';
@@ -687,6 +688,25 @@ export default function SettingsScreen() {
                   Luna Flow helps you understand and work with your body's natural rhythms at every stage of life.
                 </Text>
               </View>
+              <View style={{ height: 1, backgroundColor: theme.border.light }} />
+              <Pressable
+                onPress={() => {
+                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                  router.push('/(app)/labs-guide');
+                }}
+                className="p-4 flex-row items-center justify-between"
+              >
+                <View className="flex-row items-center">
+                  <FlaskConical size={18} color={theme.accent.lavender} />
+                  <Text
+                    style={{ fontFamily: 'Quicksand_500Medium', color: theme.text.primary }}
+                    className="text-sm ml-3"
+                  >
+                    Labs Guide
+                  </Text>
+                </View>
+                <ChevronRight size={16} color={theme.text.muted} />
+              </Pressable>
               <View style={{ height: 1, backgroundColor: theme.border.light }} />
               <Pressable
                 onPress={() => {
