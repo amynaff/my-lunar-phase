@@ -134,7 +134,7 @@ export default function LabsGuideScreen() {
 
   const handleFunctionHealthLink = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    Linking.openURL('https://www.functionhealth.com');
+    Linking.openURL('https://my.functionhealth.com/signup?code=ANAFF10&_saasquatch=ANAFF10&d=FHREF25');
   };
 
   return (
@@ -215,12 +215,20 @@ export default function LabsGuideScreen() {
                 style={{ backgroundColor: `${theme.accent.purple}15` }}
               >
                 <Sun size={18} color={theme.accent.purple} />
-                <Text
-                  style={{ fontFamily: 'Quicksand_500Medium', color: theme.accent.purple }}
-                  className="text-sm ml-2 flex-1"
-                >
-                  Function Health (no affiliation)
-                </Text>
+                <View className="flex-1 ml-2">
+                  <Text
+                    style={{ fontFamily: 'Quicksand_500Medium', color: theme.accent.purple }}
+                    className="text-sm"
+                  >
+                    Function Health
+                  </Text>
+                  <Text
+                    style={{ fontFamily: 'Quicksand_400Regular', color: theme.text.muted }}
+                    className="text-xs"
+                  >
+                    Affiliate link
+                  </Text>
+                </View>
                 <ExternalLink size={14} color={theme.accent.purple} />
               </Pressable>
             </View>
