@@ -193,19 +193,19 @@ export default function LabsGuideScreen() {
                 style={{ fontFamily: 'CormorantGaramond_600SemiBold', color: theme.text.primary }}
                 className="text-xl mb-3"
               >
-                Knowledge is Power
+                Take Control of Your Health
               </Text>
               <Text
                 style={{ fontFamily: 'Quicksand_400Regular', color: theme.text.secondary, lineHeight: 22 }}
                 className="text-sm"
               >
-                I recommend every woman get a full hormone blood panel at least every year, if not every six months starting at the age of 35.
+                We check cholesterol. We check blood sugar. But hormones that affect everything? Apparently optional.
               </Text>
               <Text
                 style={{ fontFamily: 'Quicksand_400Regular', color: theme.text.secondary, lineHeight: 22 }}
                 className="text-sm mt-3"
               >
-                If your insurance doesn't cover it, there are many places where you can get reasonably priced labs.
+                It's recommended that every woman get a full hormone blood panel at least yearly—if not every six months—starting at age 35. If your insurance won't cover it, there are places to get reasonably priced labs.
               </Text>
 
               {/* Function Health Link */}
