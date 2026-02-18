@@ -227,28 +227,28 @@ export default function SettingsScreen() {
               }}
             >
               <LinearGradient
-                colors={isPremium ? ['#fcd34d', '#f59e0b'] : ['rgba(249, 168, 212, 0.2)', 'rgba(196, 181, 253, 0.2)']}
+                colors={isPremium ? ['#fff9e6', '#ffe066', '#ffc107'] : ['rgba(249, 168, 212, 0.2)', 'rgba(196, 181, 253, 0.2)']}
                 start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 0 }}
-                style={{ borderRadius: 20, padding: 16, borderWidth: 1, borderColor: isPremium ? '#f59e0b' : 'rgba(249, 168, 212, 0.3)' }}
+                end={{ x: 1, y: 1 }}
+                style={{ borderRadius: 20, padding: 16, borderWidth: 1, borderColor: isPremium ? '#ffd54f' : 'rgba(249, 168, 212, 0.3)' }}
               >
                 <View className="flex-row items-center justify-between">
                   <View className="flex-row items-center">
                     <View
                       className="w-10 h-10 rounded-full items-center justify-center mr-3"
-                      style={{ backgroundColor: isPremium ? 'rgba(255,255,255,0.3)' : 'rgba(249, 168, 212, 0.2)' }}
+                      style={{ backgroundColor: isPremium ? 'rgba(255,255,255,0.6)' : 'rgba(249, 168, 212, 0.2)' }}
                     >
-                      <Crown size={20} color={isPremium ? '#fff' : '#f9a8d4'} />
+                      <Crown size={20} color={isPremium ? '#f59e0b' : '#f9a8d4'} />
                     </View>
                     <View>
                       <Text
-                        style={{ fontFamily: 'Quicksand_600SemiBold', color: isPremium ? '#fff' : theme.text.primary }}
+                        style={{ fontFamily: 'Quicksand_600SemiBold', color: isPremium ? '#92400e' : theme.text.primary }}
                         className="text-base"
                       >
                         {isPremium ? 'Premium Member' : 'Free Plan'}
                       </Text>
                       <Text
-                        style={{ fontFamily: 'Quicksand_400Regular', color: isPremium ? 'rgba(255,255,255,0.8)' : theme.text.tertiary }}
+                        style={{ fontFamily: 'Quicksand_400Regular', color: isPremium ? '#b45309' : theme.text.tertiary }}
                         className="text-xs"
                       >
                         {isPremium ? 'All features unlocked' : 'Tap to upgrade'}
