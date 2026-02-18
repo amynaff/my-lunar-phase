@@ -134,7 +134,7 @@ export default function LabsGuideScreen() {
 
   const handleFunctionHealthLink = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    Linking.openURL('https://my.functionhealth.com/signup?code=ANAFF10&_saasquatch=ANAFF10&d=FHREF25');
+    Linking.openURL('https://my.functionhealth.com/signup?code=ANAFF10');
   };
 
   return (
