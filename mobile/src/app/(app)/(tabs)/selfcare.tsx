@@ -501,7 +501,8 @@ export default function SelfCareScreen() {
       <Text style={{ fontFamily: 'Quicksand_600SemiBold', color: theme.text.primary }} className="text-lg mb-4 px-6">
         Daily Affirmations
       </Text>
-      <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ paddingLeft: 24, paddingRight: 24 }} style={{ flexGrow: 0 }}>
+      <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ flexGrow: 0 }}>
+        <View style={{ width: 24 }} />
         {affirmations.map((affirmation, index) => (
           <Animated.View key={affirmation} entering={FadeInUp.delay(850 + index * 50).duration(500)} style={{ marginRight: 12 }}>
             <LinearGradient colors={getGradientColors()} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={{ borderRadius: 16, padding: 16, width: 220 }}>
@@ -512,6 +513,7 @@ export default function SelfCareScreen() {
             </LinearGradient>
           </Animated.View>
         ))}
+        <View style={{ width: 24 }} />
       </ScrollView>
     </Animated.View>
   );
