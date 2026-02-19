@@ -1,5 +1,5 @@
 import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
-import { Stack } from 'expo-router';
+import { Stack, Redirect } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 import { useColorScheme } from '@/lib/useColorScheme';
@@ -9,7 +9,7 @@ import { KeyboardProvider } from 'react-native-keyboard-controller';
 import { useSession } from '@/lib/auth/use-session';
 
 export const unstable_settings = {
-  initialRouteName: '(app)',
+  initialRouteName: 'sign-in',
 };
 
 SplashScreen.preventAutoHideAsync();
@@ -21,17 +21,17 @@ function RootLayoutNav({ colorScheme }: { colorScheme: 'light' | 'dark' | null |
 
   if (isLoading) return null;
 
+  // Redirect based on auth state
+  if (session?.user) {
+    return <Redirect href="/(app)" />;
+  }
+
   return (
     <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
       <Stack screenOptions={{ headerShown: false }}>
-        <Stack.Protected guard={!!session?.user}>
-          <Stack.Screen name="(app)" />
-        </Stack.Protected>
-
-        <Stack.Protected guard={!session?.user}>
-          <Stack.Screen name="sign-in" />
-          <Stack.Screen name="verify-otp" />
-        </Stack.Protected>
+        <Stack.Screen name="sign-in" />
+        <Stack.Screen name="verify-otp" />
+        <Stack.Screen name="(app)" />
       </Stack>
     </ThemeProvider>
   );

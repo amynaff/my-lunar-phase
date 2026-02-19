@@ -58,9 +58,11 @@ function TabIcon({ icon: Icon, label, focused, color }: TabIconProps) {
         numberOfLines={1}
         style={{
           fontWeight: focused ? '600' : '400',
-          fontSize: 9,
+          fontSize: 10,
           color: focused ? theme.text.secondary : theme.text.muted,
           marginTop: 3,
+          minWidth: 50,
+          textAlign: 'center',
         }}
       >
         {label}
@@ -126,18 +128,18 @@ export default function TabLayout() {
       <Tabs.Screen
         name="nutrition"
         options={{
-          title: 'Nutrition',
+          title: 'Nourish',
           tabBarIcon: ({ focused, color }) => (
-            <TabIcon icon={Apple} label="Nutrition" focused={focused} color={color} />
+            <TabIcon icon={Apple} label="Nourish" focused={focused} color={color} />
           ),
         }}
       />
       <Tabs.Screen
         name="movement"
         options={{
-          title: 'Movement',
+          title: 'Move',
           tabBarIcon: ({ focused, color }) => (
-            <TabIcon icon={Dumbbell} label="Movement" focused={focused} color={color} />
+            <TabIcon icon={Dumbbell} label="Move" focused={focused} color={color} />
           ),
         }}
       />
