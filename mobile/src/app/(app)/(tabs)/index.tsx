@@ -15,6 +15,7 @@ import { useThemeStore, getTheme } from '@/lib/theme-store';
 import { useSubscriptionStore } from '@/lib/subscription-store';
 import { api } from '@/lib/api/api';
 import { router } from 'expo-router';
+import { useSession } from '@/lib/auth/use-session';
 import {
   useFonts,
   CormorantGaramond_400Regular,
@@ -43,6 +44,7 @@ export default function HomeScreen() {
   const tier = useSubscriptionStore(s => s.tier);
   const isPremium = tier === 'premium';
   const [isReady, setIsReady] = useState(false);
+  const { data: session, isLoading: sessionLoading } = useSession();
 
   const [fontsLoaded] = useFonts({
     CormorantGaramond_400Regular,
@@ -60,10 +62,10 @@ export default function HomeScreen() {
   }, [fontsLoaded]);
 
   useEffect(() => {
-    if (isReady && !hasCompletedOnboarding) {
+    if (isReady && !sessionLoading && session?.user && !hasCompletedOnboarding) {
       router.replace('/onboarding');
     }
-  }, [hasCompletedOnboarding, isReady]);
+  }, [hasCompletedOnboarding, isReady, session, sessionLoading]);
 
   // Sync cycle data to backend for partner feature
   useEffect(() => {

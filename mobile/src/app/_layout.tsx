@@ -29,21 +29,15 @@ function useProtectedRoute() {
     const isAuthenticated = !!session?.user;
 
     if (isAuthenticated && !inAuthGroup) {
-      // Redirect to app if authenticated and on auth screens
       router.replace('/(app)');
     } else if (!isAuthenticated && inAuthGroup) {
-      // Redirect to sign-in if not authenticated and trying to access app
       router.replace('/sign-in');
     }
   }, [session, isLoading, segments]);
-
-  return { isLoading };
 }
 
 function RootLayoutNav({ colorScheme }: { colorScheme: 'light' | 'dark' | null | undefined }) {
-  const { isLoading } = useProtectedRoute();
-
-  if (isLoading) return null;
+  useProtectedRoute();
 
   return (
     <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
