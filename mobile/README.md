@@ -30,7 +30,28 @@ A beautiful, comprehensive mobile app that helps women understand and work with 
 - Tailored nutrition and movement recommendations
 - Affirmations for this powerful life stage
 
+### Post Menopause
+- **Wisdom Years Focus** - Embrace this vibrant new chapter
+- Health priorities: bone health, heart health, brain vitality, sleep quality
+- Symptom tracking for vaginal dryness, joint pain, energy fluctuations
+- Tailored nutrition and movement for optimal wellness
+- Affirmations celebrating this powerful life stage
+
 ## Features
+
+### Community & Secret Chats
+- **Women's Stories** - Share and read anonymous stories from women at all life stages
+- **Comment Threads** - Support others with anonymous comments on stories
+- **Secret Chat Channels** - Topic-based anonymous chat rooms:
+  - Symptoms & Support
+  - Fertility & TTC
+  - Relationships
+  - Wellness & Self-Care
+  - Perimenopause Journey
+  - Menopause & Beyond
+- **Life Stage Filtering** - Filter content by Regular, Peri, Meno, or Post
+- **100% Anonymous** - No personal data collected or stored
+- **Hearts** - Show support with anonymous heart reactions
 
 ### Partner Support System
 - **Invite your partner** - Generate a unique invite code to share with someone who supports you

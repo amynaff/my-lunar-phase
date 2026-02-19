@@ -127,14 +127,61 @@ model CommunityStory {
   id          String   @id @default(cuid())
   // No userId - completely anonymous, no way to trace back
   category    String   // 'symptoms', 'nutrition', 'movement', 'lifestyle', 'success'
-  lifeStage   String   // 'regular', 'perimenopause', 'menopause' - for filtering
+  lifeStage   String   // 'regular', 'perimenopause', 'menopause', 'postmenopause' - for filtering
   title       String
   content     String
   hearts      Int      @default(0)  // Community appreciation count
   isApproved  Boolean  @default(true)  // For moderation if needed
   createdAt   DateTime @default(now())
 
+  // Comments on this story
+  comments    StoryComment[]
+
   @@index([category])
   @@index([lifeStage])
+  @@index([createdAt])
+}
+
+model StoryComment {
+  id        String   @id @default(cuid())
+  storyId   String
+  story     CommunityStory @relation(fields: [storyId], references: [id], onDelete: Cascade)
+  // Anonymous - no userId
+  content   String
+  hearts    Int      @default(0)
+  createdAt DateTime @default(now())
+
+  @@index([storyId])
+  @@index([createdAt])
+}
+
+// ==================== Chat Channels (Secret Chats) ====================
+
+model ChatChannel {
+  id          String   @id @default(cuid())
+  name        String   // e.g., "Fertility & TTC", "Symptoms", "Relationships"
+  description String
+  emoji       String   // Channel icon
+  color       String   // Theme color
+  sortOrder   Int      @default(0)
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+
+  messages    ChatMessage[]
+
+  @@index([sortOrder])
+}
+
+model ChatMessage {
+  id        String   @id @default(cuid())
+  channelId String
+  channel   ChatChannel @relation(fields: [channelId], references: [id], onDelete: Cascade)
+  // Anonymous - no userId
+  lifeStage String?  // Optional: 'regular', 'perimenopause', 'menopause', 'postmenopause'
+  content   String
+  hearts    Int      @default(0)
+  createdAt DateTime @default(now())
+
+  @@index([channelId])
   @@index([createdAt])
 }
