@@ -3,7 +3,7 @@ import { persist, createJSONStorage } from 'zustand/middleware';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export type CyclePhase = 'menstrual' | 'follicular' | 'ovulatory' | 'luteal';
-export type LifeStage = 'regular' | 'perimenopause' | 'menopause';
+export type LifeStage = 'regular' | 'perimenopause' | 'menopause' | 'postmenopause';
 export type MoonPhase = 'new_moon' | 'waxing_crescent' | 'first_quarter' | 'waxing_gibbous' | 'full_moon' | 'waning_gibbous' | 'last_quarter' | 'waning_crescent';
 
 // Moon phase calculation based on lunar cycle (29.53 days)
@@ -495,6 +495,13 @@ export const lifeStageInfo: Record<LifeStage, {
     description: 'A time of wisdom and freedom. Embrace your second spring.',
     ageRange: '12+ months without period',
   },
+  postmenopause: {
+    name: 'Post Menopause',
+    emoji: '🌟',
+    color: '#ec4899',
+    description: 'Your wisdom years. A time of renewal, clarity, and vibrant living.',
+    ageRange: 'After menopause transition',
+  },
 };
 
 // Perimenopause symptoms for tracking
@@ -535,4 +542,22 @@ export const menopauseSymptoms = [
   { id: 'urinary_issues', name: 'Urinary Changes', emoji: '🚿', category: 'physical' },
   { id: 'skin_changes', name: 'Skin Changes', emoji: '✨', category: 'physical' },
   { id: 'hair_changes', name: 'Hair Changes', emoji: '💇', category: 'physical' },
+];
+
+// Post menopause symptoms for tracking (focus on long-term wellness)
+export const postmenopauseSymptoms = [
+  { id: 'bone_health', name: 'Bone Health', emoji: '🦴', category: 'physical' },
+  { id: 'heart_health', name: 'Heart Health', emoji: '❤️', category: 'physical' },
+  { id: 'joint_stiffness', name: 'Joint Stiffness', emoji: '🦵', category: 'physical' },
+  { id: 'sleep_quality', name: 'Sleep Quality', emoji: '😴', category: 'sleep' },
+  { id: 'energy_levels', name: 'Energy Levels', emoji: '⚡', category: 'energy' },
+  { id: 'mood_wellness', name: 'Mood & Wellness', emoji: '🌈', category: 'mood' },
+  { id: 'cognitive_clarity', name: 'Mental Clarity', emoji: '🧠', category: 'cognitive' },
+  { id: 'vaginal_health', name: 'Vaginal Health', emoji: '🌸', category: 'intimate' },
+  { id: 'urinary_health', name: 'Urinary Health', emoji: '💧', category: 'physical' },
+  { id: 'skin_elasticity', name: 'Skin Health', emoji: '✨', category: 'physical' },
+  { id: 'weight_management', name: 'Weight Management', emoji: '⚖️', category: 'physical' },
+  { id: 'stress_levels', name: 'Stress Levels', emoji: '🧘', category: 'mood' },
+  { id: 'social_connection', name: 'Social Connection', emoji: '👥', category: 'mood' },
+  { id: 'libido', name: 'Intimacy & Libido', emoji: '💜', category: 'intimate' },
 ];

@@ -21,6 +21,7 @@ import {
   Shield,
   MessageCircle,
   FlaskConical,
+  Star,
 } from 'lucide-react-native';
 import { useCycleStore, phaseInfo, LifeStage, lifeStageInfo } from '@/lib/cycle-store';
 import { useThemeStore, getTheme } from '@/lib/theme-store';
@@ -48,6 +49,7 @@ const lifeStageOptions: { stage: LifeStage; icon: typeof Moon; color: string }[]
   { stage: 'regular', icon: Moon, color: '#9d84ed' },
   { stage: 'perimenopause', icon: Leaf, color: '#f59e0b' },
   { stage: 'menopause', icon: Sun, color: '#8b5cf6' },
+  { stage: 'postmenopause', icon: Star, color: '#ec4899' },
 ];
 
 export default function SettingsScreen() {

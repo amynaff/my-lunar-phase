@@ -7,7 +7,7 @@ import Animated, {
   SlideOutLeft,
   FadeIn,
 } from 'react-native-reanimated';
-import { Moon, Sparkles, ArrowRight, ChevronLeft, ChevronDown, Leaf, Sun } from 'lucide-react-native';
+import { Moon, Sparkles, ArrowRight, ChevronLeft, ChevronDown, Leaf, Sun, Star } from 'lucide-react-native';
 import { useCycleStore, LifeStage, lifeStageInfo } from '@/lib/cycle-store';
 import { router } from 'expo-router';
 import * as Haptics from 'expo-haptics';
@@ -58,6 +58,7 @@ const lifeStageOptions: { stage: LifeStage; icon: React.ComponentType<any>; grad
   { stage: 'regular', icon: Moon, gradient: ['#c4b5fd', '#9d84ed'] },
   { stage: 'perimenopause', icon: Leaf, gradient: ['#fcd34d', '#f59e0b'] },
   { stage: 'menopause', icon: Sun, gradient: ['#c4b5fd', '#8b5cf6'] },
+  { stage: 'postmenopause', icon: Star, gradient: ['#f9a8d4', '#ec4899'] },
 ];
 
 export default function OnboardingScreen() {
@@ -492,7 +493,7 @@ export default function OnboardingScreen() {
           ),
         },
       ];
-    } else {
+    } else if (lifeStage === 'menopause') {
       // Menopause
       return [
         ...baseSteps,
@@ -545,6 +546,60 @@ export default function OnboardingScreen() {
           ),
         },
       ];
+    } else {
+      // Post Menopause
+      return [
+        ...baseSteps,
+        // Post Menopause confirmation
+        {
+          title: 'Welcome to your wisdom years',
+          subtitle: 'A time of clarity, renewal, and vibrant living',
+          content: (
+            <View className="items-center">
+              <View
+                className="w-28 h-28 rounded-full items-center justify-center mb-6"
+                style={{ backgroundColor: 'rgba(236, 72, 153, 0.2)' }}
+              >
+                <Star size={50} color="#ec4899" />
+              </View>
+
+              <View
+                className="rounded-2xl p-5 w-full border"
+                style={{ backgroundColor: 'rgba(255,255,255,0.8)', borderColor: 'rgba(236, 72, 153, 0.3)' }}
+              >
+                <Text
+                  style={{ fontFamily: 'Quicksand_600SemiBold', color: '#ec4899' }}
+                  className="text-xs uppercase tracking-wider mb-3"
+                >
+                  Your vibrant chapter
+                </Text>
+                <Text
+                  style={{ fontFamily: 'Quicksand_400Regular', color: '#9d174d' }}
+                  className="text-sm leading-5 mb-4"
+                >
+                  Post menopause is a time of renewed energy and clarity. Your body has found its new rhythm. We'll help you:
+                </Text>
+
+                {[
+                  'Maintain bone and heart health',
+                  'Support cognitive wellness',
+                  'Optimize nutrition for longevity',
+                  'Stay active with joyful movement',
+                  'Nurture emotional wellbeing',
+                  'Embrace this empowering stage',
+                ].map((item, index) => (
+                  <View key={index} className="flex-row items-center mb-2">
+                    <View className="w-2 h-2 rounded-full mr-3" style={{ backgroundColor: '#ec4899' }} />
+                    <Text style={{ fontFamily: 'Quicksand_400Regular', color: '#9d174d' }} className="text-sm">
+                      {item}
+                    </Text>
+                  </View>
+                ))}
+              </View>
+            </View>
+          ),
+        },
+      ];
     }
   };
 
@@ -574,7 +629,7 @@ export default function OnboardingScreen() {
     setLifeStageStore(lifeStage);
 
     // Only set period data for regular and perimenopause
-    if (lifeStage !== 'menopause') {
+    if (lifeStage !== 'menopause' && lifeStage !== 'postmenopause') {
       setLastPeriodStart(lastPeriod);
     }
 
@@ -594,6 +649,7 @@ export default function OnboardingScreen() {
     if (step <= 1) return { primary: '#9d84ed', gradient: ['#f9a8d4', '#c4b5fd'] as [string, string] };
     if (lifeStage === 'perimenopause') return { primary: '#f59e0b', gradient: ['#fcd34d', '#f59e0b'] as [string, string] };
     if (lifeStage === 'menopause') return { primary: '#8b5cf6', gradient: ['#c4b5fd', '#8b5cf6'] as [string, string] };
+    if (lifeStage === 'postmenopause') return { primary: '#ec4899', gradient: ['#f9a8d4', '#ec4899'] as [string, string] };
     return { primary: '#9d84ed', gradient: ['#f9a8d4', '#c4b5fd'] as [string, string] };
   };
 

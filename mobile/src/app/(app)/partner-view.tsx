@@ -18,6 +18,7 @@ import {
   Leaf,
   CloudRain,
   RefreshCw,
+  Star,
 } from 'lucide-react-native';
 import { useThemeStore, getTheme } from '@/lib/theme-store';
 import { router } from 'expo-router';
@@ -42,7 +43,7 @@ interface PartnerData {
   partnerName: string;
   isMainUser: boolean;
   sharedData: {
-    lifeStage: 'regular' | 'perimenopause' | 'menopause';
+    lifeStage: 'regular' | 'perimenopause' | 'menopause' | 'postmenopause';
     currentPhase: 'menstrual' | 'follicular' | 'ovulatory' | 'luteal';
     dayOfCycle: number | null;
     cycleLength: number | null;
@@ -52,7 +53,7 @@ interface PartnerData {
 }
 
 type CyclePhase = 'menstrual' | 'follicular' | 'ovulatory' | 'luteal';
-type LifeStage = 'regular' | 'perimenopause' | 'menopause';
+type LifeStage = 'regular' | 'perimenopause' | 'menopause' | 'postmenopause';
 
 // ---------- Phase data ----------
 
@@ -143,6 +144,14 @@ const menopauseTips = [
   'Plan calm, low-stress activities together',
 ];
 
+const postmenopauseTips = [
+  'Celebrate her wisdom and life experience',
+  'Support her health and wellness routines',
+  'Encourage her passions and new adventures',
+  'Be her partner in staying active together',
+  'Appreciate this vibrant chapter of life',
+];
+
 // ---------- Quick actions ----------
 
 interface QuickAction {
@@ -178,6 +187,12 @@ const menopauseQuickActions: QuickAction[] = [
   { label: 'Send a sweet text', emoji: '\uD83D\uDCF1', color: '#9d84ed' },
   { label: 'Bring her favorite snack', emoji: '\uD83C\uDF53', color: '#e06287' },
   { label: 'Plan a peaceful walk', emoji: '\uD83C\uDF3B', color: '#6dbb7a' },
+];
+
+const postmenopauseQuickActions: QuickAction[] = [
+  { label: 'Plan a fun adventure', emoji: '\u2728', color: '#ec4899' },
+  { label: 'Cook a healthy meal together', emoji: '\uD83E\uDD57', color: '#6dbb7a' },
+  { label: 'Send an appreciation text', emoji: '\uD83D\uDC96', color: '#9d84ed' },
 ];
 
 // ---------- Helpers ----------
@@ -239,41 +254,50 @@ export default function PartnerViewScreen() {
   const sharedData = data?.sharedData;
   const partnerName = data?.partnerName ?? 'Partner';
   const isNonCycling = sharedData?.lifeStage === 'menopause';
+  const isPostMeno = sharedData?.lifeStage === 'postmenopause';
   const isPeri = sharedData?.lifeStage === 'perimenopause';
   const phase = sharedData?.currentPhase ?? 'follicular';
   const phaseInfo = phaseDetails[phase];
 
   // Pick the right tips for life stage
   const getSupportTips = (): string[] => {
+    if (isPostMeno) return postmenopauseTips;
     if (isNonCycling) return menopauseTips;
     if (isPeri) return perimenopauseTips;
     return phaseInfo.tips;
   };
 
   const getQuickActions = (): QuickAction[] => {
+    if (isPostMeno) return postmenopauseQuickActions;
     if (isNonCycling || isPeri) return menopauseQuickActions;
     return quickActionsByPhase[phase];
   };
 
   const getPhaseColor = (): string => {
+    if (isPostMeno) return '#ec4899';
     if (isNonCycling) return '#8b5cf6';
     if (isPeri) return '#f59e0b';
     return phaseInfo.color;
   };
 
   const getPhaseEmoji = (): string => {
+    if (isPostMeno) return '\uD83C\uDF1F';
     if (isNonCycling) return '\uD83C\uDF1A';
     if (isPeri) return '\uD83C\uDF17';
     return phaseInfo.emoji;
   };
 
   const getPhaseName = (): string => {
+    if (isPostMeno) return 'Post Menopause';
     if (isNonCycling) return 'Menopause';
     if (isPeri) return 'Perimenopause';
     return phaseInfo.name;
   };
 
   const getFeeling = (): string => {
+    if (isPostMeno) {
+      return 'She\'s in her wisdom years -- a time of clarity, confidence, and renewed energy. Support her adventures and celebrate this vibrant chapter together.';
+    }
     if (isNonCycling) {
       return 'She may experience hot flashes, sleep changes, and shifting moods. This is a powerful transition -- your steady presence means the world.';
     }
