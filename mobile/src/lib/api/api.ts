@@ -1,7 +1,7 @@
 import { fetch } from "expo/fetch";
 import { authClient } from "../auth/auth-client";
 
-const baseUrl = process.env.EXPO_PUBLIC_BACKEND_URL!;
+const baseUrl = (process.env.EXPO_PUBLIC_VIBECODE_BACKEND_URL || process.env.EXPO_PUBLIC_BACKEND_URL)!;
 
 const request = async <T>(
   url: string,
