@@ -1,6 +1,24 @@
 import { createAuthClient } from "better-auth/react";
-import { expoClient } from "@better-auth/expo/client";
 import * as SecureStore from "expo-secure-store";
+
+const COOKIE_KEY = "vibecode_auth_cookie";
+
+// Store cookie globally for sync access
+let cachedCookie = "";
+
+// Initialize cookie from storage
+SecureStore.getItemAsync(COOKIE_KEY).then((value) => {
+  cachedCookie = value || "";
+});
+
+// Helper to get cookie synchronously
+export const getAuthCookie = () => cachedCookie;
+
+// Helper to set cookie
+export const setAuthCookie = async (cookie: string) => {
+  cachedCookie = cookie;
+  await SecureStore.setItemAsync(COOKIE_KEY, cookie);
+};
 
 // Define emailOTPClient inline to avoid importing from better-auth/client/plugins barrel
 // which pulls in custom-session and other modules that fail Metro resolution
@@ -41,12 +59,15 @@ const emailOTPClient = () => ({
 
 export const authClient = createAuthClient({
   baseURL: (process.env.EXPO_PUBLIC_VIBECODE_BACKEND_URL || process.env.EXPO_PUBLIC_BACKEND_URL)! as string,
+  fetchOptions: {
+    onSuccess: async (ctx) => {
+      const setCookie = ctx.response.headers.get("set-cookie");
+      if (setCookie) {
+        await setAuthCookie(setCookie);
+      }
+    },
+  },
   plugins: [
-    expoClient({
-      scheme: "vibecode",
-      storagePrefix: "vibecode",
-      storage: SecureStore,
-    }),
     emailOTPClient() as ReturnType<typeof emailOTPClient> & Record<string, unknown>,
   ],
 });
