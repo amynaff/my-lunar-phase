@@ -3,12 +3,25 @@ import { authClient } from "./auth-client";
 
 export const SESSION_QUERY_KEY = ["auth-session"] as const;
 
+interface Session {
+  user: {
+    id: string;
+    email: string;
+    name?: string;
+  } | null;
+  session?: {
+    id: string;
+    userId: string;
+    expiresAt: string;
+  } | null;
+}
+
 export const useSession = () => {
   return useQuery({
     queryKey: SESSION_QUERY_KEY,
-    queryFn: async () => {
+    queryFn: async (): Promise<Session | null> => {
       const result = await authClient.getSession();
-      return result.data ?? null;
+      return (result.data as Session) ?? null;
     },
     staleTime: 1000 * 60 * 5,
   });
