@@ -105,7 +105,9 @@ export default function VerifyOtpScreen() {
         }
 
         Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-        invalidateSession();
+        // Invalidate session then navigate directly - don't wait for the guard
+        await invalidateSession();
+        router.replace('/(app)');
       } catch (err) {
         setError('Something went wrong. Please try again.');
         Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
@@ -138,7 +140,7 @@ export default function VerifyOtpScreen() {
 
   const handleOtpChange = useCallback(
     (text: string) => {
-      // Only allow digits
+      // Only allow digits, strip spaces/dashes that might come from paste
       const cleaned = text.replace(/[^0-9]/g, '').slice(0, OTP_LENGTH);
       setOtp(cleaned);
       setFocusedIndex(cleaned.length < OTP_LENGTH ? cleaned.length : OTP_LENGTH - 1);
@@ -258,22 +260,24 @@ export default function VerifyOtpScreen() {
               entering={FadeInUp.delay(400).duration(600)}
               className="px-8 mt-10"
             >
-              {/* Hidden TextInput that captures keyboard input */}
+              {/* Hidden TextInput that captures keyboard input and supports paste */}
               <TextInput
                 ref={hiddenInputRef}
                 value={otp}
                 onChangeText={handleOtpChange}
-                keyboardType="number-pad"
+                keyboardType="default"
                 maxLength={OTP_LENGTH}
                 autoFocus
                 editable={!isVerifying}
                 textContentType="oneTimeCode"
                 autoComplete="one-time-code"
+                importantForAutofill="yes"
                 style={{
                   position: 'absolute',
                   opacity: 0,
-                  height: 1,
-                  width: 1,
+                  height: 60,
+                  width: '100%',
+                  zIndex: 10,
                 }}
               />
 
