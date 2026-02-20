@@ -152,12 +152,6 @@ export default function TabLayout() {
           ),
         }}
       />
-      <Tabs.Screen
-        name="insights"
-        options={{
-          href: null,
-        }}
-      />
     </Tabs>
   );
 }
