@@ -8,12 +8,13 @@ import {
   KeyboardAvoidingView,
   Platform,
   ActivityIndicator,
+  Modal,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import Animated, { FadeInUp, FadeInDown } from 'react-native-reanimated';
-import { Send, Sparkles, Moon, ArrowLeft, Trash2 } from 'lucide-react-native';
-import { useCycleStore, getMoonPhase, moonPhaseInfo, phaseInfo } from '@/lib/cycle-store';
+import Animated, { FadeInUp, FadeInDown, FadeIn } from 'react-native-reanimated';
+import { Send, Sparkles, Moon, ArrowLeft, Trash2, Stethoscope, X, Check, AlertCircle } from 'lucide-react-native';
+import { useCycleStore, getMoonPhase, moonPhaseInfo, phaseInfo, perimenopauseSymptoms, menopauseSymptoms, postmenopauseSymptoms } from '@/lib/cycle-store';
 import { useThemeStore, getTheme } from '@/lib/theme-store';
 import { router } from 'expo-router';
 import * as Haptics from 'expo-haptics';
@@ -37,6 +38,56 @@ interface Message {
   timestamp: Date;
 }
 
+// Common symptoms by life stage
+const getSymptomOptions = (lifeStage: string) => {
+  const commonSymptoms = [
+    { id: 'fatigue', name: 'Fatigue', emoji: '😴' },
+    { id: 'headache', name: 'Headache', emoji: '🤕' },
+    { id: 'bloating', name: 'Bloating', emoji: '🎈' },
+    { id: 'mood_swings', name: 'Mood Swings', emoji: '🎭' },
+    { id: 'sleep_issues', name: 'Sleep Issues', emoji: '😵' },
+    { id: 'cramps', name: 'Cramps', emoji: '💫' },
+  ];
+
+  if (lifeStage === 'perimenopause') {
+    return [
+      ...commonSymptoms,
+      { id: 'hot_flashes', name: 'Hot Flashes', emoji: '🔥' },
+      { id: 'night_sweats', name: 'Night Sweats', emoji: '💦' },
+      { id: 'irregular_periods', name: 'Irregular Periods', emoji: '📅' },
+      { id: 'brain_fog', name: 'Brain Fog', emoji: '🌫️' },
+      { id: 'anxiety', name: 'Anxiety', emoji: '😰' },
+      { id: 'joint_pain', name: 'Joint Pain', emoji: '🦴' },
+    ];
+  }
+
+  if (lifeStage === 'menopause' || lifeStage === 'postmenopause') {
+    return [
+      { id: 'hot_flashes', name: 'Hot Flashes', emoji: '🔥' },
+      { id: 'night_sweats', name: 'Night Sweats', emoji: '💦' },
+      { id: 'sleep_issues', name: 'Sleep Issues', emoji: '😵' },
+      { id: 'brain_fog', name: 'Brain Fog', emoji: '🌫️' },
+      { id: 'mood_changes', name: 'Mood Changes', emoji: '🎭' },
+      { id: 'fatigue', name: 'Fatigue', emoji: '😴' },
+      { id: 'joint_pain', name: 'Joint Pain', emoji: '🦴' },
+      { id: 'vaginal_dryness', name: 'Vaginal Dryness', emoji: '💧' },
+      { id: 'weight_changes', name: 'Weight Changes', emoji: '⚖️' },
+      { id: 'hair_changes', name: 'Hair Changes', emoji: '💇' },
+    ];
+  }
+
+  // Regular cycle symptoms
+  return [
+    ...commonSymptoms,
+    { id: 'breast_tenderness', name: 'Breast Tenderness', emoji: '💗' },
+    { id: 'acne', name: 'Acne', emoji: '✨' },
+    { id: 'cravings', name: 'Food Cravings', emoji: '🍫' },
+    { id: 'back_pain', name: 'Back Pain', emoji: '🔙' },
+    { id: 'anxiety', name: 'Anxiety', emoji: '😰' },
+    { id: 'irritability', name: 'Irritability', emoji: '😤' },
+  ];
+};
+
 export default function LunaAIScreen() {
   const insets = useSafeAreaInsets();
   const themeMode = useThemeStore((s) => s.mode);
@@ -48,6 +99,14 @@ export default function LunaAIScreen() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputText, setInputText] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+
+  // Symptom Checker state
+  const [showSymptomChecker, setShowSymptomChecker] = useState(false);
+  const [selectedSymptoms, setSelectedSymptoms] = useState<string[]>([]);
+  const [symptomSeverity, setSymptomSeverity] = useState<'mild' | 'moderate' | 'severe'>('moderate');
+  const [isCheckingSymptoms, setIsCheckingSymptoms] = useState(false);
+
+  const symptomOptions = getSymptomOptions(lifeStage);
 
   const [fontsLoaded] = useFonts({
     Quicksand_400Regular,
@@ -149,6 +208,80 @@ export default function LunaAIScreen() {
     }
   };
 
+  const checkSymptoms = async () => {
+    if (selectedSymptoms.length === 0 || isCheckingSymptoms) return;
+
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+    setIsCheckingSymptoms(true);
+
+    // Get symptom names
+    const symptomNames = selectedSymptoms
+      .map((id) => symptomOptions.find((s) => s.id === id)?.name)
+      .filter(Boolean) as string[];
+
+    // Add user message to chat
+    const userMessage: Message = {
+      id: Date.now().toString(),
+      role: 'user',
+      content: `🩺 Symptom Check: I'm experiencing ${symptomNames.join(', ')} (${symptomSeverity} severity)`,
+      timestamp: new Date(),
+    };
+    setMessages((prev) => [...prev, userMessage]);
+    setShowSymptomChecker(false);
+
+    try {
+      const response = await fetch(`${BACKEND_URL}/api/ai-chat/symptom-check`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          symptoms: symptomNames,
+          severity: symptomSeverity,
+          lifeStage,
+          currentPhase: lifeStage === 'regular' ? currentPhase : undefined,
+          moonPhase: lifeStage !== 'regular' ? moonInfo.name : undefined,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to get response');
+      }
+
+      const data = await response.json();
+      const assistantContent = data.choices?.[0]?.message?.content || "I'm sorry, I couldn't analyze those symptoms. Please try again.";
+
+      const assistantMessage: Message = {
+        id: (Date.now() + 1).toString(),
+        role: 'assistant',
+        content: assistantContent,
+        timestamp: new Date(),
+      };
+
+      setMessages((prev) => [...prev, assistantMessage]);
+    } catch (error) {
+      console.error('Symptom check error:', error);
+      const errorMessage: Message = {
+        id: (Date.now() + 1).toString(),
+        role: 'assistant',
+        content: "I'm having trouble connecting right now. Please check your connection and try again.",
+        timestamp: new Date(),
+      };
+      setMessages((prev) => [...prev, errorMessage]);
+    } finally {
+      setIsCheckingSymptoms(false);
+      setSelectedSymptoms([]);
+      setSymptomSeverity('moderate');
+    }
+  };
+
+  const toggleSymptom = (symptomId: string) => {
+    Haptics.selectionAsync();
+    setSelectedSymptoms((prev) =>
+      prev.includes(symptomId) ? prev.filter((id) => id !== symptomId) : [...prev, symptomId]
+    );
+  };
+
   const clearChat = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     setMessages([]);
@@ -234,7 +367,16 @@ export default function LunaAIScreen() {
                   <Trash2 size={18} color={theme.accent.blush} />
                 </Pressable>
               ) : (
-                <View className="w-10" />
+                <Pressable
+                  onPress={() => {
+                    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                    setShowSymptomChecker(true);
+                  }}
+                  className="w-10 h-10 rounded-full items-center justify-center"
+                  style={{ backgroundColor: `${theme.accent.pink}15` }}
+                >
+                  <Stethoscope size={18} color={theme.accent.pink} />
+                </Pressable>
               )}
             </View>
           </Animated.View>
@@ -275,6 +417,39 @@ export default function LunaAIScreen() {
                     {getWelcomeMessage()}
                   </Text>
                 </LinearGradient>
+
+                {/* Symptom Checker Card */}
+                <Pressable
+                  onPress={() => {
+                    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+                    setShowSymptomChecker(true);
+                  }}
+                  className="mb-5 p-4 rounded-2xl border flex-row items-center"
+                  style={{ backgroundColor: theme.bg.card, borderColor: `${theme.accent.pink}30` }}
+                >
+                  <View
+                    className="w-12 h-12 rounded-full items-center justify-center mr-3"
+                    style={{ backgroundColor: `${theme.accent.pink}15` }}
+                  >
+                    <Stethoscope size={22} color={theme.accent.pink} />
+                  </View>
+                  <View className="flex-1">
+                    <Text style={{ fontFamily: 'Quicksand_600SemiBold', color: theme.text.primary }} className="text-sm">
+                      Symptom Checker
+                    </Text>
+                    <Text style={{ fontFamily: 'Quicksand_400Regular', color: theme.text.tertiary }} className="text-xs">
+                      Get personalized insights about what you're feeling
+                    </Text>
+                  </View>
+                  <View
+                    className="px-3 py-1.5 rounded-full"
+                    style={{ backgroundColor: `${theme.accent.pink}15` }}
+                  >
+                    <Text style={{ fontFamily: 'Quicksand_500Medium', color: theme.accent.pink }} className="text-xs">
+                      Check
+                    </Text>
+                  </View>
+                </Pressable>
 
                 {/* Suggestion Chips */}
                 <Text style={{ fontFamily: 'Quicksand_500Medium', color: theme.text.tertiary }} className="text-xs mb-3">
@@ -394,6 +569,166 @@ export default function LunaAIScreen() {
           </View>
         </KeyboardAvoidingView>
       </LinearGradient>
+
+      {/* Symptom Checker Modal */}
+      <Modal visible={showSymptomChecker} animationType="slide" transparent>
+        <View className="flex-1 bg-black/50">
+          <Pressable className="flex-1" onPress={() => setShowSymptomChecker(false)} />
+          <View
+            style={{ paddingBottom: insets.bottom + 16, backgroundColor: theme.bg.primary }}
+            className="rounded-t-3xl max-h-[85%]"
+          >
+            {/* Modal Header */}
+            <View className="p-5 border-b" style={{ borderColor: theme.border.light }}>
+              <View className="flex-row items-center justify-between">
+                <View className="flex-row items-center">
+                  <View
+                    className="w-10 h-10 rounded-full items-center justify-center mr-3"
+                    style={{ backgroundColor: `${theme.accent.pink}15` }}
+                  >
+                    <Stethoscope size={20} color={theme.accent.pink} />
+                  </View>
+                  <View>
+                    <Text style={{ fontFamily: 'Quicksand_600SemiBold', color: theme.text.primary }} className="text-lg">
+                      Symptom Checker
+                    </Text>
+                    <Text style={{ fontFamily: 'Quicksand_400Regular', color: theme.text.muted }} className="text-xs">
+                      Select what you're experiencing
+                    </Text>
+                  </View>
+                </View>
+                <Pressable
+                  onPress={() => setShowSymptomChecker(false)}
+                  className="w-8 h-8 rounded-full items-center justify-center"
+                  style={{ backgroundColor: theme.bg.card }}
+                >
+                  <X size={18} color={theme.text.muted} />
+                </Pressable>
+              </View>
+            </View>
+
+            <ScrollView className="px-5" contentContainerStyle={{ paddingVertical: 16 }}>
+              {/* Disclaimer */}
+              <View
+                className="flex-row items-start p-3 rounded-xl mb-4"
+                style={{ backgroundColor: `${theme.accent.purple}10` }}
+              >
+                <AlertCircle size={16} color={theme.accent.purple} style={{ marginTop: 2 }} />
+                <Text style={{ fontFamily: 'Quicksand_400Regular', color: theme.text.secondary }} className="text-xs ml-2 flex-1">
+                  This is for informational purposes only and not a medical diagnosis. Always consult a healthcare provider for medical concerns.
+                </Text>
+              </View>
+
+              {/* Symptom Selection */}
+              <Text style={{ fontFamily: 'Quicksand_500Medium', color: theme.text.muted }} className="text-xs mb-3 uppercase tracking-wide">
+                What are you feeling?
+              </Text>
+              <View className="flex-row flex-wrap mb-5" style={{ gap: 8 }}>
+                {symptomOptions.map((symptom) => {
+                  const isSelected = selectedSymptoms.includes(symptom.id);
+                  return (
+                    <Pressable
+                      key={symptom.id}
+                      onPress={() => toggleSymptom(symptom.id)}
+                      className="px-3 py-2 rounded-full flex-row items-center"
+                      style={{
+                        backgroundColor: isSelected ? `${theme.accent.pink}20` : theme.bg.card,
+                        borderWidth: 1,
+                        borderColor: isSelected ? theme.accent.pink : theme.border.light,
+                      }}
+                    >
+                      <Text style={{ fontSize: 14 }}>{symptom.emoji}</Text>
+                      <Text
+                        style={{
+                          fontFamily: 'Quicksand_500Medium',
+                          color: isSelected ? theme.accent.pink : theme.text.secondary,
+                        }}
+                        className="text-sm ml-1.5"
+                      >
+                        {symptom.name}
+                      </Text>
+                      {isSelected && <Check size={14} color={theme.accent.pink} style={{ marginLeft: 4 }} />}
+                    </Pressable>
+                  );
+                })}
+              </View>
+
+              {/* Severity Selection */}
+              {selectedSymptoms.length > 0 && (
+                <Animated.View entering={FadeIn.duration(300)}>
+                  <Text style={{ fontFamily: 'Quicksand_500Medium', color: theme.text.muted }} className="text-xs mb-3 uppercase tracking-wide">
+                    How severe?
+                  </Text>
+                  <View className="flex-row mb-5" style={{ gap: 8 }}>
+                    {(['mild', 'moderate', 'severe'] as const).map((level) => {
+                      const isSelected = symptomSeverity === level;
+                      const colors = {
+                        mild: '#22c55e',
+                        moderate: '#f59e0b',
+                        severe: '#ef4444',
+                      };
+                      return (
+                        <Pressable
+                          key={level}
+                          onPress={() => {
+                            Haptics.selectionAsync();
+                            setSymptomSeverity(level);
+                          }}
+                          className="flex-1 py-3 rounded-xl items-center"
+                          style={{
+                            backgroundColor: isSelected ? `${colors[level]}20` : theme.bg.card,
+                            borderWidth: 1,
+                            borderColor: isSelected ? colors[level] : theme.border.light,
+                          }}
+                        >
+                          <Text
+                            style={{
+                              fontFamily: 'Quicksand_600SemiBold',
+                              color: isSelected ? colors[level] : theme.text.secondary,
+                            }}
+                            className="text-sm capitalize"
+                          >
+                            {level}
+                          </Text>
+                        </Pressable>
+                      );
+                    })}
+                  </View>
+                </Animated.View>
+              )}
+            </ScrollView>
+
+            {/* Submit Button */}
+            <View className="px-5 pt-2">
+              <Pressable
+                onPress={checkSymptoms}
+                disabled={selectedSymptoms.length === 0 || isCheckingSymptoms}
+                style={{ opacity: selectedSymptoms.length === 0 ? 0.5 : 1 }}
+              >
+                <LinearGradient
+                  colors={['#f9a8d4', '#c4b5fd']}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 0 }}
+                  style={{ borderRadius: 16, padding: 16, flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}
+                >
+                  {isCheckingSymptoms ? (
+                    <ActivityIndicator color="#fff" />
+                  ) : (
+                    <>
+                      <Stethoscope size={18} color="#fff" />
+                      <Text style={{ fontFamily: 'Quicksand_600SemiBold' }} className="text-white text-base ml-2">
+                        {selectedSymptoms.length > 0
+                          ? `Check ${selectedSymptoms.length} Symptom${selectedSymptoms.length > 1 ? 's' : ''}`
+                          : 'Select Symptoms'}
+                      </Text>
+                    </>
+                  )}
+                </LinearGradient>
+              </Pressable>
+            </View>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 }

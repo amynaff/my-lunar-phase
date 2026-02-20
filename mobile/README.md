@@ -66,6 +66,11 @@ A beautiful, comprehensive mobile app that helps women understand and work with 
 - **Powered by Grok AI** - Personalized wellness companion
 - Context-aware responses based on your life stage and current phase/moon
 - Get advice on nutrition, movement, self-care, and symptom management
+- **Symptom Checker** - Select symptoms you're experiencing and get:
+  - Personalized insights based on your life stage
+  - Whether symptoms are common for your phase
+  - Practical self-care suggestions
+  - Guidance on when to see a healthcare provider
 - Conversation history within sessions
 - Quick topic suggestions for easy interaction
 - Warm, supportive, and evidence-based guidance

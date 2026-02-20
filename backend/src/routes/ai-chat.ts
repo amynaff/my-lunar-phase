@@ -179,3 +179,82 @@ aiChatRouter.post("/quick-advice", async (c) => {
 });
 
 export { aiChatRouter };
+
+// Symptom checker endpoint
+aiChatRouter.post("/symptom-check", async (c) => {
+  try {
+    const body = await c.req.json<{
+      symptoms: string[];
+      severity?: "mild" | "moderate" | "severe";
+      duration?: string;
+      lifeStage?: string;
+      currentPhase?: string;
+      moonPhase?: string;
+    }>();
+
+    if (!body.symptoms || !Array.isArray(body.symptoms) || body.symptoms.length === 0) {
+      return c.json({ error: "At least one symptom is required" }, 400);
+    }
+
+    const apiKey = process.env.GROK_API_KEY;
+    if (!apiKey) {
+      return c.json({ error: "AI service not configured" }, 500);
+    }
+
+    const symptomCheckerPrompt = `You are Luna, a caring wellness companion helping a woman understand her symptoms.
+
+IMPORTANT GUIDELINES:
+- You are NOT a doctor and cannot diagnose conditions
+- Always recommend consulting a healthcare provider for persistent or concerning symptoms
+- Be warm, supportive, and non-alarmist
+- Provide practical comfort measures and lifestyle adjustments
+- Relate symptoms to the user's life stage/cycle phase when relevant
+
+The user is reporting the following:
+- Symptoms: ${body.symptoms.join(", ")}
+${body.severity ? `- Severity: ${body.severity}` : ""}
+${body.duration ? `- Duration: ${body.duration}` : ""}
+${body.lifeStage ? `- Life stage: ${body.lifeStage}` : ""}
+${body.currentPhase ? `- Cycle phase: ${body.currentPhase}` : ""}
+${body.moonPhase ? `- Moon phase: ${body.moonPhase}` : ""}
+
+Please provide:
+1. A brief, compassionate acknowledgment of what they're experiencing
+2. Whether these symptoms are common for their life stage/phase (if applicable)
+3. 2-3 practical self-care suggestions to help with these specific symptoms
+4. Clear guidance on when they should consult a healthcare provider
+
+Keep your response warm and supportive, around 3-4 paragraphs.`;
+
+    const messages: ChatMessage[] = [
+      { role: "system", content: symptomCheckerPrompt },
+      { role: "user", content: `I'm experiencing: ${body.symptoms.join(", ")}` },
+    ];
+
+    const response = await fetch("https://api.x.ai/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${apiKey}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        model: "grok-4-fast-non-reasoning",
+        messages,
+        max_tokens: 800,
+        temperature: 0.6,
+      }),
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error("Grok API error:", response.status, errorText);
+      return c.json({ error: "AI service error" }, 500);
+    }
+
+    const data = (await response.json()) as GrokResponse;
+    return c.json(data);
+  } catch (error) {
+    console.error("Symptom check error:", error);
+    return c.json({ error: "Failed to process symptom check" }, 500);
+  }
+});
