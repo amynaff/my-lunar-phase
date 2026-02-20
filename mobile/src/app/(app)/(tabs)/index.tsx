@@ -824,12 +824,12 @@ export default function HomeScreen() {
               Today's Guidance
             </Text>
 
-            <View className="flex-row" style={{ gap: 12 }}>
+            <View className="flex-row justify-between">
               {quickActions.map((action, index) => (
                 <AnimatedPressable
                   key={action.label}
                   entering={FadeInUp.delay(750 + index * 80).duration(500)}
-                  className="flex-1"
+                  style={{ width: '31%' }}
                   onPress={() => router.push(action.route as any)}
                 >
                   <View
