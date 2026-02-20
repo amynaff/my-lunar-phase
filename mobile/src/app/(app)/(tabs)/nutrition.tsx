@@ -124,7 +124,7 @@ const phaseNutrition: Record<CyclePhase, PhaseNutritionData> = {
     supplements: [
       { name: 'Vitamin C', amount: '500-1000mg', note: 'Helps iron absorption' },
       { name: 'Calcium', amount: '200mg' },
-      { name: 'Magnesium', amount: '100mg', note: 'For cramps and relaxation' },
+      { name: 'Magnesium Glycinate', amount: '100mg', note: 'For mood and sleep' },
     ],
     herbs: [
       { name: 'Raspberry Leaf', benefit: 'Iron-rich, uterine tonic' },
@@ -359,7 +359,7 @@ const phaseNutrition: Record<CyclePhase, PhaseNutritionData> = {
       { name: 'Vitamin B6', amount: '50-100mg', note: 'Important for hormone balance' },
       { name: 'Zinc', amount: '15-30mg/day', note: 'Vegetarians especially need supplementation' },
       { name: 'Calcium', amount: 'Extra', note: 'Need extra calcium during estrogen drop' },
-      { name: 'Magnesium', amount: 'Evening', note: 'Take in the evening (P.M.)' },
+      { name: 'Magnesium Glycinate', amount: 'Evening', note: 'For mood and sleep - take P.M.' },
       { name: 'Potassium', amount: 'Evening', note: 'Take in the evening (P.M.)' },
     ],
     herbs: [
@@ -495,7 +495,7 @@ const phaseNutrition: Record<CyclePhase, PhaseNutritionData> = {
     ],
     supplements: [
       { name: 'Calcium', amount: '150-1500mg/day', note: 'Extra needed as estrogen drops' },
-      { name: 'Magnesium', amount: '600mg-1g', note: 'For cramps, mood, and sleep' },
+      { name: 'Magnesium Glycinate', amount: '600mg-1g', note: 'For mood and sleep' },
       { name: 'Vitamin B6', amount: '50mg', note: 'Can do B6 injection if severe PMS' },
       { name: 'Zinc', amount: '15mg/day', note: 'Helps absorb B6' },
     ],
@@ -575,7 +575,7 @@ const perimenopauseNutrition = {
     'Adaptogens like Ashwagandha and Rhodiola help your body handle stress',
   ],
   supplements: [
-    { name: 'Full-Spectrum Magnesium', amount: '300-400mg', note: 'Essential for sleep, mood, muscles, and hot flashes - glycinate or threonate best absorbed' },
+    { name: 'Magnesium Glycinate', amount: '300-400mg', note: 'Best for mood and sleep - highly absorbable, calming form' },
     { name: 'Vitamin D3', amount: '2000-4000 IU', note: 'Critical for bone health, mood, and immune function - test levels yearly' },
     { name: 'B-Complex', amount: 'Daily', note: 'Supports energy, mood, and hormone metabolism - especially B6, B12, folate' },
     { name: 'Omega-3 (EPA/DHA)', amount: '1000-2000mg', note: 'Reduces inflammation, supports mood, heart, and brain' },
@@ -642,7 +642,7 @@ const menopauseNutrition = {
     'Hawthorn is excellent for long-term heart health support',
   ],
   supplements: [
-    { name: 'Full-Spectrum Magnesium', amount: '300-400mg', note: 'Critical for bones, heart, sleep, and over 300 body processes' },
+    { name: 'Magnesium Glycinate', amount: '300-400mg', note: 'Best for mood and sleep - highly absorbable, gentle on digestion' },
     { name: 'Calcium + Vitamin D3', amount: '1200mg Ca\n2000-4000 IU D3', note: 'Essential duo for bone health - split calcium into 2 doses' },
     { name: 'Vitamin K2 (MK-7)', amount: '100-200mcg', note: 'Ensures calcium goes to bones, not arteries - take with D3' },
     { name: 'Omega-3 (EPA/DHA)', amount: '1000-2000mg', note: 'Heart, brain, joints, and mood - wild-caught fish oil or algae' },
