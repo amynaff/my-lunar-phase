@@ -829,14 +829,15 @@ export default function HomeScreen() {
                 <AnimatedPressable
                   key={action.label}
                   entering={FadeInUp.delay(750 + index * 80).duration(500)}
-                  style={{ width: '31%' }}
+                  style={{ flex: 1, marginHorizontal: index === 1 ? 8 : 0 }}
                   onPress={() => router.push(action.route as any)}
                 >
                   <View
-                    className="rounded-2xl p-4 border items-center"
+                    className="rounded-2xl p-4 border items-center justify-center"
                     style={{
                       backgroundColor: `${action.color}10`,
                       borderColor: `${action.color}30`,
+                      height: 100,
                     }}
                   >
                     <View
