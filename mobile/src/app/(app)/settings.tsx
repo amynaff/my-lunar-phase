@@ -22,6 +22,7 @@ import {
   MessageCircle,
   FlaskConical,
   Star,
+  Bell,
 } from 'lucide-react-native';
 import { useCycleStore, phaseInfo, LifeStage, lifeStageInfo } from '@/lib/cycle-store';
 import { useThemeStore, getTheme } from '@/lib/theme-store';
@@ -596,6 +597,54 @@ export default function SettingsScreen() {
                     100% anonymous - we never collect personal data
                   </Text>
                 </View>
+              </View>
+            </Pressable>
+          </Animated.View>
+
+          {/* Notifications */}
+          <Animated.View
+            entering={FadeInUp.delay(395).duration(600)}
+            className="mx-6 mt-6"
+          >
+            <Text
+              style={{ fontFamily: 'Quicksand_600SemiBold', color: theme.text.accent }}
+              className="text-xs uppercase tracking-wider mb-4"
+            >
+              Notifications
+            </Text>
+            <Pressable
+              onPress={() => {
+                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                router.push('/(app)/notification-settings');
+              }}
+            >
+              <View
+                className="rounded-2xl p-4 border flex-row items-center justify-between"
+                style={{ backgroundColor: theme.bg.card, borderColor: theme.border.light }}
+              >
+                <View className="flex-row items-center flex-1 mr-2">
+                  <View
+                    className="w-10 h-10 rounded-full items-center justify-center mr-3"
+                    style={{ backgroundColor: `${theme.accent.lavender}20` }}
+                  >
+                    <Bell size={18} color={theme.accent.lavender} />
+                  </View>
+                  <View className="flex-1">
+                    <Text
+                      style={{ fontFamily: 'Quicksand_600SemiBold', color: theme.text.primary }}
+                      className="text-base"
+                    >
+                      Reminders
+                    </Text>
+                    <Text
+                      style={{ fontFamily: 'Quicksand_400Regular', color: theme.text.tertiary }}
+                      className="text-xs"
+                    >
+                      Period, wellness & phase alerts
+                    </Text>
+                  </View>
+                </View>
+                <ChevronRight size={18} color={theme.text.muted} />
               </View>
             </Pressable>
           </Animated.View>

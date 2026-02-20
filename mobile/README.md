@@ -80,6 +80,13 @@ A beautiful, comprehensive mobile app that helps women understand and work with 
 - **Data syncing** - Your cycle data syncs securely to enable partner support
 - **Privacy focused** - All sensitive data encrypted and only shared with explicit permission
 
+### Notifications & Reminders
+- **Period Reminders** - Get notified 1-7 days before your period starts
+- **Daily Wellness Check-In** - Customizable time for gentle daily reminders
+- **Phase Change Alerts** - Know when you're entering a new cycle phase
+- **Configurable Settings** - Toggle each notification type on/off
+- **Smart Scheduling** - Notifications adapt to your cycle data
+
 ### Cycle Tracking (Regular & Perimenopause)
 - Beautiful cycle wheel visualization showing current day and phase
 - Automatic phase detection (Menstrual, Follicular, Ovulatory, Luteal)
