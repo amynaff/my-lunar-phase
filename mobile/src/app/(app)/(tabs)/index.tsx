@@ -100,25 +100,25 @@ export default function HomeScreen() {
   const quickActions = [
     {
       icon: Apple,
-      label: 'Nutrition',
+      label: 'Nourish',
       color: theme.accent.pink,
       route: '/(tabs)/nutrition',
     },
     {
       icon: Dumbbell,
-      label: 'Movement',
+      label: 'Move',
       color: theme.accent.purple,
       route: '/(tabs)/movement',
     },
     {
       icon: Heart,
-      label: 'Self-Care',
+      label: 'Care',
       color: theme.accent.blush,
       route: '/(tabs)/selfcare',
     },
     {
       icon: Sparkles,
-      label: 'Luna AI',
+      label: 'Luna',
       color: theme.accent.lavender,
       route: '/luna-ai',
     },
@@ -830,7 +830,7 @@ export default function HomeScreen() {
               Today's Guidance
             </Text>
 
-            <View className="flex-row" style={{ gap: 10 }}>
+            <View className="flex-row" style={{ gap: 8 }}>
               {quickActions.map((action, index) => (
                 <AnimatedPressable
                   key={action.label}
@@ -839,21 +839,22 @@ export default function HomeScreen() {
                   onPress={() => router.push(action.route as any)}
                 >
                   <View
-                    className="rounded-2xl p-4 border items-center"
+                    className="rounded-2xl p-3 border items-center"
                     style={{
                       backgroundColor: `${action.color}10`,
                       borderColor: `${action.color}30`,
                     }}
                   >
                     <View
-                      className="w-11 h-11 rounded-full items-center justify-center mb-2"
+                      className="w-10 h-10 rounded-full items-center justify-center mb-1.5"
                       style={{ backgroundColor: `${action.color}20` }}
                     >
-                      <action.icon size={20} color={action.color} />
+                      <action.icon size={18} color={action.color} />
                     </View>
                     <Text
                       style={{ fontFamily: 'Quicksand_600SemiBold', color: theme.text.primary }}
                       className="text-xs"
+                      numberOfLines={1}
                     >
                       {action.label}
                     </Text>
