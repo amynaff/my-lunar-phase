@@ -1,8 +1,8 @@
 {
   "expo": {
-    "name": "vibecode",
-    "slug": "vibecode",
-    "scheme": "vibecode",
+    "name": "My Lunar Phase",
+    "slug": "my-lunar-phase",
+    "scheme": "my-lunar-phase",
     "version": "1.0.0",
     "orientation": "portrait",
     "userInterfaceStyle": "automatic",

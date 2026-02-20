@@ -124,7 +124,7 @@ export default function PaywallScreen() {
               style={{ fontFamily: 'CormorantGaramond_600SemiBold', color: '#fff' }}
               className="text-4xl text-center"
             >
-              Luna Flow Premium
+              My Lunar Phase Premium
             </Text>
             <Text
               style={{ fontFamily: 'Quicksand_400Regular', color: 'rgba(255,255,255,0.7)' }}

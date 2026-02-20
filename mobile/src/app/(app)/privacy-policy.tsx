@@ -22,7 +22,7 @@ const PRIVACY_SECTIONS = [
   {
     icon: Shield,
     title: 'Your Privacy Matters',
-    content: 'Luna Flow is designed with your privacy as our top priority. We believe your health data belongs to you and only you.',
+    content: 'My Lunar Phase is designed with your privacy as our top priority. We believe your health data belongs to you and only you.',
   },
   {
     icon: Database,
@@ -42,7 +42,7 @@ const PRIVACY_SECTIONS = [
   {
     icon: Heart,
     title: 'Our Commitment',
-    content: 'Luna Flow was created by a woman, for women. We will never sell, share, or monetize your personal data. Your trust is more valuable to us than any data could ever be.',
+    content: 'My Lunar Phase was created by a woman, for women. We will never sell, share, or monetize your personal data. Your trust is more valuable to us than any data could ever be.',
   },
 ];
 
@@ -179,7 +179,7 @@ export default function PrivacyPolicyScreen() {
               <Pressable
                 onPress={() => {
                   Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                  Linking.openURL('mailto:lunaflowapp@proton.me?subject=Luna Flow Support');
+                  Linking.openURL('mailto:mylunarphaseapp@proton.me?subject=My Lunar Phase Support');
                 }}
               >
                 <LinearGradient
