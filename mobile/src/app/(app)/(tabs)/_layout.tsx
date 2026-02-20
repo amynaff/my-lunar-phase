@@ -14,7 +14,6 @@ import {
   Apple,
   Heart,
   Dumbbell,
-  ShoppingCart,
 } from 'lucide-react-native';
 import * as Haptics from 'expo-haptics';
 import { useThemeStore, getTheme } from '@/lib/theme-store';
@@ -138,10 +137,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="grocery"
         options={{
-          title: 'Grocery',
-          tabBarIcon: ({ focused, color }) => (
-            <TabIcon icon={ShoppingCart} label="Grocery" focused={focused} color={color} />
-          ),
+          href: null,
         }}
       />
       <Tabs.Screen
