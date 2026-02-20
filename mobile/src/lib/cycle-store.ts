@@ -447,26 +447,32 @@ export const useCycleStore = create<CycleStore>()(
       clearGroceryList: () => set({ groceryList: [] }),
 
       addPhaseGroceries: (phase) => set((state) => {
-        const newItems = phaseGroceries[phase].map((item, index) => ({
-          id: `${Date.now()}-${index}`,
-          name: item.name,
-          phase,
-          category: item.category,
-          isChecked: false,
-        }));
+        const existingNames = new Set(state.groceryList.map(item => item.name.toLowerCase()));
+        const newItems = phaseGroceries[phase]
+          .filter(item => !existingNames.has(item.name.toLowerCase()))
+          .map((item, index) => ({
+            id: `${Date.now()}-${index}`,
+            name: item.name,
+            phase,
+            category: item.category,
+            isChecked: false,
+          }));
         return { groceryList: [...state.groceryList, ...newItems] };
       }),
 
       addLifeStageGroceries: (lifeStage) => set((state) => {
         if (lifeStage === 'regular') return state; // Regular uses phase groceries
         const groceries = lifeStageGroceries[lifeStage];
-        const newItems = groceries.map((item, index) => ({
-          id: `${Date.now()}-${index}`,
-          name: item.name,
-          phase: 'follicular' as CyclePhase, // Default phase for life stage items
-          category: item.category,
-          isChecked: false,
-        }));
+        const existingNames = new Set(state.groceryList.map(item => item.name.toLowerCase()));
+        const newItems = groceries
+          .filter(item => !existingNames.has(item.name.toLowerCase()))
+          .map((item, index) => ({
+            id: `${Date.now()}-${index}`,
+            name: item.name,
+            phase: 'follicular' as CyclePhase, // Default phase for life stage items
+            category: item.category,
+            isChecked: false,
+          }));
         return { groceryList: [...state.groceryList, ...newItems] };
       }),
 
