@@ -1131,6 +1131,7 @@ export default function NutritionScreen() {
   const insets = useSafeAreaInsets();
   const getCurrentPhase = useCycleStore(s => s.getCurrentPhase);
   const addPhaseGroceries = useCycleStore(s => s.addPhaseGroceries);
+  const addLifeStageGroceries = useCycleStore(s => s.addLifeStageGroceries);
   const lifeStage = useCycleStore(s => s.lifeStage);
   const themeMode = useThemeStore(s => s.mode);
   const theme = getTheme(themeMode);
@@ -1160,7 +1161,11 @@ export default function NutritionScreen() {
   const accentColor = getAccentColor();
 
   const handleAddToGrocery = () => {
-    addPhaseGroceries(currentPhase);
+    if (lifeStage === 'regular') {
+      addPhaseGroceries(currentPhase);
+    } else {
+      addLifeStageGroceries(lifeStage);
+    }
     router.push('/(tabs)/grocery');
   };
 
@@ -1344,9 +1349,17 @@ export default function NutritionScreen() {
 
           {/* Perimenopause-Specific Foods */}
           <Animated.View entering={FadeInUp.delay(350).duration(600)} className="mx-6 mt-4">
-            <Text style={{ fontFamily: 'Quicksand_600SemiBold', color: theme.text.primary }} className="text-lg mb-4">
-              Perimenopause Essentials
-            </Text>
+            <View className="flex-row items-center justify-between mb-4">
+              <Text style={{ fontFamily: 'Quicksand_600SemiBold', color: theme.text.primary }} className="text-lg">
+                Perimenopause Essentials
+              </Text>
+              <Pressable onPress={handleAddToGrocery} className="flex-row items-center px-3 py-2 rounded-full" style={{ backgroundColor: `${accentColor}15` }}>
+                <ShoppingCart size={14} color={accentColor} />
+                <Text style={{ fontFamily: 'Quicksand_500Medium', color: accentColor }} className="text-xs ml-2">
+                  Add to List
+                </Text>
+              </Pressable>
+            </View>
 
             <CollapsibleSection
               title="Hormone Support Foods"
@@ -1465,9 +1478,17 @@ export default function NutritionScreen() {
 
           {/* Menopause-Specific Foods */}
           <Animated.View entering={FadeInUp.delay(350).duration(600)} className="mx-6 mt-4">
-            <Text style={{ fontFamily: 'Quicksand_600SemiBold', color: theme.text.primary }} className="text-lg mb-4">
-              Menopause Essentials
-            </Text>
+            <View className="flex-row items-center justify-between mb-4">
+              <Text style={{ fontFamily: 'Quicksand_600SemiBold', color: theme.text.primary }} className="text-lg">
+                Menopause Essentials
+              </Text>
+              <Pressable onPress={handleAddToGrocery} className="flex-row items-center px-3 py-2 rounded-full" style={{ backgroundColor: `${accentColor}15` }}>
+                <ShoppingCart size={14} color={accentColor} />
+                <Text style={{ fontFamily: 'Quicksand_500Medium', color: accentColor }} className="text-xs ml-2">
+                  Add to List
+                </Text>
+              </Pressable>
+            </View>
 
             <CollapsibleSection
               title="Recommended Foods"
@@ -1551,24 +1572,22 @@ export default function NutritionScreen() {
 
           {renderLifeStageContent()}
 
-          {/* CTA - Only for regular cycle */}
-          {lifeStage === 'regular' && (
-            <Animated.View entering={FadeInUp.delay(600).duration(600)} className="mx-6 mt-8">
-              <Pressable onPress={handleAddToGrocery} className="overflow-hidden rounded-2xl">
-                <LinearGradient
-                  colors={['#f9a8d4', '#c4b5fd']}
-                  start={{ x: 0, y: 0 }}
-                  end={{ x: 1, y: 0 }}
-                  style={{ padding: 16, flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}
-                >
-                  <ShoppingCart size={20} color="#fff" />
-                  <Text style={{ fontFamily: 'Quicksand_600SemiBold' }} className="text-white text-base ml-3">
-                    Add All to Grocery List
-                  </Text>
-                </LinearGradient>
-              </Pressable>
-            </Animated.View>
-          )}
+          {/* CTA - Add to Grocery List */}
+          <Animated.View entering={FadeInUp.delay(600).duration(600)} className="mx-6 mt-8">
+            <Pressable onPress={handleAddToGrocery} className="overflow-hidden rounded-2xl">
+              <LinearGradient
+                colors={lifeStage === 'perimenopause' ? ['#f59e0b', '#fbbf24'] : lifeStage === 'menopause' ? ['#8b5cf6', '#a78bfa'] : ['#f9a8d4', '#c4b5fd']}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 0 }}
+                style={{ padding: 16, flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}
+              >
+                <ShoppingCart size={20} color="#fff" />
+                <Text style={{ fontFamily: 'Quicksand_600SemiBold' }} className="text-white text-base ml-3">
+                  Add All to Grocery List
+                </Text>
+              </LinearGradient>
+            </Pressable>
+          </Animated.View>
         </ScrollView>
       </LinearGradient>
     </View>

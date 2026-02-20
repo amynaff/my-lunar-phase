@@ -147,6 +147,7 @@ interface CycleStore {
   toggleGroceryItem: (id: string) => void;
   clearGroceryList: () => void;
   addPhaseGroceries: (phase: CyclePhase) => void;
+  addLifeStageGroceries: (lifeStage: LifeStage) => void;
 
   // Computed helpers
   getCurrentPhase: () => CyclePhase;
@@ -301,6 +302,117 @@ const phaseGroceries: Record<CyclePhase, Array<{ name: string; category: string 
   ],
 };
 
+// Life stage specific grocery suggestions
+const lifeStageGroceries: Record<Exclude<LifeStage, 'regular'>, Array<{ name: string; category: string }>> = {
+  perimenopause: [
+    // Hormone balance & hot flash support
+    { name: 'Salmon', category: 'Protein' },
+    { name: 'Mackerel', category: 'Protein' },
+    { name: 'Flaxseeds', category: 'Seeds' },
+    { name: 'Chia seeds', category: 'Seeds' },
+    // Leafy greens for bone health
+    { name: 'Kale', category: 'Vegetables' },
+    { name: 'Spinach', category: 'Vegetables' },
+    { name: 'Broccoli', category: 'Vegetables' },
+    { name: 'Brussels sprouts', category: 'Vegetables' },
+    // Berries for brain health
+    { name: 'Blueberries', category: 'Fruits' },
+    { name: 'Strawberries', category: 'Fruits' },
+    { name: 'Blackberries', category: 'Fruits' },
+    // Nuts & seeds
+    { name: 'Almonds', category: 'Nuts' },
+    { name: 'Walnuts', category: 'Nuts' },
+    { name: 'Pumpkin seeds', category: 'Seeds' },
+    // Legumes & whole grains
+    { name: 'Chickpeas', category: 'Protein' },
+    { name: 'Lentils', category: 'Protein' },
+    { name: 'Quinoa', category: 'Grains' },
+    { name: 'Oats', category: 'Grains' },
+    // Fermented & dairy
+    { name: 'Greek yogurt', category: 'Dairy' },
+    { name: 'Kefir', category: 'Dairy' },
+    { name: 'Sauerkraut', category: 'Fermented' },
+    { name: 'Kimchi', category: 'Fermented' },
+    // Other essentials
+    { name: 'Eggs', category: 'Protein' },
+    { name: 'Olive oil', category: 'Oils' },
+    { name: 'Sweet potatoes', category: 'Vegetables' },
+    { name: 'Bone broth', category: 'Pantry' },
+    { name: 'Dark chocolate (70%+)', category: 'Pantry' },
+    // Cooling foods
+    { name: 'Cucumber', category: 'Vegetables' },
+    { name: 'Watermelon', category: 'Fruits' },
+    { name: 'Chamomile tea', category: 'Beverages' },
+  ],
+  menopause: [
+    // Bone health essentials
+    { name: 'Salmon', category: 'Protein' },
+    { name: 'Sardines with bones', category: 'Protein' },
+    { name: 'Mackerel', category: 'Protein' },
+    // Leafy greens
+    { name: 'Kale', category: 'Vegetables' },
+    { name: 'Spinach', category: 'Vegetables' },
+    { name: 'Collard greens', category: 'Vegetables' },
+    { name: 'Broccoli', category: 'Vegetables' },
+    // Brain health
+    { name: 'Blueberries', category: 'Fruits' },
+    { name: 'Strawberries', category: 'Fruits' },
+    { name: 'Oranges', category: 'Fruits' },
+    // Heart-healthy fats
+    { name: 'Almonds', category: 'Nuts' },
+    { name: 'Walnuts', category: 'Nuts' },
+    { name: 'Flaxseeds', category: 'Seeds' },
+    { name: 'Chia seeds', category: 'Seeds' },
+    { name: 'Olive oil', category: 'Oils' },
+    { name: 'Avocados', category: 'Produce' },
+    // Protein sources
+    { name: 'Eggs', category: 'Protein' },
+    { name: 'Tofu', category: 'Protein' },
+    { name: 'Tempeh', category: 'Protein' },
+    { name: 'Legumes', category: 'Protein' },
+    // Whole grains & fiber
+    { name: 'Quinoa', category: 'Grains' },
+    { name: 'Oats', category: 'Grains' },
+    { name: 'Brown rice', category: 'Grains' },
+    // Calcium & probiotics
+    { name: 'Greek yogurt', category: 'Dairy' },
+    { name: 'Kefir', category: 'Dairy' },
+    // Collagen support
+    { name: 'Bone broth', category: 'Pantry' },
+    { name: 'Citrus fruits', category: 'Fruits' },
+  ],
+  postmenopause: [
+    // Heart & bone essentials
+    { name: 'Salmon', category: 'Protein' },
+    { name: 'Sardines with bones', category: 'Protein' },
+    { name: 'Mackerel', category: 'Protein' },
+    // Leafy greens
+    { name: 'Kale', category: 'Vegetables' },
+    { name: 'Spinach', category: 'Vegetables' },
+    { name: 'Swiss chard', category: 'Vegetables' },
+    // Brain health
+    { name: 'Blueberries', category: 'Fruits' },
+    { name: 'Walnuts', category: 'Nuts' },
+    { name: 'Almonds', category: 'Nuts' },
+    // Heart-healthy
+    { name: 'Olive oil', category: 'Oils' },
+    { name: 'Avocados', category: 'Produce' },
+    { name: 'Flaxseeds', category: 'Seeds' },
+    // High protein
+    { name: 'Eggs', category: 'Protein' },
+    { name: 'Greek yogurt', category: 'Dairy' },
+    { name: 'Tofu', category: 'Protein' },
+    { name: 'Legumes', category: 'Protein' },
+    // Fiber & grains
+    { name: 'Quinoa', category: 'Grains' },
+    { name: 'Oats', category: 'Grains' },
+    // Collagen & skin
+    { name: 'Bone broth', category: 'Pantry' },
+    { name: 'Oranges', category: 'Fruits' },
+    { name: 'Bell peppers', category: 'Vegetables' },
+  ],
+};
+
 export const useCycleStore = create<CycleStore>()(
   persist(
     (set, get) => ({
@@ -339,6 +451,19 @@ export const useCycleStore = create<CycleStore>()(
           id: `${Date.now()}-${index}`,
           name: item.name,
           phase,
+          category: item.category,
+          isChecked: false,
+        }));
+        return { groceryList: [...state.groceryList, ...newItems] };
+      }),
+
+      addLifeStageGroceries: (lifeStage) => set((state) => {
+        if (lifeStage === 'regular') return state; // Regular uses phase groceries
+        const groceries = lifeStageGroceries[lifeStage];
+        const newItems = groceries.map((item, index) => ({
+          id: `${Date.now()}-${index}`,
+          name: item.name,
+          phase: 'follicular' as CyclePhase, // Default phase for life stage items
           category: item.category,
           isChecked: false,
         }));

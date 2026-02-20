@@ -167,7 +167,13 @@ A beautiful, comprehensive mobile app that helps women understand and work with 
 - **Historical insights** - navigate to any month to see past data
 
 ### Smart Grocery List
-- Add phase-specific recommended foods with one tap
+- **Dedicated Grocery Tab** - Easy access from bottom navigation
+- Add phase-specific recommended foods with one tap from Nutrition screen
+- **Life Stage Specific Lists**:
+  - **Regular Cycles**: Phase-synced grocery suggestions (menstrual, follicular, ovulatory, luteal)
+  - **Perimenopause**: Foods supporting hormone balance, hot flash relief, bone health
+  - **Menopause**: Heart, bone, and brain health essentials
+  - **Post Menopause**: Collagen, heart health, and vitality foods
 - **Moon Phase Syncing** (for perimenopause/menopause users):
   - Calculates current moon phase automatically
   - Maps moon phases to cycle phase energies:
@@ -176,9 +182,10 @@ A beautiful, comprehensive mobile app that helps women understand and work with 
     - Waxing Gibbous / Full Moon → Ovulatory phase energy (peak energy, social)
     - Waning Gibbous / Last Quarter → Luteal phase energy (completion, winding down)
   - Foods aligned with lunar rhythms when monthly cycle is irregular or absent
-- Custom item addition
-- Organized by category
+- Custom item addition with category selection
+- Organized by category with expandable sections
 - Check off items as you shop
+- Clear completed items or clear all
 - Persistent storage
 
 ### Premium Features
