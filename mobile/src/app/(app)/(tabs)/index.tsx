@@ -106,21 +106,15 @@ export default function HomeScreen() {
     },
     {
       icon: Dumbbell,
-      label: 'Move',
+      label: 'Movement',
       color: theme.accent.purple,
       route: '/(tabs)/movement',
     },
     {
       icon: Heart,
-      label: 'Care',
+      label: 'Self-Care',
       color: theme.accent.blush,
       route: '/(tabs)/selfcare',
-    },
-    {
-      icon: Sparkles,
-      label: 'Luna',
-      color: theme.accent.lavender,
-      route: '/luna-ai',
     },
   ];
 
@@ -830,7 +824,7 @@ export default function HomeScreen() {
               Today's Guidance
             </Text>
 
-            <View className="flex-row" style={{ gap: 8 }}>
+            <View className="flex-row" style={{ gap: 12 }}>
               {quickActions.map((action, index) => (
                 <AnimatedPressable
                   key={action.label}
@@ -839,22 +833,21 @@ export default function HomeScreen() {
                   onPress={() => router.push(action.route as any)}
                 >
                   <View
-                    className="rounded-2xl p-3 border items-center"
+                    className="rounded-2xl p-4 border items-center"
                     style={{
                       backgroundColor: `${action.color}10`,
                       borderColor: `${action.color}30`,
                     }}
                   >
                     <View
-                      className="w-10 h-10 rounded-full items-center justify-center mb-1.5"
+                      className="w-11 h-11 rounded-full items-center justify-center mb-2"
                       style={{ backgroundColor: `${action.color}20` }}
                     >
-                      <action.icon size={18} color={action.color} />
+                      <action.icon size={20} color={action.color} />
                     </View>
                     <Text
                       style={{ fontFamily: 'Quicksand_600SemiBold', color: theme.text.primary }}
                       className="text-xs"
-                      numberOfLines={1}
                     >
                       {action.label}
                     </Text>
