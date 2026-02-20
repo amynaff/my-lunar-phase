@@ -23,12 +23,15 @@ import {
   FlaskConical,
   Star,
   Bell,
+  FileText,
+  Trash2,
 } from 'lucide-react-native';
 import { useCycleStore, phaseInfo, LifeStage, lifeStageInfo } from '@/lib/cycle-store';
 import { useThemeStore, getTheme } from '@/lib/theme-store';
 import { useSubscriptionStore } from '@/lib/subscription-store';
 import { authClient } from '@/lib/auth/auth-client';
 import { useInvalidateSession } from '@/lib/auth/use-session';
+import { api } from '@/lib/api/api';
 import { router } from 'expo-router';
 import * as Haptics from 'expo-haptics';
 import DateTimePicker from '@react-native-community/datetimepicker';
@@ -712,6 +715,48 @@ export default function SettingsScreen() {
                 </View>
                 <ChevronRight size={16} color={theme.text.muted} />
               </Pressable>
+              <Pressable
+                onPress={() => {
+                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
+                  Alert.alert(
+                    'Delete Account',
+                    'Are you sure you want to permanently delete your account? This will:\n\n• Delete all your account data\n• Remove your cycle history\n• Clear all preferences\n\nThis action cannot be undone.',
+                    [
+                      { text: 'Cancel', style: 'cancel' },
+                      {
+                        text: 'Delete Account',
+                        style: 'destructive',
+                        onPress: async () => {
+                          try {
+                            // Delete the user account via API
+                            await api.delete('/api/user/delete-account');
+                            // Clear local data
+                            resetOnboarding();
+                            // Sign out and redirect
+                            await authClient.signOut();
+                            await invalidateSession();
+                          } catch (error) {
+                            Alert.alert('Error', 'Failed to delete account. Please try again.');
+                          }
+                        },
+                      },
+                    ]
+                  );
+                }}
+                className="p-4 flex-row items-center justify-between border-t"
+                style={{ borderTopColor: theme.border.light }}
+              >
+                <View className="flex-row items-center">
+                  <Trash2 size={18} color="#ef4444" />
+                  <Text
+                    style={{ fontFamily: 'Quicksand_500Medium', color: '#ef4444' }}
+                    className="text-sm ml-3"
+                  >
+                    Delete Account
+                  </Text>
+                </View>
+                <ChevronRight size={16} color={theme.text.muted} />
+              </Pressable>
             </View>
           </Animated.View>
 
@@ -773,6 +818,25 @@ export default function SettingsScreen() {
                     className="text-sm ml-3"
                   >
                     Privacy Policy
+                  </Text>
+                </View>
+                <ChevronRight size={16} color={theme.text.muted} />
+              </Pressable>
+              <View style={{ height: 1, backgroundColor: theme.border.light }} />
+              <Pressable
+                onPress={() => {
+                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                  router.push('/(app)/terms-of-service');
+                }}
+                className="p-4 flex-row items-center justify-between"
+              >
+                <View className="flex-row items-center">
+                  <FileText size={18} color={theme.accent.purple} />
+                  <Text
+                    style={{ fontFamily: 'Quicksand_500Medium', color: theme.text.primary }}
+                    className="text-sm ml-3"
+                  >
+                    Terms of Service
                   </Text>
                 </View>
                 <ChevronRight size={16} color={theme.text.muted} />

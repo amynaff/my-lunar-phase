@@ -227,8 +227,10 @@ A beautiful, comprehensive mobile app that helps women understand and work with 
 - Smooth animations and haptic feedback
 - Glass-morphic UI elements
 
-## Privacy
+## Privacy & Legal
 - All data stored locally on device
-- No account required
 - No data sharing
 - FSA/HSA eligible subscription
+- **Privacy Policy** - Detailed privacy practices and data handling
+- **Terms of Service** - Usage terms, medical disclaimer, and community guidelines
+- **Account Deletion** - Permanently delete your account and all associated data
