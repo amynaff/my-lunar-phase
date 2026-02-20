@@ -434,15 +434,15 @@ export default function LunaAIScreen() {
                     <Stethoscope size={22} color={theme.accent.pink} />
                   </View>
                   <View className="flex-1">
-                    <Text style={{ fontFamily: 'Quicksand_600SemiBold', color: theme.text.primary }} className="text-sm">
+                    <Text style={{ fontFamily: 'Quicksand_600SemiBold', color: theme.text.primary }} className="text-sm mb-1">
                       Symptom Checker
                     </Text>
-                    <Text style={{ fontFamily: 'Quicksand_400Regular', color: theme.text.tertiary }} className="text-xs">
+                    <Text style={{ fontFamily: 'Quicksand_400Regular', color: theme.text.tertiary, lineHeight: 16 }} className="text-xs">
                       Get personalized insights about what you're feeling
                     </Text>
                   </View>
                   <View
-                    className="px-3 py-1.5 rounded-full"
+                    className="px-3 py-1.5 rounded-full ml-2"
                     style={{ backgroundColor: `${theme.accent.pink}15` }}
                   >
                     <Text style={{ fontFamily: 'Quicksand_500Medium', color: theme.accent.pink }} className="text-xs">
