@@ -749,7 +749,7 @@ interface FocusAreasSectionProps {
 }
 
 function FocusAreasSection({ focusAreas, theme, accentColor }: FocusAreasSectionProps) {
-  const [expanded, setExpanded] = useState(true);
+  const [expanded, setExpanded] = useState(false);
 
   return (
     <View
@@ -850,7 +850,7 @@ function SeedCyclingSection({ theme }: { theme: ReturnType<typeof getTheme> }) {
 
 // Nutrient Categories Section (supports any phase nutrients)
 function NutrientCategoriesSection({ nutrients, phase, theme }: { nutrients: NutrientCategory[]; phase: CyclePhase; theme: ReturnType<typeof getTheme> }) {
-  const [expandedNutrient, setExpandedNutrient] = useState<string | null>(nutrients[0]?.nutrient || null);
+  const [expandedNutrient, setExpandedNutrient] = useState<string | null>(null);
 
   const getNutrientColor = (nutrient: string) => {
     switch (nutrient) {
@@ -1338,7 +1338,7 @@ export default function NutritionScreen() {
               items={moonPhaseNutrition.foods.slice(0, 10)}
               theme={theme}
               iconBgColor={`${moonCycleInfo.color}15`}
-              defaultExpanded={true}
+              defaultExpanded={false}
             />
           </Animated.View>
 
@@ -1459,7 +1459,7 @@ export default function NutritionScreen() {
               items={moonPhaseNutrition.foods.slice(0, 10)}
               theme={theme}
               iconBgColor={`${moonCycleInfo.color}15`}
-              defaultExpanded={true}
+              defaultExpanded={false}
             />
           </Animated.View>
 
