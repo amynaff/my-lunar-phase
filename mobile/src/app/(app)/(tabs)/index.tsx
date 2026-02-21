@@ -9,11 +9,14 @@ import Animated, {
   SlideInRight,
   Layout,
 } from 'react-native-reanimated';
-import { Moon, Sparkles, Heart, Calendar, ChevronRight, Apple, Dumbbell, Crown, Flame, Sun, Leaf, Info, MessageCircle, Star, Settings, Droplets, ThermometerSun, Brain, BedDouble, Bone, HeartPulse, Zap } from 'lucide-react-native';
+import { Moon, Sparkles, Heart, Calendar, ChevronRight, Apple, Dumbbell, Crown, Flame, Sun, Leaf, Info, MessageCircle, Star, Settings, Droplets, ThermometerSun, Brain, BedDouble, Bone, HeartPulse, Zap, TrendingUp } from 'lucide-react-native';
 import { CycleWheel } from '@/components/CycleWheel';
 import { CycleGraph } from '@/components/CycleGraph';
 import { MoonPhaseCard, moonCycleEducation } from '@/components/MoonPhaseCard';
 import { LifeStageTabNav, lifeStageTabConfig } from '@/components/LifeStageTabNav';
+import { CycleCalendar, CycleDotIndicator } from '@/components/CycleCalendar';
+import { CycleStatsCard, CycleStatsMini } from '@/components/CycleStatsCard';
+import { LogPeriodModal, QuickLogPeriodButton } from '@/components/LogPeriodModal';
 import { useCycleStore, phaseInfo, lifeStageInfo, perimenopauseSymptoms, menopauseSymptoms, postmenopauseSymptoms, getMoonPhase, moonPhaseInfo, getMoonPhaseCycleEquivalent, LifeStage, CyclePhase } from '@/lib/cycle-store';
 import { useThemeStore, getTheme } from '@/lib/theme-store';
 import { useSubscriptionStore } from '@/lib/subscription-store';
@@ -130,6 +133,8 @@ export default function HomeScreen() {
   // Active tab for viewing (can differ from stored life stage for exploration)
   const [activeTab, setActiveTab] = useState<LifeStage>(storedLifeStage);
   const [isExploring, setIsExploring] = useState(false);
+  const [showLogPeriodModal, setShowLogPeriodModal] = useState(false);
+  const [showCalendarView, setShowCalendarView] = useState(false);
 
   const [fontsLoaded] = useFonts({
     CormorantGaramond_400Regular,
@@ -256,6 +261,8 @@ export default function HomeScreen() {
   const renderMenstrualCycleContent = () => {
     const moonCyclePhase = getMoonPhaseCycleEquivalent(currentMoon);
     const moonCycleInfo = phaseInfo[moonCyclePhase];
+    const getCycleStats = useCycleStore.getState().getCycleStats;
+    const stats = getCycleStats();
 
     return (
       <>
@@ -267,10 +274,29 @@ export default function HomeScreen() {
           <CycleWheel />
         </Animated.View>
 
+        {/* Log Period Button */}
+        <Animated.View
+          entering={FadeInUp.delay(400).duration(600)}
+          className="mx-6 mt-4"
+        >
+          <QuickLogPeriodButton
+            themeMode={themeMode}
+            onPress={() => setShowLogPeriodModal(true)}
+          />
+        </Animated.View>
+
+        {/* Cycle Progress Dots */}
+        <Animated.View
+          entering={FadeInUp.delay(450).duration(600)}
+          className="mx-6 mt-2"
+        >
+          <CycleDotIndicator themeMode={themeMode} />
+        </Animated.View>
+
         {/* Phase Info Card */}
         <Animated.View
           entering={FadeInUp.delay(500).duration(600)}
-          className="mx-6 mt-6"
+          className="mx-6 mt-4"
         >
           <View
             className="rounded-3xl p-5 border"
@@ -396,6 +422,65 @@ export default function HomeScreen() {
                 </View>
               </View>
             </View>
+          </Animated.View>
+        )}
+
+        {/* Cycle Stats Card */}
+        <Animated.View
+          entering={FadeInUp.delay(620).duration(600)}
+          className="mx-6 mt-4"
+        >
+          <CycleStatsCard
+            themeMode={themeMode}
+            onViewHistory={() => router.push('/cycle-history')}
+            onCheckSymptoms={() => router.push('/luna-ai')}
+          />
+        </Animated.View>
+
+        {/* Calendar Toggle */}
+        <Animated.View
+          entering={FadeInUp.delay(640).duration(600)}
+          className="mx-6 mt-4"
+        >
+          <Pressable
+            onPress={() => {
+              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+              setShowCalendarView(!showCalendarView);
+            }}
+            className="flex-row items-center justify-between rounded-2xl p-4 border"
+            style={{ backgroundColor: theme.bg.card, borderColor: theme.border.light }}
+          >
+            <View className="flex-row items-center">
+              <Calendar size={18} color={theme.accent.purple} />
+              <Text
+                style={{ fontFamily: 'Quicksand_500Medium', color: theme.text.primary }}
+                className="text-sm ml-3"
+              >
+                {showCalendarView ? 'Hide Calendar' : 'View Calendar'}
+              </Text>
+            </View>
+            <ChevronRight
+              size={18}
+              color={theme.text.tertiary}
+              style={{ transform: [{ rotate: showCalendarView ? '90deg' : '0deg' }] }}
+            />
+          </Pressable>
+        </Animated.View>
+
+        {/* Calendar View */}
+        {showCalendarView && (
+          <Animated.View
+            entering={FadeIn.duration(300)}
+            className="mx-6 mt-4"
+          >
+            <CycleCalendar
+              themeMode={themeMode}
+              onDayPress={(date) => {
+                if (date <= new Date()) {
+                  setShowLogPeriodModal(true);
+                }
+              }}
+            />
           </Animated.View>
         )}
 
@@ -1198,6 +1283,13 @@ export default function HomeScreen() {
           </Animated.View>
         </ScrollView>
       </LinearGradient>
+
+      {/* Log Period Modal */}
+      <LogPeriodModal
+        visible={showLogPeriodModal}
+        onClose={() => setShowLogPeriodModal(false)}
+        themeMode={themeMode}
+      />
     </View>
   );
 }

@@ -22,6 +22,39 @@ Each tab adapts content, trackers, insights, and affirmations to the specific li
 - Phase-synced guidance with moon phase indicator
 - Day of cycle display and energy tracking
 
+#### Period Logging & Cycle History
+- **Log Period Start** - Quick button to log when your period begins
+- **Log Period End** - Track when your period ends for accurate period length
+- **Color-coded Calendar View** - Visual calendar showing:
+  - Pink: Period days (logged)
+  - Light pink: Predicted period days
+  - Purple: Fertile window
+  - Indigo: Ovulation day
+- **Cycle Progress Dots** - Compact view of current cycle progress
+- **Cycle History Screen** - View all logged periods with stats
+- **Edit/Delete Entries** - Manage your period history
+
+#### Cycle Statistics & Irregularity Detection
+- **Previous Cycle Length** - Shows last cycle with NORMAL/ABNORMAL indicator
+- **Previous Period Length** - Shows last period with NORMAL/ABNORMAL indicator
+- **Cycle Variation** - Shows min-max range with IRREGULAR warning
+- **Irregularity Alerts** - Yellow warning for:
+  - Cycles outside 21-35 days
+  - Variation greater than 7 days
+- **PCOS/Irregular Cycles Note** - Non-diagnostic guidance:
+  - "Irregular cycles may relate to conditions like PCOS—track symptoms and consult a doctor"
+  - Predictions improve with more data
+
+#### Export for Doctor Visits
+- **Generate Report** - Create detailed cycle history report
+- **Share/Export** - Share via text or save as file
+- Report includes:
+  - Cycle statistics (average, variation, regularity)
+  - Complete period history with dates
+  - Cycle length status (Normal/Irregular)
+  - Notes and flow intensity
+  - Medical disclaimer
+
 ### Perimenopause
 - **Moon Phase Guidance** - Follow the moon's 29-day cycle as your cycles become irregular
 - MoonPhaseCard showing current lunar phase with corresponding energy

@@ -122,6 +122,27 @@ export interface GroceryItem {
   isChecked: boolean;
 }
 
+// Period log entry for tracking cycle history
+export interface PeriodLogEntry {
+  id: string;
+  startDate: string; // ISO date string
+  endDate?: string; // ISO date string, optional - can be updated later
+  periodLength: number; // calculated from start to end
+  cycleLength?: number; // calculated from previous period start to this one
+  notes?: string;
+}
+
+// Cycle statistics for analysis
+export interface CycleStats {
+  averageCycleLength: number;
+  averagePeriodLength: number;
+  cycleLengthVariation: { min: number; max: number };
+  isIrregular: boolean; // true if variation > 7 days or cycles outside 21-35 days
+  totalCyclesTracked: number;
+  lastCycleLength?: number;
+  lastPeriodLength?: number;
+}
+
 interface CycleStore {
   // Cycle data
   lastPeriodStart: string | null;
@@ -129,6 +150,9 @@ interface CycleStore {
   periodLength: number;
   hasCompletedOnboarding: boolean;
   lifeStage: LifeStage;
+
+  // Period history
+  periodHistory: PeriodLogEntry[];
 
   // Grocery list
   groceryList: GroceryItem[];
@@ -140,6 +164,19 @@ interface CycleStore {
   setLifeStage: (stage: LifeStage) => void;
   completeOnboarding: () => void;
   resetOnboarding: () => void;
+
+  // Period logging actions
+  logPeriodStart: (date: Date, notes?: string) => void;
+  logPeriodEnd: (periodId: string, endDate: Date) => void;
+  updatePeriodEntry: (periodId: string, updates: Partial<PeriodLogEntry>) => void;
+  deletePeriodEntry: (periodId: string) => void;
+  getCycleStats: () => CycleStats;
+  getOvulationEstimate: (cycleStartDate: Date) => Date;
+  getFertileWindow: (cycleStartDate: Date) => { start: Date; end: Date };
+  isDateInPeriod: (date: Date) => boolean;
+  isDateInFertileWindow: (date: Date) => boolean;
+  isDateOvulation: (date: Date) => boolean;
+  getPeriodForDate: (date: Date) => PeriodLogEntry | null;
 
   // Grocery actions
   addGroceryItem: (item: Omit<GroceryItem, 'id'>) => void;
@@ -422,13 +459,262 @@ export const useCycleStore = create<CycleStore>()(
       hasCompletedOnboarding: false,
       lifeStage: 'regular' as LifeStage,
       groceryList: [],
+      periodHistory: [],
 
       setLastPeriodStart: (date: Date) => set({ lastPeriodStart: date.toISOString() }),
       setCycleLength: (days: number) => set({ cycleLength: days }),
       setPeriodLength: (days: number) => set({ periodLength: days }),
       setLifeStage: (stage: LifeStage) => set({ lifeStage: stage }),
       completeOnboarding: () => set({ hasCompletedOnboarding: true }),
-      resetOnboarding: () => set({ hasCompletedOnboarding: false, lastPeriodStart: null, lifeStage: 'regular' }),
+      resetOnboarding: () => set({ hasCompletedOnboarding: false, lastPeriodStart: null, lifeStage: 'regular', periodHistory: [] }),
+
+      // Period logging
+      logPeriodStart: (date: Date, notes?: string) => {
+        const { periodHistory, periodLength } = get();
+        const dateStr = date.toISOString().split('T')[0];
+
+        // Check if we already have a period starting on this date
+        const existing = periodHistory.find(p => p.startDate.split('T')[0] === dateStr);
+        if (existing) return;
+
+        // Calculate cycle length from previous period
+        let cycleLength: number | undefined;
+        if (periodHistory.length > 0) {
+          const sortedHistory = [...periodHistory].sort((a, b) =>
+            new Date(b.startDate).getTime() - new Date(a.startDate).getTime()
+          );
+          const lastPeriod = sortedHistory[0];
+          const daysDiff = Math.floor(
+            (date.getTime() - new Date(lastPeriod.startDate).getTime()) / (1000 * 60 * 60 * 24)
+          );
+          if (daysDiff > 0 && daysDiff < 100) { // Reasonable cycle length
+            cycleLength = daysDiff;
+          }
+        }
+
+        const newEntry: PeriodLogEntry = {
+          id: Date.now().toString(),
+          startDate: date.toISOString(),
+          periodLength: periodLength, // Default, can be updated when period ends
+          cycleLength,
+          notes,
+        };
+
+        set({
+          periodHistory: [...periodHistory, newEntry],
+          lastPeriodStart: date.toISOString(),
+        });
+
+        // Update average cycle length if we have data
+        const stats = get().getCycleStats();
+        if (stats.totalCyclesTracked >= 2) {
+          set({ cycleLength: Math.round(stats.averageCycleLength) });
+        }
+      },
+
+      logPeriodEnd: (periodId: string, endDate: Date) => {
+        const { periodHistory } = get();
+        const updatedHistory = periodHistory.map(entry => {
+          if (entry.id === periodId) {
+            const startDate = new Date(entry.startDate);
+            const periodLength = Math.floor(
+              (endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24)
+            ) + 1; // Include both start and end days
+            return {
+              ...entry,
+              endDate: endDate.toISOString(),
+              periodLength: Math.max(1, Math.min(periodLength, 14)), // Clamp between 1-14 days
+            };
+          }
+          return entry;
+        });
+        set({ periodHistory: updatedHistory });
+
+        // Update average period length
+        const stats = get().getCycleStats();
+        if (stats.totalCyclesTracked >= 1) {
+          set({ periodLength: Math.round(stats.averagePeriodLength) });
+        }
+      },
+
+      updatePeriodEntry: (periodId: string, updates: Partial<PeriodLogEntry>) => {
+        const { periodHistory } = get();
+        const updatedHistory = periodHistory.map(entry =>
+          entry.id === periodId ? { ...entry, ...updates } : entry
+        );
+        set({ periodHistory: updatedHistory });
+      },
+
+      deletePeriodEntry: (periodId: string) => {
+        const { periodHistory } = get();
+        set({ periodHistory: periodHistory.filter(entry => entry.id !== periodId) });
+      },
+
+      getCycleStats: (): CycleStats => {
+        const { periodHistory, cycleLength, periodLength } = get();
+
+        if (periodHistory.length === 0) {
+          return {
+            averageCycleLength: cycleLength,
+            averagePeriodLength: periodLength,
+            cycleLengthVariation: { min: cycleLength, max: cycleLength },
+            isIrregular: false,
+            totalCyclesTracked: 0,
+          };
+        }
+
+        // Sort by date
+        const sorted = [...periodHistory].sort((a, b) =>
+          new Date(a.startDate).getTime() - new Date(b.startDate).getTime()
+        );
+
+        // Calculate cycle lengths (from one period start to the next)
+        const cycleLengths: number[] = [];
+        for (let i = 1; i < sorted.length; i++) {
+          const days = Math.floor(
+            (new Date(sorted[i].startDate).getTime() - new Date(sorted[i-1].startDate).getTime())
+            / (1000 * 60 * 60 * 24)
+          );
+          if (days > 0 && days < 100) { // Reasonable range
+            cycleLengths.push(days);
+          }
+        }
+
+        // Calculate period lengths
+        const periodLengths = sorted
+          .filter(p => p.periodLength > 0)
+          .map(p => p.periodLength);
+
+        const avgCycleLength = cycleLengths.length > 0
+          ? cycleLengths.reduce((a, b) => a + b, 0) / cycleLengths.length
+          : cycleLength;
+
+        const avgPeriodLength = periodLengths.length > 0
+          ? periodLengths.reduce((a, b) => a + b, 0) / periodLengths.length
+          : periodLength;
+
+        const minCycle = cycleLengths.length > 0 ? Math.min(...cycleLengths) : cycleLength;
+        const maxCycle = cycleLengths.length > 0 ? Math.max(...cycleLengths) : cycleLength;
+        const variation = maxCycle - minCycle;
+
+        // Check if irregular: variation > 7 days OR any cycle outside 21-35 day range
+        const hasOutOfRangeCycle = cycleLengths.some(c => c < 21 || c > 35);
+        const isIrregular = variation > 7 || hasOutOfRangeCycle;
+
+        const lastPeriod = sorted[sorted.length - 1];
+        const lastCycleLength = cycleLengths.length > 0 ? cycleLengths[cycleLengths.length - 1] : undefined;
+
+        return {
+          averageCycleLength: avgCycleLength,
+          averagePeriodLength: avgPeriodLength,
+          cycleLengthVariation: { min: minCycle, max: maxCycle },
+          isIrregular,
+          totalCyclesTracked: sorted.length,
+          lastCycleLength,
+          lastPeriodLength: lastPeriod?.periodLength,
+        };
+      },
+
+      getOvulationEstimate: (cycleStartDate: Date): Date => {
+        const { cycleLength } = get();
+        // Ovulation typically occurs 14 days before the next period
+        const ovulationDay = cycleLength - 14;
+        const ovulationDate = new Date(cycleStartDate);
+        ovulationDate.setDate(ovulationDate.getDate() + ovulationDay);
+        return ovulationDate;
+      },
+
+      getFertileWindow: (cycleStartDate: Date): { start: Date; end: Date } => {
+        const ovulation = get().getOvulationEstimate(cycleStartDate);
+        const start = new Date(ovulation);
+        start.setDate(start.getDate() - 5); // 5 days before ovulation
+        const end = new Date(ovulation);
+        end.setDate(end.getDate() + 1); // 1 day after ovulation
+        return { start, end };
+      },
+
+      isDateInPeriod: (date: Date): boolean => {
+        const { periodHistory, periodLength, lastPeriodStart, cycleLength } = get();
+        const dateOnly = new Date(date.toISOString().split('T')[0]);
+
+        // Check logged periods
+        for (const period of periodHistory) {
+          const start = new Date(period.startDate.split('T')[0]);
+          const end = period.endDate
+            ? new Date(period.endDate.split('T')[0])
+            : new Date(start.getTime() + (period.periodLength - 1) * 24 * 60 * 60 * 1000);
+
+          if (dateOnly >= start && dateOnly <= end) return true;
+        }
+
+        // Check predicted current period
+        if (lastPeriodStart) {
+          const lastStart = new Date(lastPeriodStart);
+          const today = new Date();
+          const daysSinceStart = Math.floor((today.getTime() - lastStart.getTime()) / (1000 * 60 * 60 * 24));
+          const currentCycleNumber = Math.floor(daysSinceStart / cycleLength);
+
+          const currentPeriodStart = new Date(lastStart);
+          currentPeriodStart.setDate(currentPeriodStart.getDate() + currentCycleNumber * cycleLength);
+          const currentPeriodEnd = new Date(currentPeriodStart);
+          currentPeriodEnd.setDate(currentPeriodEnd.getDate() + periodLength - 1);
+
+          if (dateOnly >= currentPeriodStart && dateOnly <= currentPeriodEnd) return true;
+        }
+
+        return false;
+      },
+
+      isDateInFertileWindow: (date: Date): boolean => {
+        const { lastPeriodStart, cycleLength } = get();
+        if (!lastPeriodStart) return false;
+
+        const dateOnly = new Date(date.toISOString().split('T')[0]);
+        const lastStart = new Date(lastPeriodStart);
+        const today = new Date();
+        const daysSinceStart = Math.floor((today.getTime() - lastStart.getTime()) / (1000 * 60 * 60 * 24));
+        const currentCycleNumber = Math.floor(daysSinceStart / cycleLength);
+
+        const currentCycleStart = new Date(lastStart);
+        currentCycleStart.setDate(currentCycleStart.getDate() + currentCycleNumber * cycleLength);
+
+        const fertile = get().getFertileWindow(currentCycleStart);
+        return dateOnly >= fertile.start && dateOnly <= fertile.end;
+      },
+
+      isDateOvulation: (date: Date): boolean => {
+        const { lastPeriodStart, cycleLength } = get();
+        if (!lastPeriodStart) return false;
+
+        const dateOnly = new Date(date.toISOString().split('T')[0]);
+        const lastStart = new Date(lastPeriodStart);
+        const today = new Date();
+        const daysSinceStart = Math.floor((today.getTime() - lastStart.getTime()) / (1000 * 60 * 60 * 24));
+        const currentCycleNumber = Math.floor(daysSinceStart / cycleLength);
+
+        const currentCycleStart = new Date(lastStart);
+        currentCycleStart.setDate(currentCycleStart.getDate() + currentCycleNumber * cycleLength);
+
+        const ovulation = get().getOvulationEstimate(currentCycleStart);
+        const ovulationOnly = new Date(ovulation.toISOString().split('T')[0]);
+
+        return dateOnly.getTime() === ovulationOnly.getTime();
+      },
+
+      getPeriodForDate: (date: Date): PeriodLogEntry | null => {
+        const { periodHistory } = get();
+        const dateOnly = new Date(date.toISOString().split('T')[0]);
+
+        for (const period of periodHistory) {
+          const start = new Date(period.startDate.split('T')[0]);
+          const end = period.endDate
+            ? new Date(period.endDate.split('T')[0])
+            : new Date(start.getTime() + (period.periodLength - 1) * 24 * 60 * 60 * 1000);
+
+          if (dateOnly >= start && dateOnly <= end) return period;
+        }
+        return null;
+      },
 
       addGroceryItem: (item) => set((state) => ({
         groceryList: [...state.groceryList, { ...item, id: Date.now().toString() }]
