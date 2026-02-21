@@ -260,29 +260,32 @@ export default function VerifyOtpScreen() {
               entering={FadeInUp.delay(400).duration(600)}
               className="px-8 mt-10"
             >
-              {/* Hidden TextInput that captures keyboard input and supports paste */}
-              <TextInput
-                ref={hiddenInputRef}
-                value={otp}
-                onChangeText={handleOtpChange}
-                keyboardType="default"
-                maxLength={OTP_LENGTH}
-                autoFocus
-                editable={!isVerifying}
-                textContentType="oneTimeCode"
-                autoComplete="one-time-code"
-                importantForAutofill="yes"
-                style={{
-                  position: 'absolute',
-                  opacity: 0,
-                  height: 60,
-                  width: '100%',
-                  zIndex: 10,
-                }}
-              />
+              <Pressable onPress={handleCellPress} style={{ position: 'relative' }}>
+                {/* Hidden TextInput that captures keyboard input and supports paste */}
+                <TextInput
+                  ref={hiddenInputRef}
+                  value={otp}
+                  onChangeText={handleOtpChange}
+                  keyboardType="number-pad"
+                  maxLength={OTP_LENGTH}
+                  autoFocus
+                  editable={!isVerifying}
+                  textContentType="oneTimeCode"
+                  autoComplete="one-time-code"
+                  importantForAutofill="yes"
+                  caretHidden
+                  style={{
+                    position: 'absolute',
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
+                    opacity: 0,
+                    zIndex: 10,
+                  }}
+                />
 
-              {/* Visual OTP cells */}
-              <Pressable onPress={handleCellPress}>
+                {/* Visual OTP cells */}
                 <View
                   style={{
                     flexDirection: 'row',
