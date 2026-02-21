@@ -801,7 +801,7 @@ export default function HomeScreen() {
                 <Pressable
                   className="w-9 h-9 rounded-full items-center justify-center border"
                   style={{ backgroundColor: theme.bg.card, borderColor: theme.border.light }}
-                  onPress={() => router.push('/settings')}
+                  onPress={() => router.push('/(app)/settings')}
                 >
                   <stageTheme.icon size={18} color={stageTheme.color} />
                 </Pressable>
