@@ -2,40 +2,55 @@
 
 A beautiful, comprehensive mobile app that helps women understand and work with their body's natural rhythms at every stage of life. From regular cycles through perimenopause and menopause, My Lunar Phase guides you with personalized nutrition, movement, and self-care recommendations.
 
+## Life Stage Navigation
+
+The app features a **tabbed navigation system** at the top of the home screen allowing seamless switching between life stages:
+- **Menstrual Cycle** (default) - For users in reproductive years
+- **Perimenopause** - For users in transition
+- **Menopause** - For users who've completed the transition
+- **Postmenopause** - For users in their wisdom years
+
+Each tab adapts content, trackers, insights, and affirmations to the specific life stage. Users can explore other stages while preserving their data, with an option to switch stages via the onboarding flow.
+
 ## Life Stages Supported
 
-### Regular Cycles
+### Menstrual Cycle (formerly "Regular Cycles")
 - Beautiful cycle wheel visualization showing current day and phase
 - Automatic phase detection (Menstrual, Follicular, Ovulatory, Luteal)
 - Educational hormone graph showing estrogen and progesterone curves
-- Next period countdown
-- Phase-synced guidance
+- Next period countdown with fertility window indicator
+- Phase-synced guidance with moon phase indicator
+- Day of cycle display and energy tracking
 
 ### Perimenopause
 - **Moon Phase Guidance** - Follow the moon's 29-day cycle as your cycles become irregular
 - MoonPhaseCard showing current lunar phase with corresponding energy
 - Daily practices aligned with lunar rhythms
+- **Transition Wellness Focus** - Hot flashes, sleep, brain fog, mood tracking
 - Symptom tracking for hot flashes, mood swings, sleep issues, and more
 - Irregular cycle support with flexible tracking
 - Educational content about the transition
 - Personalized recommendations for this life stage
 - Pattern recognition for symptoms
+- Moon-phase-specific affirmations
 
 ### Menopause
 - **Full Moon Phase Integration** - Connect with nature through lunar rhythms
 - MoonPhaseCard as primary guidance for daily wellness
+- **"Your Second Spring"** - Celebrating this powerful transition
 - Moon-synced nutrition, movement, and self-care recommendations
 - Focus areas: bone health, heart health, brain health, sleep quality
 - Symptom tracking and management
 - Tailored nutrition and movement recommendations
-- Affirmations for this powerful life stage
+- Moon-phase-specific affirmations for this life stage
 
-### Post Menopause
+### Postmenopause
 - **Wisdom Years Focus** - Embrace this vibrant new chapter
-- Health priorities: bone health, heart health, brain vitality, sleep quality
-- Symptom tracking for vaginal dryness, joint pain, energy fluctuations
+- **"Your Wisdom Years"** banner with personalized messaging
+- Health priorities: bone strength, heart health, mental clarity, vitality
+- Wellness tracking for bone health, energy, mood, and more
 - Tailored nutrition and movement for optimal wellness
-- Affirmations celebrating this powerful life stage
+- Moon-phase-specific affirmations celebrating this powerful life stage
 
 ## Features
 
@@ -219,13 +234,17 @@ A beautiful, comprehensive mobile app that helps women understand and work with 
 
 ## Design
 - Moon cycle/Luna aesthetic with celestial overtones
+- **Life stage tabbed navigation** with smooth transitions
 - Life stage-specific color themes:
-  - Regular Cycles: Purple/Pink gradient
-  - Perimenopause: Warm amber/gold tones
-  - Menopause: Deep purple/violet
+  - Menstrual Cycle: Purple (#9d84ed) with pink accents
+  - Perimenopause: Warm amber/gold tones (#f59e0b)
+  - Menopause: Deep purple/violet (#8b5cf6)
+  - Postmenopause: Vibrant pink (#ec4899)
+- **Moon-phase-specific affirmations** for each life stage (8 variations per stage)
 - Custom fonts: Cormorant Garamond & Quicksand
 - Smooth animations and haptic feedback
 - Glass-morphic UI elements
+- Dark mode support with beautiful deep purple theme
 
 ## Privacy & Legal
 - All data stored locally on device

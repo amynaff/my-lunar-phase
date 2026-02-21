@@ -1,16 +1,20 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { View, Text, ScrollView, Pressable, Dimensions, ActivityIndicator } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Animated, {
   FadeInDown,
   FadeInUp,
+  FadeIn,
+  SlideInRight,
+  Layout,
 } from 'react-native-reanimated';
-import { Moon, Sparkles, Heart, Calendar, ChevronRight, Apple, Dumbbell, Crown, Flame, Sun, Leaf, Info, MessageCircle, Star, Settings } from 'lucide-react-native';
+import { Moon, Sparkles, Heart, Calendar, ChevronRight, Apple, Dumbbell, Crown, Flame, Sun, Leaf, Info, MessageCircle, Star, Settings, Droplets, ThermometerSun, Brain, BedDouble, Bone, HeartPulse, Zap } from 'lucide-react-native';
 import { CycleWheel } from '@/components/CycleWheel';
 import { CycleGraph } from '@/components/CycleGraph';
 import { MoonPhaseCard, moonCycleEducation } from '@/components/MoonPhaseCard';
-import { useCycleStore, phaseInfo, lifeStageInfo, perimenopauseSymptoms, menopauseSymptoms, postmenopauseSymptoms, getMoonPhase, moonPhaseInfo, getMoonPhaseCycleEquivalent } from '@/lib/cycle-store';
+import { LifeStageTabNav, lifeStageTabConfig } from '@/components/LifeStageTabNav';
+import { useCycleStore, phaseInfo, lifeStageInfo, perimenopauseSymptoms, menopauseSymptoms, postmenopauseSymptoms, getMoonPhase, moonPhaseInfo, getMoonPhaseCycleEquivalent, LifeStage, CyclePhase } from '@/lib/cycle-store';
 import { useThemeStore, getTheme } from '@/lib/theme-store';
 import { useSubscriptionStore } from '@/lib/subscription-store';
 import { api } from '@/lib/api/api';
@@ -33,18 +37,99 @@ const { width } = Dimensions.get('window');
 
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 
+// Tab-specific titles and descriptions
+const tabInfo: Record<LifeStage, { title: string; subtitle: string }> = {
+  regular: {
+    title: 'Menstrual Cycle',
+    subtitle: 'Your monthly rhythm',
+  },
+  perimenopause: {
+    title: 'Perimenopause',
+    subtitle: 'Embracing the transition',
+  },
+  menopause: {
+    title: 'Menopause',
+    subtitle: 'Your second spring',
+  },
+  postmenopause: {
+    title: 'Postmenopause',
+    subtitle: 'Your wisdom years',
+  },
+};
+
+// Phase-specific affirmations with moon phase variations
+const getAffirmation = (lifeStage: LifeStage, phase: CyclePhase, moonPhase?: string): string => {
+  const affirmations: Record<LifeStage, Record<string, string>> = {
+    regular: {
+      menstrual: "I honor my body's need for rest and embrace this time of renewal.",
+      follicular: "I am filled with creative energy and open to new possibilities.",
+      ovulatory: "I radiate confidence and connect deeply with those around me.",
+      luteal: "I trust my ability to complete what I've started and honor my need for solitude.",
+    },
+    perimenopause: {
+      new_moon: "I embrace this transition with grace, welcoming each new beginning.",
+      waxing_crescent: "Change brings growth. I nurture my evolving self with patience.",
+      first_quarter: "My experience guides me forward with strength and clarity.",
+      waxing_gibbous: "I trust my body's wisdom as it finds its new rhythm.",
+      full_moon: "My inner light shines brightest in this season of transformation.",
+      waning_gibbous: "I release what no longer serves me and embrace what does.",
+      last_quarter: "I am grateful for this journey of becoming.",
+      waning_crescent: "I rest in the knowledge that I am exactly where I need to be.",
+      default: "I embrace this transition with grace, trusting my body's wisdom.",
+    },
+    menopause: {
+      new_moon: "I enter this new chapter with openness and curiosity.",
+      waxing_crescent: "My wisdom grows with each passing day.",
+      first_quarter: "I am free to create the life I truly desire.",
+      waxing_gibbous: "My clarity and purpose illuminate my path forward.",
+      full_moon: "I celebrate the fullness of who I am becoming.",
+      waning_gibbous: "I share my wisdom freely and receive with gratitude.",
+      last_quarter: "I release old patterns and welcome new possibilities.",
+      waning_crescent: "In stillness, I discover my deepest truths.",
+      default: "I am entering a season of freedom and renewed purpose. My best years are ahead.",
+    },
+    postmenopause: {
+      new_moon: "Each day is a canvas for my wisdom and creativity.",
+      waxing_crescent: "I continue to grow, learn, and bloom.",
+      first_quarter: "My confidence and clarity guide every decision.",
+      waxing_gibbous: "I embrace vitality and vibrant living.",
+      full_moon: "I am radiant in my wisdom and my power.",
+      waning_gibbous: "I mentor and inspire those around me.",
+      last_quarter: "I honor my journey and all it has taught me.",
+      waning_crescent: "In peace and presence, I find my greatest strength.",
+      default: "I embrace my wisdom years with joy. My clarity, confidence, and purpose shine brighter than ever.",
+    },
+  };
+
+  if (lifeStage === 'regular') {
+    return affirmations.regular[phase] || affirmations.regular.follicular;
+  }
+
+  if (moonPhase && affirmations[lifeStage][moonPhase]) {
+    return affirmations[lifeStage][moonPhase];
+  }
+
+  return affirmations[lifeStage].default;
+};
+
 export default function HomeScreen() {
   const insets = useSafeAreaInsets();
   const getCurrentPhase = useCycleStore(s => s.getCurrentPhase);
   const getDaysUntilNextPeriod = useCycleStore(s => s.getDaysUntilNextPeriod);
+  const getDayOfCycle = useCycleStore(s => s.getDayOfCycle);
   const hasCompletedOnboarding = useCycleStore(s => s.hasCompletedOnboarding);
-  const lifeStage = useCycleStore(s => s.lifeStage);
+  const storedLifeStage = useCycleStore(s => s.lifeStage);
+  const setLifeStage = useCycleStore(s => s.setLifeStage);
   const themeMode = useThemeStore(s => s.mode);
   const theme = getTheme(themeMode);
   const tier = useSubscriptionStore(s => s.tier);
   const isPremium = tier === 'premium';
   const [isReady, setIsReady] = useState(false);
   const { data: session, isLoading: sessionLoading } = useSession();
+
+  // Active tab for viewing (can differ from stored life stage for exploration)
+  const [activeTab, setActiveTab] = useState<LifeStage>(storedLifeStage);
+  const [isExploring, setIsExploring] = useState(false);
 
   const [fontsLoaded] = useFonts({
     CormorantGaramond_400Regular,
@@ -74,15 +159,33 @@ export default function HomeScreen() {
     const currentMoon = getMoonPhase();
     const moonInfo = moonPhaseInfo[currentMoon];
     api.post('/api/partner/sync', {
-      lifeStage,
+      lifeStage: storedLifeStage,
       currentPhase: phase,
-      dayOfCycle: lifeStage === 'regular' ? useCycleStore.getState().getDayOfCycle() : undefined,
-      cycleLength: lifeStage === 'regular' ? useCycleStore.getState().cycleLength : undefined,
-      moonPhase: lifeStage !== 'regular' ? moonInfo.name : undefined,
+      dayOfCycle: storedLifeStage === 'regular' ? useCycleStore.getState().getDayOfCycle() : undefined,
+      cycleLength: storedLifeStage === 'regular' ? useCycleStore.getState().cycleLength : undefined,
+      moonPhase: storedLifeStage !== 'regular' ? moonInfo.name : undefined,
     }).catch(() => {
       // Silently fail - partner sync is not critical
     });
-  }, [isReady, hasCompletedOnboarding, lifeStage]);
+  }, [isReady, hasCompletedOnboarding, storedLifeStage]);
+
+  // Reset active tab when stored life stage changes
+  useEffect(() => {
+    setActiveTab(storedLifeStage);
+    setIsExploring(false);
+  }, [storedLifeStage]);
+
+  const handleTabChange = useCallback((newStage: LifeStage) => {
+    setActiveTab(newStage);
+    setIsExploring(newStage !== storedLifeStage);
+  }, [storedLifeStage]);
+
+  const handleSwitchToStage = useCallback(() => {
+    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+    setLifeStage(activeTab);
+    setIsExploring(false);
+    router.push('/onboarding');
+  }, [activeTab, setLifeStage]);
 
   if (!fontsLoaded || !isReady) {
     return (
@@ -93,9 +196,24 @@ export default function HomeScreen() {
   }
 
   const currentPhase = getCurrentPhase();
+  const currentMoon = getMoonPhase();
+  const moonInfo = moonPhaseInfo[currentMoon];
   const info = phaseInfo[currentPhase];
-  const stageInfo = lifeStageInfo[lifeStage];
+  const stageInfo = lifeStageInfo[activeTab];
   const daysUntilPeriod = getDaysUntilNextPeriod();
+  const dayOfCycle = getDayOfCycle();
+
+  // Get theme colors based on active tab
+  const getTabTheme = (stage: LifeStage) => {
+    const tabConfig = lifeStageTabConfig.find(t => t.key === stage);
+    return {
+      color: tabConfig?.color || theme.accent.purple,
+      gradient: tabConfig?.gradient || ['#f9a8d4', '#c4b5fd'] as [string, string],
+      icon: tabConfig?.icon || Moon,
+    };
+  };
+
+  const activeTabTheme = getTabTheme(activeTab);
 
   const quickActions = [
     {
@@ -118,630 +236,722 @@ export default function HomeScreen() {
     },
   ];
 
-  // Get life stage specific colors and icons
-  const getStageTheme = () => {
-    switch (lifeStage) {
+  // Render content based on active tab
+  const renderTabContent = () => {
+    switch (activeTab) {
+      case 'regular':
+        return renderMenstrualCycleContent();
       case 'perimenopause':
-        return { color: '#f59e0b', icon: Leaf, gradient: ['#fcd34d', '#f59e0b'] as [string, string] };
+        return renderPerimenopauseContent();
       case 'menopause':
-        return { color: '#8b5cf6', icon: Sun, gradient: ['#c4b5fd', '#8b5cf6'] as [string, string] };
+        return renderMenopauseContent();
+      case 'postmenopause':
+        return renderPostmenopauseContent();
       default:
-        return { color: theme.accent.purple, icon: Moon, gradient: ['#f9a8d4', '#c4b5fd'] as [string, string] };
+        return null;
     }
   };
 
-  const stageTheme = getStageTheme();
+  // Menstrual Cycle Content (Regular)
+  const renderMenstrualCycleContent = () => {
+    const moonCyclePhase = getMoonPhaseCycleEquivalent(currentMoon);
+    const moonCycleInfo = phaseInfo[moonCyclePhase];
 
-  // Render different content based on life stage
-  const renderLifeStageContent = () => {
-    if (lifeStage === 'regular') {
-      return (
-        <>
-          {/* Cycle Wheel */}
-          <Animated.View
-            entering={FadeInUp.delay(300).duration(800)}
-            className="items-center mt-6"
-          >
-            <CycleWheel />
-          </Animated.View>
+    return (
+      <>
+        {/* Cycle Wheel */}
+        <Animated.View
+          entering={FadeInUp.delay(300).duration(800)}
+          className="items-center mt-6"
+        >
+          <CycleWheel />
+        </Animated.View>
 
-          {/* Phase Info Card */}
-          <Animated.View
-            entering={FadeInUp.delay(500).duration(600)}
-            className="mx-6 mt-6"
+        {/* Phase Info Card */}
+        <Animated.View
+          entering={FadeInUp.delay(500).duration(600)}
+          className="mx-6 mt-6"
+        >
+          <View
+            className="rounded-3xl p-5 border"
+            style={{ backgroundColor: theme.bg.card, borderColor: theme.border.light }}
           >
-            <View
-              className="rounded-3xl p-5 border"
-              style={{ backgroundColor: theme.bg.card, borderColor: theme.border.light }}
-            >
-              <View className="flex-row items-center mb-3">
-                <View
-                  className="w-10 h-10 rounded-full items-center justify-center mr-3"
-                  style={{ backgroundColor: `${info.color}20` }}
-                >
-                  <Text className="text-xl">{info.emoji}</Text>
-                </View>
-                <View className="flex-1">
-                  <Text
-                    style={{ fontFamily: 'Quicksand_600SemiBold', color: theme.text.primary }}
-                    className="text-base"
-                  >
-                    {info.name} Phase
-                  </Text>
-                  <Text
-                    style={{ fontFamily: 'Quicksand_400Regular', color: theme.text.tertiary }}
-                    className="text-xs"
-                  >
-                    {info.energy}
-                  </Text>
-                </View>
+            <View className="flex-row items-center mb-3">
+              <View
+                className="w-10 h-10 rounded-full items-center justify-center mr-3"
+                style={{ backgroundColor: `${info.color}20` }}
+              >
+                <Text className="text-xl">{info.emoji}</Text>
               </View>
+              <View className="flex-1">
+                <Text
+                  style={{ fontFamily: 'Quicksand_600SemiBold', color: theme.text.primary }}
+                  className="text-base"
+                >
+                  {info.name} Phase
+                </Text>
+                <Text
+                  style={{ fontFamily: 'Quicksand_400Regular', color: theme.text.tertiary }}
+                  className="text-xs"
+                >
+                  Day {dayOfCycle} · {info.energy}
+                </Text>
+              </View>
+              {/* Moon phase indicator */}
+              <View
+                className="items-center px-3 py-1.5 rounded-full"
+                style={{ backgroundColor: `${moonInfo.color}15` }}
+              >
+                <Text className="text-sm">{moonInfo.emoji}</Text>
+              </View>
+            </View>
 
+            <Text
+              style={{ fontFamily: 'Quicksand_400Regular', color: theme.text.secondary }}
+              className="text-sm leading-5"
+            >
+              {info.description}
+            </Text>
+
+            <View className="mt-4 pt-4 border-t" style={{ borderTopColor: theme.border.light }}>
+              <View className="flex-row items-center">
+                <Sparkles size={14} color={theme.accent.purple} />
+                <Text
+                  style={{ fontFamily: 'Quicksand_500Medium', color: theme.text.accent }}
+                  className="text-xs ml-2"
+                >
+                  Your superpower: {info.superpower}
+                </Text>
+              </View>
+            </View>
+          </View>
+        </Animated.View>
+
+        {/* Next Period Countdown */}
+        <Animated.View
+          entering={FadeInUp.delay(550).duration(600)}
+          className="mx-6 mt-4"
+        >
+          <View
+            className="flex-row items-center justify-between rounded-2xl p-4 border"
+            style={{ backgroundColor: `${theme.accent.rose}10`, borderColor: `${theme.accent.rose}30` }}
+          >
+            <View className="flex-row items-center">
+              <Calendar size={18} color={theme.accent.pink} />
+              <Text
+                style={{ fontFamily: 'Quicksand_500Medium', color: theme.text.primary }}
+                className="text-sm ml-3"
+              >
+                Next period in
+              </Text>
+            </View>
+            <View className="flex-row items-center">
+              <Text
+                style={{ fontFamily: 'Quicksand_600SemiBold', color: theme.accent.pink }}
+                className="text-lg mr-1"
+              >
+                {daysUntilPeriod}
+              </Text>
               <Text
                 style={{ fontFamily: 'Quicksand_400Regular', color: theme.text.secondary }}
-                className="text-sm leading-5"
+                className="text-sm"
               >
-                {info.description}
+                days
               </Text>
-
-              <View className="mt-4 pt-4 border-t" style={{ borderTopColor: theme.border.light }}>
-                <View className="flex-row items-center">
-                  <Sparkles size={14} color={theme.accent.purple} />
-                  <Text
-                    style={{ fontFamily: 'Quicksand_500Medium', color: theme.text.accent }}
-                    className="text-xs ml-2"
-                  >
-                    Your superpower: {info.superpower}
-                  </Text>
-                </View>
-              </View>
             </View>
-          </Animated.View>
+          </View>
+        </Animated.View>
 
-          {/* Next Period Countdown */}
-          <Animated.View
-            entering={FadeInUp.delay(550).duration(600)}
-            className="mx-6 mt-4"
-          >
-            <View
-              className="flex-row items-center justify-between rounded-2xl p-4 border"
-              style={{ backgroundColor: `${theme.accent.rose}10`, borderColor: `${theme.accent.rose}30` }}
-            >
-              <View className="flex-row items-center">
-                <Calendar size={18} color={theme.accent.pink} />
-                <Text
-                  style={{ fontFamily: 'Quicksand_500Medium', color: theme.text.primary }}
-                  className="text-sm ml-3"
-                >
-                  Next period in
-                </Text>
-              </View>
-              <View className="flex-row items-center">
-                <Text
-                  style={{ fontFamily: 'Quicksand_600SemiBold', color: theme.accent.pink }}
-                  className="text-lg mr-1"
-                >
-                  {daysUntilPeriod}
-                </Text>
-                <Text
-                  style={{ fontFamily: 'Quicksand_400Regular', color: theme.text.secondary }}
-                  className="text-sm"
-                >
-                  days
-                </Text>
-              </View>
-            </View>
-          </Animated.View>
-
-          {/* Cycle Graph - Educational */}
+        {/* Fertility & Ovulation Insight */}
+        {(currentPhase === 'follicular' || currentPhase === 'ovulatory') && (
           <Animated.View
             entering={FadeInUp.delay(600).duration(600)}
-            className="mx-6 mt-6"
-          >
-            <CycleGraph />
-          </Animated.View>
-        </>
-      );
-    } else if (lifeStage === 'perimenopause') {
-      const currentMoon = getMoonPhase();
-      const moonInfo = moonPhaseInfo[currentMoon];
-      const moonCyclePhase = getMoonPhaseCycleEquivalent(currentMoon);
-      const moonCycleInfo = phaseInfo[moonCyclePhase];
-      const moonPractices = moonCycleEducation.phases[currentMoon];
-
-      return (
-        <>
-          {/* Moon Phase Card - Primary focus for perimenopause */}
-          <View className="mx-6 mt-6">
-            <MoonPhaseCard showEducation={true} />
-          </View>
-
-          {/* Moon-Based Guidance Banner */}
-          <Animated.View
-            entering={FadeInUp.delay(400).duration(600)}
             className="mx-6 mt-4"
           >
             <View
               className="rounded-2xl p-4 border"
-              style={{ backgroundColor: `${moonInfo.color}10`, borderColor: `${moonInfo.color}30` }}
+              style={{ backgroundColor: `${theme.accent.purple}10`, borderColor: `${theme.accent.purple}30` }}
             >
-              <View className="flex-row items-center mb-2">
-                <Info size={16} color={stageTheme.color} />
+              <View className="flex-row items-center">
+                <Droplets size={18} color={theme.accent.purple} />
                 <Text
-                  style={{ fontFamily: 'Quicksand_600SemiBold', color: stageTheme.color }}
-                  className="text-xs uppercase tracking-wider ml-2"
+                  style={{ fontFamily: 'Quicksand_500Medium', color: theme.text.primary }}
+                  className="text-sm ml-3 flex-1"
                 >
-                  Why Follow the Moon?
+                  {currentPhase === 'ovulatory'
+                    ? 'Fertile window - Peak fertility days'
+                    : 'Approaching fertile window'
+                  }
                 </Text>
-              </View>
-              <Text
-                style={{ fontFamily: 'Quicksand_400Regular', color: theme.text.secondary }}
-                className="text-sm leading-5"
-              >
-                As your cycle becomes irregular during perimenopause, the moon offers a beautiful, natural rhythm to guide your wellness. The 29-day lunar cycle mirrors the menstrual cycle, helping you stay connected to nature's rhythms.
-              </Text>
-            </View>
-          </Animated.View>
-
-          {/* Today's Moon-Based Practices */}
-          <Animated.View
-            entering={FadeInUp.delay(500).duration(600)}
-            className="mx-6 mt-4"
-          >
-            <View
-              className="rounded-2xl p-5 border"
-              style={{ backgroundColor: theme.bg.card, borderColor: theme.border.light }}
-            >
-              <Text
-                style={{ fontFamily: 'Quicksand_600SemiBold', color: moonCycleInfo.color }}
-                className="text-xs uppercase tracking-wider mb-3"
-              >
-                {moonInfo.emoji} Today's Focus: {moonPractices.focus}
-              </Text>
-              <View style={{ gap: 10 }}>
-                {moonPractices.practices.slice(0, 3).map((practice, index) => (
-                  <View key={index} className="flex-row items-start">
-                    <View
-                      className="w-5 h-5 rounded-full items-center justify-center mr-3 mt-0.5"
-                      style={{ backgroundColor: `${moonCycleInfo.color}20` }}
-                    >
-                      <Text style={{ fontFamily: 'Quicksand_600SemiBold', color: moonCycleInfo.color, fontSize: 10 }}>
-                        {index + 1}
-                      </Text>
-                    </View>
-                    <Text
-                      style={{ fontFamily: 'Quicksand_400Regular', color: theme.text.secondary, flex: 1 }}
-                      className="text-sm leading-5"
-                    >
-                      {practice}
-                    </Text>
-                  </View>
-                ))}
+                <View
+                  className="px-2 py-1 rounded-full"
+                  style={{ backgroundColor: `${theme.accent.purple}20` }}
+                >
+                  <Text
+                    style={{ fontFamily: 'Quicksand_600SemiBold', color: theme.accent.purple }}
+                    className="text-xs"
+                  >
+                    {currentPhase === 'ovulatory' ? 'High' : 'Medium'}
+                  </Text>
+                </View>
               </View>
             </View>
           </Animated.View>
+        )}
 
-          {/* Symptom Quick Track */}
-          <Animated.View
-            entering={FadeInUp.delay(600).duration(600)}
-            className="mx-6 mt-4"
+        {/* Cycle Graph - Educational */}
+        <Animated.View
+          entering={FadeInUp.delay(650).duration(600)}
+          className="mx-6 mt-6"
+        >
+          <CycleGraph />
+        </Animated.View>
+      </>
+    );
+  };
+
+  // Perimenopause Content
+  const renderPerimenopauseContent = () => {
+    const moonCyclePhase = getMoonPhaseCycleEquivalent(currentMoon);
+    const moonCycleInfo = phaseInfo[moonCyclePhase];
+    const moonPractices = moonCycleEducation.phases[currentMoon];
+
+    return (
+      <>
+        {/* Moon Phase Card - Primary focus for perimenopause */}
+        <Animated.View
+          entering={FadeInUp.delay(300).duration(600)}
+          className="mx-6 mt-6"
+        >
+          <MoonPhaseCard showEducation={true} />
+        </Animated.View>
+
+        {/* Moon-Based Guidance Banner */}
+        <Animated.View
+          entering={FadeInUp.delay(400).duration(600)}
+          className="mx-6 mt-4"
+        >
+          <View
+            className="rounded-2xl p-4 border"
+            style={{ backgroundColor: `${moonInfo.color}10`, borderColor: `${activeTabTheme.color}30` }}
           >
-            <Pressable
-              onPress={() => {
-                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                if (isPremium) {
-                  // TODO: Navigate to symptom tracking
-                } else {
-                  router.push('/paywall');
-                }
-              }}
-            >
-              <View
-                className="rounded-2xl p-4 border"
-                style={{ backgroundColor: theme.bg.card, borderColor: theme.border.light }}
+            <View className="flex-row items-center mb-2">
+              <Info size={16} color={activeTabTheme.color} />
+              <Text
+                style={{ fontFamily: 'Quicksand_600SemiBold', color: activeTabTheme.color }}
+                className="text-xs uppercase tracking-wider ml-2"
               >
-                <View className="flex-row items-center justify-between">
-                  <View className="flex-row items-center">
-                    <Flame size={20} color="#f59e0b" />
-                    <Text
-                      style={{ fontFamily: 'Quicksand_500Medium', color: theme.text.primary }}
-                      className="text-sm ml-3"
-                    >
-                      Track Today's Symptoms
-                    </Text>
-                  </View>
-                  <View className="flex-row items-center">
-                    {!isPremium && (
-                      <View className="px-2 py-1 rounded-full mr-2" style={{ backgroundColor: 'rgba(249, 168, 212, 0.2)' }}>
-                        <Crown size={12} color="#f9a8d4" />
-                      </View>
-                    )}
-                    <ChevronRight size={18} color={theme.text.tertiary} />
-                  </View>
-                </View>
-
-                {/* Common symptom pills */}
-                <View className="flex-row flex-wrap mt-3" style={{ gap: 8 }}>
-                  {perimenopauseSymptoms.slice(0, 5).map((symptom) => (
-                    <View
-                      key={symptom.id}
-                      className="flex-row items-center px-3 py-1.5 rounded-full"
-                      style={{ backgroundColor: `${stageTheme.color}15` }}
-                    >
-                      <Text className="text-sm mr-1">{symptom.emoji}</Text>
-                      <Text
-                        style={{ fontFamily: 'Quicksand_400Regular', color: theme.text.secondary }}
-                        className="text-xs"
-                      >
-                        {symptom.name}
-                      </Text>
-                    </View>
-                  ))}
-                </View>
-              </View>
-            </Pressable>
-          </Animated.View>
-        </>
-      );
-    } else if (lifeStage === 'menopause') {
-      // Menopause - Full moon phase guidance
-      const currentMoon = getMoonPhase();
-      const moonInfo = moonPhaseInfo[currentMoon];
-      const moonCyclePhase = getMoonPhaseCycleEquivalent(currentMoon);
-      const moonCycleInfo = phaseInfo[moonCyclePhase];
-      const moonPractices = moonCycleEducation.phases[currentMoon];
-
-      return (
-        <>
-          {/* Moon Phase Card - Primary focus for menopause */}
-          <View className="mx-6 mt-6">
-            <MoonPhaseCard showEducation={true} />
+                Why Follow the Moon?
+              </Text>
+            </View>
+            <Text
+              style={{ fontFamily: 'Quicksand_400Regular', color: theme.text.secondary }}
+              className="text-sm leading-5"
+            >
+              As your cycle becomes irregular during perimenopause, the moon offers a beautiful, natural rhythm to guide your wellness. The 29-day lunar cycle mirrors the menstrual cycle, helping you stay connected to nature's rhythms.
+            </Text>
           </View>
+        </Animated.View>
 
-          {/* Nature's Rhythm Explanation */}
-          <Animated.View
-            entering={FadeInUp.delay(400).duration(600)}
-            className="mx-6 mt-4"
+        {/* Transition Wellness Focus */}
+        <Animated.View
+          entering={FadeInUp.delay(450).duration(600)}
+          className="mx-6 mt-4"
+        >
+          <Text
+            style={{ fontFamily: 'Quicksand_600SemiBold', color: theme.text.primary }}
+            className="text-base mb-3"
           >
-            <LinearGradient
-              colors={['rgba(139, 92, 246, 0.12)', 'rgba(196, 181, 253, 0.08)']}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 1 }}
-              style={{ borderRadius: 20, padding: 16, borderWidth: 1, borderColor: 'rgba(139, 92, 246, 0.25)' }}
-            >
-              <View className="flex-row items-center mb-2">
-                <Sparkles size={16} color="#8b5cf6" />
+            Transition Wellness Focus
+          </Text>
+          <View className="flex-row flex-wrap" style={{ gap: 10 }}>
+            {[
+              { icon: ThermometerSun, label: 'Hot Flashes', color: '#f59e0b' },
+              { icon: BedDouble, label: 'Sleep', color: '#8b5cf6' },
+              { icon: Brain, label: 'Brain Fog', color: '#ec4899' },
+              { icon: HeartPulse, label: 'Mood', color: '#ef4444' },
+            ].map((item) => (
+              <View
+                key={item.label}
+                className="flex-row items-center px-4 py-3 rounded-2xl border"
+                style={{ backgroundColor: `${item.color}10`, borderColor: `${item.color}25` }}
+              >
+                <item.icon size={16} color={item.color} style={{ marginRight: 8 }} />
                 <Text
-                  style={{ fontFamily: 'Quicksand_600SemiBold', color: '#8b5cf6' }}
-                  className="text-xs uppercase tracking-wider ml-2"
+                  style={{ fontFamily: 'Quicksand_500Medium', color: theme.text.primary }}
+                  className="text-sm"
                 >
-                  Connect with Nature
+                  {item.label}
                 </Text>
               </View>
-              <Text
-                style={{ fontFamily: 'Quicksand_400Regular', color: theme.text.secondary }}
-                className="text-sm leading-5"
-              >
-                Without a menstrual cycle, the moon becomes your guide. Ancient wisdom and modern women alike have found peace in following the lunar rhythm - a 29-day cycle that mirrors the menstrual cycle and connects you to nature's eternal flow.
-              </Text>
-            </LinearGradient>
-          </Animated.View>
+            ))}
+          </View>
+        </Animated.View>
 
-          {/* Today's Moon-Based Practices */}
-          <Animated.View
-            entering={FadeInUp.delay(500).duration(600)}
-            className="mx-6 mt-4"
-          >
-            <View
-              className="rounded-2xl p-5 border"
-              style={{ backgroundColor: theme.bg.card, borderColor: theme.border.light }}
-            >
-              <Text
-                style={{ fontFamily: 'Quicksand_600SemiBold', color: moonCycleInfo.color }}
-                className="text-xs uppercase tracking-wider mb-3"
-              >
-                {moonInfo.emoji} Today's Focus: {moonPractices.focus}
-              </Text>
-              <View style={{ gap: 10 }}>
-                {moonPractices.practices.map((practice, index) => (
-                  <View key={index} className="flex-row items-start">
-                    <View
-                      className="w-5 h-5 rounded-full items-center justify-center mr-3 mt-0.5"
-                      style={{ backgroundColor: `${moonCycleInfo.color}20` }}
-                    >
-                      <Text style={{ fontFamily: 'Quicksand_600SemiBold', color: moonCycleInfo.color, fontSize: 10 }}>
-                        {index + 1}
-                      </Text>
-                    </View>
-                    <Text
-                      style={{ fontFamily: 'Quicksand_400Regular', color: theme.text.secondary, flex: 1 }}
-                      className="text-sm leading-5"
-                    >
-                      {practice}
-                    </Text>
-                  </View>
-                ))}
-              </View>
-            </View>
-          </Animated.View>
-
-          {/* Health Focus Areas */}
-          <Animated.View
-            entering={FadeInUp.delay(600).duration(600)}
-            className="mx-6 mt-4"
+        {/* Today's Moon-Based Practices */}
+        <Animated.View
+          entering={FadeInUp.delay(500).duration(600)}
+          className="mx-6 mt-4"
+        >
+          <View
+            className="rounded-2xl p-5 border"
+            style={{ backgroundColor: theme.bg.card, borderColor: theme.border.light }}
           >
             <Text
-              style={{ fontFamily: 'Quicksand_600SemiBold', color: theme.text.primary }}
-              className="text-base mb-3"
+              style={{ fontFamily: 'Quicksand_600SemiBold', color: moonCycleInfo.color }}
+              className="text-xs uppercase tracking-wider mb-3"
             >
-              Menopause Wellness Focus
+              {moonInfo.emoji} Today's Focus: {moonPractices.focus}
             </Text>
-            <View className="flex-row flex-wrap" style={{ gap: 10 }}>
-              {[
-                { emoji: '💪', label: 'Bone Health' },
-                { emoji: '❤️', label: 'Heart Health' },
-                { emoji: '🧠', label: 'Brain Health' },
-                { emoji: '😴', label: 'Sleep Quality' },
-              ].map((item) => (
-                <View
-                  key={item.label}
-                  className="flex-row items-center px-4 py-3 rounded-2xl border"
-                  style={{ backgroundColor: theme.bg.card, borderColor: theme.border.light }}
-                >
-                  <Text className="text-lg mr-2">{item.emoji}</Text>
-                  <Text
-                    style={{ fontFamily: 'Quicksand_500Medium', color: theme.text.primary }}
-                    className="text-sm"
+            <View style={{ gap: 10 }}>
+              {moonPractices.practices.slice(0, 3).map((practice, index) => (
+                <View key={index} className="flex-row items-start">
+                  <View
+                    className="w-5 h-5 rounded-full items-center justify-center mr-3 mt-0.5"
+                    style={{ backgroundColor: `${moonCycleInfo.color}20` }}
                   >
-                    {item.label}
+                    <Text style={{ fontFamily: 'Quicksand_600SemiBold', color: moonCycleInfo.color, fontSize: 10 }}>
+                      {index + 1}
+                    </Text>
+                  </View>
+                  <Text
+                    style={{ fontFamily: 'Quicksand_400Regular', color: theme.text.secondary, flex: 1 }}
+                    className="text-sm leading-5"
+                  >
+                    {practice}
                   </Text>
                 </View>
               ))}
             </View>
-          </Animated.View>
-
-          {/* Symptom Quick Track */}
-          <Animated.View
-            entering={FadeInUp.delay(700).duration(600)}
-            className="mx-6 mt-4"
-          >
-            <Pressable
-              onPress={() => {
-                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                if (isPremium) {
-                  // TODO: Navigate to symptom tracking
-                } else {
-                  router.push('/paywall');
-                }
-              }}
-            >
-              <View
-                className="rounded-2xl p-4 border"
-                style={{ backgroundColor: theme.bg.card, borderColor: theme.border.light }}
-              >
-                <View className="flex-row items-center justify-between">
-                  <View className="flex-row items-center">
-                    <Flame size={20} color="#8b5cf6" />
-                    <Text
-                      style={{ fontFamily: 'Quicksand_500Medium', color: theme.text.primary }}
-                      className="text-sm ml-3"
-                    >
-                      Track Today's Symptoms
-                    </Text>
-                  </View>
-                  <View className="flex-row items-center">
-                    {!isPremium && (
-                      <View className="px-2 py-1 rounded-full mr-2" style={{ backgroundColor: 'rgba(249, 168, 212, 0.2)' }}>
-                        <Crown size={12} color="#f9a8d4" />
-                      </View>
-                    )}
-                    <ChevronRight size={18} color={theme.text.tertiary} />
-                  </View>
-                </View>
-
-                {/* Common symptom pills */}
-                <View className="flex-row flex-wrap mt-3" style={{ gap: 8 }}>
-                  {menopauseSymptoms.slice(0, 5).map((symptom) => (
-                    <View
-                      key={symptom.id}
-                      className="flex-row items-center px-3 py-1.5 rounded-full"
-                      style={{ backgroundColor: `${stageTheme.color}15` }}
-                    >
-                      <Text className="text-sm mr-1">{symptom.emoji}</Text>
-                      <Text
-                        style={{ fontFamily: 'Quicksand_400Regular', color: theme.text.secondary }}
-                        className="text-xs"
-                      >
-                        {symptom.name}
-                      </Text>
-                    </View>
-                  ))}
-                </View>
-              </View>
-            </Pressable>
-          </Animated.View>
-        </>
-      );
-    } else {
-      // Post Menopause - Wisdom years with moon guidance
-      const currentMoon = getMoonPhase();
-      const moonInfo = moonPhaseInfo[currentMoon];
-      const moonCyclePhase = getMoonPhaseCycleEquivalent(currentMoon);
-      const moonCycleInfo = phaseInfo[moonCyclePhase];
-      const moonPractices = moonCycleEducation.phases[currentMoon];
-
-      return (
-        <>
-          {/* Moon Phase Card */}
-          <View className="mx-6 mt-6">
-            <MoonPhaseCard showEducation={true} />
           </View>
+        </Animated.View>
 
-          {/* Wisdom Years Welcome */}
-          <Animated.View
-            entering={FadeInUp.delay(400).duration(600)}
-            className="mx-6 mt-4"
-          >
-            <LinearGradient
-              colors={['rgba(236, 72, 153, 0.12)', 'rgba(249, 168, 212, 0.08)']}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 1 }}
-              style={{ borderRadius: 20, padding: 16, borderWidth: 1, borderColor: 'rgba(236, 72, 153, 0.25)' }}
-            >
-              <View className="flex-row items-center mb-2">
-                <Sparkles size={16} color="#ec4899" />
-                <Text
-                  style={{ fontFamily: 'Quicksand_600SemiBold', color: '#ec4899' }}
-                  className="text-xs uppercase tracking-wider ml-2"
-                >
-                  Your Wisdom Years
-                </Text>
-              </View>
-              <Text
-                style={{ fontFamily: 'Quicksand_400Regular', color: theme.text.secondary }}
-                className="text-sm leading-5"
-              >
-                This is a time of clarity, confidence, and renewed purpose. Your body has found its new rhythm. The moon guides your wellness journey, connecting you to nature's timeless cycles and your own inner wisdom.
-              </Text>
-            </LinearGradient>
-          </Animated.View>
-
-          {/* Today's Moon-Based Practices */}
-          <Animated.View
-            entering={FadeInUp.delay(500).duration(600)}
-            className="mx-6 mt-4"
+        {/* Symptom Quick Track */}
+        <Animated.View
+          entering={FadeInUp.delay(600).duration(600)}
+          className="mx-6 mt-4"
+        >
+          <Pressable
+            onPress={() => {
+              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+              if (isPremium) {
+                // TODO: Navigate to symptom tracking
+              } else {
+                router.push('/paywall');
+              }
+            }}
           >
             <View
-              className="rounded-2xl p-5 border"
+              className="rounded-2xl p-4 border"
               style={{ backgroundColor: theme.bg.card, borderColor: theme.border.light }}
             >
-              <Text
-                style={{ fontFamily: 'Quicksand_600SemiBold', color: moonCycleInfo.color }}
-                className="text-xs uppercase tracking-wider mb-3"
-              >
-                {moonInfo.emoji} Today's Focus: {moonPractices.focus}
-              </Text>
-              <View style={{ gap: 10 }}>
-                {moonPractices.practices.map((practice, index) => (
-                  <View key={index} className="flex-row items-start">
-                    <View
-                      className="w-5 h-5 rounded-full items-center justify-center mr-3 mt-0.5"
-                      style={{ backgroundColor: `${moonCycleInfo.color}20` }}
-                    >
-                      <Text style={{ fontFamily: 'Quicksand_600SemiBold', color: moonCycleInfo.color, fontSize: 10 }}>
-                        {index + 1}
-                      </Text>
+              <View className="flex-row items-center justify-between">
+                <View className="flex-row items-center">
+                  <Flame size={20} color="#f59e0b" />
+                  <Text
+                    style={{ fontFamily: 'Quicksand_500Medium', color: theme.text.primary }}
+                    className="text-sm ml-3"
+                  >
+                    Track Today's Symptoms
+                  </Text>
+                </View>
+                <View className="flex-row items-center">
+                  {!isPremium && (
+                    <View className="px-2 py-1 rounded-full mr-2" style={{ backgroundColor: 'rgba(249, 168, 212, 0.2)' }}>
+                      <Crown size={12} color="#f9a8d4" />
                     </View>
+                  )}
+                  <ChevronRight size={18} color={theme.text.tertiary} />
+                </View>
+              </View>
+
+              {/* Common symptom pills */}
+              <View className="flex-row flex-wrap mt-3" style={{ gap: 8 }}>
+                {perimenopauseSymptoms.slice(0, 5).map((symptom) => (
+                  <View
+                    key={symptom.id}
+                    className="flex-row items-center px-3 py-1.5 rounded-full"
+                    style={{ backgroundColor: `${activeTabTheme.color}15` }}
+                  >
+                    <Text className="text-sm mr-1">{symptom.emoji}</Text>
                     <Text
-                      style={{ fontFamily: 'Quicksand_400Regular', color: theme.text.secondary, flex: 1 }}
-                      className="text-sm leading-5"
+                      style={{ fontFamily: 'Quicksand_400Regular', color: theme.text.secondary }}
+                      className="text-xs"
                     >
-                      {practice}
+                      {symptom.name}
                     </Text>
                   </View>
                 ))}
               </View>
             </View>
-          </Animated.View>
+          </Pressable>
+        </Animated.View>
+      </>
+    );
+  };
 
-          {/* Wellness Focus Areas */}
-          <Animated.View
-            entering={FadeInUp.delay(600).duration(600)}
-            className="mx-6 mt-4"
+  // Menopause Content
+  const renderMenopauseContent = () => {
+    const moonCyclePhase = getMoonPhaseCycleEquivalent(currentMoon);
+    const moonCycleInfo = phaseInfo[moonCyclePhase];
+    const moonPractices = moonCycleEducation.phases[currentMoon];
+
+    return (
+      <>
+        {/* Moon Phase Card - Primary focus for menopause */}
+        <Animated.View
+          entering={FadeInUp.delay(300).duration(600)}
+          className="mx-6 mt-6"
+        >
+          <MoonPhaseCard showEducation={true} />
+        </Animated.View>
+
+        {/* Nature's Rhythm Explanation */}
+        <Animated.View
+          entering={FadeInUp.delay(400).duration(600)}
+          className="mx-6 mt-4"
+        >
+          <LinearGradient
+            colors={['rgba(139, 92, 246, 0.12)', 'rgba(196, 181, 253, 0.08)']}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+            style={{ borderRadius: 20, padding: 16, borderWidth: 1, borderColor: 'rgba(139, 92, 246, 0.25)' }}
+          >
+            <View className="flex-row items-center mb-2">
+              <Sparkles size={16} color="#8b5cf6" />
+              <Text
+                style={{ fontFamily: 'Quicksand_600SemiBold', color: '#8b5cf6' }}
+                className="text-xs uppercase tracking-wider ml-2"
+              >
+                Your Second Spring
+              </Text>
+            </View>
+            <Text
+              style={{ fontFamily: 'Quicksand_400Regular', color: theme.text.secondary }}
+              className="text-sm leading-5"
+            >
+              Without a menstrual cycle, the moon becomes your guide. Ancient wisdom and modern women alike have found peace in following the lunar rhythm - a 29-day cycle that connects you to nature's eternal flow.
+            </Text>
+          </LinearGradient>
+        </Animated.View>
+
+        {/* Health Focus Areas */}
+        <Animated.View
+          entering={FadeInUp.delay(450).duration(600)}
+          className="mx-6 mt-4"
+        >
+          <Text
+            style={{ fontFamily: 'Quicksand_600SemiBold', color: theme.text.primary }}
+            className="text-base mb-3"
+          >
+            Menopause Wellness Focus
+          </Text>
+          <View className="flex-row flex-wrap" style={{ gap: 10 }}>
+            {[
+              { icon: Bone, label: 'Bone Health', color: '#8b5cf6' },
+              { icon: HeartPulse, label: 'Heart Health', color: '#ef4444' },
+              { icon: Brain, label: 'Brain Health', color: '#ec4899' },
+              { icon: BedDouble, label: 'Sleep Quality', color: '#6366f1' },
+            ].map((item) => (
+              <View
+                key={item.label}
+                className="flex-row items-center px-4 py-3 rounded-2xl border"
+                style={{ backgroundColor: `${item.color}10`, borderColor: `${item.color}25` }}
+              >
+                <item.icon size={16} color={item.color} style={{ marginRight: 8 }} />
+                <Text
+                  style={{ fontFamily: 'Quicksand_500Medium', color: theme.text.primary }}
+                  className="text-sm"
+                >
+                  {item.label}
+                </Text>
+              </View>
+            ))}
+          </View>
+        </Animated.View>
+
+        {/* Today's Moon-Based Practices */}
+        <Animated.View
+          entering={FadeInUp.delay(500).duration(600)}
+          className="mx-6 mt-4"
+        >
+          <View
+            className="rounded-2xl p-5 border"
+            style={{ backgroundColor: theme.bg.card, borderColor: theme.border.light }}
           >
             <Text
-              style={{ fontFamily: 'Quicksand_600SemiBold', color: theme.text.primary }}
-              className="text-base mb-3"
+              style={{ fontFamily: 'Quicksand_600SemiBold', color: moonCycleInfo.color }}
+              className="text-xs uppercase tracking-wider mb-3"
             >
-              Post Menopause Wellness
+              {moonInfo.emoji} Today's Focus: {moonPractices.focus}
             </Text>
-            <View className="flex-row flex-wrap" style={{ gap: 10 }}>
-              {[
-                { emoji: '💪', label: 'Bone Strength' },
-                { emoji: '❤️', label: 'Heart Health' },
-                { emoji: '🧠', label: 'Mental Clarity' },
-                { emoji: '⚡', label: 'Vitality' },
-              ].map((item) => (
-                <View
-                  key={item.label}
-                  className="flex-row items-center px-4 py-3 rounded-2xl border"
-                  style={{ backgroundColor: theme.bg.card, borderColor: theme.border.light }}
-                >
-                  <Text className="text-lg mr-2">{item.emoji}</Text>
-                  <Text
-                    style={{ fontFamily: 'Quicksand_500Medium', color: theme.text.primary }}
-                    className="text-sm"
+            <View style={{ gap: 10 }}>
+              {moonPractices.practices.map((practice, index) => (
+                <View key={index} className="flex-row items-start">
+                  <View
+                    className="w-5 h-5 rounded-full items-center justify-center mr-3 mt-0.5"
+                    style={{ backgroundColor: `${moonCycleInfo.color}20` }}
                   >
-                    {item.label}
+                    <Text style={{ fontFamily: 'Quicksand_600SemiBold', color: moonCycleInfo.color, fontSize: 10 }}>
+                      {index + 1}
+                    </Text>
+                  </View>
+                  <Text
+                    style={{ fontFamily: 'Quicksand_400Regular', color: theme.text.secondary, flex: 1 }}
+                    className="text-sm leading-5"
+                  >
+                    {practice}
                   </Text>
                 </View>
               ))}
             </View>
-          </Animated.View>
+          </View>
+        </Animated.View>
 
-          {/* Track Wellness */}
-          <Animated.View
-            entering={FadeInUp.delay(700).duration(600)}
-            className="mx-6 mt-4"
+        {/* Symptom Quick Track */}
+        <Animated.View
+          entering={FadeInUp.delay(600).duration(600)}
+          className="mx-6 mt-4"
+        >
+          <Pressable
+            onPress={() => {
+              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+              if (isPremium) {
+                // TODO: Navigate to symptom tracking
+              } else {
+                router.push('/paywall');
+              }
+            }}
           >
-            <Pressable
-              onPress={() => {
-                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                if (isPremium) {
-                  // Navigate to symptom tracker
-                } else {
-                  router.push('/paywall');
-                }
-              }}
+            <View
+              className="rounded-2xl p-4 border"
+              style={{ backgroundColor: theme.bg.card, borderColor: theme.border.light }}
             >
-              <View
-                className="rounded-2xl p-4 border"
-                style={{ backgroundColor: theme.bg.card, borderColor: theme.border.light }}
-              >
-                <View className="flex-row items-center justify-between">
-                  <View className="flex-row items-center">
-                    <Flame size={20} color="#ec4899" />
-                    <Text
-                      style={{ fontFamily: 'Quicksand_500Medium', color: theme.text.primary }}
-                      className="text-sm ml-3"
-                    >
-                      Track Your Wellness
-                    </Text>
-                  </View>
-                  <View className="flex-row items-center">
-                    {!isPremium && (
-                      <View className="px-2 py-1 rounded-full mr-2" style={{ backgroundColor: 'rgba(249, 168, 212, 0.2)' }}>
-                        <Crown size={12} color="#f9a8d4" />
-                      </View>
-                    )}
-                    <ChevronRight size={18} color={theme.text.tertiary} />
-                  </View>
+              <View className="flex-row items-center justify-between">
+                <View className="flex-row items-center">
+                  <Flame size={20} color="#8b5cf6" />
+                  <Text
+                    style={{ fontFamily: 'Quicksand_500Medium', color: theme.text.primary }}
+                    className="text-sm ml-3"
+                  >
+                    Track Today's Symptoms
+                  </Text>
                 </View>
-
-                {/* Wellness tracking pills */}
-                <View className="flex-row flex-wrap mt-3" style={{ gap: 8 }}>
-                  {postmenopauseSymptoms.slice(0, 5).map((symptom) => (
-                    <View
-                      key={symptom.id}
-                      className="flex-row items-center px-3 py-1.5 rounded-full"
-                      style={{ backgroundColor: `${stageTheme.color}15` }}
-                    >
-                      <Text className="text-sm mr-1">{symptom.emoji}</Text>
-                      <Text
-                        style={{ fontFamily: 'Quicksand_400Regular', color: theme.text.secondary }}
-                        className="text-xs"
-                      >
-                        {symptom.name}
-                      </Text>
+                <View className="flex-row items-center">
+                  {!isPremium && (
+                    <View className="px-2 py-1 rounded-full mr-2" style={{ backgroundColor: 'rgba(249, 168, 212, 0.2)' }}>
+                      <Crown size={12} color="#f9a8d4" />
                     </View>
-                  ))}
+                  )}
+                  <ChevronRight size={18} color={theme.text.tertiary} />
                 </View>
               </View>
-            </Pressable>
-          </Animated.View>
-        </>
-      );
-    }
+
+              {/* Common symptom pills */}
+              <View className="flex-row flex-wrap mt-3" style={{ gap: 8 }}>
+                {menopauseSymptoms.slice(0, 5).map((symptom) => (
+                  <View
+                    key={symptom.id}
+                    className="flex-row items-center px-3 py-1.5 rounded-full"
+                    style={{ backgroundColor: `${activeTabTheme.color}15` }}
+                  >
+                    <Text className="text-sm mr-1">{symptom.emoji}</Text>
+                    <Text
+                      style={{ fontFamily: 'Quicksand_400Regular', color: theme.text.secondary }}
+                      className="text-xs"
+                    >
+                      {symptom.name}
+                    </Text>
+                  </View>
+                ))}
+              </View>
+            </View>
+          </Pressable>
+        </Animated.View>
+      </>
+    );
+  };
+
+  // Postmenopause Content
+  const renderPostmenopauseContent = () => {
+    const moonCyclePhase = getMoonPhaseCycleEquivalent(currentMoon);
+    const moonCycleInfo = phaseInfo[moonCyclePhase];
+    const moonPractices = moonCycleEducation.phases[currentMoon];
+
+    return (
+      <>
+        {/* Moon Phase Card */}
+        <Animated.View
+          entering={FadeInUp.delay(300).duration(600)}
+          className="mx-6 mt-6"
+        >
+          <MoonPhaseCard showEducation={true} />
+        </Animated.View>
+
+        {/* Wisdom Years Welcome */}
+        <Animated.View
+          entering={FadeInUp.delay(400).duration(600)}
+          className="mx-6 mt-4"
+        >
+          <LinearGradient
+            colors={['rgba(236, 72, 153, 0.12)', 'rgba(249, 168, 212, 0.08)']}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+            style={{ borderRadius: 20, padding: 16, borderWidth: 1, borderColor: 'rgba(236, 72, 153, 0.25)' }}
+          >
+            <View className="flex-row items-center mb-2">
+              <Star size={16} color="#ec4899" />
+              <Text
+                style={{ fontFamily: 'Quicksand_600SemiBold', color: '#ec4899' }}
+                className="text-xs uppercase tracking-wider ml-2"
+              >
+                Your Wisdom Years
+              </Text>
+            </View>
+            <Text
+              style={{ fontFamily: 'Quicksand_400Regular', color: theme.text.secondary }}
+              className="text-sm leading-5"
+            >
+              This is a time of clarity, confidence, and renewed purpose. Your body has found its new rhythm. The moon guides your wellness journey, connecting you to nature's timeless cycles and your own inner wisdom.
+            </Text>
+          </LinearGradient>
+        </Animated.View>
+
+        {/* Wellness Focus Areas */}
+        <Animated.View
+          entering={FadeInUp.delay(450).duration(600)}
+          className="mx-6 mt-4"
+        >
+          <Text
+            style={{ fontFamily: 'Quicksand_600SemiBold', color: theme.text.primary }}
+            className="text-base mb-3"
+          >
+            Postmenopause Wellness
+          </Text>
+          <View className="flex-row flex-wrap" style={{ gap: 10 }}>
+            {[
+              { icon: Bone, label: 'Bone Strength', color: '#ec4899' },
+              { icon: HeartPulse, label: 'Heart Health', color: '#ef4444' },
+              { icon: Brain, label: 'Mental Clarity', color: '#8b5cf6' },
+              { icon: Zap, label: 'Vitality', color: '#f59e0b' },
+            ].map((item) => (
+              <View
+                key={item.label}
+                className="flex-row items-center px-4 py-3 rounded-2xl border"
+                style={{ backgroundColor: `${item.color}10`, borderColor: `${item.color}25` }}
+              >
+                <item.icon size={16} color={item.color} style={{ marginRight: 8 }} />
+                <Text
+                  style={{ fontFamily: 'Quicksand_500Medium', color: theme.text.primary }}
+                  className="text-sm"
+                >
+                  {item.label}
+                </Text>
+              </View>
+            ))}
+          </View>
+        </Animated.View>
+
+        {/* Today's Moon-Based Practices */}
+        <Animated.View
+          entering={FadeInUp.delay(500).duration(600)}
+          className="mx-6 mt-4"
+        >
+          <View
+            className="rounded-2xl p-5 border"
+            style={{ backgroundColor: theme.bg.card, borderColor: theme.border.light }}
+          >
+            <Text
+              style={{ fontFamily: 'Quicksand_600SemiBold', color: moonCycleInfo.color }}
+              className="text-xs uppercase tracking-wider mb-3"
+            >
+              {moonInfo.emoji} Today's Focus: {moonPractices.focus}
+            </Text>
+            <View style={{ gap: 10 }}>
+              {moonPractices.practices.map((practice, index) => (
+                <View key={index} className="flex-row items-start">
+                  <View
+                    className="w-5 h-5 rounded-full items-center justify-center mr-3 mt-0.5"
+                    style={{ backgroundColor: `${moonCycleInfo.color}20` }}
+                  >
+                    <Text style={{ fontFamily: 'Quicksand_600SemiBold', color: moonCycleInfo.color, fontSize: 10 }}>
+                      {index + 1}
+                    </Text>
+                  </View>
+                  <Text
+                    style={{ fontFamily: 'Quicksand_400Regular', color: theme.text.secondary, flex: 1 }}
+                    className="text-sm leading-5"
+                  >
+                    {practice}
+                  </Text>
+                </View>
+              ))}
+            </View>
+          </View>
+        </Animated.View>
+
+        {/* Track Wellness */}
+        <Animated.View
+          entering={FadeInUp.delay(600).duration(600)}
+          className="mx-6 mt-4"
+        >
+          <Pressable
+            onPress={() => {
+              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+              if (isPremium) {
+                // Navigate to symptom tracker
+              } else {
+                router.push('/paywall');
+              }
+            }}
+          >
+            <View
+              className="rounded-2xl p-4 border"
+              style={{ backgroundColor: theme.bg.card, borderColor: theme.border.light }}
+            >
+              <View className="flex-row items-center justify-between">
+                <View className="flex-row items-center">
+                  <Flame size={20} color="#ec4899" />
+                  <Text
+                    style={{ fontFamily: 'Quicksand_500Medium', color: theme.text.primary }}
+                    className="text-sm ml-3"
+                  >
+                    Track Your Wellness
+                  </Text>
+                </View>
+                <View className="flex-row items-center">
+                  {!isPremium && (
+                    <View className="px-2 py-1 rounded-full mr-2" style={{ backgroundColor: 'rgba(249, 168, 212, 0.2)' }}>
+                      <Crown size={12} color="#f9a8d4" />
+                    </View>
+                  )}
+                  <ChevronRight size={18} color={theme.text.tertiary} />
+                </View>
+              </View>
+
+              {/* Wellness tracking pills */}
+              <View className="flex-row flex-wrap mt-3" style={{ gap: 8 }}>
+                {postmenopauseSymptoms.slice(0, 5).map((symptom) => (
+                  <View
+                    key={symptom.id}
+                    className="flex-row items-center px-3 py-1.5 rounded-full"
+                    style={{ backgroundColor: `${activeTabTheme.color}15` }}
+                  >
+                    <Text className="text-sm mr-1">{symptom.emoji}</Text>
+                    <Text
+                      style={{ fontFamily: 'Quicksand_400Regular', color: theme.text.secondary }}
+                      className="text-xs"
+                    >
+                      {symptom.name}
+                    </Text>
+                  </View>
+                ))}
+              </View>
+            </View>
+          </Pressable>
+        </Animated.View>
+      </>
+    );
   };
 
   return (
@@ -762,32 +972,32 @@ export default function HomeScreen() {
             style={{ paddingTop: insets.top + 16 }}
             className="px-6"
           >
-            <View className="flex-row items-center justify-between">
+            <View className="flex-row items-center justify-between mb-4">
               <View>
                 <Text
                   style={{ fontFamily: 'CormorantGaramond_400Regular', color: theme.text.muted }}
                   className="text-sm tracking-widest uppercase"
                 >
-                  {lifeStage === 'regular' ? 'Welcome back' : stageInfo.name}
+                  {tabInfo[activeTab].subtitle}
                 </Text>
                 <Text
                   style={{ fontFamily: 'CormorantGaramond_600SemiBold', color: theme.text.primary }}
                   className="text-3xl mt-1"
                 >
-                  My Lunar Phase
+                  {tabInfo[activeTab].title}
                 </Text>
               </View>
               <View className="flex-row items-center">
                 {/* Luna AI Button */}
                 <Pressable
                   className="w-9 h-9 rounded-full items-center justify-center border mr-2"
-                  style={{ backgroundColor: `${stageTheme.color}15`, borderColor: `${stageTheme.color}30` }}
+                  style={{ backgroundColor: `${activeTabTheme.color}15`, borderColor: `${activeTabTheme.color}30` }}
                   onPress={() => {
                     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
                     router.push('/luna-ai');
                   }}
                 >
-                  <Sparkles size={16} color={stageTheme.color} />
+                  <Sparkles size={16} color={activeTabTheme.color} />
                 </Pressable>
                 {!isPremium && (
                   <Pressable
@@ -803,14 +1013,65 @@ export default function HomeScreen() {
                   style={{ backgroundColor: theme.bg.card, borderColor: theme.border.light }}
                   onPress={() => router.push('/(app)/settings')}
                 >
-                  <Settings size={18} color={stageTheme.color} />
+                  <Settings size={18} color={activeTabTheme.color} />
                 </Pressable>
               </View>
             </View>
           </Animated.View>
 
-          {/* Life Stage Specific Content */}
-          {renderLifeStageContent()}
+          {/* Life Stage Tab Navigation */}
+          <Animated.View
+            entering={FadeInDown.delay(200).duration(600)}
+          >
+            <LifeStageTabNav
+              activeStage={activeTab}
+              onStageChange={handleTabChange}
+              themeMode={themeMode}
+            />
+          </Animated.View>
+
+          {/* Exploring Banner */}
+          {isExploring && (
+            <Animated.View
+              entering={FadeIn.duration(300)}
+              className="mx-6 mt-4"
+            >
+              <Pressable onPress={handleSwitchToStage}>
+                <LinearGradient
+                  colors={[`${activeTabTheme.color}20`, `${activeTabTheme.color}10`]}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 1 }}
+                  style={{ borderRadius: 16, padding: 12, borderWidth: 1, borderColor: `${activeTabTheme.color}40` }}
+                >
+                  <View className="flex-row items-center justify-between">
+                    <View className="flex-row items-center flex-1">
+                      <Info size={16} color={activeTabTheme.color} />
+                      <Text
+                        style={{ fontFamily: 'Quicksand_500Medium', color: theme.text.primary }}
+                        className="text-sm ml-2 flex-1"
+                      >
+                        Exploring {tabInfo[activeTab].title}
+                      </Text>
+                    </View>
+                    <View
+                      className="px-3 py-1.5 rounded-full"
+                      style={{ backgroundColor: `${activeTabTheme.color}25` }}
+                    >
+                      <Text
+                        style={{ fontFamily: 'Quicksand_600SemiBold', color: activeTabTheme.color }}
+                        className="text-xs"
+                      >
+                        Switch to this stage
+                      </Text>
+                    </View>
+                  </View>
+                </LinearGradient>
+              </Pressable>
+            </Animated.View>
+          )}
+
+          {/* Tab-Specific Content */}
+          {renderTabContent()}
 
           {/* Quick Actions */}
           <Animated.View
@@ -870,17 +1131,17 @@ export default function HomeScreen() {
               }}
             >
               <LinearGradient
-                colors={[`${stageTheme.color}20`, `${stageTheme.color}10`]}
+                colors={[`${activeTabTheme.color}20`, `${activeTabTheme.color}10`]}
                 start={{ x: 0, y: 0 }}
                 end={{ x: 1, y: 1 }}
-                style={{ borderRadius: 20, padding: 16, borderWidth: 1, borderColor: `${stageTheme.color}30` }}
+                style={{ borderRadius: 20, padding: 16, borderWidth: 1, borderColor: `${activeTabTheme.color}30` }}
               >
                 <View className="flex-row items-center">
                   <View
                     className="w-10 h-10 rounded-full items-center justify-center mr-3"
-                    style={{ backgroundColor: `${stageTheme.color}25` }}
+                    style={{ backgroundColor: `${activeTabTheme.color}25` }}
                   >
-                    <Sparkles size={18} color={stageTheme.color} />
+                    <Sparkles size={18} color={activeTabTheme.color} />
                   </View>
                   <View className="flex-1">
                     <Text
@@ -893,14 +1154,14 @@ export default function HomeScreen() {
                       style={{ fontFamily: 'Quicksand_400Regular', color: theme.text.tertiary }}
                       className="text-xs mt-0.5"
                     >
-                      Get personalized wellness advice
+                      Get personalized {activeTab === 'regular' ? 'cycle' : lifeStageInfo[activeTab].name.toLowerCase()} advice
                     </Text>
                   </View>
                   <View
                     className="w-8 h-8 rounded-full items-center justify-center"
-                    style={{ backgroundColor: `${stageTheme.color}20` }}
+                    style={{ backgroundColor: `${activeTabTheme.color}20` }}
                   >
-                    <MessageCircle size={16} color={stageTheme.color} />
+                    <MessageCircle size={16} color={activeTabTheme.color} />
                   </View>
                 </View>
               </LinearGradient>
@@ -913,22 +1174,25 @@ export default function HomeScreen() {
             className="mx-6 mt-6"
           >
             <LinearGradient
-              colors={[`${stageTheme.gradient[0]}30`, `${stageTheme.gradient[1]}20`]}
+              colors={[`${activeTabTheme.gradient[0]}30`, `${activeTabTheme.gradient[1]}20`]}
               start={{ x: 0, y: 0 }}
               end={{ x: 1, y: 1 }}
               style={{ borderRadius: 20, padding: 20 }}
             >
-              <Text
-                className="text-xs uppercase tracking-widest mb-2"
-                style={{ fontFamily: 'Quicksand_600SemiBold', color: stageTheme.color }}
-              >
-                Daily Affirmation
-              </Text>
+              <View className="flex-row items-center mb-3">
+                <Moon size={14} color={activeTabTheme.color} />
+                <Text
+                  className="text-xs uppercase tracking-widest ml-2"
+                  style={{ fontFamily: 'Quicksand_600SemiBold', color: activeTabTheme.color }}
+                >
+                  Daily Affirmation
+                </Text>
+              </View>
               <Text
                 style={{ fontFamily: 'CormorantGaramond_400Regular', color: theme.text.primary }}
                 className="text-xl leading-7"
               >
-                {getAffirmation(lifeStage, currentPhase)}
+                {getAffirmation(activeTab, currentPhase, currentMoon)}
               </Text>
             </LinearGradient>
           </Animated.View>
@@ -936,37 +1200,4 @@ export default function HomeScreen() {
       </LinearGradient>
     </View>
   );
-}
-
-function getAffirmation(lifeStage: string, phase: string): string {
-  const affirmations: Record<string, Record<string, string>> = {
-    regular: {
-      menstrual: "I honor my body's need for rest and embrace this time of renewal.",
-      follicular: "I am filled with creative energy and open to new possibilities.",
-      ovulatory: "I radiate confidence and connect deeply with those around me.",
-      luteal: "I trust my ability to complete what I've started and honor my need for solitude.",
-    },
-    perimenopause: {
-      menstrual: "I embrace this transition with grace, trusting my body's wisdom.",
-      follicular: "Change brings growth. I welcome each new day with curiosity.",
-      ovulatory: "My experience and wisdom make me more powerful than ever.",
-      luteal: "I am patient with myself as my body finds its new rhythm.",
-    },
-    menopause: {
-      default: "I am entering a season of freedom and renewed purpose. My best years are ahead.",
-    },
-    postmenopause: {
-      default: "I embrace my wisdom years with joy. My clarity, confidence, and purpose shine brighter than ever.",
-    },
-  };
-
-  if (lifeStage === 'menopause') {
-    return affirmations.menopause.default;
-  }
-
-  if (lifeStage === 'postmenopause') {
-    return affirmations.postmenopause.default;
-  }
-
-  return affirmations[lifeStage]?.[phase] || affirmations.regular.follicular;
 }

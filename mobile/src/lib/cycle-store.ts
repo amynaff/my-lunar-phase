@@ -606,7 +606,7 @@ export const lifeStageInfo: Record<LifeStage, {
   ageRange: string;
 }> = {
   regular: {
-    name: 'Regular Cycles',
+    name: 'Menstrual Cycle',
     emoji: '🌙',
     color: '#9d84ed',
     description: 'Your monthly rhythm guides your wellness journey.',
