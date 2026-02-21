@@ -1,6 +1,6 @@
-# Luna Flow
+# My Lunar Phase
 
-A beautiful, comprehensive mobile app that helps women understand and work with their body's natural rhythms at every stage of life. From regular cycles through perimenopause and menopause, Luna Flow guides you with personalized nutrition, movement, and self-care recommendations.
+A beautiful, comprehensive mobile app that helps women understand and work with their body's natural rhythms at every stage of life. From regular cycles through perimenopause and menopause, My Lunar Phase guides you with personalized nutrition, movement, and self-care recommendations.
 
 ## Life Stages Supported
 

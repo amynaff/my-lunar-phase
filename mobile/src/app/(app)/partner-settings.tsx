@@ -139,7 +139,7 @@ export default function PartnerSettingsScreen() {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     try {
       await Share.share({
-        message: `Join me on Luna Flow! Use this partner invite code: ${code}`,
+        message: `Join me on My Lunar Phase! Use this partner invite code: ${code}`,
       });
     } catch {
       // user cancelled share

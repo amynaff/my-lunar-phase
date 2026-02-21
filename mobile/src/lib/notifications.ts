@@ -58,7 +58,7 @@ export async function requestNotificationPermissions(): Promise<boolean> {
   // Set up Android notification channel
   if (Platform.OS === 'android') {
     await Notifications.setNotificationChannelAsync('default', {
-      name: 'Luna Flow',
+      name: 'My Lunar Phase',
       importance: Notifications.AndroidImportance.HIGH,
       vibrationPattern: [0, 250, 250, 250],
       lightColor: '#c4b5fd',
@@ -300,7 +300,7 @@ export async function sendTestNotification(): Promise<void> {
   await Notifications.scheduleNotificationAsync({
     identifier: `test-${Date.now()}`,
     content: {
-      title: '🌙 Luna Flow',
+      title: '🌙 My Lunar Phase',
       body: 'Notifications are working! You will receive reminders based on your settings.',
       data: { type: 'test' },
       sound: true,

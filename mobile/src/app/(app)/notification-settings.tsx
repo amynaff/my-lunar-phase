@@ -217,7 +217,7 @@ export default function NotificationSettingsScreen() {
                     Enable Notifications
                   </Text>
                   <Text style={{ fontFamily: 'Quicksand_400Regular', color: theme.text.muted }} className="text-xs">
-                    Tap to allow Luna Flow to send you reminders
+                    Tap to allow My Lunar Phase to send you reminders
                   </Text>
                 </View>
                 <ChevronRight size={18} color={theme.accent.purple} />

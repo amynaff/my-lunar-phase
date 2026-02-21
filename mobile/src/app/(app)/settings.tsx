@@ -781,7 +781,7 @@ export default function SettingsScreen() {
                   style={{ fontFamily: 'Quicksand_400Regular', color: theme.text.secondary }}
                   className="text-sm ml-3 flex-1"
                 >
-                  Luna Flow helps you understand and work with your body's natural rhythms at every stage of life.
+                  My Lunar Phase helps you understand and work with your body's natural rhythms at every stage of life.
                 </Text>
               </View>
               <View style={{ height: 1, backgroundColor: theme.border.light }} />

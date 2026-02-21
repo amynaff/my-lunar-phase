@@ -774,7 +774,7 @@ export default function HomeScreen() {
                   style={{ fontFamily: 'CormorantGaramond_600SemiBold', color: theme.text.primary }}
                   className="text-3xl mt-1"
                 >
-                  Luna Flow
+                  My Lunar Phase
                 </Text>
               </View>
               <View className="flex-row items-center">

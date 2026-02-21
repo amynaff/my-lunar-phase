@@ -101,7 +101,7 @@ export default function OnboardingScreen() {
     const baseSteps = [
       // Step 0: Welcome
       {
-        title: 'Welcome to Luna Flow',
+        title: 'Welcome to My Lunar Phase',
         subtitle: 'Your cycle is your superpower',
         content: (
           <View className="items-center">

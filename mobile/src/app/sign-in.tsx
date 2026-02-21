@@ -200,7 +200,7 @@ export default function SignInScreen() {
                     letterSpacing: 1,
                   }}
                 >
-                  Luna Flow
+                  My Lunar Phase
                 </Text>
               </Animated.View>
 

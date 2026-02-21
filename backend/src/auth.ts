@@ -33,7 +33,7 @@ export const auth = betterAuth({
           body: JSON.stringify({
             to: email,
             code: String(otp),
-            fromName: "Luna Flow",
+            fromName: "My Lunar Phase",
             lang: "en",
           }),
         });

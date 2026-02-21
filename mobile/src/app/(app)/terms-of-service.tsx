@@ -22,17 +22,17 @@ const TERMS_SECTIONS = [
   {
     icon: FileText,
     title: 'Acceptance of Terms',
-    content: 'By downloading, installing, or using Luna Flow, you agree to be bound by these Terms of Service. If you do not agree to these terms, please do not use the app.',
+    content: 'By downloading, installing, or using My Lunar Phase, you agree to be bound by these Terms of Service. If you do not agree to these terms, please do not use the app.',
   },
   {
     icon: Sparkles,
     title: 'Use of the App',
-    content: 'Luna Flow is designed to help you track and understand your menstrual cycle and wellness. The app provides:\n\n• Cycle tracking and predictions\n• Nutrition and movement guidance\n• Self-care recommendations\n• Community features\n\nYou agree to use the app for personal, non-commercial purposes only.',
+    content: 'My Lunar Phase is designed to help you track and understand your menstrual cycle and wellness. The app provides:\n\n• Cycle tracking and predictions\n• Nutrition and movement guidance\n• Self-care recommendations\n• Community features\n\nYou agree to use the app for personal, non-commercial purposes only.',
   },
   {
     icon: AlertTriangle,
     title: 'Medical Disclaimer',
-    content: 'Luna Flow is not a medical device and is not intended to diagnose, treat, cure, or prevent any disease or health condition.\n\nThe information provided is for educational and informational purposes only. Always consult with a qualified healthcare provider for medical advice, diagnosis, or treatment.\n\nNever disregard professional medical advice or delay seeking it because of something you read in this app.',
+    content: 'My Lunar Phase is not a medical device and is not intended to diagnose, treat, cure, or prevent any disease or health condition.\n\nThe information provided is for educational and informational purposes only. Always consult with a qualified healthcare provider for medical advice, diagnosis, or treatment.\n\nNever disregard professional medical advice or delay seeking it because of something you read in this app.',
   },
   {
     icon: Users,
@@ -42,7 +42,7 @@ const TERMS_SECTIONS = [
   {
     icon: Scale,
     title: 'Limitation of Liability',
-    content: 'Luna Flow and its creators shall not be liable for any indirect, incidental, special, consequential, or punitive damages arising from your use of the app.\n\nThe app is provided "as is" without warranties of any kind. We do not guarantee the accuracy of cycle predictions or any health-related information.',
+    content: 'My Lunar Phase and its creators shall not be liable for any indirect, incidental, special, consequential, or punitive damages arising from your use of the app.\n\nThe app is provided "as is" without warranties of any kind. We do not guarantee the accuracy of cycle predictions or any health-related information.',
   },
 ];
 
@@ -179,7 +179,7 @@ export default function TermsOfServiceScreen() {
               <Pressable
                 onPress={() => {
                   Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                  Linking.openURL('mailto:lunaflowapp@proton.me?subject=Luna Flow Terms Question');
+                  Linking.openURL('mailto:lunaflowapp@proton.me?subject=My Lunar Phase Terms Question');
                 }}
               >
                 <LinearGradient
