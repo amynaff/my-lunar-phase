@@ -68,7 +68,7 @@ export function CycleWheel({ size = WHEEL_SIZE }: Props) {
   const isDark = themeMode === 'dark';
 
   return (
-    <AnimatedView style={[{ alignItems: 'center' }, containerStyle]}>
+    <AnimatedView style={[{ alignItems: 'center', width: size, height: size }, containerStyle]}>
       {/* Soft glow effect behind wheel */}
       <AnimatedView
         style={[
