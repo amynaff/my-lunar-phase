@@ -1322,8 +1322,8 @@ export default function NutritionScreen() {
                 style={{ fontFamily: 'Quicksand_400Regular', color: theme.text.secondary }}
                 className="text-sm leading-5"
               >
-                During the {moonInfo.name.toLowerCase()}, your body resonates with {moonCycleInfo.name.toLowerCase()} energy.
-                The nutrition below supports this natural rhythm while addressing perimenopause needs.
+                During the {moonInfo.name.toLowerCase()}, align your nutrition with nature's rhythm.
+                The foods below support your body's needs while addressing perimenopause wellness.
               </Text>
             </View>
           </Animated.View>
@@ -1334,11 +1334,11 @@ export default function NutritionScreen() {
               {moonInfo.emoji} {moonInfo.name} Nutrition
             </Text>
             <Text style={{ fontFamily: 'Quicksand_400Regular', color: theme.text.tertiary }} className="text-xs mb-4">
-              Based on {moonCycleInfo.name.toLowerCase()} phase energy
+              Foods for lunar alignment
             </Text>
 
             <CollapsibleSection
-              title={`${moonCycleInfo.name} Foods`}
+              title="Foods for Lunar Alignment"
               icon={<UtensilsCrossed size={18} color={moonCycleInfo.color} />}
               items={moonPhaseNutrition.foods.slice(0, 10)}
               theme={theme}
@@ -1452,7 +1452,7 @@ export default function NutritionScreen() {
                 className="text-sm leading-5"
               >
                 Without a menstrual cycle, the moon becomes your guide for nutrition rhythms. During the {moonInfo.name.toLowerCase()},
-                focus on foods that support {moonCycleInfo.name.toLowerCase()} energy - this creates a beautiful connection with nature's cycles.
+                nourish your body with foods that align with nature's cycles - this creates a beautiful connection with the lunar rhythm.
               </Text>
             </LinearGradient>
           </Animated.View>
@@ -1463,11 +1463,11 @@ export default function NutritionScreen() {
               {moonInfo.emoji} {moonInfo.name} Nutrition
             </Text>
             <Text style={{ fontFamily: 'Quicksand_400Regular', color: theme.text.tertiary }} className="text-xs mb-4">
-              {moonCycleInfo.name} phase foods for lunar alignment
+              Foods for lunar alignment
             </Text>
 
             <CollapsibleSection
-              title={`${moonCycleInfo.name} Foods`}
+              title="Foods for Lunar Alignment"
               icon={<UtensilsCrossed size={18} color={moonCycleInfo.color} />}
               items={moonPhaseNutrition.foods.slice(0, 10)}
               theme={theme}
