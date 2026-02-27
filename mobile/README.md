@@ -193,6 +193,22 @@ A beautiful, comprehensive mobile app that helps women understand and work with 
 - Journal prompts for reflection
 - Understanding why you feel certain ways
 
+### Intimacy & Desire Guide
+- **Phase-Specific Libido Information** - Understand how hormones affect desire throughout your cycle:
+  - **Menstrual**: Variable desire - some feel heightened, others prefer rest
+  - **Follicular**: Rising desire as estrogen increases
+  - **Ovulatory**: Peak desire - highest libido, enhanced sensitivity
+  - **Luteal**: Variable - focus shifts to emotional connection
+- **Physiology Explained** - Learn what's happening in your body
+- **Personal Tips** - Phase-appropriate suggestions for intimacy
+- **Partner Tips** - Help your partner understand your changing needs
+- **Life Stage Guidance**:
+  - **Perimenopause**: Navigate changes with tips for dryness, arousal changes, and communication
+  - **Menopause**: Embrace a new chapter with practical advice and positive perspectives
+  - **Postmenopause**: Wisdom and pleasure - continued intimacy with proper care
+- **Common Changes** - Know what to expect at each life stage
+- **The Silver Lining** - Positive aspects of intimacy during menopause (no pregnancy concerns, more freedom, deeper connection)
+
 ### Journal
 - **Dedicated Journal Tab** - Easy access from bottom navigation
 - **Text Entries** - Write your thoughts, reflections, and experiences

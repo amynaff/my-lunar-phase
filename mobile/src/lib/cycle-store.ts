@@ -883,6 +883,208 @@ export const phaseInfo: Record<CyclePhase, {
   },
 };
 
+// Intimacy & libido information by cycle phase
+export const phaseIntimacyInfo: Record<CyclePhase, {
+  libidoLevel: 'low' | 'rising' | 'peak' | 'variable';
+  title: string;
+  description: string;
+  physiology: string;
+  tips: string[];
+  partnerTips: string[];
+}> = {
+  menstrual: {
+    libidoLevel: 'variable',
+    title: 'Rest & Reconnect',
+    description: 'Libido varies during menstruation - some feel heightened desire while others prefer rest. Both are normal.',
+    physiology: 'Hormones are at their lowest point. Some experience increased sensitivity and desire, while others feel more inward. Orgasms may help relieve cramps through natural endorphin release.',
+    tips: [
+      'Honor what feels right for your body - there\'s no "should"',
+      'If interested, orgasms can help relieve menstrual cramps',
+      'Focus on emotional intimacy if physical isn\'t appealing',
+      'Warm baths or massage can feel nurturing',
+      'Period sex is safe - use a towel if desired',
+    ],
+    partnerTips: [
+      'Ask what feels supportive - don\'t assume',
+      'Offer non-sexual physical comfort like cuddling',
+      'Be understanding if energy is low',
+      'Warm compresses or gentle massage can help',
+    ],
+  },
+  follicular: {
+    libidoLevel: 'rising',
+    title: 'Awakening Desire',
+    description: 'As estrogen rises, so does your desire. This is a time of increasing interest in connection and intimacy.',
+    physiology: 'Rising estrogen increases vaginal lubrication, sensitivity, and desire. Your body is preparing for potential ovulation. Energy and confidence are building.',
+    tips: [
+      'Great time to initiate or plan intimate moments',
+      'Explore new ideas or fantasies as curiosity peaks',
+      'Communication feels easier - share your desires',
+      'Energy is building - enjoy playful connection',
+      'Your increasing confidence makes this a great time for date nights',
+    ],
+    partnerTips: [
+      'Her energy and interest are increasing',
+      'She may be more receptive to spontaneity',
+      'Great time for playful flirtation',
+      'Plan romantic activities together',
+    ],
+  },
+  ovulatory: {
+    libidoLevel: 'peak',
+    title: 'Peak Desire',
+    description: 'This is your biological peak for desire. High estrogen and testosterone create heightened attraction and pleasure.',
+    physiology: 'Estrogen peaks, testosterone surges. Cervical mucus increases lubrication. You may feel more attractive and attracted to others. This is fertility\'s peak.',
+    tips: [
+      'Embrace this natural peak in desire',
+      'Communication and confidence are highest - express needs',
+      'Sensation and pleasure are enhanced',
+      'If trying to conceive, this is your fertile window',
+      'If not trying to conceive, use protection - fertility is highest',
+      'You may notice increased attraction to your partner',
+    ],
+    partnerTips: [
+      'She\'s at her most confident and radiant',
+      'Desire is naturally highest now',
+      'She may initiate more during this time',
+      'Great time for deeper emotional and physical connection',
+      'Be aware: this is peak fertility',
+    ],
+  },
+  luteal: {
+    libidoLevel: 'variable',
+    title: 'Tender Connection',
+    description: 'Progesterone brings a desire for deeper emotional connection. Physical intimacy may feel more meaningful when paired with emotional closeness.',
+    physiology: 'Progesterone rises, potentially reducing libido for some. Others experience stable or increased desire. PMS symptoms may affect comfort levels. Need for emotional security often increases.',
+    tips: [
+      'Focus on emotional intimacy and connection',
+      'Slower, more sensual experiences may feel best',
+      'Communicate if you need more foreplay or patience',
+      'Self-pleasure can help with mood and sleep',
+      'Honor if your needs shift toward comfort over passion',
+      'Physical touch like cuddling may feel more appealing',
+    ],
+    partnerTips: [
+      'Emotional connection becomes more important',
+      'She may need more patience and tenderness',
+      'Don\'t take lower libido personally - it\'s hormonal',
+      'Non-sexual physical affection is valued',
+      'Creating comfort and security matters more now',
+    ],
+  },
+};
+
+// Intimacy information for perimenopause
+export const perimenopauseIntimacyInfo = {
+  title: 'Navigating Change',
+  description: 'Perimenopause brings hormonal fluctuations that can affect desire, comfort, and pleasure. With understanding and adaptation, intimacy can remain fulfilling.',
+  physiology: 'Fluctuating estrogen can cause vaginal dryness, reduced natural lubrication, and changes in arousal patterns. These are normal physiological changes, not signs of inadequacy.',
+  commonChanges: [
+    'Vaginal dryness and reduced lubrication',
+    'Changes in arousal time - may take longer',
+    'Fluctuating desire - high one week, low the next',
+    'Hot flashes may interrupt intimate moments',
+    'Sleep disruption affecting energy for intimacy',
+    'Body image changes affecting confidence',
+  ],
+  tips: [
+    'Lubricants are your friend - water or silicone-based',
+    'Extended foreplay helps with arousal changes',
+    'Communicate openly about what feels good now',
+    'Explore new forms of pleasure and connection',
+    'Regular sexual activity helps maintain vaginal health',
+    'Consider vaginal moisturizers for daily comfort',
+    'Temperature control during intimacy (cool room, fans)',
+    'Focus on pleasure, not performance',
+  ],
+  partnerTips: [
+    'Patience and understanding are essential',
+    'Don\'t take changes personally - it\'s biology',
+    'Ask what feels good - it may have changed',
+    'Longer foreplay shows care, not inconvenience',
+    'Emotional connection matters more than ever',
+    'Be supportive about her changing body',
+  ],
+  selfCareTips: [
+    'Kegel exercises support pelvic floor health',
+    'Stay hydrated for overall vaginal health',
+    'Omega-3 fatty acids may help with lubrication',
+    'Regular movement increases blood flow',
+    'Stress reduction supports healthy libido',
+  ],
+};
+
+// Intimacy information for menopause
+export const menopauseIntimacyInfo = {
+  title: 'A New Chapter',
+  description: 'Post-menopause, many women discover a renewed sense of freedom in intimacy - no more periods, no pregnancy concerns. With proper care, this can be a liberating time.',
+  physiology: 'Lower estrogen means less natural lubrication and potential vaginal atrophy. However, regular intimacy and proper care can maintain comfort and pleasure. Desire may shift but doesn\'t disappear.',
+  commonChanges: [
+    'Vaginal dryness is common but manageable',
+    'Vaginal tissues may thin (vaginal atrophy)',
+    'Arousal may take longer',
+    'Orgasms may feel different but still pleasurable',
+    'Freedom from periods and pregnancy concerns',
+    'Potential for deeper emotional intimacy',
+  ],
+  tips: [
+    'Use lubricant every time - make it part of the routine',
+    'Vaginal moisturizers used regularly help tissue health',
+    'Regular sexual activity maintains vaginal elasticity',
+    'Talk to your doctor about vaginal estrogen if needed',
+    'Explore what feels good now - bodies change',
+    'Embrace the freedom from contraception concerns',
+    'Focus on pleasure over performance',
+    'Pelvic floor exercises maintain sensation',
+  ],
+  partnerTips: [
+    'This phase can bring renewed connection',
+    'Patience with arousal changes shows love',
+    'Explore new ways to connect physically',
+    'Her comfort is paramount - use lubricant generously',
+    'Celebrate the freedom of this phase together',
+    'Focus on intimacy, not just intercourse',
+  ],
+  positives: [
+    'No more worry about pregnancy',
+    'No periods to interrupt intimacy',
+    'Often more time and privacy',
+    'Deeper self-knowledge about pleasure',
+    'Opportunity for renewed connection',
+    'Freedom to explore without constraints',
+  ],
+};
+
+// Intimacy information for postmenopause
+export const postmenopauseIntimacyInfo = {
+  title: 'Wisdom & Pleasure',
+  description: 'In postmenopause, you know yourself better than ever. Many women report satisfying intimacy well into their later years with the right care and communication.',
+  physiology: 'Hormone levels have stabilized at lower levels. Vaginal health requires ongoing attention, but with proper care, pleasurable intimacy continues. Emotional and physical intimacy become deeply intertwined.',
+  tips: [
+    'Continued use of lubricants and moisturizers',
+    'Regular intimate activity maintains vaginal health',
+    'Pelvic floor exercises preserve sensation',
+    'Open communication with partners about needs',
+    'Explore all forms of intimacy and pleasure',
+    'Consider HRT if recommended by your doctor',
+    'Stay curious and open to what feels good',
+  ],
+  partnerTips: [
+    'Connection and communication are key',
+    'Physical intimacy may look different but remain meaningful',
+    'Patience and presence matter most',
+    'Celebrate your intimate connection',
+    'Focus on pleasure in all its forms',
+  ],
+  wellness: [
+    'Regular movement supports blood flow',
+    'Heart health supports sexual health',
+    'Stress management enhances desire',
+    'Quality sleep improves energy for intimacy',
+    'Self-acceptance enhances confidence',
+  ],
+};
+
 // Life stage information for display
 export const lifeStageInfo: Record<LifeStage, {
   name: string;
