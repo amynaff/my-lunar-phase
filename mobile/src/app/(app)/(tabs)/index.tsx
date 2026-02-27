@@ -178,6 +178,14 @@ export default function HomeScreen() {
                 </Text>
               </View>
               <View className="flex-row items-center">
+                {/* Settings Button */}
+                <Pressable
+                  className="w-9 h-9 rounded-full items-center justify-center border mr-2"
+                  style={{ backgroundColor: theme.bg.card, borderColor: theme.border.light }}
+                  onPress={() => router.push('/(app)/settings')}
+                >
+                  <Settings size={18} color={theme.accent.purple} />
+                </Pressable>
                 {/* Luna AI Button */}
                 <Pressable
                   className="w-9 h-9 rounded-full items-center justify-center border mr-2"
@@ -191,20 +199,13 @@ export default function HomeScreen() {
                 </Pressable>
                 {!isPremium && (
                   <Pressable
-                    className="w-9 h-9 rounded-full items-center justify-center border mr-2"
+                    className="w-9 h-9 rounded-full items-center justify-center border"
                     style={{ backgroundColor: 'rgba(249, 168, 212, 0.1)', borderColor: 'rgba(249, 168, 212, 0.3)' }}
                     onPress={() => router.push('/paywall')}
                   >
                     <Crown size={16} color="#f9a8d4" />
                   </Pressable>
                 )}
-                <Pressable
-                  className="w-9 h-9 rounded-full items-center justify-center border"
-                  style={{ backgroundColor: theme.bg.card, borderColor: theme.border.light }}
-                  onPress={() => router.push('/(app)/settings')}
-                >
-                  <Settings size={18} color={theme.accent.purple} />
-                </Pressable>
               </View>
             </View>
           </Animated.View>
