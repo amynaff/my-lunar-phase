@@ -12,7 +12,9 @@ import { CycleWheel } from '@/components/CycleWheel';
 import { CycleGraph } from '@/components/CycleGraph';
 import { CycleCalendar, CycleDotIndicator } from '@/components/CycleCalendar';
 import { CycleStatsCard } from '@/components/CycleStatsCard';
+import { CycleInsightsCard } from '@/components/CycleInsightsCard';
 import { LogPeriodModal, QuickLogPeriodButton } from '@/components/LogPeriodModal';
+import { EditPeriodDatesModal } from '@/components/EditPeriodDatesModal';
 import { useCycleStore, phaseInfo, getMoonPhase, moonPhaseInfo, CyclePhase } from '@/lib/cycle-store';
 import { useThemeStore, getTheme } from '@/lib/theme-store';
 import { useSubscriptionStore } from '@/lib/subscription-store';
@@ -63,6 +65,7 @@ export default function HomeScreen() {
 
   const [showLogPeriodModal, setShowLogPeriodModal] = useState(false);
   const [showCalendarView, setShowCalendarView] = useState(false);
+  const [showEditPeriodDates, setShowEditPeriodDates] = useState(false);
 
   const [fontsLoaded] = useFonts({
     CormorantGaramond_400Regular,
@@ -362,14 +365,14 @@ export default function HomeScreen() {
             </Animated.View>
           )}
 
-          {/* Cycle Stats Card */}
+          {/* My Cycles - Insights Card */}
           <Animated.View
             entering={FadeInUp.delay(520).duration(600)}
             className="mx-6 mt-4"
           >
-            <CycleStatsCard
+            <CycleInsightsCard
               themeMode={themeMode}
-              onViewHistory={() => router.push('/cycle-history')}
+              onEditPeriodDates={() => setShowEditPeriodDates(true)}
               onCheckSymptoms={() => router.push('/luna-ai')}
             />
           </Animated.View>
@@ -559,6 +562,13 @@ export default function HomeScreen() {
       <LogPeriodModal
         visible={showLogPeriodModal}
         onClose={() => setShowLogPeriodModal(false)}
+        themeMode={themeMode}
+      />
+
+      {/* Edit Period Dates Modal */}
+      <EditPeriodDatesModal
+        visible={showEditPeriodDates}
+        onClose={() => setShowEditPeriodDates(false)}
         themeMode={themeMode}
       />
     </View>

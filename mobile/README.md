@@ -15,6 +15,13 @@ A beautiful, comprehensive mobile app that helps women understand and work with 
 #### Period Logging & Cycle History
 - **Log Period Start** - Quick button to log when your period begins
 - **Log Period End** - Track when your period ends for accurate period length
+- **Edit Period Dates** - Full calendar view to easily edit any period:
+  - Tap any date to start logging
+  - Select multiple days for period duration
+  - Edit existing periods by tapping them
+  - Delete period entries if needed
+  - Visual indicators for logged vs predicted days
+  - Recent periods list for quick access
 - **Color-coded Calendar View** - Visual calendar showing:
   - Pink: Period days (logged)
   - Light pink: Predicted period days
@@ -24,16 +31,23 @@ A beautiful, comprehensive mobile app that helps women understand and work with 
 - **Cycle History Screen** - View all logged periods with stats
 - **Edit/Delete Entries** - Manage your period history
 
-#### Cycle Statistics & Irregularity Detection
+#### Cycle Statistics & Irregularity Detection (Flo-style)
+- **My Cycles Card** - At-a-glance view of your cycle health:
+  - Current cycle day count with start date
+  - Progress dots showing period vs cycle days
+  - Quick edit access for period dates
 - **Previous Cycle Length** - Shows last cycle with NORMAL/ABNORMAL indicator
 - **Previous Period Length** - Shows last period with NORMAL/ABNORMAL indicator
 - **Cycle Variation** - Shows min-max range with IRREGULAR warning
-- **Irregularity Alerts** - Yellow warning for:
-  - Cycles outside 21-35 days
-  - Variation greater than 7 days
-- **PCOS/Irregular Cycles Note** - Non-diagnostic guidance:
-  - "Irregular cycles may relate to conditions like PCOS—track symptoms and consult a doctor"
-  - Predictions improve with more data
+- **Irregularity Alerts** - Yellow warning badges for:
+  - Cycles outside 21-35 days (ABNORMAL)
+  - Period outside 2-7 days (ABNORMAL)
+  - Variation greater than 7 days (IRREGULAR)
+- **PCOS/Irregular Cycles Support**:
+  - Health assistant message when irregularities detected
+  - "Check symptoms" button linking to Luna AI
+  - Non-diagnostic guidance with medical disclaimer
+  - Helpful for women tracking cycles with PCOS
 
 #### Export for Doctor Visits
 - **Generate Report** - Create detailed cycle history report
