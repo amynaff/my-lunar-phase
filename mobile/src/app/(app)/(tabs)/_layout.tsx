@@ -14,6 +14,7 @@ import {
   Apple,
   Heart,
   Dumbbell,
+  BookOpen,
 } from 'lucide-react-native';
 import * as Haptics from 'expo-haptics';
 import { useThemeStore, getTheme } from '@/lib/theme-store';
@@ -146,6 +147,15 @@ export default function TabLayout() {
           title: 'Move',
           tabBarIcon: ({ focused, color }) => (
             <TabIcon icon={Dumbbell} label="Move" focused={focused} color={color} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="journal"
+        options={{
+          title: 'Journal',
+          tabBarIcon: ({ focused, color }) => (
+            <TabIcon icon={BookOpen} label="Journal" focused={focused} color={color} />
           ),
         }}
       />

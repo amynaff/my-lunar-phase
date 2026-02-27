@@ -1,16 +1,6 @@
 # My Lunar Phase
 
-A beautiful, comprehensive mobile app that helps women understand and work with their body's natural rhythms at every stage of life. From regular cycles through perimenopause and menopause, My Lunar Phase guides you with personalized nutrition, movement, and self-care recommendations.
-
-## Life Stage Navigation
-
-The app features a **tabbed navigation system** at the top of the home screen allowing seamless switching between life stages:
-- **Menstrual Cycle** (default) - For users in reproductive years
-- **Perimenopause** - For users in transition
-- **Menopause** - For users who've completed the transition
-- **Postmenopause** - For users in their wisdom years
-
-Each tab adapts content, trackers, insights, and affirmations to the specific life stage. Users can explore other stages while preserving their data, with an option to switch stages via the onboarding flow.
+A beautiful, comprehensive mobile app that helps women understand and work with their body's natural rhythms. My Lunar Phase guides you with personalized nutrition, movement, and self-care recommendations synced to your menstrual cycle.
 
 ## Life Stages Supported
 
@@ -202,6 +192,26 @@ Each tab adapts content, trackers, insights, and affirmations to the specific li
 - Daily affirmations for each life stage
 - Journal prompts for reflection
 - Understanding why you feel certain ways
+
+### Journal
+- **Dedicated Journal Tab** - Easy access from bottom navigation
+- **Text Entries** - Write your thoughts, reflections, and experiences
+- **Voice Memos** - Record voice notes when you prefer speaking over typing
+- **Journal Prompts** - Phase-specific prompts to inspire reflection:
+  - Menstrual: Release & rest themes
+  - Follicular: New beginnings & creativity
+  - Ovulatory: Connection & expression
+  - Luteal: Completion & reflection
+- **Entry Organization**:
+  - **Week View** - Navigate by week with calendar strip
+  - **Month View** - Browse entries by month
+  - **All Entries** - See complete journal history
+- **Mood Tags** - Tag entries with feelings (grateful, energized, peaceful, creative, etc.)
+- **Streak Tracking** - Build journaling habits with streak counter
+- **Cycle Integration** - Entries automatically tagged with cycle phase and day
+- **Search & Filter** - Find past entries easily
+- **Edit & Delete** - Manage your entries anytime
+- **Stats Dashboard** - See your journaling streak, weekly entries, and total count
 
 ### Mood & Energy Heatmap
 - **Calendar view** showing mood and energy levels across the month
