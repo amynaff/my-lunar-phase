@@ -153,6 +153,24 @@ A beautiful, comprehensive mobile app that helps women understand and work with 
 - Pattern analysis and insights
 - Export data for healthcare providers
 
+### Personal Symptom Logging
+- **Daily Symptom Check-In** - Log how you're feeling each day
+- **35+ Trackable Symptoms** across 7 categories:
+  - **Physical**: Cramps, headache, back pain, breast tenderness, bloating, joint pain, hot flashes, night sweats
+  - **Emotional**: Mood swings, irritability, anxiety, sadness, sensitivity, happiness, confidence, brain fog
+  - **Energy**: Fatigue, low energy, high energy, restlessness
+  - **Digestive**: Cravings, increased/decreased appetite, nausea, digestive issues
+  - **Sleep**: Insomnia, oversleeping, vivid dreams, difficulty waking
+  - **Skin**: Acne, dry skin, oily skin, glowing skin
+  - **Other**: Libido changes, water retention, dizziness
+- **Severity Tracking** - Mark symptoms as Mild, Moderate, or Severe
+- **Phase-Tagged Entries** - Each entry automatically linked to your cycle phase and day
+- **Pattern Recognition** - See what symptoms you typically experience during each phase
+- **Predictive Insights** - "Based on your history, you may experience..." during current phase
+- **Logging Streak** - Track your daily logging consistency
+- **Notes** - Add personal notes to each symptom entry
+- **History Navigation** - Log symptoms for past days (not just today)
+
 ### Nutrition Guide
 - Phase-specific food recommendations with benefits
 - Life stage-optimized suggestions

@@ -15,6 +15,8 @@ import { CycleStatsCard } from '@/components/CycleStatsCard';
 import { CycleInsightsCard } from '@/components/CycleInsightsCard';
 import { LogPeriodModal, QuickLogPeriodButton } from '@/components/LogPeriodModal';
 import { EditPeriodDatesModal } from '@/components/EditPeriodDatesModal';
+import { SymptomLogModal } from '@/components/SymptomLogModal';
+import { SymptomInsightsCard } from '@/components/SymptomInsightsCard';
 import { useCycleStore, phaseInfo, getMoonPhase, moonPhaseInfo, CyclePhase } from '@/lib/cycle-store';
 import { useThemeStore, getTheme } from '@/lib/theme-store';
 import { useSubscriptionStore } from '@/lib/subscription-store';
@@ -66,6 +68,7 @@ export default function HomeScreen() {
   const [showLogPeriodModal, setShowLogPeriodModal] = useState(false);
   const [showCalendarView, setShowCalendarView] = useState(false);
   const [showEditPeriodDates, setShowEditPeriodDates] = useState(false);
+  const [showSymptomLogModal, setShowSymptomLogModal] = useState(false);
 
   const [fontsLoaded] = useFonts({
     CormorantGaramond_400Regular,
@@ -377,6 +380,17 @@ export default function HomeScreen() {
             />
           </Animated.View>
 
+          {/* Symptom Tracking Card */}
+          <Animated.View
+            entering={FadeInUp.delay(530).duration(600)}
+            className="mx-6 mt-4"
+          >
+            <SymptomInsightsCard
+              themeMode={themeMode}
+              onLogSymptoms={() => setShowSymptomLogModal(true)}
+            />
+          </Animated.View>
+
           {/* Calendar Toggle */}
           <Animated.View
             entering={FadeInUp.delay(540).duration(600)}
@@ -570,6 +584,12 @@ export default function HomeScreen() {
         visible={showEditPeriodDates}
         onClose={() => setShowEditPeriodDates(false)}
         themeMode={themeMode}
+      />
+
+      {/* Symptom Log Modal */}
+      <SymptomLogModal
+        visible={showSymptomLogModal}
+        onClose={() => setShowSymptomLogModal(false)}
       />
     </View>
   );
