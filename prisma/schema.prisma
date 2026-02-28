@@ -1,0 +1,187 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// ==================== Auth Models ====================
+
+model User {
+  id            String    @id
+  name          String
+  email         String    @unique
+  emailVerified Boolean   @default(false)
+  image         String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  sessions      Session[]
+  accounts      Account[]
+
+  // Partner system
+  partnerInvites  PartnerInvite[]  @relation("InviteCreator")
+  sharedCycleData SharedCycleData?
+  partnershipAsUser    Partnership? @relation("PartnershipUser")
+  partnershipAsPartner Partnership? @relation("PartnershipPartner")
+
+  // Mood tracking
+  moodEntries     MoodEntry[]
+}
+
+model Session {
+  id        String   @id
+  expiresAt DateTime
+  token     String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  ipAddress String?
+  userAgent String?
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Account {
+  id                    String    @id
+  accountId             String
+  providerId            String
+  userId                String
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  accessToken           String?
+  refreshToken          String?
+  idToken               String?
+  accessTokenExpiresAt  DateTime?
+  refreshTokenExpiresAt DateTime?
+  scope                 String?
+  password              String?
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+}
+
+model Verification {
+  id         String   @id
+  identifier String
+  value      String
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+// ==================== Partner Models ====================
+
+model PartnerInvite {
+  id        String   @id @default(cuid())
+  code      String   @unique
+  creatorId String
+  creator   User     @relation("InviteCreator", fields: [creatorId], references: [id], onDelete: Cascade)
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime @default(now())
+}
+
+model Partnership {
+  id        String   @id @default(cuid())
+  userId    String   @unique
+  user      User     @relation("PartnershipUser", fields: [userId], references: [id], onDelete: Cascade)
+  partnerId String   @unique
+  partner   User     @relation("PartnershipPartner", fields: [partnerId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+}
+
+model SharedCycleData {
+  id              String   @id @default(cuid())
+  userId          String   @unique
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  lifeStage       String
+  currentPhase    String
+  dayOfCycle      Int?
+  cycleLength     Int?
+  moonPhase       String?
+  lastUpdated     DateTime @default(now())
+}
+
+// ==================== Mood & Energy Tracking ====================
+
+model MoodEntry {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  date        DateTime
+  mood        Int      // 1-5 scale (1=very low, 5=very high)
+  energy      Int      // 1-5 scale (1=very low, 5=very high)
+  notes       String?
+  cyclePhase  String?  // Phase at time of entry
+  dayOfCycle  Int?     // Day of cycle at time of entry
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@unique([userId, date])
+  @@index([userId])
+  @@index([date])
+}
+
+// ==================== Community Stories (Anonymous) ====================
+
+model CommunityStory {
+  id          String   @id @default(cuid())
+  // No userId - completely anonymous, no way to trace back
+  category    String   // 'symptoms', 'nutrition', 'movement', 'lifestyle', 'success'
+  lifeStage   String   // 'regular', 'perimenopause', 'menopause', 'postmenopause' - for filtering
+  title       String
+  content     String
+  hearts      Int      @default(0)  // Community appreciation count
+  isApproved  Boolean  @default(true)  // For moderation if needed
+  createdAt   DateTime @default(now())
+
+  // Comments on this story
+  comments    StoryComment[]
+
+  @@index([category])
+  @@index([lifeStage])
+  @@index([createdAt])
+}
+
+model StoryComment {
+  id        String   @id @default(cuid())
+  storyId   String
+  story     CommunityStory @relation(fields: [storyId], references: [id], onDelete: Cascade)
+  // Anonymous - no userId
+  content   String
+  hearts    Int      @default(0)
+  createdAt DateTime @default(now())
+
+  @@index([storyId])
+  @@index([createdAt])
+}
+
+// ==================== Chat Channels (Secret Chats) ====================
+
+model ChatChannel {
+  id          String   @id @default(cuid())
+  name        String   // e.g., "Fertility & TTC", "Symptoms", "Relationships"
+  description String
+  emoji       String   // Channel icon
+  color       String   // Theme color
+  sortOrder   Int      @default(0)
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+
+  messages    ChatMessage[]
+
+  @@index([sortOrder])
+}
+
+model ChatMessage {
+  id        String   @id @default(cuid())
+  channelId String
+  channel   ChatChannel @relation(fields: [channelId], references: [id], onDelete: Cascade)
+  // Anonymous - no userId
+  lifeStage String?  // Optional: 'regular', 'perimenopause', 'menopause', 'postmenopause'
+  content   String
+  hearts    Int      @default(0)
+  createdAt DateTime @default(now())
+
+  @@index([channelId])
+  @@index([createdAt])
+}
