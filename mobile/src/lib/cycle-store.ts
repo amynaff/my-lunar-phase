@@ -122,6 +122,27 @@ export interface GroceryItem {
   isChecked: boolean;
 }
 
+// Period log entry for tracking cycle history
+export interface PeriodLogEntry {
+  id: string;
+  startDate: string; // ISO date string
+  endDate?: string; // ISO date string, optional - can be updated later
+  periodLength: number; // calculated from start to end
+  cycleLength?: number; // calculated from previous period start to this one
+  notes?: string;
+}
+
+// Cycle statistics for analysis
+export interface CycleStats {
+  averageCycleLength: number;
+  averagePeriodLength: number;
+  cycleLengthVariation: { min: number; max: number };
+  isIrregular: boolean; // true if variation > 7 days or cycles outside 21-35 days
+  totalCyclesTracked: number;
+  lastCycleLength?: number;
+  lastPeriodLength?: number;
+}
+
 interface CycleStore {
   // Cycle data
   lastPeriodStart: string | null;
@@ -129,6 +150,9 @@ interface CycleStore {
   periodLength: number;
   hasCompletedOnboarding: boolean;
   lifeStage: LifeStage;
+
+  // Period history
+  periodHistory: PeriodLogEntry[];
 
   // Grocery list
   groceryList: GroceryItem[];
@@ -140,6 +164,19 @@ interface CycleStore {
   setLifeStage: (stage: LifeStage) => void;
   completeOnboarding: () => void;
   resetOnboarding: () => void;
+
+  // Period logging actions
+  logPeriodStart: (date: Date, notes?: string) => void;
+  logPeriodEnd: (periodId: string, endDate: Date) => void;
+  updatePeriodEntry: (periodId: string, updates: Partial<PeriodLogEntry>) => void;
+  deletePeriodEntry: (periodId: string) => void;
+  getCycleStats: () => CycleStats;
+  getOvulationEstimate: (cycleStartDate: Date) => Date;
+  getFertileWindow: (cycleStartDate: Date) => { start: Date; end: Date };
+  isDateInPeriod: (date: Date) => boolean;
+  isDateInFertileWindow: (date: Date) => boolean;
+  isDateOvulation: (date: Date) => boolean;
+  getPeriodForDate: (date: Date) => PeriodLogEntry | null;
 
   // Grocery actions
   addGroceryItem: (item: Omit<GroceryItem, 'id'>) => void;
@@ -422,13 +459,262 @@ export const useCycleStore = create<CycleStore>()(
       hasCompletedOnboarding: false,
       lifeStage: 'regular' as LifeStage,
       groceryList: [],
+      periodHistory: [],
 
       setLastPeriodStart: (date: Date) => set({ lastPeriodStart: date.toISOString() }),
       setCycleLength: (days: number) => set({ cycleLength: days }),
       setPeriodLength: (days: number) => set({ periodLength: days }),
       setLifeStage: (stage: LifeStage) => set({ lifeStage: stage }),
       completeOnboarding: () => set({ hasCompletedOnboarding: true }),
-      resetOnboarding: () => set({ hasCompletedOnboarding: false, lastPeriodStart: null, lifeStage: 'regular' }),
+      resetOnboarding: () => set({ hasCompletedOnboarding: false, lastPeriodStart: null, lifeStage: 'regular', periodHistory: [] }),
+
+      // Period logging
+      logPeriodStart: (date: Date, notes?: string) => {
+        const { periodHistory, periodLength } = get();
+        const dateStr = date.toISOString().split('T')[0];
+
+        // Check if we already have a period starting on this date
+        const existing = periodHistory.find(p => p.startDate.split('T')[0] === dateStr);
+        if (existing) return;
+
+        // Calculate cycle length from previous period
+        let cycleLength: number | undefined;
+        if (periodHistory.length > 0) {
+          const sortedHistory = [...periodHistory].sort((a, b) =>
+            new Date(b.startDate).getTime() - new Date(a.startDate).getTime()
+          );
+          const lastPeriod = sortedHistory[0];
+          const daysDiff = Math.floor(
+            (date.getTime() - new Date(lastPeriod.startDate).getTime()) / (1000 * 60 * 60 * 24)
+          );
+          if (daysDiff > 0 && daysDiff < 100) { // Reasonable cycle length
+            cycleLength = daysDiff;
+          }
+        }
+
+        const newEntry: PeriodLogEntry = {
+          id: Date.now().toString(),
+          startDate: date.toISOString(),
+          periodLength: periodLength, // Default, can be updated when period ends
+          cycleLength,
+          notes,
+        };
+
+        set({
+          periodHistory: [...periodHistory, newEntry],
+          lastPeriodStart: date.toISOString(),
+        });
+
+        // Update average cycle length if we have data
+        const stats = get().getCycleStats();
+        if (stats.totalCyclesTracked >= 2) {
+          set({ cycleLength: Math.round(stats.averageCycleLength) });
+        }
+      },
+
+      logPeriodEnd: (periodId: string, endDate: Date) => {
+        const { periodHistory } = get();
+        const updatedHistory = periodHistory.map(entry => {
+          if (entry.id === periodId) {
+            const startDate = new Date(entry.startDate);
+            const periodLength = Math.floor(
+              (endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24)
+            ) + 1; // Include both start and end days
+            return {
+              ...entry,
+              endDate: endDate.toISOString(),
+              periodLength: Math.max(1, Math.min(periodLength, 14)), // Clamp between 1-14 days
+            };
+          }
+          return entry;
+        });
+        set({ periodHistory: updatedHistory });
+
+        // Update average period length
+        const stats = get().getCycleStats();
+        if (stats.totalCyclesTracked >= 1) {
+          set({ periodLength: Math.round(stats.averagePeriodLength) });
+        }
+      },
+
+      updatePeriodEntry: (periodId: string, updates: Partial<PeriodLogEntry>) => {
+        const { periodHistory } = get();
+        const updatedHistory = periodHistory.map(entry =>
+          entry.id === periodId ? { ...entry, ...updates } : entry
+        );
+        set({ periodHistory: updatedHistory });
+      },
+
+      deletePeriodEntry: (periodId: string) => {
+        const { periodHistory } = get();
+        set({ periodHistory: periodHistory.filter(entry => entry.id !== periodId) });
+      },
+
+      getCycleStats: (): CycleStats => {
+        const { periodHistory, cycleLength, periodLength } = get();
+
+        if (periodHistory.length === 0) {
+          return {
+            averageCycleLength: cycleLength,
+            averagePeriodLength: periodLength,
+            cycleLengthVariation: { min: cycleLength, max: cycleLength },
+            isIrregular: false,
+            totalCyclesTracked: 0,
+          };
+        }
+
+        // Sort by date
+        const sorted = [...periodHistory].sort((a, b) =>
+          new Date(a.startDate).getTime() - new Date(b.startDate).getTime()
+        );
+
+        // Calculate cycle lengths (from one period start to the next)
+        const cycleLengths: number[] = [];
+        for (let i = 1; i < sorted.length; i++) {
+          const days = Math.floor(
+            (new Date(sorted[i].startDate).getTime() - new Date(sorted[i-1].startDate).getTime())
+            / (1000 * 60 * 60 * 24)
+          );
+          if (days > 0 && days < 100) { // Reasonable range
+            cycleLengths.push(days);
+          }
+        }
+
+        // Calculate period lengths
+        const periodLengths = sorted
+          .filter(p => p.periodLength > 0)
+          .map(p => p.periodLength);
+
+        const avgCycleLength = cycleLengths.length > 0
+          ? cycleLengths.reduce((a, b) => a + b, 0) / cycleLengths.length
+          : cycleLength;
+
+        const avgPeriodLength = periodLengths.length > 0
+          ? periodLengths.reduce((a, b) => a + b, 0) / periodLengths.length
+          : periodLength;
+
+        const minCycle = cycleLengths.length > 0 ? Math.min(...cycleLengths) : cycleLength;
+        const maxCycle = cycleLengths.length > 0 ? Math.max(...cycleLengths) : cycleLength;
+        const variation = maxCycle - minCycle;
+
+        // Check if irregular: variation > 7 days OR any cycle outside 21-35 day range
+        const hasOutOfRangeCycle = cycleLengths.some(c => c < 21 || c > 35);
+        const isIrregular = variation > 7 || hasOutOfRangeCycle;
+
+        const lastPeriod = sorted[sorted.length - 1];
+        const lastCycleLength = cycleLengths.length > 0 ? cycleLengths[cycleLengths.length - 1] : undefined;
+
+        return {
+          averageCycleLength: avgCycleLength,
+          averagePeriodLength: avgPeriodLength,
+          cycleLengthVariation: { min: minCycle, max: maxCycle },
+          isIrregular,
+          totalCyclesTracked: sorted.length,
+          lastCycleLength,
+          lastPeriodLength: lastPeriod?.periodLength,
+        };
+      },
+
+      getOvulationEstimate: (cycleStartDate: Date): Date => {
+        const { cycleLength } = get();
+        // Ovulation typically occurs 14 days before the next period
+        const ovulationDay = cycleLength - 14;
+        const ovulationDate = new Date(cycleStartDate);
+        ovulationDate.setDate(ovulationDate.getDate() + ovulationDay);
+        return ovulationDate;
+      },
+
+      getFertileWindow: (cycleStartDate: Date): { start: Date; end: Date } => {
+        const ovulation = get().getOvulationEstimate(cycleStartDate);
+        const start = new Date(ovulation);
+        start.setDate(start.getDate() - 5); // 5 days before ovulation
+        const end = new Date(ovulation);
+        end.setDate(end.getDate() + 1); // 1 day after ovulation
+        return { start, end };
+      },
+
+      isDateInPeriod: (date: Date): boolean => {
+        const { periodHistory, periodLength, lastPeriodStart, cycleLength } = get();
+        const dateOnly = new Date(date.toISOString().split('T')[0]);
+
+        // Check logged periods
+        for (const period of periodHistory) {
+          const start = new Date(period.startDate.split('T')[0]);
+          const end = period.endDate
+            ? new Date(period.endDate.split('T')[0])
+            : new Date(start.getTime() + (period.periodLength - 1) * 24 * 60 * 60 * 1000);
+
+          if (dateOnly >= start && dateOnly <= end) return true;
+        }
+
+        // Check predicted current period
+        if (lastPeriodStart) {
+          const lastStart = new Date(lastPeriodStart);
+          const today = new Date();
+          const daysSinceStart = Math.floor((today.getTime() - lastStart.getTime()) / (1000 * 60 * 60 * 24));
+          const currentCycleNumber = Math.floor(daysSinceStart / cycleLength);
+
+          const currentPeriodStart = new Date(lastStart);
+          currentPeriodStart.setDate(currentPeriodStart.getDate() + currentCycleNumber * cycleLength);
+          const currentPeriodEnd = new Date(currentPeriodStart);
+          currentPeriodEnd.setDate(currentPeriodEnd.getDate() + periodLength - 1);
+
+          if (dateOnly >= currentPeriodStart && dateOnly <= currentPeriodEnd) return true;
+        }
+
+        return false;
+      },
+
+      isDateInFertileWindow: (date: Date): boolean => {
+        const { lastPeriodStart, cycleLength } = get();
+        if (!lastPeriodStart) return false;
+
+        const dateOnly = new Date(date.toISOString().split('T')[0]);
+        const lastStart = new Date(lastPeriodStart);
+        const today = new Date();
+        const daysSinceStart = Math.floor((today.getTime() - lastStart.getTime()) / (1000 * 60 * 60 * 24));
+        const currentCycleNumber = Math.floor(daysSinceStart / cycleLength);
+
+        const currentCycleStart = new Date(lastStart);
+        currentCycleStart.setDate(currentCycleStart.getDate() + currentCycleNumber * cycleLength);
+
+        const fertile = get().getFertileWindow(currentCycleStart);
+        return dateOnly >= fertile.start && dateOnly <= fertile.end;
+      },
+
+      isDateOvulation: (date: Date): boolean => {
+        const { lastPeriodStart, cycleLength } = get();
+        if (!lastPeriodStart) return false;
+
+        const dateOnly = new Date(date.toISOString().split('T')[0]);
+        const lastStart = new Date(lastPeriodStart);
+        const today = new Date();
+        const daysSinceStart = Math.floor((today.getTime() - lastStart.getTime()) / (1000 * 60 * 60 * 24));
+        const currentCycleNumber = Math.floor(daysSinceStart / cycleLength);
+
+        const currentCycleStart = new Date(lastStart);
+        currentCycleStart.setDate(currentCycleStart.getDate() + currentCycleNumber * cycleLength);
+
+        const ovulation = get().getOvulationEstimate(currentCycleStart);
+        const ovulationOnly = new Date(ovulation.toISOString().split('T')[0]);
+
+        return dateOnly.getTime() === ovulationOnly.getTime();
+      },
+
+      getPeriodForDate: (date: Date): PeriodLogEntry | null => {
+        const { periodHistory } = get();
+        const dateOnly = new Date(date.toISOString().split('T')[0]);
+
+        for (const period of periodHistory) {
+          const start = new Date(period.startDate.split('T')[0]);
+          const end = period.endDate
+            ? new Date(period.endDate.split('T')[0])
+            : new Date(start.getTime() + (period.periodLength - 1) * 24 * 60 * 60 * 1000);
+
+          if (dateOnly >= start && dateOnly <= end) return period;
+        }
+        return null;
+      },
 
       addGroceryItem: (item) => set((state) => ({
         groceryList: [...state.groceryList, { ...item, id: Date.now().toString() }]
@@ -597,6 +883,208 @@ export const phaseInfo: Record<CyclePhase, {
   },
 };
 
+// Intimacy & libido information by cycle phase
+export const phaseIntimacyInfo: Record<CyclePhase, {
+  libidoLevel: 'low' | 'rising' | 'peak' | 'variable';
+  title: string;
+  description: string;
+  physiology: string;
+  tips: string[];
+  partnerTips: string[];
+}> = {
+  menstrual: {
+    libidoLevel: 'variable',
+    title: 'Rest & Reconnect',
+    description: 'Libido varies during menstruation - some feel heightened desire while others prefer rest. Both are normal.',
+    physiology: 'Hormones are at their lowest point. Some experience increased sensitivity and desire, while others feel more inward. Orgasms may help relieve cramps through natural endorphin release.',
+    tips: [
+      'Honor what feels right for your body - there\'s no "should"',
+      'If interested, orgasms can help relieve menstrual cramps',
+      'Focus on emotional intimacy if physical isn\'t appealing',
+      'Warm baths or massage can feel nurturing',
+      'Period sex is safe - use a towel if desired',
+    ],
+    partnerTips: [
+      'Ask what feels supportive - don\'t assume',
+      'Offer non-sexual physical comfort like cuddling',
+      'Be understanding if energy is low',
+      'Warm compresses or gentle massage can help',
+    ],
+  },
+  follicular: {
+    libidoLevel: 'rising',
+    title: 'Awakening Desire',
+    description: 'As estrogen rises, so does your desire. This is a time of increasing interest in connection and intimacy.',
+    physiology: 'Rising estrogen increases vaginal lubrication, sensitivity, and desire. Your body is preparing for potential ovulation. Energy and confidence are building.',
+    tips: [
+      'Great time to initiate or plan intimate moments',
+      'Explore new ideas or fantasies as curiosity peaks',
+      'Communication feels easier - share your desires',
+      'Energy is building - enjoy playful connection',
+      'Your increasing confidence makes this a great time for date nights',
+    ],
+    partnerTips: [
+      'Her energy and interest are increasing',
+      'She may be more receptive to spontaneity',
+      'Great time for playful flirtation',
+      'Plan romantic activities together',
+    ],
+  },
+  ovulatory: {
+    libidoLevel: 'peak',
+    title: 'Peak Desire',
+    description: 'This is your biological peak for desire. High estrogen and testosterone create heightened attraction and pleasure.',
+    physiology: 'Estrogen peaks, testosterone surges. Cervical mucus increases lubrication. You may feel more attractive and attracted to others. This is fertility\'s peak.',
+    tips: [
+      'Embrace this natural peak in desire',
+      'Communication and confidence are highest - express needs',
+      'Sensation and pleasure are enhanced',
+      'If trying to conceive, this is your fertile window',
+      'If not trying to conceive, use protection - fertility is highest',
+      'You may notice increased attraction to your partner',
+    ],
+    partnerTips: [
+      'She\'s at her most confident and radiant',
+      'Desire is naturally highest now',
+      'She may initiate more during this time',
+      'Great time for deeper emotional and physical connection',
+      'Be aware: this is peak fertility',
+    ],
+  },
+  luteal: {
+    libidoLevel: 'variable',
+    title: 'Tender Connection',
+    description: 'Progesterone brings a desire for deeper emotional connection. Physical intimacy may feel more meaningful when paired with emotional closeness.',
+    physiology: 'Progesterone rises, potentially reducing libido for some. Others experience stable or increased desire. PMS symptoms may affect comfort levels. Need for emotional security often increases.',
+    tips: [
+      'Focus on emotional intimacy and connection',
+      'Slower, more sensual experiences may feel best',
+      'Communicate if you need more foreplay or patience',
+      'Self-pleasure can help with mood and sleep',
+      'Honor if your needs shift toward comfort over passion',
+      'Physical touch like cuddling may feel more appealing',
+    ],
+    partnerTips: [
+      'Emotional connection becomes more important',
+      'She may need more patience and tenderness',
+      'Don\'t take lower libido personally - it\'s hormonal',
+      'Non-sexual physical affection is valued',
+      'Creating comfort and security matters more now',
+    ],
+  },
+};
+
+// Intimacy information for perimenopause
+export const perimenopauseIntimacyInfo = {
+  title: 'Navigating Change',
+  description: 'Perimenopause brings hormonal fluctuations that can affect desire, comfort, and pleasure. With understanding and adaptation, intimacy can remain fulfilling.',
+  physiology: 'Fluctuating estrogen can cause vaginal dryness, reduced natural lubrication, and changes in arousal patterns. These are normal physiological changes, not signs of inadequacy.',
+  commonChanges: [
+    'Vaginal dryness and reduced lubrication',
+    'Changes in arousal time - may take longer',
+    'Fluctuating desire - high one week, low the next',
+    'Hot flashes may interrupt intimate moments',
+    'Sleep disruption affecting energy for intimacy',
+    'Body image changes affecting confidence',
+  ],
+  tips: [
+    'Lubricants are your friend - water or silicone-based',
+    'Extended foreplay helps with arousal changes',
+    'Communicate openly about what feels good now',
+    'Explore new forms of pleasure and connection',
+    'Regular sexual activity helps maintain vaginal health',
+    'Consider vaginal moisturizers for daily comfort',
+    'Temperature control during intimacy (cool room, fans)',
+    'Focus on pleasure, not performance',
+  ],
+  partnerTips: [
+    'Patience and understanding are essential',
+    'Don\'t take changes personally - it\'s biology',
+    'Ask what feels good - it may have changed',
+    'Longer foreplay shows care, not inconvenience',
+    'Emotional connection matters more than ever',
+    'Be supportive about her changing body',
+  ],
+  selfCareTips: [
+    'Kegel exercises support pelvic floor health',
+    'Stay hydrated for overall vaginal health',
+    'Omega-3 fatty acids may help with lubrication',
+    'Regular movement increases blood flow',
+    'Stress reduction supports healthy libido',
+  ],
+};
+
+// Intimacy information for menopause
+export const menopauseIntimacyInfo = {
+  title: 'A New Chapter',
+  description: 'Post-menopause, many women discover a renewed sense of freedom in intimacy - no more periods, no pregnancy concerns. With proper care, this can be a liberating time.',
+  physiology: 'Lower estrogen means less natural lubrication and potential vaginal atrophy. However, regular intimacy and proper care can maintain comfort and pleasure. Desire may shift but doesn\'t disappear.',
+  commonChanges: [
+    'Vaginal dryness is common but manageable',
+    'Vaginal tissues may thin (vaginal atrophy)',
+    'Arousal may take longer',
+    'Orgasms may feel different but still pleasurable',
+    'Freedom from periods and pregnancy concerns',
+    'Potential for deeper emotional intimacy',
+  ],
+  tips: [
+    'Use lubricant every time - make it part of the routine',
+    'Vaginal moisturizers used regularly help tissue health',
+    'Regular sexual activity maintains vaginal elasticity',
+    'Talk to your doctor about vaginal estrogen if needed',
+    'Explore what feels good now - bodies change',
+    'Embrace the freedom from contraception concerns',
+    'Focus on pleasure over performance',
+    'Pelvic floor exercises maintain sensation',
+  ],
+  partnerTips: [
+    'This phase can bring renewed connection',
+    'Patience with arousal changes shows love',
+    'Explore new ways to connect physically',
+    'Her comfort is paramount - use lubricant generously',
+    'Celebrate the freedom of this phase together',
+    'Focus on intimacy, not just intercourse',
+  ],
+  positives: [
+    'No more worry about pregnancy',
+    'No periods to interrupt intimacy',
+    'Often more time and privacy',
+    'Deeper self-knowledge about pleasure',
+    'Opportunity for renewed connection',
+    'Freedom to explore without constraints',
+  ],
+};
+
+// Intimacy information for postmenopause
+export const postmenopauseIntimacyInfo = {
+  title: 'Wisdom & Pleasure',
+  description: 'In postmenopause, you know yourself better than ever. Many women report satisfying intimacy well into their later years with the right care and communication.',
+  physiology: 'Hormone levels have stabilized at lower levels. Vaginal health requires ongoing attention, but with proper care, pleasurable intimacy continues. Emotional and physical intimacy become deeply intertwined.',
+  tips: [
+    'Continued use of lubricants and moisturizers',
+    'Regular intimate activity maintains vaginal health',
+    'Pelvic floor exercises preserve sensation',
+    'Open communication with partners about needs',
+    'Explore all forms of intimacy and pleasure',
+    'Consider HRT if recommended by your doctor',
+    'Stay curious and open to what feels good',
+  ],
+  partnerTips: [
+    'Connection and communication are key',
+    'Physical intimacy may look different but remain meaningful',
+    'Patience and presence matter most',
+    'Celebrate your intimate connection',
+    'Focus on pleasure in all its forms',
+  ],
+  wellness: [
+    'Regular movement supports blood flow',
+    'Heart health supports sexual health',
+    'Stress management enhances desire',
+    'Quality sleep improves energy for intimacy',
+    'Self-acceptance enhances confidence',
+  ],
+};
+
 // Life stage information for display
 export const lifeStageInfo: Record<LifeStage, {
   name: string;
@@ -606,7 +1094,7 @@ export const lifeStageInfo: Record<LifeStage, {
   ageRange: string;
 }> = {
   regular: {
-    name: 'Regular Cycles',
+    name: 'Menstrual Cycle',
     emoji: '🌙',
     color: '#9d84ed',
     description: 'Your monthly rhythm guides your wellness journey.',

@@ -23,6 +23,7 @@ import {
 } from 'lucide-react-native';
 import { useCycleStore, phaseInfo, CyclePhase, lifeStageInfo, getMoonPhase, moonPhaseInfo, getMoonPhaseCycleEquivalent } from '@/lib/cycle-store';
 import { MoonPhaseCard, moonCycleEducation } from '@/components/MoonPhaseCard';
+import { IntimacyCard } from '@/components/IntimacyCard';
 import { useThemeStore, getTheme } from '@/lib/theme-store';
 import {
   useFonts,
@@ -361,6 +362,14 @@ export default function SelfCareScreen() {
             </View>
           </Animated.View>
 
+          {/* Intimacy & Desire */}
+          <Animated.View entering={FadeInUp.delay(750).duration(600)} className="mx-6 mt-6">
+            <Text style={{ fontFamily: 'Quicksand_600SemiBold', color: theme.text.primary }} className="text-lg mb-4">
+              Intimacy & Desire
+            </Text>
+            <IntimacyCard themeMode={themeMode} />
+          </Animated.View>
+
           {/* Affirmations */}
           {renderAffirmations(selfCare.affirmations)}
 
@@ -484,6 +493,14 @@ export default function SelfCareScreen() {
                 </View>
               ))}
             </View>
+          </Animated.View>
+
+          {/* Intimacy & Connection */}
+          <Animated.View entering={FadeInUp.delay(750).duration(600)} className="mx-6 mt-6">
+            <Text style={{ fontFamily: 'Quicksand_600SemiBold', color: theme.text.primary }} className="text-lg mb-4">
+              Intimacy & Connection
+            </Text>
+            <IntimacyCard themeMode={themeMode} />
           </Animated.View>
 
           {/* Affirmations */}

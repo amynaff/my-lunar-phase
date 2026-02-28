@@ -1,41 +1,93 @@
 # My Lunar Phase
 
-A beautiful, comprehensive mobile app that helps women understand and work with their body's natural rhythms at every stage of life. From regular cycles through perimenopause and menopause, My Lunar Phase guides you with personalized nutrition, movement, and self-care recommendations.
+A beautiful, comprehensive mobile app that helps women understand and work with their body's natural rhythms. My Lunar Phase guides you with personalized nutrition, movement, and self-care recommendations synced to your menstrual cycle.
 
 ## Life Stages Supported
 
-### Regular Cycles
+### Menstrual Cycle (formerly "Regular Cycles")
 - Beautiful cycle wheel visualization showing current day and phase
 - Automatic phase detection (Menstrual, Follicular, Ovulatory, Luteal)
 - Educational hormone graph showing estrogen and progesterone curves
-- Next period countdown
-- Phase-synced guidance
+- Next period countdown with fertility window indicator
+- Phase-synced guidance with moon phase indicator
+- Day of cycle display and energy tracking
+
+#### Period Logging & Cycle History
+- **Log Period Start** - Quick button to log when your period begins
+- **Log Period End** - Track when your period ends for accurate period length
+- **Edit Period Dates** - Full calendar view to easily edit any period:
+  - Tap any date to start logging
+  - Select multiple days for period duration
+  - Edit existing periods by tapping them
+  - Delete period entries if needed
+  - Visual indicators for logged vs predicted days
+  - Recent periods list for quick access
+- **Color-coded Calendar View** - Visual calendar showing:
+  - Pink: Period days (logged)
+  - Light pink: Predicted period days
+  - Purple: Fertile window
+  - Indigo: Ovulation day
+- **Cycle Progress Dots** - Compact view of current cycle progress
+- **Cycle History Screen** - View all logged periods with stats
+- **Edit/Delete Entries** - Manage your period history
+
+#### Cycle Statistics & Irregularity Detection (Flo-style)
+- **My Cycles Card** - At-a-glance view of your cycle health:
+  - Current cycle day count with start date
+  - Progress dots showing period vs cycle days
+  - Quick edit access for period dates
+- **Previous Cycle Length** - Shows last cycle with NORMAL/ABNORMAL indicator
+- **Previous Period Length** - Shows last period with NORMAL/ABNORMAL indicator
+- **Cycle Variation** - Shows min-max range with IRREGULAR warning
+- **Irregularity Alerts** - Yellow warning badges for:
+  - Cycles outside 21-35 days (ABNORMAL)
+  - Period outside 2-7 days (ABNORMAL)
+  - Variation greater than 7 days (IRREGULAR)
+- **PCOS/Irregular Cycles Support**:
+  - Health assistant message when irregularities detected
+  - "Check symptoms" button linking to Luna AI
+  - Non-diagnostic guidance with medical disclaimer
+  - Helpful for women tracking cycles with PCOS
+
+#### Export for Doctor Visits
+- **Generate Report** - Create detailed cycle history report
+- **Share/Export** - Share via text or save as file
+- Report includes:
+  - Cycle statistics (average, variation, regularity)
+  - Complete period history with dates
+  - Cycle length status (Normal/Irregular)
+  - Notes and flow intensity
+  - Medical disclaimer
 
 ### Perimenopause
 - **Moon Phase Guidance** - Follow the moon's 29-day cycle as your cycles become irregular
 - MoonPhaseCard showing current lunar phase with corresponding energy
 - Daily practices aligned with lunar rhythms
+- **Transition Wellness Focus** - Hot flashes, sleep, brain fog, mood tracking
 - Symptom tracking for hot flashes, mood swings, sleep issues, and more
 - Irregular cycle support with flexible tracking
 - Educational content about the transition
 - Personalized recommendations for this life stage
 - Pattern recognition for symptoms
+- Moon-phase-specific affirmations
 
 ### Menopause
 - **Full Moon Phase Integration** - Connect with nature through lunar rhythms
 - MoonPhaseCard as primary guidance for daily wellness
+- **"Your Second Spring"** - Celebrating this powerful transition
 - Moon-synced nutrition, movement, and self-care recommendations
 - Focus areas: bone health, heart health, brain health, sleep quality
 - Symptom tracking and management
 - Tailored nutrition and movement recommendations
-- Affirmations for this powerful life stage
+- Moon-phase-specific affirmations for this life stage
 
-### Post Menopause
+### Postmenopause
 - **Wisdom Years Focus** - Embrace this vibrant new chapter
-- Health priorities: bone health, heart health, brain vitality, sleep quality
-- Symptom tracking for vaginal dryness, joint pain, energy fluctuations
+- **"Your Wisdom Years"** banner with personalized messaging
+- Health priorities: bone strength, heart health, mental clarity, vitality
+- Wellness tracking for bone health, energy, mood, and more
 - Tailored nutrition and movement for optimal wellness
-- Affirmations celebrating this powerful life stage
+- Moon-phase-specific affirmations celebrating this powerful life stage
 
 ## Features
 
@@ -101,6 +153,24 @@ A beautiful, comprehensive mobile app that helps women understand and work with 
 - Pattern analysis and insights
 - Export data for healthcare providers
 
+### Personal Symptom Logging
+- **Daily Symptom Check-In** - Log how you're feeling each day
+- **35+ Trackable Symptoms** across 7 categories:
+  - **Physical**: Cramps, headache, back pain, breast tenderness, bloating, joint pain, hot flashes, night sweats
+  - **Emotional**: Mood swings, irritability, anxiety, sadness, sensitivity, happiness, confidence, brain fog
+  - **Energy**: Fatigue, low energy, high energy, restlessness
+  - **Digestive**: Cravings, increased/decreased appetite, nausea, digestive issues
+  - **Sleep**: Insomnia, oversleeping, vivid dreams, difficulty waking
+  - **Skin**: Acne, dry skin, oily skin, glowing skin
+  - **Other**: Libido changes, water retention, dizziness
+- **Severity Tracking** - Mark symptoms as Mild, Moderate, or Severe
+- **Phase-Tagged Entries** - Each entry automatically linked to your cycle phase and day
+- **Pattern Recognition** - See what symptoms you typically experience during each phase
+- **Predictive Insights** - "Based on your history, you may experience..." during current phase
+- **Logging Streak** - Track your daily logging consistency
+- **Notes** - Add personal notes to each symptom entry
+- **History Navigation** - Log symptoms for past days (not just today)
+
 ### Nutrition Guide
 - Phase-specific food recommendations with benefits
 - Life stage-optimized suggestions
@@ -154,6 +224,42 @@ A beautiful, comprehensive mobile app that helps women understand and work with 
 - Daily affirmations for each life stage
 - Journal prompts for reflection
 - Understanding why you feel certain ways
+
+### Intimacy & Desire Guide
+- **Phase-Specific Libido Information** - Understand how hormones affect desire throughout your cycle:
+  - **Menstrual**: Variable desire - some feel heightened, others prefer rest
+  - **Follicular**: Rising desire as estrogen increases
+  - **Ovulatory**: Peak desire - highest libido, enhanced sensitivity
+  - **Luteal**: Variable - focus shifts to emotional connection
+- **Physiology Explained** - Learn what's happening in your body
+- **Personal Tips** - Phase-appropriate suggestions for intimacy
+- **Partner Tips** - Help your partner understand your changing needs
+- **Life Stage Guidance**:
+  - **Perimenopause**: Navigate changes with tips for dryness, arousal changes, and communication
+  - **Menopause**: Embrace a new chapter with practical advice and positive perspectives
+  - **Postmenopause**: Wisdom and pleasure - continued intimacy with proper care
+- **Common Changes** - Know what to expect at each life stage
+- **The Silver Lining** - Positive aspects of intimacy during menopause (no pregnancy concerns, more freedom, deeper connection)
+
+### Journal
+- **Dedicated Journal Tab** - Easy access from bottom navigation
+- **Text Entries** - Write your thoughts, reflections, and experiences
+- **Voice Memos** - Record voice notes when you prefer speaking over typing
+- **Journal Prompts** - Phase-specific prompts to inspire reflection:
+  - Menstrual: Release & rest themes
+  - Follicular: New beginnings & creativity
+  - Ovulatory: Connection & expression
+  - Luteal: Completion & reflection
+- **Entry Organization**:
+  - **Week View** - Navigate by week with calendar strip
+  - **Month View** - Browse entries by month
+  - **All Entries** - See complete journal history
+- **Mood Tags** - Tag entries with feelings (grateful, energized, peaceful, creative, etc.)
+- **Streak Tracking** - Build journaling habits with streak counter
+- **Cycle Integration** - Entries automatically tagged with cycle phase and day
+- **Search & Filter** - Find past entries easily
+- **Edit & Delete** - Manage your entries anytime
+- **Stats Dashboard** - See your journaling streak, weekly entries, and total count
 
 ### Mood & Energy Heatmap
 - **Calendar view** showing mood and energy levels across the month
@@ -219,13 +325,17 @@ A beautiful, comprehensive mobile app that helps women understand and work with 
 
 ## Design
 - Moon cycle/Luna aesthetic with celestial overtones
+- **Life stage tabbed navigation** with smooth transitions
 - Life stage-specific color themes:
-  - Regular Cycles: Purple/Pink gradient
-  - Perimenopause: Warm amber/gold tones
-  - Menopause: Deep purple/violet
+  - Menstrual Cycle: Purple (#9d84ed) with pink accents
+  - Perimenopause: Warm amber/gold tones (#f59e0b)
+  - Menopause: Deep purple/violet (#8b5cf6)
+  - Postmenopause: Vibrant pink (#ec4899)
+- **Moon-phase-specific affirmations** for each life stage (8 variations per stage)
 - Custom fonts: Cormorant Garamond & Quicksand
 - Smooth animations and haptic feedback
 - Glass-morphic UI elements
+- Dark mode support with beautiful deep purple theme
 
 ## Privacy & Legal
 - All data stored locally on device
