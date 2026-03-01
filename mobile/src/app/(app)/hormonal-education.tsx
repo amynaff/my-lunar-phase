@@ -121,47 +121,35 @@ const educationSections: EducationSection[] = [
     content: [
       {
         type: 'paragraph',
-        text: 'Many women experience hormonal imbalances during their cycling years—whether dealing with PCOS, endometriosis, or PMS. Common symptoms include irregular periods, heavy bleeding, mood changes, weight challenges, fatigue, and inflammation.',
+        text: 'For women with menstrual cycles dealing with conditions like PCOS and endometriosis, hormone support often focuses on addressing underlying imbalances—particularly relative estrogen dominance, high androgens (in PCOS), inflammation, and irregular ovulation.',
       },
       {
         type: 'heading',
-        text: 'The Role of Estrogen Dominance',
+        text: 'Common Underlying Patterns',
       },
       {
         type: 'paragraph',
-        text: 'A common misunderstanding is that symptoms stem from simple estrogen deficiency. In reality, low or inconsistent progesterone often creates relative estrogen dominance—where estrogen\'s effects become unopposed or exaggerated, even when estrogen levels appear normal.',
+        text: 'Both PCOS and endometriosis frequently involve estrogen dominance (where estrogen effects are unopposed due to low or inconsistent progesterone), insulin resistance (especially in PCOS), chronic inflammation, and disrupted ovulation.',
       },
       {
         type: 'heading',
-        text: 'Why This Happens',
+        text: 'Symptoms of Imbalance',
       },
       {
         type: 'paragraph',
-        text: 'Progesterone levels can be disrupted by irregular ovulation (common in PCOS) or other factors:',
-      },
-      {
-        type: 'bullet',
-        text: 'Chronic stress elevates cortisol, stealing progesterone precursors',
-      },
-      {
-        type: 'bullet',
-        text: 'Nutrient deficiencies impair hormone production',
-      },
-      {
-        type: 'bullet',
-        text: 'Irregular ovulation reduces natural progesterone',
-      },
-      {
-        type: 'bullet',
-        text: 'Environmental estrogens (xenoestrogens) add to estrogen load',
+        text: 'This can lead to irregular/heavy periods, pelvic pain, acne, hair growth/loss, weight challenges, fatigue, and fertility concerns.',
       },
       {
         type: 'heading',
-        text: 'The Progesterone-to-Estrogen Ratio',
+        text: 'A Balanced Approach',
       },
       {
         type: 'paragraph',
-        text: 'A disrupted progesterone-to-estrogen ratio (ideally aiming for 200–500 or higher) allows estrogen to promote cell proliferation, suppress thyroid function, encourage fat storage, thicken blood, impair mitochondrial energy production, and contribute to insulin resistance.',
+        text: 'Many integrative approaches prioritize bioidentical hormones (which match the body\'s natural chemistry) alongside lifestyle foundations for symptom relief, cycle regulation, and long-term health—rather than simply suppressing cycles with synthetic options.',
+      },
+      {
+        type: 'tip',
+        text: 'A balanced, protective strategy often starts with foundational supports before considering estrogen.',
       },
     ],
   },
@@ -227,47 +215,59 @@ const educationSections: EducationSection[] = [
   // Progesterone section for REGULAR cycling women
   {
     id: 'progesterone-cycling',
-    title: 'Progesterone: The Protective Hormone',
-    subtitle: 'Often the first priority',
+    title: 'Bioidentical Progesterone',
+    subtitle: 'The primary tool for cycle support',
     icon: Shield,
     color: '#34d399',
     lifeStages: ['regular'],
     content: [
       {
         type: 'paragraph',
-        text: 'Bioidentical progesterone is often the primary foundation of hormone support for cycling women. This hormone addresses many symptoms directly and provides crucial protective effects.',
+        text: 'Bioidentical progesterone is commonly emphasized as first-line support for both PCOS and endometriosis. It addresses multiple symptoms directly while providing protective effects.',
       },
       {
         type: 'heading',
-        text: 'Key Benefits of Progesterone',
+        text: 'Key Benefits',
       },
       {
         type: 'bullet',
-        text: 'Balances relative estrogen effects',
+        text: 'Helps oppose excess estrogen effects',
       },
       {
         type: 'bullet',
-        text: 'Supports mood and stress resilience',
+        text: 'Supports regular ovulation (beneficial in PCOS by lowering androgens)',
       },
       {
         type: 'bullet',
-        text: 'Reduces inflammation throughout the body',
+        text: 'Lightens heavy flows',
       },
       {
         type: 'bullet',
-        text: 'Helps regulate menstrual cycles',
+        text: 'Eases cramps and pain (especially in endometriosis)',
       },
       {
         type: 'bullet',
-        text: 'Eases PMS symptoms',
+        text: 'Improves sleep and mood',
       },
       {
         type: 'bullet',
-        text: 'Supports fertility and healthy pregnancy',
+        text: 'Reduces inflammation',
+      },
+      {
+        type: 'bullet',
+        text: 'Protects tissues from unchecked cell growth',
+      },
+      {
+        type: 'heading',
+        text: 'How to Use',
+      },
+      {
+        type: 'paragraph',
+        text: 'Cyclic use (e.g., days 14–28 of a typical cycle, or tailored to symptoms) via topical cream, oral micronized capsules (100–300 mg), or vaginal forms is often preferred for better targeting and fewer side effects than synthetics.',
       },
       {
         type: 'tip',
-        text: 'Cyclic use (e.g., days 14–28) via topical cream or oral micronized capsules is often recommended for cycling women.',
+        text: 'Bioidentical progesterone is favored for its exact match to body chemistry and potential for fewer side effects compared to synthetic alternatives.',
       },
     ],
   },
@@ -533,11 +533,11 @@ const educationSections: EducationSection[] = [
       },
       {
         type: 'bullet',
-        text: 'Cyclic use (e.g., days 14–28) via topical cream or oral micronized capsules',
+        text: 'Cyclic use (e.g., days 14–28) via topical cream or oral micronized capsules (100–300 mg)',
       },
       {
         type: 'bullet',
-        text: 'Better tolerated with fewer side effects than synthetics',
+        text: 'Better tolerated with fewer side effects than synthetic progestins',
       },
       {
         type: 'heading',
@@ -553,7 +553,7 @@ const educationSections: EducationSection[] = [
       },
       {
         type: 'bullet',
-        text: 'Regular movement (both strength and cardio)',
+        text: 'Regular movement (both strength training and cardio)',
       },
       {
         type: 'bullet',
@@ -564,8 +564,16 @@ const educationSections: EducationSection[] = [
         text: 'Spearmint tea may help lower androgens',
       },
       {
+        type: 'heading',
+        text: 'Other Supports If Needed',
+      },
+      {
+        type: 'paragraph',
+        text: 'Low-dose DHEA or pregnenolone for energy/mood, or natural thyroid support if labs indicate decline.',
+      },
+      {
         type: 'warning',
-        text: 'Avoid synthetic progestins which can have androgenic effects. Estrogen should only be added with caution after optimizing progesterone, always balanced to avoid worsening dominance.',
+        text: 'Avoid synthetic progestins (which can have androgenic effects). Estrogen should only be added with caution after optimizing progesterone—and always balanced to avoid worsening dominance.',
       },
     ],
   },
@@ -579,11 +587,15 @@ const educationSections: EducationSection[] = [
     content: [
       {
         type: 'paragraph',
-        text: 'Endometriosis involves estrogen dominance, chronic inflammation, and immune dysfunction. The focus is on opposing excess estrogen effects and reducing inflammation rather than simply suppressing cycles.',
+        text: 'Endometriosis involves estrogen dominance, chronic inflammation, and immune dysfunction. The focus is on opposing excess estrogen effects and reducing inflammation rather than simply suppressing cycles with synthetic options.',
       },
       {
         type: 'heading',
-        text: 'Progesterone as Primary Support',
+        text: 'Bioidentical Progesterone',
+      },
+      {
+        type: 'paragraph',
+        text: 'Often emphasized as primary support for endometriosis:',
       },
       {
         type: 'bullet',
@@ -606,12 +618,20 @@ const educationSections: EducationSection[] = [
         text: 'Lightens heavy flows',
       },
       {
+        type: 'bullet',
+        text: 'Improves sleep and mood',
+      },
+      {
         type: 'heading',
-        text: 'Anti-Inflammatory Foundation',
+        text: 'Lifestyle & Anti-Inflammatory Foundation',
+      },
+      {
+        type: 'paragraph',
+        text: 'These form the core of endometriosis support, as hormones interconnect with these systems:',
       },
       {
         type: 'bullet',
-        text: 'Anti-inflammatory diet: high fiber, omega-3s, low processed foods',
+        text: 'Anti-inflammatory diet: high fiber, omega-3s, low processed carbs/sugars',
       },
       {
         type: 'bullet',
@@ -626,8 +646,8 @@ const educationSections: EducationSection[] = [
         text: 'Sleep optimization for immune function',
       },
       {
-        type: 'tip',
-        text: 'Endometriosis is estrogen-sensitive—routine estrogen addition is often avoided. Focus on progesterone and anti-inflammatory supports first.',
+        type: 'warning',
+        text: 'Endometriosis is estrogen-sensitive—routine estrogen addition is often avoided. Many approaches focus on progesterone and anti-inflammatory supports. Avoid unopposed estrogen or indirect options like high-dose flaxseed/DIM that might not fully resolve imbalances.',
       },
     ],
   },
@@ -641,35 +661,35 @@ const educationSections: EducationSection[] = [
     content: [
       {
         type: 'paragraph',
-        text: 'For typical PMS (mood swings, bloating, cramps, irritability), the focus is on gentle cycle support and reducing hormonal fluctuations during the luteal phase.',
+        text: 'For typical PMS (mood swings, bloating, cramps, irritability) without severe PMDD, the focus is on gentle cycle support and reducing hormonal fluctuations.',
       },
       {
         type: 'heading',
-        text: 'Cyclic Progesterone Support',
+        text: 'Bioidentical Progesterone (Cyclic)',
       },
       {
         type: 'paragraph',
-        text: 'Bioidentical progesterone in the luteal phase (second half of cycle) can help:',
+        text: 'Often used in the luteal phase, it\'s seen as more effective and better-tolerated than synthetic alternatives for many. Benefits include:',
       },
       {
         type: 'bullet',
-        text: 'Calm the brain and stabilize mood',
+        text: 'Calms the brain and stabilizes mood',
       },
       {
         type: 'bullet',
-        text: 'Reduce inflammation and ease cramps',
+        text: 'Reduces inflammation and eases cramps',
       },
       {
         type: 'bullet',
-        text: 'Relieve breast tenderness and bloating',
+        text: 'Relieves breast tenderness and bloating',
       },
       {
         type: 'bullet',
-        text: 'Improve sleep quality',
+        text: 'Improves sleep quality',
       },
       {
         type: 'heading',
-        text: 'Foundational Nutrients',
+        text: 'Foundational Nutrients & Herbs',
       },
       {
         type: 'bullet',
@@ -688,8 +708,16 @@ const educationSections: EducationSection[] = [
         text: 'Evening primrose oil for breast tenderness',
       },
       {
+        type: 'bullet',
+        text: 'Chasteberry (Vitex) may support progesterone production and reduce irritability',
+      },
+      {
         type: 'heading',
         text: 'Lifestyle Emphasis',
+      },
+      {
+        type: 'paragraph',
+        text: 'These often provide significant relief:',
       },
       {
         type: 'bullet',
@@ -705,11 +733,11 @@ const educationSections: EducationSection[] = [
       },
       {
         type: 'bullet',
-        text: 'Stress management practices',
+        text: 'Stress management (e.g., mindfulness)',
       },
       {
         type: 'tip',
-        text: 'Chasteberry (Vitex) may support natural progesterone production in cycling women, though effects vary individually.',
+        text: 'These approaches aim for individualized, root-cause support—testing hormone levels/ratios, tracking symptoms/cycles, and adjusting based on response—rather than one-size-fits-all suppression.',
       },
     ],
   },
