@@ -25,6 +25,7 @@ import {
   Bell,
   FileText,
   Trash2,
+  Brain,
 } from 'lucide-react-native';
 import { useCycleStore, phaseInfo, LifeStage, lifeStageInfo } from '@/lib/cycle-store';
 import { useThemeStore, getTheme } from '@/lib/theme-store';
@@ -799,6 +800,25 @@ export default function SettingsScreen() {
                     className="text-sm ml-3"
                   >
                     Labs Guide
+                  </Text>
+                </View>
+                <ChevronRight size={16} color={theme.text.muted} />
+              </Pressable>
+              <View style={{ height: 1, backgroundColor: theme.border.light }} />
+              <Pressable
+                onPress={() => {
+                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                  router.push('/(app)/hormonal-education');
+                }}
+                className="p-4 flex-row items-center justify-between"
+              >
+                <View className="flex-row items-center">
+                  <Brain size={18} color={theme.accent.purple} />
+                  <Text
+                    style={{ fontFamily: 'Quicksand_500Medium', color: theme.text.primary }}
+                    className="text-sm ml-3"
+                  >
+                    Hormonal Education
                   </Text>
                 </View>
                 <ChevronRight size={16} color={theme.text.muted} />

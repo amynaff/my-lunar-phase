@@ -76,6 +76,8 @@ export default function AppLayout() {
       <Stack.Screen name="log-mood" options={{ presentation: "modal" }} />
       <Stack.Screen name="notification-settings" options={{ presentation: "modal" }} />
       <Stack.Screen name="community" />
+      <Stack.Screen name="labs-guide" />
+      <Stack.Screen name="hormonal-education" />
     </Stack>
   );
 }
