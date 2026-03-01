@@ -7,7 +7,7 @@ import Animated, {
   FadeInUp,
   FadeIn,
 } from 'react-native-reanimated';
-import { Moon, Sparkles, Heart, Calendar, ChevronRight, Apple, Dumbbell, Crown, MessageCircle, Settings, Droplets } from 'lucide-react-native';
+import { Moon, Sparkles, Heart, Calendar, ChevronRight, Apple, Dumbbell, Crown, MessageCircle, Settings, Droplets, Sun, Star, Brain, Leaf, Wind, Activity } from 'lucide-react-native';
 import { CycleWheel } from '@/components/CycleWheel';
 import { CycleGraph } from '@/components/CycleGraph';
 import { CycleCalendar, CycleDotIndicator } from '@/components/CycleCalendar';
@@ -17,7 +17,7 @@ import { LogPeriodModal, QuickLogPeriodButton } from '@/components/LogPeriodModa
 import { EditPeriodDatesModal } from '@/components/EditPeriodDatesModal';
 import { SymptomLogModal } from '@/components/SymptomLogModal';
 import { SymptomInsightsCard } from '@/components/SymptomInsightsCard';
-import { useCycleStore, phaseInfo, getMoonPhase, moonPhaseInfo, CyclePhase } from '@/lib/cycle-store';
+import { useCycleStore, phaseInfo, getMoonPhase, moonPhaseInfo, CyclePhase, lifeStageInfo } from '@/lib/cycle-store';
 import { useThemeStore, getTheme } from '@/lib/theme-store';
 import { useSubscriptionStore } from '@/lib/subscription-store';
 import { api } from '@/lib/api/api';
@@ -49,6 +49,20 @@ const getAffirmation = (phase: CyclePhase): string => {
     luteal: "I trust my ability to complete what I've started and honor my need for solitude.",
   };
   return affirmations[phase] || affirmations.follicular;
+};
+
+// Menopause/Postmenopause affirmations
+const getMenopauseAffirmation = (): string => {
+  const affirmations = [
+    "I embrace this powerful chapter with wisdom and grace.",
+    "My experience is my superpower. I am more than enough.",
+    "I honor my body's transformation and celebrate my vitality.",
+    "This is my time to shine. I am free to be fully myself.",
+    "I trust my inner wisdom and nurture my wellbeing with love.",
+  ];
+  const today = new Date();
+  const index = today.getDate() % affirmations.length;
+  return affirmations[index];
 };
 
 export default function HomeScreen() {
@@ -116,6 +130,10 @@ export default function HomeScreen() {
     );
   }
 
+  // Check if user is in menopause or postmenopause - they don't have cycles
+  const isNonCycling = storedLifeStage === 'menopause' || storedLifeStage === 'postmenopause';
+  const stageInfo = lifeStageInfo[storedLifeStage];
+
   const currentPhase = getCurrentPhase();
   const currentMoon = getMoonPhase();
   const moonInfo = moonPhaseInfo[currentMoon];
@@ -144,6 +162,385 @@ export default function HomeScreen() {
     },
   ];
 
+  // Render menopause/postmenopause home screen
+  if (isNonCycling) {
+    const isMenopause = storedLifeStage === 'menopause';
+    const stageColor = isMenopause ? '#8b5cf6' : '#ec4899';
+    const StageIcon = isMenopause ? Sun : Star;
+
+    const wellnessAreas = [
+      {
+        icon: Heart,
+        title: 'Heart Health',
+        description: 'Cardiovascular wellness becomes especially important',
+        color: '#ef4444',
+      },
+      {
+        icon: Activity,
+        title: 'Bone Health',
+        description: 'Support bone density with movement & nutrition',
+        color: '#8b5cf6',
+      },
+      {
+        icon: Brain,
+        title: 'Brain Health',
+        description: 'Cognitive wellness and mental clarity',
+        color: '#06b6d4',
+      },
+      {
+        icon: Wind,
+        title: 'Sleep & Energy',
+        description: 'Quality rest and sustained vitality',
+        color: '#f59e0b',
+      },
+    ];
+
+    return (
+      <View className="flex-1">
+        <LinearGradient
+          colors={theme.gradient}
+          locations={[0, 0.25, 0.5, 0.75, 1]}
+          style={{ flex: 1 }}
+        >
+          <ScrollView
+            className="flex-1"
+            contentContainerStyle={{ paddingBottom: 140 }}
+            showsVerticalScrollIndicator={false}
+          >
+            {/* Header */}
+            <Animated.View
+              entering={FadeInDown.delay(100).duration(600)}
+              style={{ paddingTop: insets.top + 16 }}
+              className="px-6"
+            >
+              <View className="flex-row items-center justify-between mb-4">
+                <View>
+                  <Text
+                    style={{ fontFamily: 'CormorantGaramond_400Regular', color: theme.text.muted }}
+                    className="text-sm tracking-widest uppercase"
+                  >
+                    Your wellness journey
+                  </Text>
+                  <Text
+                    style={{ fontFamily: 'CormorantGaramond_600SemiBold', color: theme.text.primary }}
+                    className="text-3xl mt-1"
+                  >
+                    {stageInfo.name}
+                  </Text>
+                </View>
+                <View className="flex-row items-center">
+                  <Pressable
+                    className="w-9 h-9 rounded-full items-center justify-center border mr-2"
+                    style={{ backgroundColor: theme.bg.card, borderColor: theme.border.light }}
+                    onPress={() => router.push('/(app)/settings')}
+                  >
+                    <Settings size={18} color={theme.accent.purple} />
+                  </Pressable>
+                  <Pressable
+                    className="w-9 h-9 rounded-full items-center justify-center border mr-2"
+                    style={{ backgroundColor: `${stageColor}15`, borderColor: `${stageColor}30` }}
+                    onPress={() => {
+                      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                      router.push('/luna-ai');
+                    }}
+                  >
+                    <Sparkles size={16} color={stageColor} />
+                  </Pressable>
+                  {!isPremium && (
+                    <Pressable
+                      className="w-9 h-9 rounded-full items-center justify-center border"
+                      style={{ backgroundColor: 'rgba(249, 168, 212, 0.1)', borderColor: 'rgba(249, 168, 212, 0.3)' }}
+                      onPress={() => router.push('/paywall')}
+                    >
+                      <Crown size={16} color="#f9a8d4" />
+                    </Pressable>
+                  )}
+                </View>
+              </View>
+            </Animated.View>
+
+            {/* Welcome Card */}
+            <Animated.View
+              entering={FadeInUp.delay(200).duration(600)}
+              className="mx-6 mt-2"
+            >
+              <LinearGradient
+                colors={isMenopause ? ['#c4b5fd', '#8b5cf6'] : ['#f9a8d4', '#ec4899']}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 1 }}
+                style={{ borderRadius: 24, padding: 24 }}
+              >
+                <View className="items-center">
+                  <View
+                    className="w-20 h-20 rounded-full items-center justify-center mb-4"
+                    style={{ backgroundColor: 'rgba(255,255,255,0.25)' }}
+                  >
+                    <StageIcon size={40} color="#fff" />
+                  </View>
+                  <Text
+                    style={{ fontFamily: 'CormorantGaramond_600SemiBold', color: '#fff' }}
+                    className="text-2xl text-center mb-2"
+                  >
+                    {isMenopause ? 'Your Second Spring' : 'Your Wisdom Years'}
+                  </Text>
+                  <Text
+                    style={{ fontFamily: 'Quicksand_400Regular', color: 'rgba(255,255,255,0.9)' }}
+                    className="text-sm text-center leading-5"
+                  >
+                    {stageInfo.description}
+                  </Text>
+                </View>
+
+                {/* Moon Phase */}
+                <View
+                  className="flex-row items-center justify-center mt-5 pt-4 border-t"
+                  style={{ borderTopColor: 'rgba(255,255,255,0.2)' }}
+                >
+                  <Text className="text-xl mr-2">{moonInfo.emoji}</Text>
+                  <Text
+                    style={{ fontFamily: 'Quicksand_500Medium', color: 'rgba(255,255,255,0.9)' }}
+                    className="text-sm"
+                  >
+                    {moonInfo.name}
+                  </Text>
+                </View>
+              </LinearGradient>
+            </Animated.View>
+
+            {/* Wellness Focus Areas */}
+            <Animated.View
+              entering={FadeInUp.delay(300).duration(600)}
+              className="mx-6 mt-6"
+            >
+              <Text
+                style={{ fontFamily: 'Quicksand_600SemiBold', color: theme.text.primary }}
+                className="text-lg mb-4"
+              >
+                Your Wellness Focus
+              </Text>
+
+              <View className="flex-row flex-wrap" style={{ marginHorizontal: -6 }}>
+                {wellnessAreas.map((area, index) => (
+                  <View key={area.title} style={{ width: '50%', padding: 6 }}>
+                    <Animated.View entering={FadeInUp.delay(350 + index * 50).duration(400)}>
+                      <View
+                        className="rounded-2xl p-4 border"
+                        style={{ backgroundColor: theme.bg.card, borderColor: theme.border.light }}
+                      >
+                        <View
+                          className="w-10 h-10 rounded-full items-center justify-center mb-3"
+                          style={{ backgroundColor: `${area.color}15` }}
+                        >
+                          <area.icon size={20} color={area.color} />
+                        </View>
+                        <Text
+                          style={{ fontFamily: 'Quicksand_600SemiBold', color: theme.text.primary }}
+                          className="text-sm mb-1"
+                        >
+                          {area.title}
+                        </Text>
+                        <Text
+                          style={{ fontFamily: 'Quicksand_400Regular', color: theme.text.tertiary }}
+                          className="text-xs leading-4"
+                        >
+                          {area.description}
+                        </Text>
+                      </View>
+                    </Animated.View>
+                  </View>
+                ))}
+              </View>
+            </Animated.View>
+
+            {/* Symptom Tracking */}
+            <Animated.View
+              entering={FadeInUp.delay(500).duration(600)}
+              className="mx-6 mt-4"
+            >
+              <SymptomInsightsCard
+                themeMode={themeMode}
+                onLogSymptoms={() => setShowSymptomLogModal(true)}
+              />
+            </Animated.View>
+
+            {/* Hormonal Education Link */}
+            <Animated.View
+              entering={FadeInUp.delay(550).duration(600)}
+              className="mx-6 mt-4"
+            >
+              <Pressable
+                onPress={() => {
+                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                  router.push('/hormonal-education');
+                }}
+                className="flex-row items-center justify-between rounded-2xl p-4 border"
+                style={{ backgroundColor: `${stageColor}10`, borderColor: `${stageColor}30` }}
+              >
+                <View className="flex-row items-center flex-1">
+                  <View
+                    className="w-10 h-10 rounded-full items-center justify-center mr-3"
+                    style={{ backgroundColor: `${stageColor}20` }}
+                  >
+                    <Brain size={20} color={stageColor} />
+                  </View>
+                  <View className="flex-1">
+                    <Text
+                      style={{ fontFamily: 'Quicksand_600SemiBold', color: theme.text.primary }}
+                      className="text-sm"
+                    >
+                      Hormonal Health Education
+                    </Text>
+                    <Text
+                      style={{ fontFamily: 'Quicksand_400Regular', color: theme.text.tertiary }}
+                      className="text-xs"
+                    >
+                      Learn about bioidentical hormone support
+                    </Text>
+                  </View>
+                </View>
+                <ChevronRight size={18} color={theme.text.tertiary} />
+              </Pressable>
+            </Animated.View>
+
+            {/* Quick Actions */}
+            <Animated.View
+              entering={FadeInUp.delay(600).duration(600)}
+              className="mt-6 px-6"
+            >
+              <Text
+                style={{ fontFamily: 'Quicksand_600SemiBold', color: theme.text.primary }}
+                className="text-lg mb-4"
+              >
+                Today's Guidance
+              </Text>
+
+              <View className="flex-row justify-between">
+                {quickActions.map((action, index) => (
+                  <AnimatedPressable
+                    key={action.label}
+                    entering={FadeInUp.delay(650 + index * 80).duration(500)}
+                    style={{ flex: 1, marginHorizontal: index === 1 ? 8 : 0 }}
+                    onPress={() => router.push(action.route as any)}
+                  >
+                    <View
+                      className="rounded-2xl p-4 border items-center justify-center"
+                      style={{
+                        backgroundColor: `${action.color}10`,
+                        borderColor: `${action.color}30`,
+                        height: 100,
+                      }}
+                    >
+                      <View
+                        className="w-11 h-11 rounded-full items-center justify-center mb-2"
+                        style={{ backgroundColor: `${action.color}20` }}
+                      >
+                        <action.icon size={20} color={action.color} />
+                      </View>
+                      <Text
+                        style={{ fontFamily: 'Quicksand_600SemiBold', color: theme.text.primary }}
+                        className="text-xs"
+                      >
+                        {action.label}
+                      </Text>
+                    </View>
+                  </AnimatedPressable>
+                ))}
+              </View>
+            </Animated.View>
+
+            {/* Luna AI Assistant */}
+            <Animated.View
+              entering={FadeInUp.delay(700).duration(600)}
+              className="mx-6 mt-6"
+            >
+              <Pressable
+                onPress={() => {
+                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                  router.push('/luna-ai');
+                }}
+              >
+                <LinearGradient
+                  colors={[`${stageColor}20`, `${stageColor}10`]}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 1 }}
+                  style={{ borderRadius: 20, padding: 16, borderWidth: 1, borderColor: `${stageColor}30` }}
+                >
+                  <View className="flex-row items-center">
+                    <View
+                      className="w-10 h-10 rounded-full items-center justify-center mr-3"
+                      style={{ backgroundColor: `${stageColor}25` }}
+                    >
+                      <Sparkles size={18} color={stageColor} />
+                    </View>
+                    <View className="flex-1">
+                      <Text
+                        style={{ fontFamily: 'Quicksand_600SemiBold', color: theme.text.primary }}
+                        className="text-base"
+                      >
+                        Ask Luna AI
+                      </Text>
+                      <Text
+                        style={{ fontFamily: 'Quicksand_400Regular', color: theme.text.tertiary }}
+                        className="text-xs mt-0.5"
+                      >
+                        Get personalized wellness advice
+                      </Text>
+                    </View>
+                    <View
+                      className="w-8 h-8 rounded-full items-center justify-center"
+                      style={{ backgroundColor: `${stageColor}20` }}
+                    >
+                      <MessageCircle size={16} color={stageColor} />
+                    </View>
+                  </View>
+                </LinearGradient>
+              </Pressable>
+            </Animated.View>
+
+            {/* Daily Affirmation */}
+            <Animated.View
+              entering={FadeInUp.delay(800).duration(600)}
+              className="mx-6 mt-6"
+            >
+              <LinearGradient
+                colors={isMenopause
+                  ? ['rgba(196, 181, 253, 0.3)', 'rgba(139, 92, 246, 0.2)']
+                  : ['rgba(249, 168, 212, 0.3)', 'rgba(236, 72, 153, 0.2)']
+                }
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 1 }}
+                style={{ borderRadius: 20, padding: 20 }}
+              >
+                <View className="flex-row items-center mb-3">
+                  <StageIcon size={14} color={stageColor} />
+                  <Text
+                    className="text-xs uppercase tracking-widest ml-2"
+                    style={{ fontFamily: 'Quicksand_600SemiBold', color: stageColor }}
+                  >
+                    Daily Affirmation
+                  </Text>
+                </View>
+                <Text
+                  style={{ fontFamily: 'CormorantGaramond_400Regular', color: theme.text.primary }}
+                  className="text-xl leading-7"
+                >
+                  {getMenopauseAffirmation()}
+                </Text>
+              </LinearGradient>
+            </Animated.View>
+          </ScrollView>
+        </LinearGradient>
+
+        {/* Symptom Log Modal */}
+        <SymptomLogModal
+          visible={showSymptomLogModal}
+          onClose={() => setShowSymptomLogModal(false)}
+        />
+      </View>
+    );
+  }
+
+  // Regular cycling user view (original)
   return (
     <View className="flex-1">
       <LinearGradient
