@@ -28,6 +28,10 @@ model User {
 
   // Mood tracking
   moodEntries     MoodEntry[]
+
+  // Journal
+  journalEntries  JournalEntry[]
+  journalInsights JournalInsight[]
 }
 
 model Session {
@@ -183,5 +187,51 @@ model ChatMessage {
   createdAt DateTime @default(now())
 
   @@index([channelId])
+  @@index([createdAt])
+}
+
+// ==================== Journal Entries (with AI Pattern Detection) ====================
+
+model JournalEntry {
+  id              String   @id @default(cuid())
+  userId          String
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  date            DateTime
+  title           String?
+  content         String
+  voiceMemoUri    String?  // Local file path reference
+  voiceMemoDuration Int?   // Duration in seconds
+  prompt          String?  // The prompt used for this entry
+  cyclePhase      String?  // menstrual/follicular/ovulatory/luteal
+  dayOfCycle      Int?
+  mood            Int?     // 1-5 scale
+  tags            String   // JSON array of tags like ["grateful", "tired"]
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([userId])
+  @@index([date])
+  @@index([cyclePhase])
+}
+
+// AI-detected patterns and insights from journal entries
+model JournalInsight {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type        String   // 'pattern', 'observation', 'theme', 'suggestion'
+  title       String   // Short title for the insight
+  content     String   // Full insight text
+  confidence  Float    @default(0.5) // 0-1 confidence score
+  relatedTags String?  // JSON array of related emotion tags
+  relatedPhases String? // JSON array of related cycle phases
+  dateRange   String?  // JSON object with startDate and endDate
+  isRead      Boolean  @default(false)
+  isDismissed Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  expiresAt   DateTime? // Some insights are temporary
+
+  @@index([userId])
+  @@index([type])
   @@index([createdAt])
 }

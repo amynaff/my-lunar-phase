@@ -25,6 +25,7 @@ import {
   Sparkles,
   Search,
   Filter,
+  Zap,
 } from 'lucide-react-native';
 import * as Haptics from 'expo-haptics';
 import {
@@ -41,6 +42,8 @@ import { useThemeStore, getTheme } from '@/lib/theme-store';
 import { useCycleStore, phaseInfo, CyclePhase } from '@/lib/cycle-store';
 import { useJournalStore, journalPrompts, JournalEntry } from '@/lib/journal-store';
 import { JournalEntryModal } from '@/components/JournalEntryModal';
+import { QuickCheckInSheet } from '@/components/QuickCheckInSheet';
+import { JournalInsightsPanel } from '@/components/JournalInsightsPanel';
 
 const { width } = Dimensions.get('window');
 
@@ -68,6 +71,7 @@ export default function JournalScreen() {
   const [viewMode, setViewMode] = useState<ViewMode>('week');
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [showEntryModal, setShowEntryModal] = useState(false);
+  const [showQuickCheckIn, setShowQuickCheckIn] = useState(false);
   const [editingEntry, setEditingEntry] = useState<JournalEntry | undefined>();
   const [selectedPrompt, setSelectedPrompt] = useState<string | undefined>();
 
@@ -208,13 +212,27 @@ export default function JournalScreen() {
                   Journal
                 </Text>
               </View>
-              <Pressable
-                onPress={() => openNewEntry()}
-                className="w-12 h-12 rounded-full items-center justify-center"
-                style={{ backgroundColor: theme.accent.purple }}
-              >
-                <Plus size={24} color="#fff" />
-              </Pressable>
+              <View className="flex-row items-center" style={{ gap: 10 }}>
+                {/* Quick Check-In Button */}
+                <Pressable
+                  onPress={() => {
+                    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+                    setShowQuickCheckIn(true);
+                  }}
+                  className="w-12 h-12 rounded-full items-center justify-center"
+                  style={{ backgroundColor: `${theme.accent.pink}` }}
+                >
+                  <Zap size={22} color="#fff" />
+                </Pressable>
+                {/* New Entry Button */}
+                <Pressable
+                  onPress={() => openNewEntry()}
+                  className="w-12 h-12 rounded-full items-center justify-center"
+                  style={{ backgroundColor: theme.accent.purple }}
+                >
+                  <Plus size={24} color="#fff" />
+                </Pressable>
+              </View>
             </View>
           </Animated.View>
 
@@ -288,6 +306,9 @@ export default function JournalScreen() {
               </View>
             </View>
           </Animated.View>
+
+          {/* AI Insights Panel - "Luna Noticed..." */}
+          <JournalInsightsPanel style={{ marginTop: 16 }} />
 
           {/* View Mode Toggle */}
           <Animated.View
@@ -678,6 +699,12 @@ export default function JournalScreen() {
         }}
         editEntry={editingEntry}
         initialPrompt={selectedPrompt}
+      />
+
+      {/* Quick Check-In Sheet */}
+      <QuickCheckInSheet
+        visible={showQuickCheckIn}
+        onClose={() => setShowQuickCheckIn(false)}
       />
     </View>
   );

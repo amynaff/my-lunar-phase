@@ -245,6 +245,17 @@ A beautiful, comprehensive mobile app that helps women understand and work with 
 - **Dedicated Journal Tab** - Easy access from bottom navigation
 - **Text Entries** - Write your thoughts, reflections, and experiences
 - **Voice Memos** - Record voice notes when you prefer speaking over typing
+- **Quick Check-In** - Fast mood + brief note (tweet-sized) for busy days
+  - Mood slider with emojis (1-5 scale)
+  - 280-character quick thoughts
+  - Tag selection for emotions
+  - Perfect for on-the-go journaling
+- **AI Pattern Detection** - "Luna Noticed..." insights panel
+  - Automatic pattern recognition across entries
+  - Detects emotional patterns and cycle correlations
+  - Identifies recurring themes in your writing
+  - Personalized suggestions based on your entries
+  - Phase-aware insights (e.g., "You tend to feel creative during follicular phase")
 - **Journal Prompts** - Phase-specific prompts to inspire reflection:
   - Menstrual: Release & rest themes
   - Follicular: New beginnings & creativity
@@ -260,6 +271,7 @@ A beautiful, comprehensive mobile app that helps women understand and work with 
 - **Search & Filter** - Find past entries easily
 - **Edit & Delete** - Manage your entries anytime
 - **Stats Dashboard** - See your journaling streak, weekly entries, and total count
+- **Cloud Sync** - Journal entries sync to the server for backup
 
 ### Mood & Energy Heatmap
 - **Calendar view** showing mood and energy levels across the month
