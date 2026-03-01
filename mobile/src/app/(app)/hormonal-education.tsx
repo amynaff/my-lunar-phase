@@ -61,15 +61,15 @@ const educationSections: EducationSection[] = [
     content: [
       {
         type: 'paragraph',
-        text: 'Many women experience significant shifts in hormone balance during and after menopause, often leading to symptoms like hot flashes, night sweats, insomnia, mood changes, weight gain, fatigue, brain fog, and increased inflammation.',
+        text: 'Many women experience hormonal imbalances at various life stages—whether dealing with PCOS, endometriosis, PMS, perimenopause, or postmenopause. Common symptoms include irregular periods, heavy bleeding, mood changes, weight challenges, fatigue, brain fog, and inflammation.',
       },
       {
         type: 'heading',
-        text: 'Beyond Simple Estrogen Decline',
+        text: 'The Role of Estrogen Dominance',
       },
       {
         type: 'paragraph',
-        text: 'A common misunderstanding is that these issues stem mainly from a simple lack of estrogen. In reality, while overall estrogen production declines, a sharp drop in progesterone can create a state of relative estrogen dominance—where estrogen\'s effects become unopposed or exaggerated in tissues, even if blood levels appear low.',
+        text: 'A common misunderstanding is that symptoms stem from simple estrogen deficiency. In reality, low or inconsistent progesterone often creates relative estrogen dominance—where estrogen\'s effects become unopposed or exaggerated, even when estrogen levels appear normal or low.',
       },
       {
         type: 'heading',
@@ -77,7 +77,7 @@ const educationSections: EducationSection[] = [
       },
       {
         type: 'paragraph',
-        text: 'Progesterone levels plummet far more dramatically than estrogen in menopause (and often start earlier in perimenopause). Several factors can worsen this pattern:',
+        text: 'Progesterone levels can be disrupted by irregular ovulation (PCOS), decline dramatically in perimenopause, or drop to near-zero after menopause. Several factors worsen this pattern:',
       },
       {
         type: 'bullet',
@@ -339,6 +339,205 @@ const educationSections: EducationSection[] = [
       {
         type: 'warning',
         text: 'Hormones form an interconnected network—adjusting one impacts others. Isolated replacement can sometimes create new imbalances.',
+      },
+    ],
+  },
+  {
+    id: 'pcos',
+    title: 'PCOS Support',
+    subtitle: 'Polycystic ovary syndrome',
+    icon: Heart,
+    color: '#f472b6',
+    content: [
+      {
+        type: 'paragraph',
+        text: 'PCOS frequently involves estrogen dominance (unopposed due to irregular ovulation), high androgens, insulin resistance, and chronic inflammation. This can lead to irregular/heavy periods, acne, hair growth/loss, weight challenges, fatigue, and fertility concerns.',
+      },
+      {
+        type: 'heading',
+        text: 'Bioidentical Progesterone',
+      },
+      {
+        type: 'paragraph',
+        text: 'Often emphasized as first-line support. It helps oppose excess estrogen, supports regular ovulation (which can lower androgens), lightens heavy flows, improves sleep/mood, and protects tissues.',
+      },
+      {
+        type: 'bullet',
+        text: 'Cyclic use (e.g., days 14–28) via topical cream or oral micronized capsules',
+      },
+      {
+        type: 'bullet',
+        text: 'Better tolerated with fewer side effects than synthetics',
+      },
+      {
+        type: 'heading',
+        text: 'Address Insulin Resistance',
+      },
+      {
+        type: 'paragraph',
+        text: 'This is crucial for PCOS. Insulin resistance drives androgen production and worsens symptoms.',
+      },
+      {
+        type: 'bullet',
+        text: 'Low-glycemic, nutrient-dense nutrition',
+      },
+      {
+        type: 'bullet',
+        text: 'Regular movement (both strength and cardio)',
+      },
+      {
+        type: 'bullet',
+        text: 'Supportive supplements: myo-inositol, berberine, omega-3s',
+      },
+      {
+        type: 'bullet',
+        text: 'Spearmint tea may help lower androgens',
+      },
+      {
+        type: 'warning',
+        text: 'Avoid synthetic progestins which can have androgenic effects. Estrogen should only be added with caution after optimizing progesterone, always balanced to avoid worsening dominance.',
+      },
+    ],
+  },
+  {
+    id: 'endometriosis',
+    title: 'Endometriosis Support',
+    subtitle: 'Managing inflammation & pain',
+    icon: Shield,
+    color: '#a78bfa',
+    content: [
+      {
+        type: 'paragraph',
+        text: 'Endometriosis involves estrogen dominance, chronic inflammation, and immune dysfunction. The focus is on opposing excess estrogen effects and reducing inflammation rather than simply suppressing cycles.',
+      },
+      {
+        type: 'heading',
+        text: 'Progesterone as Primary Support',
+      },
+      {
+        type: 'bullet',
+        text: 'Helps oppose excess estrogen at tissue level',
+      },
+      {
+        type: 'bullet',
+        text: 'Reduces inflammation throughout the body',
+      },
+      {
+        type: 'bullet',
+        text: 'May help suppress lesion growth and immune dysfunction',
+      },
+      {
+        type: 'bullet',
+        text: 'Eases cramps and pelvic pain',
+      },
+      {
+        type: 'bullet',
+        text: 'Lightens heavy flows',
+      },
+      {
+        type: 'heading',
+        text: 'Anti-Inflammatory Foundation',
+      },
+      {
+        type: 'bullet',
+        text: 'Anti-inflammatory diet: high fiber, omega-3s, low processed foods',
+      },
+      {
+        type: 'bullet',
+        text: 'Gut health support for proper estrogen detoxification',
+      },
+      {
+        type: 'bullet',
+        text: 'Stress reduction (cortisol worsens inflammation)',
+      },
+      {
+        type: 'bullet',
+        text: 'Sleep optimization for immune function',
+      },
+      {
+        type: 'tip',
+        text: 'Endometriosis is estrogen-sensitive—routine estrogen addition is often avoided. Focus on progesterone and anti-inflammatory supports first.',
+      },
+    ],
+  },
+  {
+    id: 'pms',
+    title: 'PMS & Cycle Support',
+    subtitle: 'For regular menstrual cycles',
+    icon: Moon,
+    color: '#06b6d4',
+    content: [
+      {
+        type: 'paragraph',
+        text: 'For typical PMS (mood swings, bloating, cramps, irritability), the focus is on gentle cycle support and reducing hormonal fluctuations during the luteal phase.',
+      },
+      {
+        type: 'heading',
+        text: 'Cyclic Progesterone Support',
+      },
+      {
+        type: 'paragraph',
+        text: 'Bioidentical progesterone in the luteal phase (second half of cycle) can help:',
+      },
+      {
+        type: 'bullet',
+        text: 'Calm the brain and stabilize mood',
+      },
+      {
+        type: 'bullet',
+        text: 'Reduce inflammation and ease cramps',
+      },
+      {
+        type: 'bullet',
+        text: 'Relieve breast tenderness and bloating',
+      },
+      {
+        type: 'bullet',
+        text: 'Improve sleep quality',
+      },
+      {
+        type: 'heading',
+        text: 'Foundational Nutrients',
+      },
+      {
+        type: 'bullet',
+        text: 'Magnesium (200–400 mg daily) for cramps and mood',
+      },
+      {
+        type: 'bullet',
+        text: 'Vitamin B6 for mood and water balance',
+      },
+      {
+        type: 'bullet',
+        text: 'Calcium for overall comfort',
+      },
+      {
+        type: 'bullet',
+        text: 'Evening primrose oil for breast tenderness',
+      },
+      {
+        type: 'heading',
+        text: 'Lifestyle Emphasis',
+      },
+      {
+        type: 'bullet',
+        text: 'Consistent sleep schedule',
+      },
+      {
+        type: 'bullet',
+        text: 'Regular movement',
+      },
+      {
+        type: 'bullet',
+        text: 'Reduced caffeine, sugar, and alcohol',
+      },
+      {
+        type: 'bullet',
+        text: 'Stress management practices',
+      },
+      {
+        type: 'tip',
+        text: 'Chasteberry (Vitex) may support natural progesterone production in cycling women, though effects vary individually.',
       },
     ],
   },
@@ -617,7 +816,7 @@ export default function HormonalEducationScreen() {
                 }}
                 className="text-sm"
               >
-                A more protective, balanced approach to hormone health focuses on restoring harmony rather than immediately adding estrogen. This means prioritizing foundational, safer supports first, using bioidentical hormones (which match the body's natural chemistry) in physiologic doses tailored to individual needs, symptoms, and testing.
+                Whether you're navigating PCOS, endometriosis, PMS, perimenopause, or postmenopause, a protective approach focuses on restoring hormonal harmony rather than simply adding estrogen. This means prioritizing foundational supports first, using bioidentical hormones tailored to your individual needs.
               </Text>
               <Text
                 style={{
@@ -627,7 +826,7 @@ export default function HormonalEducationScreen() {
                 }}
                 className="text-sm mt-3"
               >
-                Many women find improved energy, mood, sleep, metabolism, libido, and overall vitality through this individualized, root-cause-focused method.
+                Many women find improved energy, mood, sleep, metabolism, and overall vitality through this individualized, root-cause-focused method.
               </Text>
             </View>
           </Animated.View>

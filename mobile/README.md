@@ -316,11 +316,15 @@ A beautiful, comprehensive mobile app that helps women understand and work with 
   - Lifestyle foundations for natural hormone support
   - What to approach with caution (wild yam, vitex, DIM)
   - Testing and monitoring ratios
+- **Menstrual Cycle Conditions**:
+  - **PCOS Support** - Addressing insulin resistance, high androgens, progesterone support
+  - **Endometriosis Support** - Anti-inflammatory approach, opposing estrogen dominance
+  - **PMS & Cycle Support** - Cyclic progesterone, foundational nutrients, lifestyle
 - **Prioritized Strategy** - Clear hierarchy: Progesterone → DHEA → Pregnenolone → Thyroid → Lifestyle → Then Estrogen (if needed)
-- **Medical Disclaimers** - Clear guidance to consult qualified healthcare providers
 - **Bioidentical vs Synthetic** - Education on hormone types and their differences
 - **Expandable Sections** - Clean, non-overwhelming interface with tap-to-expand content
 - **Accessible via Settings** - Found in Settings > About > Hormonal Education
+- For personalized recommendations, consult a knowledgeable practitioner for testing, monitoring, and tailored dosing
 
 ### Premium Features
 - Unlimited symptom tracking
