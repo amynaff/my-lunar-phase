@@ -10,11 +10,13 @@ export interface JournalEntry {
   title: string | null;
   content: string;
   mood: number | null;
-  energy: number | null;
-  symptoms: string[];
   tags: string[];
   cyclePhase: string | null;
   dayOfCycle: number | null;
+  prompt: string | null;
+  voiceMemoUri: string | null;
+  voiceMemoDuration: number | null;
+  lunaReflection: string | null;
   createdAt: string;
   updatedAt: string;
 }

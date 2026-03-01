@@ -241,7 +241,7 @@ A beautiful, comprehensive mobile app that helps women understand and work with 
 - **Common Changes** - Know what to expect at each life stage
 - **The Silver Lining** - Positive aspects of intimacy during menopause (no pregnancy concerns, more freedom, deeper connection)
 
-### Journal
+### Journal - A Journal That Pays Attention
 - **Dedicated Journal Tab** - Easy access from bottom navigation
 - **Text Entries** - Write your thoughts, reflections, and experiences
 - **Voice Memos** - Record voice notes when you prefer speaking over typing
@@ -250,12 +250,11 @@ A beautiful, comprehensive mobile app that helps women understand and work with 
   - 280-character quick thoughts
   - Tag selection for emotions
   - Perfect for on-the-go journaling
-- **AI Pattern Detection** - "Luna Noticed..." insights panel
-  - Automatic pattern recognition across entries
-  - Detects emotional patterns and cycle correlations
-  - Identifies recurring themes in your writing
-  - Personalized suggestions based on your entries
-  - Phase-aware insights (e.g., "You tend to feel creative during follicular phase")
+- **Luna Responds** - After you save, Luna reads your entry and writes back a short, personal reflection:
+  - Notices ONE specific thing you mentioned
+  - Reflects it back with warmth and understanding
+  - Ends with a gentle, open question to invite deeper thought
+  - Not advice. Not a summary. Just genuine attention.
 - **Journal Prompts** - Phase-specific prompts to inspire reflection:
   - Menstrual: Release & rest themes
   - Follicular: New beginnings & creativity
@@ -269,7 +268,7 @@ A beautiful, comprehensive mobile app that helps women understand and work with 
 - **Streak Tracking** - Build journaling habits with streak counter
 - **Cycle Integration** - Entries automatically tagged with cycle phase and day
 - **Search & Filter** - Find past entries easily
-- **Edit & Delete** - Manage your entries anytime
+- **Delete with Confirmation** - Remove entries with a confirmation tap
 - **Stats Dashboard** - See your journaling streak, weekly entries, and total count
 - **Cloud Sync** - Journal entries sync to the server for backup
 

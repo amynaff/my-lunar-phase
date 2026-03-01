@@ -5,6 +5,7 @@ import {
   ScrollView,
   Pressable,
   Dimensions,
+  Alert,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -26,6 +27,8 @@ import {
   Search,
   Filter,
   Zap,
+  Moon,
+  Trash2,
 } from 'lucide-react-native';
 import * as Haptics from 'expo-haptics';
 import {
@@ -43,7 +46,6 @@ import { useCycleStore, phaseInfo, CyclePhase } from '@/lib/cycle-store';
 import { useJournalStore, journalPrompts, JournalEntry } from '@/lib/journal-store';
 import { JournalEntryModal } from '@/components/JournalEntryModal';
 import { QuickCheckInSheet } from '@/components/QuickCheckInSheet';
-import { JournalInsightsPanel } from '@/components/JournalInsightsPanel';
 
 const { width } = Dimensions.get('window');
 
@@ -67,6 +69,7 @@ export default function JournalScreen() {
   const getStreakCount = useJournalStore((s) => s.getStreakCount);
   const getTotalEntries = useJournalStore((s) => s.getTotalEntries);
   const getEntriesThisWeek = useJournalStore((s) => s.getEntriesThisWeek);
+  const deleteEntry = useJournalStore((s) => s.deleteEntry);
 
   const [viewMode, setViewMode] = useState<ViewMode>('week');
   const [selectedDate, setSelectedDate] = useState(new Date());
@@ -144,6 +147,28 @@ export default function JournalScreen() {
     setEditingEntry(entry);
     setSelectedPrompt(undefined);
     setShowEntryModal(true);
+  };
+
+  const confirmDeleteEntry = (entry: JournalEntry) => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+    Alert.alert(
+      'Delete Entry',
+      'Are you sure you want to delete this journal entry? This cannot be undone.',
+      [
+        {
+          text: 'Cancel',
+          style: 'cancel',
+        },
+        {
+          text: 'Delete',
+          style: 'destructive',
+          onPress: () => {
+            Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+            deleteEntry(entry.id);
+          },
+        },
+      ]
+    );
   };
 
   const formatDate = (dateStr: string) => {
@@ -306,9 +331,6 @@ export default function JournalScreen() {
               </View>
             </View>
           </Animated.View>
-
-          {/* AI Insights Panel - "Luna Noticed..." */}
-          <JournalInsightsPanel style={{ marginTop: 16 }} />
 
           {/* View Mode Toggle */}
           <Animated.View
@@ -587,7 +609,7 @@ export default function JournalScreen() {
                     >
                       {/* Entry Header */}
                       <View className="flex-row items-center justify-between mb-2">
-                        <View className="flex-row items-center">
+                        <View className="flex-row items-center flex-1">
                           <Text
                             style={{ fontFamily: 'Quicksand_500Medium', color: theme.text.tertiary }}
                             className="text-xs"
@@ -613,14 +635,27 @@ export default function JournalScreen() {
                             </View>
                           )}
                         </View>
-                        {entry.voiceMemoUri && (
-                          <View
+                        <View className="flex-row items-center" style={{ gap: 8 }}>
+                          {entry.voiceMemoUri && (
+                            <View
+                              className="w-6 h-6 rounded-full items-center justify-center"
+                              style={{ backgroundColor: `${theme.accent.purple}15` }}
+                            >
+                              <Mic size={12} color={theme.accent.purple} />
+                            </View>
+                          )}
+                          <Pressable
+                            onPress={(e) => {
+                              e.stopPropagation();
+                              confirmDeleteEntry(entry);
+                            }}
                             className="w-6 h-6 rounded-full items-center justify-center"
-                            style={{ backgroundColor: `${theme.accent.purple}15` }}
+                            style={{ backgroundColor: `${theme.accent.pink}15` }}
+                            hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
                           >
-                            <Mic size={12} color={theme.accent.purple} />
-                          </View>
-                        )}
+                            <Trash2 size={12} color={theme.accent.pink} />
+                          </Pressable>
+                        </View>
                       </View>
 
                       {/* Title */}
@@ -678,6 +713,30 @@ export default function JournalScreen() {
                               </View>
                             );
                           })}
+                        </View>
+                      )}
+
+                      {/* Luna's Reflection */}
+                      {(entry as any).lunaReflection && (
+                        <View
+                          className="mt-3 p-3 rounded-xl"
+                          style={{ backgroundColor: `${theme.accent.purple}08` }}
+                        >
+                          <View className="flex-row items-center mb-2">
+                            <Moon size={14} color={theme.accent.purple} />
+                            <Text
+                              style={{ fontFamily: 'Quicksand_600SemiBold', color: theme.accent.purple }}
+                              className="text-xs ml-1.5"
+                            >
+                              Luna noticed...
+                            </Text>
+                          </View>
+                          <Text
+                            style={{ fontFamily: 'Quicksand_400Regular', color: theme.text.secondary }}
+                            className="text-sm leading-5 italic"
+                          >
+                            {(entry as any).lunaReflection}
+                          </Text>
                         </View>
                       )}
                     </Pressable>

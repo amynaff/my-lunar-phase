@@ -134,8 +134,8 @@ journalRouter.post(
       },
     });
 
-    // Trigger async pattern detection after new entry
-    triggerPatternDetection(user.id).catch(console.error);
+    // Generate Luna's reflection asynchronously
+    generateLunaReflection(entry.id, data.content, data.cyclePhase, data.prompt).catch(console.error);
 
     return c.json({
       entry: {
@@ -403,6 +403,96 @@ journalRouter.get("/stats", async (c) => {
     },
   });
 });
+
+// ==================== Luna Reflection Generation ====================
+
+async function generateLunaReflection(
+  entryId: string,
+  content: string,
+  cyclePhase?: string,
+  prompt?: string
+) {
+  const apiKey = process.env.GROK_API_KEY;
+  if (!apiKey) {
+    console.log("GROK_API_KEY not configured, skipping Luna reflection");
+    return;
+  }
+
+  // Don't generate for very short entries
+  if (content.length < 20) {
+    return;
+  }
+
+  const phaseContext = cyclePhase
+    ? `The user is currently in their ${cyclePhase} phase.`
+    : "";
+
+  const promptContext = prompt ? `They were responding to the prompt: "${prompt}"` : "";
+
+  const systemPrompt = `You are Luna, a warm and attentive journal companion for a women's wellness app. Your role is to truly pay attention to what someone writes and respond with genuine care.
+
+When someone shares a journal entry with you, write a SHORT personal reflection (2-3 sentences max) that:
+1. Notices ONE specific thing they mentioned - a feeling, an observation, a detail that stood out
+2. Reflects it back to them with warmth and understanding
+3. Ends with a gentle, open question that invites deeper thought (not advice, not a summary)
+
+IMPORTANT:
+- Be genuinely attentive, not generic
+- Don't give advice or try to fix anything
+- Don't summarize what they wrote
+- Don't use phrases like "I hear you" or "It sounds like"
+- Be specific - reference actual words or feelings they shared
+- Keep it short and intimate, like a thoughtful friend
+- Write in first person as Luna
+
+${phaseContext}
+${promptContext}`;
+
+  const userMessage = `Here's my journal entry:
+
+${content}`;
+
+  try {
+    const response = await fetch("https://api.x.ai/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${apiKey}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        model: "grok-4-fast-non-reasoning",
+        messages: [
+          { role: "system", content: systemPrompt },
+          { role: "user", content: userMessage },
+        ],
+        max_tokens: 200,
+        temperature: 0.8,
+      }),
+    });
+
+    if (!response.ok) {
+      console.error("Grok API error:", response.status);
+      return;
+    }
+
+    const data = (await response.json()) as GrokResponse;
+    const reflection = data.choices[0]?.message?.content;
+
+    if (!reflection) {
+      return;
+    }
+
+    // Update the entry with Luna's reflection
+    await prisma.journalEntry.update({
+      where: { id: entryId },
+      data: { lunaReflection: reflection.trim() },
+    });
+
+    console.log(`Generated Luna reflection for entry ${entryId}`);
+  } catch (error) {
+    console.error("Luna reflection error:", error);
+  }
+}
 
 // ==================== Pattern Detection Logic ====================
 
