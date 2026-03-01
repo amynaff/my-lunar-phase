@@ -387,11 +387,11 @@ const educationSections: EducationSection[] = [
       },
       {
         type: 'paragraph',
-        text: 'Rather than chasing "normal" ranges, aim for optimal ratios and symptom resolution. Work with a practitioner who understands functional hormone optimization.',
+        text: 'Rather than chasing "normal" ranges, aim for optimal ratios and symptom resolution.',
       },
       {
         type: 'tip',
-        text: 'Track your symptoms alongside lab results to see what truly helps YOU.',
+        text: 'For personalized recommendations, consult a knowledgeable practitioner for testing, monitoring, and tailored dosing.',
       },
     ],
   },
@@ -578,7 +578,7 @@ export default function HormonalEducationScreen() {
                   style={{ fontFamily: 'Quicksand_600SemiBold', color: theme.accent.pink }}
                   className="text-sm mb-1"
                 >
-                  Consult Your Doctor
+                  Work with a Qualified Practitioner
                 </Text>
                 <Text
                   style={{
@@ -588,7 +588,7 @@ export default function HormonalEducationScreen() {
                   }}
                   className="text-xs"
                 >
-                  This information is educational only. Hormone therapy requires individualized assessment by a qualified healthcare provider. Never start or change hormone treatment without medical guidance.
+                  For personalized recommendations, consult a knowledgeable practitioner for testing, monitoring, and tailored dosing.
                 </Text>
               </View>
             </View>
@@ -816,7 +816,7 @@ export default function HormonalEducationScreen() {
               }}
               className="text-xs text-center"
             >
-              This educational content is not medical advice. Hormone therapy decisions should be made with a qualified healthcare provider who can assess your individual situation, review your lab work, and monitor your response to treatment.
+              This content is educational. For personalized recommendations, consult a knowledgeable practitioner for testing, monitoring, and tailored dosing.
             </Text>
           </Animated.View>
         </ScrollView>
