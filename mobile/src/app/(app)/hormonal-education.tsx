@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { View, Text, ScrollView, Pressable } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -24,6 +24,7 @@ import {
   Scale,
 } from 'lucide-react-native';
 import { useThemeStore, getTheme } from '@/lib/theme-store';
+import { useCycleStore, LifeStage } from '@/lib/cycle-store';
 import { router } from 'expo-router';
 import * as Haptics from 'expo-haptics';
 import {
@@ -44,6 +45,8 @@ interface EducationSection {
   icon: typeof Heart;
   color: string;
   content: ContentBlock[];
+  // Which life stages this section is relevant for
+  lifeStages: LifeStage[];
 }
 
 interface ContentBlock {
@@ -58,6 +61,7 @@ const educationSections: EducationSection[] = [
     subtitle: 'The foundation of wellness',
     icon: Scale,
     color: '#c084fc',
+    lifeStages: ['regular', 'perimenopause', 'menopause', 'postmenopause'],
     content: [
       {
         type: 'paragraph',
@@ -111,6 +115,7 @@ const educationSections: EducationSection[] = [
     subtitle: 'Often the first priority',
     icon: Shield,
     color: '#34d399',
+    lifeStages: ['regular', 'perimenopause', 'menopause', 'postmenopause'],
     content: [
       {
         type: 'paragraph',
@@ -160,6 +165,7 @@ const educationSections: EducationSection[] = [
     subtitle: 'DHEA, Pregnenolone & Thyroid',
     icon: Zap,
     color: '#fbbf24',
+    lifeStages: ['regular', 'perimenopause', 'menopause', 'postmenopause'],
     content: [
       {
         type: 'heading',
@@ -197,6 +203,7 @@ const educationSections: EducationSection[] = [
     subtitle: 'After foundational support',
     icon: Droplets,
     color: '#f472b6',
+    lifeStages: ['regular', 'perimenopause', 'menopause', 'postmenopause'],
     content: [
       {
         type: 'paragraph',
@@ -250,6 +257,7 @@ const educationSections: EducationSection[] = [
     subtitle: 'Natural hormone support',
     icon: Leaf,
     color: '#22c55e',
+    lifeStages: ['regular', 'perimenopause', 'menopause', 'postmenopause'],
     content: [
       {
         type: 'paragraph',
@@ -307,6 +315,7 @@ const educationSections: EducationSection[] = [
     subtitle: 'Not all natural is helpful',
     icon: AlertTriangle,
     color: '#ef4444',
+    lifeStages: ['regular', 'perimenopause', 'menopause', 'postmenopause'],
     content: [
       {
         type: 'paragraph',
@@ -348,6 +357,7 @@ const educationSections: EducationSection[] = [
     subtitle: 'Polycystic ovary syndrome',
     icon: Heart,
     color: '#f472b6',
+    lifeStages: ['regular'],
     content: [
       {
         type: 'paragraph',
@@ -405,6 +415,7 @@ const educationSections: EducationSection[] = [
     subtitle: 'Managing inflammation & pain',
     icon: Shield,
     color: '#a78bfa',
+    lifeStages: ['regular'],
     content: [
       {
         type: 'paragraph',
@@ -466,6 +477,7 @@ const educationSections: EducationSection[] = [
     subtitle: 'For regular menstrual cycles',
     icon: Moon,
     color: '#06b6d4',
+    lifeStages: ['regular'],
     content: [
       {
         type: 'paragraph',
@@ -547,6 +559,7 @@ const educationSections: EducationSection[] = [
     subtitle: 'Track ratios, not just levels',
     icon: Activity,
     color: '#60a5fa',
+    lifeStages: ['regular', 'perimenopause', 'menopause', 'postmenopause'],
     content: [
       {
         type: 'paragraph',
@@ -600,7 +613,15 @@ export default function HormonalEducationScreen() {
   const insets = useSafeAreaInsets();
   const themeMode = useThemeStore((s) => s.mode);
   const theme = getTheme(themeMode);
+  const lifeStage = useCycleStore((s) => s.lifeStage);
   const [expandedSections, setExpandedSections] = useState<string[]>(['understanding']);
+
+  // Filter sections based on user's life stage
+  const filteredSections = useMemo(() => {
+    return educationSections.filter((section) =>
+      section.lifeStages.includes(lifeStage)
+    );
+  }, [lifeStage]);
 
   const [fontsLoaded] = useFonts({
     CormorantGaramond_400Regular,
@@ -899,7 +920,7 @@ export default function HormonalEducationScreen() {
               Learn More
             </Text>
 
-            {educationSections.map((section, index) => {
+            {filteredSections.map((section, index) => {
               const isExpanded = expandedSections.includes(section.id);
               const Icon = section.icon;
 
