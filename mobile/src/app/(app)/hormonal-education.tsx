@@ -55,17 +55,73 @@ interface ContentBlock {
 }
 
 const educationSections: EducationSection[] = [
+  // Section for PERI/MENO/POSTMENO users - Understanding the transition
   {
-    id: 'understanding',
-    title: 'Understanding Hormonal Balance',
-    subtitle: 'The foundation of wellness',
+    id: 'understanding-menopause',
+    title: 'Understanding Your Hormonal Shift',
+    subtitle: 'What\'s really happening',
     icon: Scale,
     color: '#c084fc',
-    lifeStages: ['regular', 'perimenopause', 'menopause', 'postmenopause'],
+    lifeStages: ['perimenopause', 'menopause', 'postmenopause'],
     content: [
       {
         type: 'paragraph',
-        text: 'Many women experience hormonal imbalances at various life stages—whether dealing with PCOS, endometriosis, PMS, perimenopause, or postmenopause. Common symptoms include irregular periods, heavy bleeding, mood changes, weight challenges, fatigue, brain fog, and inflammation.',
+        text: 'Many women experience significant shifts in hormone balance during and after menopause, often leading to symptoms like hot flashes, night sweats, insomnia, mood changes, weight gain, fatigue, brain fog, and increased inflammation.',
+      },
+      {
+        type: 'heading',
+        text: 'The Real Story About Estrogen',
+      },
+      {
+        type: 'paragraph',
+        text: 'A common misunderstanding is that these issues stem mainly from a simple lack of estrogen that needs routine replacement. In reality, while overall estrogen production declines, a sharp drop in progesterone can create a state of relative estrogen dominance—where estrogen\'s effects become unopposed or exaggerated in tissues, even if blood levels appear low.',
+      },
+      {
+        type: 'heading',
+        text: 'Why This Imbalance Happens',
+      },
+      {
+        type: 'paragraph',
+        text: 'This imbalance arises because progesterone levels plummet far more dramatically than estrogen in menopause (and often start earlier in perimenopause). Several factors worsen this pattern:',
+      },
+      {
+        type: 'bullet',
+        text: 'Chronic stress elevates cortisol, stealing progesterone precursors',
+      },
+      {
+        type: 'bullet',
+        text: 'Nutrient deficiencies impair hormone production',
+      },
+      {
+        type: 'bullet',
+        text: 'Environmental estrogens (xenoestrogens) add to estrogen load',
+      },
+      {
+        type: 'heading',
+        text: 'The Progesterone-to-Estrogen Ratio',
+      },
+      {
+        type: 'paragraph',
+        text: 'A disrupted progesterone-to-estrogen ratio (ideally 200–500 or higher) allows estrogen to promote cell proliferation (especially in breast and uterine tissues), suppress thyroid function, encourage fat storage and fibrosis, thicken blood, impair mitochondrial energy production, and contribute to insulin resistance and heightened stress responses via elevated cortisol.',
+      },
+      {
+        type: 'tip',
+        text: 'A more protective, balanced approach focuses on restoring harmony rather than immediately adding estrogen.',
+      },
+    ],
+  },
+  // Section for REGULAR cycling women - Understanding hormonal balance
+  {
+    id: 'understanding-cycling',
+    title: 'Understanding Hormonal Balance',
+    subtitle: 'The foundation of cycle wellness',
+    icon: Scale,
+    color: '#c084fc',
+    lifeStages: ['regular'],
+    content: [
+      {
+        type: 'paragraph',
+        text: 'Many women experience hormonal imbalances during their cycling years—whether dealing with PCOS, endometriosis, or PMS. Common symptoms include irregular periods, heavy bleeding, mood changes, weight challenges, fatigue, and inflammation.',
       },
       {
         type: 'heading',
@@ -73,7 +129,7 @@ const educationSections: EducationSection[] = [
       },
       {
         type: 'paragraph',
-        text: 'A common misunderstanding is that symptoms stem from simple estrogen deficiency. In reality, low or inconsistent progesterone often creates relative estrogen dominance—where estrogen\'s effects become unopposed or exaggerated, even when estrogen levels appear normal or low.',
+        text: 'A common misunderstanding is that symptoms stem from simple estrogen deficiency. In reality, low or inconsistent progesterone often creates relative estrogen dominance—where estrogen\'s effects become unopposed or exaggerated, even when estrogen levels appear normal.',
       },
       {
         type: 'heading',
@@ -81,7 +137,7 @@ const educationSections: EducationSection[] = [
       },
       {
         type: 'paragraph',
-        text: 'Progesterone levels can be disrupted by irregular ovulation (PCOS), decline dramatically in perimenopause, or drop to near-zero after menopause. Several factors worsen this pattern:',
+        text: 'Progesterone levels can be disrupted by irregular ovulation (common in PCOS) or other factors:',
       },
       {
         type: 'bullet',
@@ -109,17 +165,18 @@ const educationSections: EducationSection[] = [
       },
     ],
   },
+  // Progesterone section for PERI/MENO/POSTMENO
   {
-    id: 'progesterone',
-    title: 'Progesterone: The Protective Hormone',
-    subtitle: 'Often the first priority',
+    id: 'progesterone-menopause',
+    title: 'Progesterone: Your Primary Foundation',
+    subtitle: 'The first priority in hormone support',
     icon: Shield,
     color: '#34d399',
-    lifeStages: ['regular', 'perimenopause', 'menopause', 'postmenopause'],
+    lifeStages: ['perimenopause', 'menopause', 'postmenopause'],
     content: [
       {
         type: 'paragraph',
-        text: 'Bioidentical progesterone is often the primary foundation of hormone support. This hormone addresses many symptoms directly and provides crucial protective effects.',
+        text: 'Bioidentical progesterone is often the primary foundation of hormone support during and after menopause. This hormone often addresses many symptoms directly and provides crucial protective effects.',
       },
       {
         type: 'heading',
@@ -127,7 +184,7 @@ const educationSections: EducationSection[] = [
       },
       {
         type: 'bullet',
-        text: 'Balances relative estrogen effects',
+        text: 'Helps balance any relative estrogen effects',
       },
       {
         type: 'bullet',
@@ -154,19 +211,79 @@ const educationSections: EducationSection[] = [
         text: 'Supports bone health',
       },
       {
+        type: 'heading',
+        text: 'Why Bioidentical?',
+      },
+      {
+        type: 'paragraph',
+        text: 'Bioidentical hormones match the body\'s natural chemistry exactly. They are often better tolerated than synthetics and can be dosed precisely to your individual needs.',
+      },
+      {
         type: 'tip',
         text: 'Topical creams or other non-oral forms are commonly preferred for better absorption and fewer side effects.',
       },
     ],
   },
+  // Progesterone section for REGULAR cycling women
   {
-    id: 'supportive',
+    id: 'progesterone-cycling',
+    title: 'Progesterone: The Protective Hormone',
+    subtitle: 'Often the first priority',
+    icon: Shield,
+    color: '#34d399',
+    lifeStages: ['regular'],
+    content: [
+      {
+        type: 'paragraph',
+        text: 'Bioidentical progesterone is often the primary foundation of hormone support for cycling women. This hormone addresses many symptoms directly and provides crucial protective effects.',
+      },
+      {
+        type: 'heading',
+        text: 'Key Benefits of Progesterone',
+      },
+      {
+        type: 'bullet',
+        text: 'Balances relative estrogen effects',
+      },
+      {
+        type: 'bullet',
+        text: 'Supports mood and stress resilience',
+      },
+      {
+        type: 'bullet',
+        text: 'Reduces inflammation throughout the body',
+      },
+      {
+        type: 'bullet',
+        text: 'Helps regulate menstrual cycles',
+      },
+      {
+        type: 'bullet',
+        text: 'Eases PMS symptoms',
+      },
+      {
+        type: 'bullet',
+        text: 'Supports fertility and healthy pregnancy',
+      },
+      {
+        type: 'tip',
+        text: 'Cyclic use (e.g., days 14–28) via topical cream or oral micronized capsules is often recommended for cycling women.',
+      },
+    ],
+  },
+  // Supportive Hormones for PERI/MENO/POSTMENO
+  {
+    id: 'supportive-menopause',
     title: 'Supportive Hormones',
     subtitle: 'DHEA, Pregnenolone & Thyroid',
     icon: Zap,
     color: '#fbbf24',
-    lifeStages: ['regular', 'perimenopause', 'menopause', 'postmenopause'],
+    lifeStages: ['perimenopause', 'menopause', 'postmenopause'],
     content: [
+      {
+        type: 'paragraph',
+        text: 'After establishing progesterone as your foundation, these supportive hormones can further optimize your wellbeing:',
+      },
       {
         type: 'heading',
         text: 'DHEA (Low Doses)',
@@ -185,11 +302,11 @@ const educationSections: EducationSection[] = [
       },
       {
         type: 'heading',
-        text: 'Thyroid Support',
+        text: 'Natural Desiccated Thyroid',
       },
       {
         type: 'paragraph',
-        text: 'Thyroid function frequently declines with age, contributing to fatigue, weight challenges, and cognitive fog. Natural desiccated thyroid (if indicated by testing) can make a significant difference.',
+        text: 'Thyroid function frequently declines with age, contributing to fatigue, weight challenges, and cognitive fog. Addressing it (if indicated by testing) can make a significant difference.',
       },
       {
         type: 'tip',
@@ -197,33 +314,18 @@ const educationSections: EducationSection[] = [
       },
     ],
   },
+  // When to Consider Estrogen - PERI/MENO/POSTMENO specific
   {
-    id: 'estrogen',
+    id: 'estrogen-menopause',
     title: 'When to Consider Estrogen',
-    subtitle: 'After foundational support',
+    subtitle: 'Only after foundational support',
     icon: Droplets,
     color: '#f472b6',
-    lifeStages: ['regular', 'perimenopause', 'menopause', 'postmenopause'],
+    lifeStages: ['perimenopause', 'menopause', 'postmenopause'],
     content: [
       {
         type: 'paragraph',
-        text: 'Only after optimizing protective elements—progesterone, DHEA, pregnenolone, thyroid, and lifestyle—should estrogen be considered if symptoms persist.',
-      },
-      {
-        type: 'heading',
-        text: 'Indications for Estrogen',
-      },
-      {
-        type: 'bullet',
-        text: 'Persistent vaginal dryness unresponsive to other treatments',
-      },
-      {
-        type: 'bullet',
-        text: 'Severe hot flashes affecting quality of life',
-      },
-      {
-        type: 'bullet',
-        text: 'Low energy despite other optimizations',
+        text: 'Only after optimizing protective elements—progesterone, DHEA, pregnenolone, thyroid, and lifestyle—and if symptoms like persistent vaginal dryness, low energy, or severe hot flashes remain—consider adding a small amount of bioidentical estrogen.',
       },
       {
         type: 'heading',
@@ -231,7 +333,7 @@ const educationSections: EducationSection[] = [
       },
       {
         type: 'bullet',
-        text: 'Use bioidentical forms (topical cream preferred)',
+        text: 'Use bioidentical forms (typically as a topical cream)',
       },
       {
         type: 'bullet',
@@ -239,11 +341,15 @@ const educationSections: EducationSection[] = [
       },
       {
         type: 'bullet',
-        text: 'Always pair with adequate progesterone',
+        text: 'Always pair with adequate progesterone to maintain balance',
       },
       {
         type: 'bullet',
-        text: 'Symptom-guided, as-needed dosing often favored',
+        text: 'Symptom-guided, as-needed dosing is often favored',
+      },
+      {
+        type: 'paragraph',
+        text: 'Especially for women with lower body mass or specific tissue storage patterns, as-needed dosing (rather than continuous or fixed schedules) may be preferable.',
       },
       {
         type: 'warning',
@@ -251,13 +357,14 @@ const educationSections: EducationSection[] = [
       },
     ],
   },
+  // Lifestyle section for PERI/MENO/POSTMENO
   {
-    id: 'lifestyle',
+    id: 'lifestyle-menopause',
     title: 'Lifestyle Foundations',
-    subtitle: 'Natural hormone support',
+    subtitle: 'Essential supports for hormone balance',
     icon: Leaf,
     color: '#22c55e',
-    lifeStages: ['regular', 'perimenopause', 'menopause', 'postmenopause'],
+    lifeStages: ['perimenopause', 'menopause', 'postmenopause'],
     content: [
       {
         type: 'paragraph',
@@ -273,7 +380,7 @@ const educationSections: EducationSection[] = [
       },
       {
         type: 'heading',
-        text: 'Natural Light Exposure',
+        text: 'Natural Sunlight Exposure',
       },
       {
         type: 'paragraph',
@@ -281,11 +388,11 @@ const educationSections: EducationSection[] = [
       },
       {
         type: 'heading',
-        text: 'Movement',
+        text: 'Regular Movement',
       },
       {
         type: 'paragraph',
-        text: 'Regular physical activity improves insulin sensitivity, supports bone health, and helps manage stress. Include both strength training and gentle movement.',
+        text: 'Physical activity improves insulin sensitivity, supports bone health, and helps manage stress. Include both strength training and gentle movement.',
       },
       {
         type: 'heading',
@@ -309,17 +416,18 @@ const educationSections: EducationSection[] = [
       },
     ],
   },
+  // Cautions section for PERI/MENO/POSTMENO
   {
-    id: 'cautions',
+    id: 'cautions-menopause',
     title: 'What to Approach with Caution',
     subtitle: 'Not all natural is helpful',
     icon: AlertTriangle,
     color: '#ef4444',
-    lifeStages: ['regular', 'perimenopause', 'menopause', 'postmenopause'],
+    lifeStages: ['perimenopause', 'menopause', 'postmenopause'],
     content: [
       {
         type: 'paragraph',
-        text: 'Some commonly recommended supplements may not be as helpful as believed, or may even worsen certain imbalances.',
+        text: 'Avoid or use caution with these commonly recommended but potentially problematic approaches:',
       },
       {
         type: 'heading',
@@ -327,7 +435,7 @@ const educationSections: EducationSection[] = [
       },
       {
         type: 'paragraph',
-        text: 'Does not reliably convert to progesterone in the body and may have estrogenic activity. Not a substitute for bioidentical progesterone.',
+        text: 'Does not reliably raise progesterone in the body and may actually have estrogenic activity. Not a substitute for bioidentical progesterone.',
       },
       {
         type: 'heading',
@@ -343,7 +451,7 @@ const educationSections: EducationSection[] = [
       },
       {
         type: 'paragraph',
-        text: 'These may not sufficiently balance estrogen or could increase estrogen load in some cases. Individual response varies significantly.',
+        text: 'These might not sufficiently balance estrogen or could even increase estrogen load in some cases. Individual response varies significantly.',
       },
       {
         type: 'warning',
@@ -351,6 +459,58 @@ const educationSections: EducationSection[] = [
       },
     ],
   },
+  // Additional Considerations for PERI/MENO/POSTMENO
+  {
+    id: 'considerations-menopause',
+    title: 'Additional Considerations',
+    subtitle: 'A holistic approach',
+    icon: Heart,
+    color: '#ec4899',
+    lifeStages: ['perimenopause', 'menopause', 'postmenopause'],
+    content: [
+      {
+        type: 'paragraph',
+        text: 'Hormones form an interconnected network—adjusting one impacts others, so isolated replacement can sometimes create new imbalances.',
+      },
+      {
+        type: 'heading',
+        text: 'Protection Over Replacement',
+      },
+      {
+        type: 'paragraph',
+        text: 'In contexts like cancer prevention or management, the emphasis remains on protective strategies (e.g., progesterone\'s opposing role to estrogen\'s proliferative effects) rather than unopposed estrogen.',
+      },
+      {
+        type: 'heading',
+        text: 'Holistic Supports',
+      },
+      {
+        type: 'paragraph',
+        text: 'Testing ratios, tracking symptoms, and incorporating holistic supports enhance safety and effectiveness:',
+      },
+      {
+        type: 'bullet',
+        text: 'Nutrition optimization',
+      },
+      {
+        type: 'bullet',
+        text: 'Stress management practices',
+      },
+      {
+        type: 'bullet',
+        text: 'Targeted supplements',
+      },
+      {
+        type: 'bullet',
+        text: 'Acupuncture and bodywork',
+      },
+      {
+        type: 'tip',
+        text: 'Many women find improved energy, mood, sleep, metabolism, libido, and overall vitality through this individualized, root-cause-focused method.',
+      },
+    ],
+  },
+  // ========== SECTIONS FOR REGULAR CYCLING WOMEN ==========
   {
     id: 'pcos',
     title: 'PCOS Support',
@@ -553,6 +713,7 @@ const educationSections: EducationSection[] = [
       },
     ],
   },
+  // Testing section - for all life stages
   {
     id: 'testing',
     title: 'Testing & Monitoring',
