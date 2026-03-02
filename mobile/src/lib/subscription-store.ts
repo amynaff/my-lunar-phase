@@ -87,14 +87,22 @@ export const useSubscriptionStore = create<SubscriptionStore>()(
 // Subscription pricing (for display purposes)
 export const subscriptionPricing = {
   monthly: {
-    price: 9.99,
+    price: 2.99,
     period: 'month',
     savings: null,
+    identifier: '$rc_monthly',
   },
   yearly: {
-    price: 59.99,
+    price: 19.99,
     period: 'year',
-    savings: '50%',
-    monthlyEquivalent: 4.99,
+    savings: '44%',
+    monthlyEquivalent: 1.67,
+    identifier: '$rc_annual',
+  },
+  lifetime: {
+    price: 39.99,
+    period: 'lifetime',
+    savings: null,
+    identifier: '$rc_lifetime',
   },
 };
