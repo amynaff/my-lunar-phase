@@ -113,14 +113,18 @@ export default function PaywallScreen() {
   if (!fontsLoaded) return null;
 
   const handlePurchase = async () => {
+    console.log('[Paywall] handlePurchase called, selectedPlan:', selectedPlan);
+
+    // Web platform handling
+    if (Platform.OS === 'web') {
+      setError('Purchases are only available in the mobile app. Please open the app on your iPhone to subscribe.');
+      return;
+    }
+
     const selectedPackage = packages[selectedPlan];
+    console.log('[Paywall] selectedPackage:', selectedPackage?.identifier);
 
     if (!selectedPackage) {
-      // Fallback for web or when RevenueCat isn't configured
-      if (Platform.OS === 'web') {
-        setError('Purchases are only available in the mobile app');
-        return;
-      }
       setError('Unable to load subscription. Please try again.');
       return;
     }
@@ -603,16 +607,18 @@ export default function PaywallScreen() {
 
         {/* Subscribe Button */}
         <View
-          style={{ paddingBottom: insets.bottom + 16 }}
+          style={{ paddingBottom: insets.bottom + 16, backgroundColor: '#0f0a1e' }}
           className="px-6 absolute bottom-0 left-0 right-0"
         >
           <LinearGradient
             colors={['transparent', 'rgba(15, 10, 30, 0.95)', '#0f0a1e']}
             style={{ position: 'absolute', top: -60, left: 0, right: 0, height: 80 }}
+            pointerEvents="none"
           />
           <Pressable
             onPress={handlePurchase}
             disabled={isPurchasing || isLoading}
+            style={({ pressed }) => ({ opacity: pressed ? 0.8 : 1 })}
           >
             <LinearGradient
               colors={['#c4b5fd', '#f9a8d4']}
