@@ -1,21 +1,32 @@
 {
   "expo": {
     "name": "My Lunar Phase",
-    "slug": "my-lunar-phase",
+    "slug": "mylunarphase",
     "scheme": "my-lunar-phase",
     "version": "1.0.0",
     "orientation": "portrait",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.mylunarphase.app",
+      "buildNumber": "1",
+      "infoPlist": {
+        "NSMicrophoneUsageDescription": "LunaFlow uses the microphone to record audio tracks that the app attaches to your creations.",
+        "UIBackgroundModes": [
+          "remote-notification"
+        ]
+      }
     },
     "android": {
       "edgeToEdgeEnabled": true
     },
-    "plugins": ["expo-router"],
+    "plugins": [
+      "expo-router"
+    ],
     "experiments": {
       "typedRoutes": true
-    }
+    },
+    "icon": "./icon.png"
   }
 }
