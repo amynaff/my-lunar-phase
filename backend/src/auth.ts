@@ -1,7 +1,6 @@
 import { betterAuth } from "better-auth";
 import { expo } from "@better-auth/expo";
 import { prismaAdapter } from "better-auth/adapters/prisma";
-import { emailOTP } from "better-auth/plugins";
 import { prisma } from "./prisma";
 import { env } from "./env";
 
@@ -18,32 +17,26 @@ export const auth = betterAuth({
     "https://*.dev.vibecode.run",
     "https://*.vibecode.run",
     "https://*.vibecodeapp.com",
+    "https://appleid.apple.com",
     env.BACKEND_URL,
   ],
 
+  // Social sign-in providers (one-tap authentication)
+  socialProviders: {
+    apple: {
+      clientId: process.env.APPLE_CLIENT_ID || "com.mylunarphase.app",
+      clientSecret: process.env.APPLE_CLIENT_SECRET || "",
+      // For native iOS apps, this is the bundle ID
+      appBundleIdentifier: process.env.APPLE_BUNDLE_ID || "com.mylunarphase.app",
+    },
+    google: {
+      clientId: process.env.GOOGLE_CLIENT_ID || "",
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET || "",
+    },
+  },
+
   plugins: [
     expo(),
-    emailOTP({
-      async sendVerificationOTP({ email, otp, type }) {
-        if (type !== "sign-in") return;
-
-        const response = await fetch("https://smtp.vibecodeapp.com/v1/send/otp", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            to: email,
-            code: String(otp),
-            fromName: "My Lunar Phase",
-            lang: "en",
-          }),
-        });
-
-        if (!response.ok) {
-          const data = (await response.json().catch(() => null)) as { error?: string } | null;
-          throw new Error(data?.error || `Failed to send OTP (HTTP ${response.status})`);
-        }
-      },
-    }),
   ],
 
   advanced: {
