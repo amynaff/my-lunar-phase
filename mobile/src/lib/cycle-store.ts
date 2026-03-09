@@ -242,34 +242,34 @@ const phaseGroceries: Record<CyclePhase, Array<{ name: string; category: string 
     { name: 'Seaweed (kelp, dulse)', category: 'Vegetables' },
     { name: 'Lemons', category: 'Fruits' },
     // Vitamin E sources
-    { name: 'Wheat germ oil', category: 'Oils' },
+    { name: 'Wheat germ', category: 'Grains' },
     { name: 'Whole grains', category: 'Grains' },
     { name: 'Sweet potatoes', category: 'Vegetables' },
     { name: 'Mixed nuts', category: 'Nuts' },
-    // Linoleic acid sources
-    { name: 'Raw safflower oil', category: 'Oils' },
-    { name: 'Fertile eggs (pasture-raised)', category: 'Protein' },
-    { name: 'Liver', category: 'Protein' },
-    { name: 'Walnuts', category: 'Nuts' },
-    { name: 'Sunflower seeds', category: 'Seeds' },
-    { name: 'Pumpkin seeds', category: 'Seeds' },
-    // Protein sources
+    // Omega-3 sources (anti-inflammatory)
     { name: 'Wild salmon', category: 'Protein' },
+    { name: 'Sardines', category: 'Protein' },
+    { name: 'Walnuts', category: 'Nuts' },
+    { name: 'Flaxseeds', category: 'Seeds' },
+    { name: 'Chia seeds', category: 'Seeds' },
+    // Protein sources
     { name: 'Chicken', category: 'Protein' },
     { name: 'Tofu', category: 'Protein' },
     { name: 'Legumes', category: 'Protein' },
+    { name: 'Eggs', category: 'Protein' },
     { name: 'Tahini', category: 'Pantry' },
-    // Best days for dairy
+    // Best days for dairy (calcium)
     { name: 'Greek yogurt', category: 'Dairy' },
     { name: 'Cheese', category: 'Dairy' },
     { name: 'Milk', category: 'Dairy' },
-    // Greens
+    // Greens (magnesium & B vitamins)
     { name: 'Dark leafy greens', category: 'Vegetables' },
+    { name: 'Spinach', category: 'Vegetables' },
     { name: 'Parsley', category: 'Produce' },
     { name: 'Dandelion greens', category: 'Vegetables' },
-    // Lecithin
-    { name: 'Lecithin granules', category: 'Supplements' },
-    { name: 'Fenugreek seeds', category: 'Seeds' },
+    // B vitamin sources
+    { name: 'Sunflower seeds', category: 'Seeds' },
+    { name: 'Pumpkin seeds', category: 'Seeds' },
   ],
   ovulatory: [
     // Vitamin B6 sources (eat raw when possible)
