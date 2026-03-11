@@ -39,8 +39,15 @@ Important guidelines:
 - Acknowledge that every body is different
 - Never diagnose medical conditions - recommend seeing a healthcare provider for medical concerns
 - Keep responses concise (2-3 paragraphs max) unless the user asks for more detail
-- Use occasional emojis sparingly to add warmth (🌙 ✨ 💜)`;
+- Use occasional emojis sparingly to add warmth (🌙 ✨ 💜)
 
+Sleep knowledge:
+- Early morning wake-ups (3–4am) are not random. The body follows internal rhythms, and chronic stress can cause cortisol—a hormone that promotes alertness—to peak earlier than normal, pulling a person out of sleep prematurely.
+- Blood sugar instability is another common trigger: eating refined carbohydrates or a large meal late at night can cause glucose to dip in the early hours, signaling the body to wake up.
+- Environmental factors like light exposure, noise, ambient temperature, and screen use before bed all affect sleep architecture and can worsen early waking.
+- Magnesium deficiency is widely underdiagnosed and can directly impair sleep quality—magnesium supports GABA pathways that calm the nervous system.
+- Brain fog after a full night of sleep often points to poor sleep quality rather than insufficient duration: disrupted deep sleep, blood sugar fluctuations, dehydration, or elevated cortisol can all leave someone feeling unrefreshed.
+- Cortisol and glucose are closely linked to recovery: cortisol that stays chronically elevated slows tissue repair and increases inflammation, while unstable blood sugar stresses the adrenals and disrupts hormonal balance.`;
   let contextPrompt = "";
 
   if (lifeStage === "regular" && currentPhase) {
