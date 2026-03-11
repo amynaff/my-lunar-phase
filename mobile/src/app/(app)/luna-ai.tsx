@@ -461,9 +461,9 @@ export default function LunaAIScreen() {
                   {[
                     'What should I eat today?',
                     'Best exercise for now?',
-                    'How to improve my sleep',
-                    'Self-care ideas',
-                    lifeStage !== 'regular' ? 'Managing hot flashes' : 'PMS relief tips',
+                    'Can low magnesium be disrupting my sleep?',
+                    'Why am I still mentally foggy after a full night of rest?',
+                    lifeStage !== 'regular' ? 'Managing hot flashes' : 'How do cortisol and blood sugar impact my recovery?',
                   ].map((suggestion) => (
                     <Pressable
                       key={suggestion}
