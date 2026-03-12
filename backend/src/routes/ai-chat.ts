@@ -54,21 +54,29 @@ Sleep knowledge:
     contextPrompt = `
 
 The user is currently in their ${currentPhase} phase of their menstrual cycle. Tailor your advice to support this specific phase:
-- Menstrual: Rest, iron-rich foods, gentle movement, self-compassion
-- Follicular: Rising energy, new projects, strength training, light fresh foods
-- Ovulatory: Peak energy, social activities, high-intensity workouts, communication
-- Luteal: Winding down, comfort foods, moderate exercise, boundaries`;
-  } else if ((lifeStage === "perimenopause" || lifeStage === "menopause") && moonPhase) {
+- Menstrual: Rest, iron-rich foods, gentle movement, self-compassion. Corresponds to New Moon energy.
+- Follicular: Rising energy, new projects, strength training, light fresh foods. Corresponds to Waxing Moon energy.
+- Ovulatory: Peak energy, social activities, high-intensity workouts, communication. Corresponds to Full Moon energy.
+- Luteal: Winding down, comfort foods, moderate exercise, boundaries. Corresponds to Waning Moon energy.
+
+Menstrual-Lunar Connection: A 2021 study in Science Advances found that women under 35 with longer cycles (closer to 29.5 days) showed intermittent synchronization between menstruation and lunar phases. While this synchronization is not universal, many women find meaning in connecting their cycles to moon phases.`;
+  } else if ((lifeStage === "perimenopause" || lifeStage === "menopause" || lifeStage === "postmenopause") && moonPhase) {
     contextPrompt = `
 
-The user is ${lifeStage === "perimenopause" ? "in perimenopause" : "post-menopausal"} and follows the moon phases for wellness guidance.
+The user is ${lifeStage === "perimenopause" ? "in perimenopause" : lifeStage === "menopause" ? "in menopause" : "post-menopausal"} and follows the moon phases for wellness guidance.
 Current moon phase: ${moonPhase}
 
-Moon phase guidance:
-- New Moon / Waning Crescent: Rest, reflection, intention setting
-- Waxing Crescent / First Quarter: New beginnings, action, building energy
-- Waxing Gibbous / Full Moon: Peak energy, celebration, connection
-- Waning Gibbous / Last Quarter: Gratitude, release, winding down
+Being in tune with moon phases is a way for women in all situations—city or countryside—to connect with the rhythms of nature. For women whose menstrual cycles have become irregular or stopped, the moon provides a beautiful framework for wellness.
+
+Complete Moon Phase Guide:
+- New Moon (Dark Moon): Symbolizes new beginnings, introspection, and planting intentions. Time to set goals, cleanse energy, and embrace the unknown. Energy is inward and restorative.
+- Waxing Crescent (Growing Moon): Embodies growth, action, and building momentum. Focus on intentions, take steps toward goals, cultivate positive energy.
+- First Quarter (Waxing Half Moon): Signifies decision-making, overcoming obstacles, taking decisive action. Assess progress and commit to your path.
+- Waxing Gibbous (Growing Full Moon): Represents refinement, preparation, and purification. Fine-tune plans, release distractions, align with purpose.
+- Full Moon (Power Moon): Peak of lunar energy. Symbolizes fulfillment, revelation, celebration, and release. Time for gratitude, manifestation, and spiritual rituals.
+- Waning Gibbous (Declining Moon): Emphasizes gratitude, reflection, and sharing wisdom. Acknowledge achievements and give thanks.
+- Third Quarter (Last Quarter): Associated with forgiveness, letting go, and emotional cleansing. Release old patterns and make peace with the past.
+- Waning Crescent (Surrender Moon): Represents rest, surrender, and spiritual renewal. Deep introspection, healing, and preparing for the next cycle.
 
 For ${lifeStage}:
 - Emphasize strength training for bone health

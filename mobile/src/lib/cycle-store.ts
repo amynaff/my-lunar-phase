@@ -29,76 +29,153 @@ export const getMoonPhase = (date: Date = new Date()): MoonPhase => {
 // Moon phase information with corresponding cycle phase energy
 export const moonPhaseInfo: Record<MoonPhase, {
   name: string;
+  alternateName: string;
   emoji: string;
   color: string;
   description: string;
+  spiritualMeaning: string;
   energy: string;
   correspondingCyclePhase: CyclePhase;
 }> = {
   new_moon: {
     name: 'New Moon',
+    alternateName: 'Dark Moon',
     emoji: '🌑',
     color: '#1e1b4b',
     description: 'A time for rest, reflection, and setting intentions.',
+    spiritualMeaning: 'The New Moon symbolizes new beginnings, introspection, and the planting of intentions. In spiritual traditions, it represents a time to set goals, cleanse energy, and embrace the unknown. This is your moment to turn inward, release what no longer serves you, and plant seeds for what you wish to manifest.',
     energy: 'Inward & Restorative',
     correspondingCyclePhase: 'menstrual',
   },
   waxing_crescent: {
     name: 'Waxing Crescent',
+    alternateName: 'Growing Moon',
     emoji: '🌒',
     color: '#4c1d95',
     description: 'Fresh energy emerges. Plant seeds for new beginnings.',
+    spiritualMeaning: 'The Waxing Crescent embodies growth, action, and building momentum. It\'s a time to focus on your intentions, take steps toward your goals, and cultivate positive energy. Your dreams are taking root—nurture them with attention and care.',
     energy: 'Rising & Hopeful',
     correspondingCyclePhase: 'follicular',
   },
   first_quarter: {
     name: 'First Quarter',
+    alternateName: 'Waxing Half Moon',
     emoji: '🌓',
     color: '#6d28d9',
     description: 'Take action on your intentions. Build momentum.',
+    spiritualMeaning: 'The First Quarter signifies decision-making, overcoming obstacles, and taking decisive action. It\'s a time to assess your progress and commit fully to your path. Challenges may arise—meet them with courage and determination.',
     energy: 'Active & Determined',
     correspondingCyclePhase: 'follicular',
   },
   waxing_gibbous: {
     name: 'Waxing Gibbous',
+    alternateName: 'Growing Full Moon',
     emoji: '🌔',
     color: '#7c3aed',
     description: 'Refine and adjust. Trust the process.',
+    spiritualMeaning: 'The Waxing Gibbous represents refinement, preparation, and purification. It\'s ideal for fine-tuning your plans, releasing distractions, and aligning with your purpose. Trust that your efforts are building toward something beautiful.',
     energy: 'Building & Refining',
     correspondingCyclePhase: 'ovulatory',
   },
   full_moon: {
     name: 'Full Moon',
+    alternateName: 'Power Moon',
     emoji: '🌕',
     color: '#f5f3ff',
     description: 'Peak energy and illumination. Celebrate your progress.',
+    spiritualMeaning: 'The Full Moon is the peak of lunar energy. It symbolizes fulfillment, revelation, celebration, and release. In many traditions, it\'s a time for gratitude, manifestation, and spiritual rituals. What was planted at the New Moon now comes to fruition—celebrate how far you\'ve come.',
     energy: 'High & Radiant',
     correspondingCyclePhase: 'ovulatory',
   },
   waning_gibbous: {
     name: 'Waning Gibbous',
+    alternateName: 'Declining Moon',
     emoji: '🌖',
     color: '#8b5cf6',
     description: 'Share your wisdom. Practice gratitude.',
+    spiritualMeaning: 'The Waning Gibbous emphasizes gratitude, reflection, and sharing wisdom. It\'s a time to acknowledge your achievements, give thanks for your blessings, and share what you\'ve learned with others. Your light can guide those around you.',
     energy: 'Generous & Grateful',
     correspondingCyclePhase: 'luteal',
   },
   last_quarter: {
-    name: 'Last Quarter',
+    name: 'Third Quarter',
+    alternateName: 'Last Quarter',
     emoji: '🌗',
     color: '#a78bfa',
     description: 'Release what no longer serves you. Forgive and let go.',
+    spiritualMeaning: 'The Third Quarter is associated with forgiveness, letting go, and emotional cleansing. It supports releasing old patterns and making peace with the past. This is a powerful time for shadow work and freeing yourself from what holds you back.',
     energy: 'Releasing & Clearing',
     correspondingCyclePhase: 'luteal',
   },
   waning_crescent: {
     name: 'Waning Crescent',
+    alternateName: 'Surrender Moon',
     emoji: '🌘',
     color: '#c4b5fd',
     description: 'Rest and surrender. Prepare for renewal.',
+    spiritualMeaning: 'The Waning Crescent represents rest, surrender, and spiritual renewal. It\'s a time for deep introspection, healing, and preparing for the next cycle. Allow yourself to rest completely—the darkness before the dawn holds wisdom and restoration.',
     energy: 'Restful & Surrendering',
     correspondingCyclePhase: 'menstrual',
   },
+};
+
+// Menstrual-Lunar Cycle Alignment Information
+export const menstrualLunarAlignment = {
+  title: 'The Menstrual-Lunar Connection',
+  subtitle: 'Ancient wisdom meets modern understanding',
+
+  intro: `For thousands of years, women have observed connections between their menstrual cycles and the moon's phases. The average menstrual cycle (28-29 days) closely mirrors the lunar cycle (29.5 days), leading to cultural and spiritual associations between women's bodies and the moon.`,
+
+  scientificNote: `A 2021 study in Science Advances found that women under 35 with longer cycles (closer to 29.5 days) showed intermittent synchronization between menstruation and lunar phases—particularly with the full and new moon. This synchronization is not universal and may be influenced by age, artificial light exposure, and individual cycle variability.`,
+
+  phases: {
+    menstrual: {
+      moonPhase: 'New Moon',
+      description: 'Menstruation corresponds to the New Moon—a time of physical and emotional cleansing, reflection, and beginning anew.',
+      energy: 'Both are periods of withdrawal, release, and introspection. Just as the moon retreats into darkness, your body releases and renews.',
+      practices: [
+        'Honor your need for rest and solitude',
+        'Set intentions for the coming cycle',
+        'Practice gentle self-care rituals',
+        'Journal about what you wish to release',
+      ],
+    },
+    follicular: {
+      moonPhase: 'Waxing Moon',
+      description: 'The Follicular phase aligns with the Waxing Moon—a period of growth, focus, and setting intentions.',
+      energy: 'As estrogen rises and the moon grows, so does your energy and creativity. New possibilities emerge.',
+      practices: [
+        'Start new projects and set goals',
+        'Embrace creative endeavors',
+        'Build new habits and routines',
+        'Take action on your intentions',
+      ],
+    },
+    ovulatory: {
+      moonPhase: 'Full Moon',
+      description: 'Ovulation is linked to the Full Moon—symbolizing peak energy, connection, and celebration.',
+      energy: 'At your most fertile and radiant, you mirror the full moon\'s brightness. Communication, confidence, and magnetism peak.',
+      practices: [
+        'Engage in social activities and connection',
+        'Celebrate your accomplishments',
+        'Express yourself fully',
+        'Embrace your natural radiance',
+      ],
+    },
+    luteal: {
+      moonPhase: 'Waning Moon',
+      description: 'The Luteal phase mirrors the Waning Moon—a time for introspection, bringing intentions to fruition, and preparing for renewal.',
+      energy: 'As progesterone rises and the moon wanes, focus turns inward. Complete projects, tie up loose ends, and prepare for rest.',
+      practices: [
+        'Complete ongoing projects',
+        'Practice self-compassion',
+        'Reduce commitments and simplify',
+        'Prepare your body and mind for rest',
+      ],
+    },
+  },
+
+  whyItMatters: `Whether or not your cycle syncs perfectly with the moon, understanding this ancient framework offers valuable insight into your body's natural rhythms. It reminds us that fluctuations in energy, mood, and needs are not weaknesses—they are part of a beautiful, cyclical nature shared with the natural world.`,
 };
 
 // Get the cycle phase equivalent for the current moon phase (for peri/menopause)

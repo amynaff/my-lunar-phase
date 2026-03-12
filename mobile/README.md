@@ -61,7 +61,16 @@ A beautiful, comprehensive mobile app that helps women understand and work with 
 
 ### Perimenopause
 - **Moon Phase Guidance** - Follow the moon's 29-day cycle as your cycles become irregular
-- MoonPhaseCard showing current lunar phase with corresponding energy
+- MoonPhaseCard showing current lunar phase with alternate names and spiritual meanings
+- **8 Complete Moon Phases with Traditional Names**:
+  - New Moon (Dark Moon) - New beginnings, introspection, setting intentions
+  - Waxing Crescent (Growing Moon) - Growth, action, building momentum
+  - First Quarter (Waxing Half Moon) - Decision-making, overcoming obstacles
+  - Waxing Gibbous (Growing Full Moon) - Refinement, preparation, purification
+  - Full Moon (Power Moon) - Peak energy, fulfillment, celebration
+  - Waning Gibbous (Declining Moon) - Gratitude, reflection, sharing wisdom
+  - Third Quarter (Last Quarter) - Forgiveness, letting go, emotional cleansing
+  - Waning Crescent (Surrender Moon) - Rest, surrender, spiritual renewal
 - Daily practices aligned with lunar rhythms
 - **Transition Wellness Focus** - Hot flashes, sleep, brain fog, mood tracking
 - Symptom tracking for hot flashes, mood swings, sleep issues, and more
@@ -73,7 +82,7 @@ A beautiful, comprehensive mobile app that helps women understand and work with 
 
 ### Menopause
 - **Full Moon Phase Integration** - Connect with nature through lunar rhythms
-- MoonPhaseCard as primary guidance for daily wellness
+- MoonPhaseCard as primary guidance for daily wellness with spiritual meanings
 - **"Your Second Spring"** - Celebrating this powerful transition
 - Moon-synced nutrition, movement, and self-care recommendations
 - Focus areas: bone health, heart health, brain health, sleep quality
@@ -84,10 +93,22 @@ A beautiful, comprehensive mobile app that helps women understand and work with 
 ### Postmenopause
 - **Wisdom Years Focus** - Embrace this vibrant new chapter
 - **"Your Wisdom Years"** banner with personalized messaging
+- Moon phase awareness for connecting with natural rhythms
 - Health priorities: bone strength, heart health, mental clarity, vitality
 - Wellness tracking for bone health, energy, mood, and more
 - Tailored nutrition and movement for optimal wellness
 - Moon-phase-specific affirmations celebrating this powerful life stage
+
+### Moon-Menstrual Cycle Alignment (For Women with Regular Cycles)
+- **Educational content** connecting menstrual phases to lunar phases
+- **Four-phase alignment**:
+  - Menstruation ↔ New Moon - Physical and emotional cleansing, reflection
+  - Follicular Phase ↔ Waxing Moon - Growth, focus, setting intentions
+  - Ovulation ↔ Full Moon - Peak energy, connection, celebration
+  - Luteal Phase ↔ Waning Moon - Introspection, bringing intentions to fruition
+- **Scientific context** - 2021 Science Advances study on intermittent synchronization
+- Practices for each phase alignment
+- Understanding cyclical nature shared with the natural world
 
 ## Features
 
