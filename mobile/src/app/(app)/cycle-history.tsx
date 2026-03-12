@@ -3,13 +3,14 @@ import { View, Text, ScrollView, Pressable, Alert, Share } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Animated, { FadeInDown, FadeInUp } from 'react-native-reanimated';
-import { ChevronLeft, Download, Share2, Calendar, Clock, TrendingUp, AlertTriangle, CheckCircle, Trash2, Edit3, FileText } from 'lucide-react-native';
+import { ChevronLeft, Download, Share2, Calendar, Clock, TrendingUp, AlertTriangle, CheckCircle, Trash2, Edit3, FileText, CalendarDays } from 'lucide-react-native';
 import { router } from 'expo-router';
 import * as FileSystem from 'expo-file-system';
 import * as Sharing from 'expo-sharing';
 import { useCycleStore, PeriodLogEntry } from '@/lib/cycle-store';
 import { useThemeStore, getTheme } from '@/lib/theme-store';
 import { CycleCalendar } from '@/components/CycleCalendar';
+import { FloStyleCalendar } from '@/components/FloStyleCalendar';
 import { LogPeriodModal } from '@/components/LogPeriodModal';
 import * as Haptics from 'expo-haptics';
 import {
@@ -33,6 +34,7 @@ export default function CycleHistoryScreen() {
   const deletePeriodEntry = useCycleStore(s => s.deletePeriodEntry);
 
   const [showLogModal, setShowLogModal] = useState(false);
+  const [showFloCalendar, setShowFloCalendar] = useState(false);
   const [editingPeriodId, setEditingPeriodId] = useState<string | null>(null);
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
 
@@ -92,6 +94,32 @@ export default function CycleHistoryScreen() {
     } else if (date <= new Date()) {
       // Allow logging for past/current dates
       setShowLogModal(true);
+    }
+  };
+
+  // Handler for logging period from Flo calendar
+  const handleLogPeriodFromCalendar = (date: Date) => {
+    if (date <= new Date()) {
+      setSelectedDate(date);
+      setShowFloCalendar(false);
+      setShowLogModal(true);
+    }
+  };
+
+  // Handler for day press in Flo calendar
+  const handleFloDayPress = (date: Date) => {
+    const period = periodHistory.find(p => {
+      const start = new Date(p.startDate.split('T')[0]);
+      const end = p.endDate
+        ? new Date(p.endDate.split('T')[0])
+        : new Date(start.getTime() + (p.periodLength - 1) * 24 * 60 * 60 * 1000);
+      const dateOnly = new Date(date.toISOString().split('T')[0]);
+      return dateOnly >= start && dateOnly <= end;
+    });
+
+    if (period) {
+      setShowFloCalendar(false);
+      handleEditPeriod(period.id);
     }
   };
 
@@ -326,6 +354,21 @@ export default function CycleHistoryScreen() {
             entering={FadeInUp.delay(300).duration(600)}
             className="mx-6 mb-4"
           >
+            {/* View Full Calendar Button */}
+            <Pressable
+              onPress={() => {
+                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                setShowFloCalendar(true);
+              }}
+              className="flex-row items-center justify-center py-3 mb-3 rounded-xl border"
+              style={{ backgroundColor: `${theme.accent.purple}10`, borderColor: `${theme.accent.purple}30` }}
+            >
+              <CalendarDays size={18} color={theme.accent.purple} />
+              <Text style={{ fontFamily: 'Quicksand_600SemiBold', color: theme.accent.purple, fontSize: 14, marginLeft: 8 }}>
+                View Full Calendar with Moon Phases
+              </Text>
+            </Pressable>
+
             <CycleCalendar
               themeMode={themeMode}
               onDayPress={handleDayPress}
@@ -508,6 +551,14 @@ export default function CycleHistoryScreen() {
         themeMode={themeMode}
         initialDate={selectedDate || undefined}
         editingPeriodId={editingPeriodId || undefined}
+      />
+
+      {/* Flo-Style Full Calendar with Moon Phases */}
+      <FloStyleCalendar
+        visible={showFloCalendar}
+        onClose={() => setShowFloCalendar(false)}
+        onDayPress={handleFloDayPress}
+        onLogPeriod={handleLogPeriodFromCalendar}
       />
     </View>
   );

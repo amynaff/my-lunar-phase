@@ -22,11 +22,22 @@ A beautiful, comprehensive mobile app that helps women understand and work with 
   - Delete period entries if needed
   - Visual indicators for logged vs predicted days
   - Recent periods list for quick access
+- **Flo-Style Full Calendar** - Scrollable multi-month calendar inspired by Flo app:
+  - View multiple months at once (scrollable)
+  - Moon phase indicators on every day
+  - Period days highlighted in pink
+  - Today indicator with dashed circle
+  - Monday-start week format
+  - Long press any day to log a new period
+  - Month/Year toggle view
+  - Perfect for PCOS and perimenopause with skipped/long periods
+  - Allows logging new period each month regardless of predictions
 - **Color-coded Calendar View** - Visual calendar showing:
   - Pink: Period days (logged)
   - Light pink: Predicted period days
   - Purple: Fertile window
   - Indigo: Ovulation day
+  - Yellow dots: Moon phase indicators
 - **Cycle Progress Dots** - Compact view of current cycle progress
 - **Cycle History Screen** - View all logged periods with stats
 - **Edit/Delete Entries** - Manage your period history
