@@ -10,7 +10,7 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.mylunarphase.app",
-      "buildNumber": "1",
+      "buildNumber": "2",
       "infoPlist": {
         "NSMicrophoneUsageDescription": "MyLunarPhase uses the microphone to record audio tracks that the app attaches to your creations.",
         "UIBackgroundModes": [
