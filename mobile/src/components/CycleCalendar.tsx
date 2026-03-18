@@ -2,9 +2,120 @@ import React, { useState, useMemo } from 'react';
 import { View, Text, Pressable, ScrollView } from 'react-native';
 import Animated, { FadeIn, FadeInDown } from 'react-native-reanimated';
 import { ChevronLeft, ChevronRight } from 'lucide-react-native';
-import { useCycleStore } from '@/lib/cycle-store';
+import { useCycleStore, MoonPhase } from '@/lib/cycle-store';
 import { getTheme } from '@/lib/theme-store';
 import * as Haptics from 'expo-haptics';
+
+// Get moon phase for any date
+const getMoonPhaseForDate = (date: Date): MoonPhase => {
+  const knownNewMoon = new Date(2000, 0, 6, 18, 14, 0);
+  const lunarCycle = 29.53058867;
+  const daysSinceNewMoon = (date.getTime() - knownNewMoon.getTime()) / (1000 * 60 * 60 * 24);
+  const moonAge = ((daysSinceNewMoon % lunarCycle) + lunarCycle) % lunarCycle;
+
+  if (moonAge < 1.85) return 'new_moon';
+  if (moonAge < 7.38) return 'waxing_crescent';
+  if (moonAge < 9.23) return 'first_quarter';
+  if (moonAge < 14.77) return 'waxing_gibbous';
+  if (moonAge < 16.61) return 'full_moon';
+  if (moonAge < 22.15) return 'waning_gibbous';
+  if (moonAge < 23.99) return 'last_quarter';
+  return 'waning_crescent';
+};
+
+// Moon phase visual component
+const MoonPhaseIcon = ({ phase, size = 10 }: { phase: MoonPhase; size?: number }) => {
+  const halfSize = size / 2;
+
+  return (
+    <View
+      style={{
+        width: size,
+        height: size,
+        borderRadius: halfSize,
+        backgroundColor: phase === 'new_moon' ? '#1e1b4b' : '#f5d742',
+        overflow: 'hidden',
+      }}
+    >
+      {phase === 'waxing_crescent' && (
+        <View
+          style={{
+            position: 'absolute',
+            left: -size * 0.25,
+            top: 0,
+            width: size,
+            height: size,
+            borderRadius: halfSize,
+            backgroundColor: '#1e1b4b',
+          }}
+        />
+      )}
+      {phase === 'first_quarter' && (
+        <View
+          style={{
+            position: 'absolute',
+            left: 0,
+            top: 0,
+            width: halfSize,
+            height: size,
+            backgroundColor: '#1e1b4b',
+          }}
+        />
+      )}
+      {phase === 'waxing_gibbous' && (
+        <View
+          style={{
+            position: 'absolute',
+            left: -halfSize,
+            top: 0,
+            width: size * 0.75,
+            height: size,
+            borderRadius: halfSize,
+            backgroundColor: '#1e1b4b',
+          }}
+        />
+      )}
+      {phase === 'waning_gibbous' && (
+        <View
+          style={{
+            position: 'absolute',
+            right: -halfSize,
+            top: 0,
+            width: size * 0.75,
+            height: size,
+            borderRadius: halfSize,
+            backgroundColor: '#1e1b4b',
+          }}
+        />
+      )}
+      {phase === 'last_quarter' && (
+        <View
+          style={{
+            position: 'absolute',
+            right: 0,
+            top: 0,
+            width: halfSize,
+            height: size,
+            backgroundColor: '#1e1b4b',
+          }}
+        />
+      )}
+      {phase === 'waning_crescent' && (
+        <View
+          style={{
+            position: 'absolute',
+            right: -size * 0.25,
+            top: 0,
+            width: size,
+            height: size,
+            borderRadius: halfSize,
+            backgroundColor: '#1e1b4b',
+          }}
+        />
+      )}
+    </View>
+  );
+};
 
 interface CycleCalendarProps {
   themeMode: 'light' | 'dark';
@@ -231,6 +342,8 @@ export function CycleCalendar({ themeMode, onDayPress, selectedDate, compact = f
                   >
                     {date.getDate()}
                   </Text>
+                  {/* Moon phase icon */}
+                  <MoonPhaseIcon phase={getMoonPhaseForDate(date)} size={compact ? 8 : 10} />
                 </View>
               </Pressable>
             );
@@ -241,7 +354,7 @@ export function CycleCalendar({ themeMode, onDayPress, selectedDate, compact = f
       {/* Legend */}
       {!compact && (
         <View className="px-4 py-3 border-t" style={{ borderTopColor: theme.border.light }}>
-          <View className="flex-row flex-wrap justify-center" style={{ gap: 12 }}>
+          <View className="flex-row flex-wrap justify-center" style={{ gap: 10 }}>
             <View className="flex-row items-center">
               <View className="w-3 h-3 rounded-full mr-1.5" style={{ backgroundColor: DAY_COLORS.period }} />
               <Text style={{ fontFamily: 'Quicksand_400Regular', color: theme.text.secondary, fontSize: 11 }}>
@@ -261,9 +374,9 @@ export function CycleCalendar({ themeMode, onDayPress, selectedDate, compact = f
               </Text>
             </View>
             <View className="flex-row items-center">
-              <View className="w-3 h-3 rounded-full mr-1.5" style={{ backgroundColor: DAY_COLORS.ovulation }} />
+              <View className="w-3 h-3 rounded-full mr-1.5" style={{ backgroundColor: '#f5d742' }} />
               <Text style={{ fontFamily: 'Quicksand_400Regular', color: theme.text.secondary, fontSize: 11 }}>
-                Ovulation
+                Moon
               </Text>
             </View>
           </View>
