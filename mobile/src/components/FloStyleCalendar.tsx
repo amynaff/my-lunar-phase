@@ -178,72 +178,91 @@ function MonthView({
                 {date.getDate()}
               </Text>
 
-              {/* Moon phase indicator - small circle below the date */}
+              {/* Moon phase indicator - styled like Flo app */}
               <View
                 className="mt-0.5"
                 style={{
-                  width: 8,
-                  height: 8,
-                  borderRadius: 4,
-                  backgroundColor: moonVisual.color,
-                  borderWidth: moonPhase === 'full_moon' ? 0 : 0.5,
-                  borderColor: '#94a3b8',
-                  // Half moon effect for quarter phases
-                  ...(moonPhase === 'first_quarter' || moonPhase === 'last_quarter' ? {
-                    overflow: 'hidden',
-                  } : {}),
+                  width: 12,
+                  height: 12,
+                  borderRadius: 6,
+                  backgroundColor: moonPhase === 'new_moon' ? '#1e1b4b' : '#f5d742',
+                  overflow: 'hidden',
                 }}
               >
-                {/* Half moon shadow for quarters */}
-                {(moonPhase === 'first_quarter') && (
+                {/* Dark overlay for different phases */}
+                {moonPhase === 'waxing_crescent' && (
+                  <View
+                    style={{
+                      position: 'absolute',
+                      left: -3,
+                      top: 0,
+                      width: 12,
+                      height: 12,
+                      borderRadius: 6,
+                      backgroundColor: '#1e1b4b',
+                    }}
+                  />
+                )}
+                {moonPhase === 'first_quarter' && (
                   <View
                     style={{
                       position: 'absolute',
                       left: 0,
                       top: 0,
-                      width: 4,
-                      height: 8,
+                      width: 6,
+                      height: 12,
                       backgroundColor: '#1e1b4b',
                     }}
                   />
                 )}
-                {(moonPhase === 'last_quarter') && (
+                {moonPhase === 'waxing_gibbous' && (
+                  <View
+                    style={{
+                      position: 'absolute',
+                      left: -6,
+                      top: 0,
+                      width: 9,
+                      height: 12,
+                      borderRadius: 6,
+                      backgroundColor: '#1e1b4b',
+                    }}
+                  />
+                )}
+                {moonPhase === 'waning_gibbous' && (
+                  <View
+                    style={{
+                      position: 'absolute',
+                      right: -6,
+                      top: 0,
+                      width: 9,
+                      height: 12,
+                      borderRadius: 6,
+                      backgroundColor: '#1e1b4b',
+                    }}
+                  />
+                )}
+                {moonPhase === 'last_quarter' && (
                   <View
                     style={{
                       position: 'absolute',
                       right: 0,
                       top: 0,
-                      width: 4,
-                      height: 8,
-                      backgroundColor: '#1e1b4b',
-                    }}
-                  />
-                )}
-                {/* Crescent effects */}
-                {(moonPhase === 'waxing_crescent' || moonPhase === 'waning_crescent') && (
-                  <View
-                    style={{
-                      position: 'absolute',
-                      left: moonPhase === 'waxing_crescent' ? -2 : 4,
-                      top: 0,
                       width: 6,
-                      height: 8,
+                      height: 12,
                       backgroundColor: '#1e1b4b',
-                      borderRadius: 4,
                     }}
                   />
                 )}
-                {/* Gibbous effects */}
-                {(moonPhase === 'waxing_gibbous' || moonPhase === 'waning_gibbous') && (
+                {moonPhase === 'waning_crescent' && (
                   <View
                     style={{
                       position: 'absolute',
-                      left: moonPhase === 'waning_gibbous' ? -1 : 5,
+                      right: -3,
                       top: 0,
-                      width: 4,
-                      height: 8,
+                      width: 12,
+                      height: 12,
+                      borderRadius: 6,
                       backgroundColor: '#1e1b4b',
-                      borderRadius: 2,
                     }}
                   />
                 )}
@@ -411,7 +430,7 @@ export function FloStyleCalendar({ visible, onClose, onDayPress, onLogPeriod }: 
             backgroundColor: theme.bg.primary,
           }}
         >
-          <View className="flex-row justify-center items-center" style={{ gap: 20 }}>
+          <View className="flex-row justify-center items-center" style={{ gap: 16 }}>
             <View className="flex-row items-center">
               <View className="w-4 h-4 rounded-full mr-2" style={{ backgroundColor: '#ec4899' }} />
               <Text style={{ fontFamily: 'Quicksand_500Medium', color: theme.text.secondary, fontSize: 12 }}>
@@ -432,9 +451,15 @@ export function FloStyleCalendar({ visible, onClose, onDayPress, onLogPeriod }: 
               </Text>
             </View>
             <View className="flex-row items-center">
-              <View className="w-3 h-3 rounded-full mr-2" style={{ backgroundColor: '#fcd34d' }} />
+              <View className="w-3 h-3 rounded-full mr-1.5" style={{ backgroundColor: '#f5d742' }} />
               <Text style={{ fontFamily: 'Quicksand_500Medium', color: theme.text.secondary, fontSize: 12 }}>
-                Moon
+                Full
+              </Text>
+            </View>
+            <View className="flex-row items-center">
+              <View className="w-3 h-3 rounded-full mr-1.5" style={{ backgroundColor: '#1e1b4b' }} />
+              <Text style={{ fontFamily: 'Quicksand_500Medium', color: theme.text.secondary, fontSize: 12 }}>
+                New
               </Text>
             </View>
           </View>
