@@ -5,8 +5,6 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Animated, { FadeInDown, FadeInUp } from 'react-native-reanimated';
 import { ChevronLeft, Download, Share2, Calendar, Clock, TrendingUp, AlertTriangle, CheckCircle, Trash2, Edit3, FileText, CalendarDays } from 'lucide-react-native';
 import { router } from 'expo-router';
-import * as FileSystem from 'expo-file-system';
-import * as Sharing from 'expo-sharing';
 import { useCycleStore, PeriodLogEntry } from '@/lib/cycle-store';
 import { useThemeStore, getTheme } from '@/lib/theme-store';
 import { CycleCalendar } from '@/components/CycleCalendar';
@@ -187,22 +185,10 @@ export default function CycleHistoryScreen() {
 
     try {
       const reportText = generateReportText();
-      const fileName = `LunaFlow_Cycle_Report_${new Date().toISOString().split('T')[0]}.txt`;
-      const filePath = `${FileSystem.documentDirectory}${fileName}`;
-
-      await FileSystem.writeAsStringAsync(filePath, reportText, {
-        encoding: FileSystem.EncodingType.UTF8,
+      await Share.share({
+        message: reportText,
+        title: 'LunaFlow Cycle Report',
       });
-
-      if (await Sharing.isAvailableAsync()) {
-        await Sharing.shareAsync(filePath, {
-          mimeType: 'text/plain',
-          dialogTitle: 'Share Cycle Report',
-          UTI: 'public.plain-text',
-        });
-      } else {
-        Alert.alert('Export Complete', `Report saved to ${fileName}`);
-      }
     } catch (error) {
       console.error('Export error:', error);
       Alert.alert('Export Error', 'Failed to export report. Please try again.');

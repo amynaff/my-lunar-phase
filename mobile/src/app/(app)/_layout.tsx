@@ -5,24 +5,41 @@ import {
   requestNotificationPermissions,
   getNotificationSettings,
   scheduleAllNotifications,
+  addNotificationResponseListener,
 } from "@/lib/notifications";
+import { router } from "expo-router";
 
 // Initialize notifications when app loads
 function useNotificationSetup() {
   const lifeStage = useCycleStore((s) => s.lifeStage);
   const getDaysUntilNextPeriod = useCycleStore((s) => s.getDaysUntilNextPeriod);
   const getCurrentPhase = useCycleStore((s) => s.getCurrentPhase);
+  const cycleLength = useCycleStore((s) => s.cycleLength);
+  const getDayOfCycle = useCycleStore((s) => s.getDayOfCycle);
 
   useEffect(() => {
     const setupNotifications = async () => {
-      // Only for regular cycle tracking (not perimenopause/menopause for now)
-      if (lifeStage !== 'regular') return;
-
       const hasPermission = await requestNotificationPermissions();
       if (!hasPermission) return;
 
       const settings = await getNotificationSettings();
       if (!settings.enabled) return;
+
+      const isNonCycling = lifeStage === 'menopause' || lifeStage === 'postmenopause';
+
+      if (isNonCycling) {
+        // For menopause users, schedule only wellness notifications
+        await scheduleAllNotifications(settings, {
+          daysUntilPeriod: 0,
+          currentPhase: 'follicular',
+          phaseEmoji: '🌙',
+          daysUntilNextPhase: 0,
+          nextPhaseName: 'Wellness',
+          nextPhaseEmoji: '✨',
+          lifeStage,
+        });
+        return;
+      }
 
       const currentPhase = getCurrentPhase();
       const currentPhaseInfo = phaseInfo[currentPhase];
@@ -31,17 +48,24 @@ function useNotificationSetup() {
       const nextPhase = phases[(currentIndex + 1) % 4];
       const nextPhaseInfo = phaseInfo[nextPhase];
 
-      // Calculate days until next phase (approximate)
+      // Calculate cycle metrics
       const daysUntilPeriod = getDaysUntilNextPeriod();
-      const dayOfCycle = 28 - daysUntilPeriod;
-      let daysUntilNextPhase = 0;
+      const dayOfCycle = getDayOfCycle();
 
+      // Calculate days until ovulation (roughly mid-cycle)
+      const ovulationDay = Math.round(cycleLength / 2);
+      const daysUntilOvulation = dayOfCycle < ovulationDay
+        ? ovulationDay - dayOfCycle
+        : cycleLength - dayOfCycle + ovulationDay;
+
+      // Calculate days until next phase
+      let daysUntilNextPhase = 0;
       if (currentPhase === 'menstrual') {
         daysUntilNextPhase = Math.max(0, 5 - dayOfCycle);
       } else if (currentPhase === 'follicular') {
-        daysUntilNextPhase = Math.max(0, 13 - dayOfCycle);
+        daysUntilNextPhase = Math.max(0, Math.round(cycleLength / 2) - 1 - dayOfCycle);
       } else if (currentPhase === 'ovulatory') {
-        daysUntilNextPhase = Math.max(0, 16 - dayOfCycle);
+        daysUntilNextPhase = Math.max(0, Math.round(cycleLength / 2) + 2 - dayOfCycle);
       } else {
         daysUntilNextPhase = daysUntilPeriod;
       }
@@ -53,11 +77,30 @@ function useNotificationSetup() {
         daysUntilNextPhase,
         nextPhaseName: nextPhaseInfo.name,
         nextPhaseEmoji: nextPhaseInfo.emoji,
+        daysUntilOvulation,
+        lifeStage,
       });
     };
 
     setupNotifications();
-  }, [lifeStage]);
+
+    // Handle notification taps - navigate to relevant screen
+    const subscription = addNotificationResponseListener((response) => {
+      const data = response.notification.request.content.data;
+
+      if (data?.type === 'wellness-checkin' || data?.type === 'wellness-tip') {
+        router.push('/log-mood');
+      } else if (data?.type === 'period-reminder') {
+        router.push('/(tabs)');
+      } else if (data?.type === 'phase-change') {
+        router.push('/(tabs)');
+      } else if (data?.type === 'fertile-window' || data?.type === 'ovulation') {
+        router.push('/(tabs)');
+      }
+    });
+
+    return () => subscription.remove();
+  }, [lifeStage, cycleLength]);
 }
 
 export default function AppLayout() {

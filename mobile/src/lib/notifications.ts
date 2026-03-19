@@ -21,19 +21,72 @@ export interface NotificationSettings {
   enabled: boolean;
   periodReminders: boolean;
   periodReminderDays: number; // days before period to remind
+  fertileWindowAlerts: boolean;
+  ovulationAlerts: boolean;
   dailyWellnessCheckIn: boolean;
   dailyCheckInTime: string; // HH:MM format
   phaseChangeAlerts: boolean;
+  wellnessTips: boolean;
+  quietHoursEnabled: boolean;
+  quietHoursStart: string; // HH:MM
+  quietHoursEnd: string; // HH:MM
 }
 
 export const defaultNotificationSettings: NotificationSettings = {
   enabled: true,
   periodReminders: true,
   periodReminderDays: 2,
+  fertileWindowAlerts: true,
+  ovulationAlerts: true,
   dailyWellnessCheckIn: true,
   dailyCheckInTime: '09:00',
   phaseChangeAlerts: true,
+  wellnessTips: true,
+  quietHoursEnabled: true,
+  quietHoursStart: '22:00',
+  quietHoursEnd: '08:00',
 };
+
+// Phase-specific wellness tips
+const wellnessTipsByPhase: Record<string, string[]> = {
+  menstrual: [
+    "Rest is productive. Honor your body's need for gentle movement today.",
+    "Iron-rich foods like spinach and lentils support your energy during menstruation.",
+    "A warm bath with magnesium salts can help ease cramps naturally.",
+    "This is your inner winter - journaling and reflection are powerful now.",
+    "Gentle yoga or stretching can help relieve tension without depleting energy.",
+  ],
+  follicular: [
+    "Your energy is rising! Perfect time to start that new project or workout routine.",
+    "High-protein meals fuel your increasing energy and focus.",
+    "This is your creative peak - brainstorm and plan ahead.",
+    "Try a new workout class or activity - your body craves novelty now.",
+    "Social connections flourish in this phase - reach out to a friend!",
+  ],
+  ovulatory: [
+    "You're in your power phase! Communication skills peak now.",
+    "High-intensity workouts feel amazing during ovulation.",
+    "Stay hydrated - your body temperature rises slightly during this phase.",
+    "Perfect time for important conversations or presentations.",
+    "Light, fresh meals with lots of veggies support your vibrant energy.",
+  ],
+  luteal: [
+    "Nesting instincts kick in - organize your space for calm.",
+    "Complex carbs help maintain serotonin levels as progesterone rises.",
+    "Strength training is ideal now - your muscles recover well.",
+    "Prioritize tasks and delegate if possible - focus is key.",
+    "Magnesium-rich foods like dark chocolate can ease PMS symptoms.",
+  ],
+};
+
+// Menopause wellness tips
+const menopauseWellnessTips = [
+  "Strength training helps maintain bone density - aim for 2-3 sessions weekly.",
+  "Cooling breathwork can help manage hot flashes naturally.",
+  "Phytoestrogen-rich foods like flaxseed support hormonal balance.",
+  "Quality sleep is foundational - create a cool, dark sleep environment.",
+  "Heart-healthy omega-3s from salmon support brain and cardiovascular health.",
+];
 
 // Request notification permissions
 export async function requestNotificationPermissions(): Promise<boolean> {
@@ -55,7 +108,7 @@ export async function requestNotificationPermissions(): Promise<boolean> {
     return false;
   }
 
-  // Set up Android notification channel
+  // Set up Android notification channels
   if (Platform.OS === 'android') {
     await Notifications.setNotificationChannelAsync('default', {
       name: 'My Lunar Phase',
@@ -69,6 +122,13 @@ export async function requestNotificationPermissions(): Promise<boolean> {
       importance: Notifications.AndroidImportance.HIGH,
       vibrationPattern: [0, 250, 250, 250],
       lightColor: '#f9a8d4',
+    });
+
+    await Notifications.setNotificationChannelAsync('fertility-alerts', {
+      name: 'Fertility Alerts',
+      importance: Notifications.AndroidImportance.HIGH,
+      vibrationPattern: [0, 250, 250, 250],
+      lightColor: '#c4b5fd',
     });
 
     await Notifications.setNotificationChannelAsync('wellness-checkin', {
@@ -126,25 +186,55 @@ export async function cancelNotificationsByPrefix(prefix: string): Promise<void>
   }
 }
 
+// Check if time is within quiet hours
+function isWithinQuietHours(hour: number, minute: number, settings: NotificationSettings): boolean {
+  if (!settings.quietHoursEnabled) return false;
+
+  const [startHour, startMin] = settings.quietHoursStart.split(':').map(Number);
+  const [endHour, endMin] = settings.quietHoursEnd.split(':').map(Number);
+
+  const currentMinutes = hour * 60 + minute;
+  const startMinutes = startHour * 60 + startMin;
+  const endMinutes = endHour * 60 + endMin;
+
+  // Handle overnight quiet hours (e.g., 22:00 to 08:00)
+  if (startMinutes > endMinutes) {
+    return currentMinutes >= startMinutes || currentMinutes < endMinutes;
+  }
+  return currentMinutes >= startMinutes && currentMinutes < endMinutes;
+}
+
+// Get notification time respecting quiet hours
+function getNotificationHour(preferredHour: number, settings: NotificationSettings): number {
+  if (!settings.quietHoursEnabled) return preferredHour;
+
+  const [endHour] = settings.quietHoursEnd.split(':').map(Number);
+
+  if (isWithinQuietHours(preferredHour, 0, settings)) {
+    return endHour; // Schedule for end of quiet hours
+  }
+  return preferredHour;
+}
+
 // Schedule period reminder notification
 export async function schedulePeriodReminder(
   daysUntilPeriod: number,
-  reminderDaysBefore: number
+  settings: NotificationSettings
 ): Promise<void> {
-  // Cancel existing period reminders
   await cancelNotificationsByPrefix('period-reminder');
 
-  if (daysUntilPeriod <= 0) return;
+  if (!settings.periodReminders || daysUntilPeriod <= 0) return;
 
-  const daysUntilReminder = daysUntilPeriod - reminderDaysBefore;
+  const daysUntilReminder = daysUntilPeriod - settings.periodReminderDays;
+  const notificationHour = getNotificationHour(9, settings);
 
   if (daysUntilReminder <= 0) {
-    // Period is coming very soon, send reminder now or tomorrow morning
+    // Period is coming very soon
     const trigger: Notifications.NotificationTriggerInput = daysUntilPeriod === 1
       ? { type: Notifications.SchedulableTriggerInputTypes.TIME_INTERVAL, seconds: 1 }
       : {
           type: Notifications.SchedulableTriggerInputTypes.CALENDAR,
-          hour: 9,
+          hour: notificationHour,
           minute: 0,
           repeats: false,
         };
@@ -152,7 +242,7 @@ export async function schedulePeriodReminder(
     await Notifications.scheduleNotificationAsync({
       identifier: `period-reminder-${Date.now()}`,
       content: {
-        title: '🌙 Period Coming Soon',
+        title: '🌸 Period Coming Soon',
         body: daysUntilPeriod === 1
           ? "Your period is expected tomorrow. Take it easy and prepare for rest."
           : `Your period is expected in ${daysUntilPeriod} days. Time to prepare!`,
@@ -162,15 +252,14 @@ export async function schedulePeriodReminder(
       trigger,
     });
   } else {
-    // Schedule for the future
     const secondsUntilReminder = daysUntilReminder * 24 * 60 * 60;
 
     await Notifications.scheduleNotificationAsync({
       identifier: `period-reminder-${Date.now()}`,
       content: {
-        title: '🌙 Period Reminder',
-        body: `Your period is expected in ${reminderDaysBefore} days. Time to prepare and be gentle with yourself.`,
-        data: { type: 'period-reminder', daysUntil: reminderDaysBefore },
+        title: '🌸 Period Reminder',
+        body: `Your period is expected in ${settings.periodReminderDays} days. Time to prepare and be gentle with yourself.`,
+        data: { type: 'period-reminder', daysUntil: settings.periodReminderDays },
         sound: true,
       },
       trigger: {
@@ -181,12 +270,109 @@ export async function schedulePeriodReminder(
   }
 }
 
+// Schedule fertile window alert
+export async function scheduleFertileWindowAlert(
+  daysUntilOvulation: number,
+  settings: NotificationSettings
+): Promise<void> {
+  await cancelNotificationsByPrefix('fertile-window');
+
+  if (!settings.fertileWindowAlerts || daysUntilOvulation <= 0) return;
+
+  // Fertile window starts ~5 days before ovulation
+  const daysUntilFertileWindow = Math.max(0, daysUntilOvulation - 5);
+  const notificationHour = getNotificationHour(9, settings);
+
+  if (daysUntilFertileWindow <= 1) {
+    // Fertile window starting soon or already started
+    await Notifications.scheduleNotificationAsync({
+      identifier: `fertile-window-${Date.now()}`,
+      content: {
+        title: '💜 Fertile Window Starting',
+        body: 'Your fertile window is beginning. Your body is preparing for ovulation - you may notice increased energy and libido.',
+        data: { type: 'fertile-window' },
+        sound: true,
+      },
+      trigger: {
+        type: Notifications.SchedulableTriggerInputTypes.CALENDAR,
+        hour: notificationHour,
+        minute: 0,
+        repeats: false,
+      },
+    });
+  } else {
+    const secondsUntilAlert = daysUntilFertileWindow * 24 * 60 * 60;
+
+    await Notifications.scheduleNotificationAsync({
+      identifier: `fertile-window-${Date.now()}`,
+      content: {
+        title: '💜 Fertile Window Starting',
+        body: 'Your fertile window is beginning. Your body is preparing for ovulation.',
+        data: { type: 'fertile-window' },
+        sound: true,
+      },
+      trigger: {
+        type: Notifications.SchedulableTriggerInputTypes.TIME_INTERVAL,
+        seconds: secondsUntilAlert,
+      },
+    });
+  }
+}
+
+// Schedule ovulation day alert
+export async function scheduleOvulationAlert(
+  daysUntilOvulation: number,
+  settings: NotificationSettings
+): Promise<void> {
+  await cancelNotificationsByPrefix('ovulation');
+
+  if (!settings.ovulationAlerts || daysUntilOvulation <= 0) return;
+
+  const notificationHour = getNotificationHour(9, settings);
+
+  if (daysUntilOvulation === 1) {
+    await Notifications.scheduleNotificationAsync({
+      identifier: `ovulation-${Date.now()}`,
+      content: {
+        title: '✨ Ovulation Day Tomorrow',
+        body: 'Tomorrow is your estimated ovulation day - your energy and confidence will be at their peak!',
+        data: { type: 'ovulation' },
+        sound: true,
+      },
+      trigger: {
+        type: Notifications.SchedulableTriggerInputTypes.CALENDAR,
+        hour: notificationHour,
+        minute: 0,
+        repeats: false,
+      },
+    });
+  } else {
+    const secondsUntilOvulation = (daysUntilOvulation - 1) * 24 * 60 * 60;
+
+    await Notifications.scheduleNotificationAsync({
+      identifier: `ovulation-${Date.now()}`,
+      content: {
+        title: '✨ Ovulation Day Tomorrow',
+        body: 'Tomorrow is your estimated ovulation day - your energy and confidence will be at their peak!',
+        data: { type: 'ovulation' },
+        sound: true,
+      },
+      trigger: {
+        type: Notifications.SchedulableTriggerInputTypes.TIME_INTERVAL,
+        seconds: secondsUntilOvulation,
+      },
+    });
+  }
+}
+
 // Schedule daily wellness check-in
-export async function scheduleDailyWellnessCheckIn(timeString: string): Promise<void> {
-  // Cancel existing wellness check-ins
+export async function scheduleDailyWellnessCheckIn(settings: NotificationSettings): Promise<void> {
   await cancelNotificationsByPrefix('wellness-checkin');
 
-  const [hours, minutes] = timeString.split(':').map(Number);
+  if (!settings.dailyWellnessCheckIn) return;
+
+  const [hours, minutes] = settings.dailyCheckInTime.split(':').map(Number);
+  const finalHour = getNotificationHour(hours, settings);
 
   const messages = [
     { title: '✨ Good Morning', body: 'How are you feeling today? Take a moment to check in with your body.' },
@@ -196,7 +382,6 @@ export async function scheduleDailyWellnessCheckIn(timeString: string): Promise<
     { title: '🦋 Mindful Moment', body: 'Take a breath. How are you feeling physically and emotionally?' },
   ];
 
-  // Pick a random message for variety
   const message = messages[Math.floor(Math.random() * messages.length)];
 
   await Notifications.scheduleNotificationAsync({
@@ -209,7 +394,7 @@ export async function scheduleDailyWellnessCheckIn(timeString: string): Promise<
     },
     trigger: {
       type: Notifications.SchedulableTriggerInputTypes.CALENDAR,
-      hour: hours,
+      hour: finalHour,
       minute: minutes,
       repeats: true,
     },
@@ -220,14 +405,14 @@ export async function scheduleDailyWellnessCheckIn(timeString: string): Promise<
 export async function schedulePhaseChangeAlert(
   phaseName: string,
   phaseEmoji: string,
-  daysUntilChange: number
+  daysUntilChange: number,
+  settings: NotificationSettings
 ): Promise<void> {
-  // Cancel existing phase alerts
   await cancelNotificationsByPrefix('phase-change');
 
-  if (daysUntilChange <= 0) return;
+  if (!settings.phaseChangeAlerts || daysUntilChange <= 0) return;
 
-  const secondsUntilChange = daysUntilChange * 24 * 60 * 60;
+  const notificationHour = getNotificationHour(8, settings);
 
   const phaseMessages: Record<string, string> = {
     menstrual: 'Time to rest and restore. Honor your body with gentle movement and nourishing foods.',
@@ -236,19 +421,107 @@ export async function schedulePhaseChangeAlert(
     luteal: 'Winding down phase. Focus on completion and self-care.',
   };
 
-  const body = phaseMessages[phaseName.toLowerCase()] || `New phase beginning. Adjust your wellness routine accordingly.`;
+  const body = phaseMessages[phaseName.toLowerCase()] || 'New phase beginning. Adjust your wellness routine accordingly.';
 
+  if (daysUntilChange === 1) {
+    await Notifications.scheduleNotificationAsync({
+      identifier: `phase-change-${Date.now()}`,
+      content: {
+        title: `${phaseEmoji} ${phaseName} Phase Starting`,
+        body,
+        data: { type: 'phase-change', phase: phaseName },
+        sound: true,
+      },
+      trigger: {
+        type: Notifications.SchedulableTriggerInputTypes.CALENDAR,
+        hour: notificationHour,
+        minute: 0,
+        repeats: false,
+      },
+    });
+  } else {
+    const secondsUntilChange = (daysUntilChange - 1) * 24 * 60 * 60;
+
+    await Notifications.scheduleNotificationAsync({
+      identifier: `phase-change-${Date.now()}`,
+      content: {
+        title: `${phaseEmoji} ${phaseName} Phase Starting Tomorrow`,
+        body,
+        data: { type: 'phase-change', phase: phaseName },
+        sound: true,
+      },
+      trigger: {
+        type: Notifications.SchedulableTriggerInputTypes.TIME_INTERVAL,
+        seconds: secondsUntilChange,
+      },
+    });
+  }
+}
+
+// Schedule daily wellness tip based on current phase
+export async function scheduleWellnessTip(
+  currentPhase: string,
+  settings: NotificationSettings
+): Promise<void> {
+  await cancelNotificationsByPrefix('wellness-tip');
+
+  if (!settings.wellnessTips) return;
+
+  const notificationHour = getNotificationHour(10, settings);
+
+  // Get phase-specific tips
+  const tips = wellnessTipsByPhase[currentPhase.toLowerCase()] || wellnessTipsByPhase.follicular;
+  const tip = tips[Math.floor(Math.random() * tips.length)];
+
+  const phaseEmojis: Record<string, string> = {
+    menstrual: '🌙',
+    follicular: '🌱',
+    ovulatory: '✨',
+    luteal: '🍂',
+  };
+
+  const emoji = phaseEmojis[currentPhase.toLowerCase()] || '💜';
+
+  // Schedule for tomorrow
   await Notifications.scheduleNotificationAsync({
-    identifier: `phase-change-${Date.now()}`,
+    identifier: `wellness-tip-${Date.now()}`,
     content: {
-      title: `${phaseEmoji} ${phaseName} Phase Starting`,
-      body,
-      data: { type: 'phase-change', phase: phaseName },
+      title: `${emoji} ${currentPhase} Wellness Tip`,
+      body: tip,
+      data: { type: 'wellness-tip', phase: currentPhase },
       sound: true,
     },
     trigger: {
-      type: Notifications.SchedulableTriggerInputTypes.TIME_INTERVAL,
-      seconds: secondsUntilChange,
+      type: Notifications.SchedulableTriggerInputTypes.CALENDAR,
+      hour: notificationHour,
+      minute: 0,
+      repeats: false,
+    },
+  });
+}
+
+// Schedule menopause-specific wellness tip
+export async function scheduleMenopauseWellnessTip(settings: NotificationSettings): Promise<void> {
+  await cancelNotificationsByPrefix('wellness-tip');
+
+  if (!settings.wellnessTips) return;
+
+  const notificationHour = getNotificationHour(10, settings);
+  const tip = menopauseWellnessTips[Math.floor(Math.random() * menopauseWellnessTips.length)];
+
+  await Notifications.scheduleNotificationAsync({
+    identifier: `wellness-tip-${Date.now()}`,
+    content: {
+      title: '☀️ Wellness Tip',
+      body: tip,
+      data: { type: 'wellness-tip', phase: 'menopause' },
+      sound: true,
+    },
+    trigger: {
+      type: Notifications.SchedulableTriggerInputTypes.CALENDAR,
+      hour: notificationHour,
+      minute: 0,
+      repeats: false,
     },
   });
 }
@@ -263,6 +536,8 @@ export async function scheduleAllNotifications(
     daysUntilNextPhase: number;
     nextPhaseName: string;
     nextPhaseEmoji: string;
+    daysUntilOvulation?: number;
+    lifeStage?: string;
   }
 ): Promise<void> {
   if (!settings.enabled) {
@@ -270,14 +545,37 @@ export async function scheduleAllNotifications(
     return;
   }
 
+  const isNonCycling = cycleData.lifeStage === 'menopause' || cycleData.lifeStage === 'postmenopause';
+
+  if (isNonCycling) {
+    // For menopause users, only schedule wellness tips and daily check-in
+    if (settings.dailyWellnessCheckIn) {
+      await scheduleDailyWellnessCheckIn(settings);
+    }
+    if (settings.wellnessTips) {
+      await scheduleMenopauseWellnessTip(settings);
+    }
+    return;
+  }
+
   // Period reminders
   if (settings.periodReminders && cycleData.daysUntilPeriod > 0) {
-    await schedulePeriodReminder(cycleData.daysUntilPeriod, settings.periodReminderDays);
+    await schedulePeriodReminder(cycleData.daysUntilPeriod, settings);
+  }
+
+  // Fertile window alerts
+  if (settings.fertileWindowAlerts && cycleData.daysUntilOvulation !== undefined && cycleData.daysUntilOvulation > 0) {
+    await scheduleFertileWindowAlert(cycleData.daysUntilOvulation, settings);
+  }
+
+  // Ovulation alerts
+  if (settings.ovulationAlerts && cycleData.daysUntilOvulation !== undefined && cycleData.daysUntilOvulation > 0) {
+    await scheduleOvulationAlert(cycleData.daysUntilOvulation, settings);
   }
 
   // Daily wellness check-in
   if (settings.dailyWellnessCheckIn) {
-    await scheduleDailyWellnessCheckIn(settings.dailyCheckInTime);
+    await scheduleDailyWellnessCheckIn(settings);
   }
 
   // Phase change alerts
@@ -285,8 +583,34 @@ export async function scheduleAllNotifications(
     await schedulePhaseChangeAlert(
       cycleData.nextPhaseName,
       cycleData.nextPhaseEmoji,
-      cycleData.daysUntilNextPhase
+      cycleData.daysUntilNextPhase,
+      settings
     );
+  }
+
+  // Wellness tips
+  if (settings.wellnessTips) {
+    await scheduleWellnessTip(cycleData.currentPhase, settings);
+  }
+}
+
+// Initialize notifications on app start
+export async function initializeNotifications(cycleData: {
+  daysUntilPeriod: number;
+  currentPhase: string;
+  phaseEmoji: string;
+  daysUntilNextPhase: number;
+  nextPhaseName: string;
+  nextPhaseEmoji: string;
+  daysUntilOvulation?: number;
+  lifeStage?: string;
+}): Promise<void> {
+  const hasPermission = await requestNotificationPermissions();
+  if (!hasPermission) return;
+
+  const settings = await getNotificationSettings();
+  if (settings.enabled) {
+    await scheduleAllNotifications(settings, cycleData);
   }
 }
 
@@ -310,4 +634,11 @@ export async function sendTestNotification(): Promise<void> {
       seconds: 1,
     },
   });
+}
+
+// Listen for notification taps
+export function addNotificationResponseListener(
+  callback: (response: Notifications.NotificationResponse) => void
+): Notifications.EventSubscription {
+  return Notifications.addNotificationResponseReceivedListener(callback);
 }

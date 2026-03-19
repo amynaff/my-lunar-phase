@@ -166,10 +166,20 @@ A beautiful, comprehensive mobile app that helps women understand and work with 
 
 ### Notifications & Reminders
 - **Period Reminders** - Get notified 1-7 days before your period starts
+- **Fertile Window Alerts** - Know when your fertile window is beginning
+- **Ovulation Day Alerts** - Notification on your estimated ovulation day
 - **Daily Wellness Check-In** - Customizable time for gentle daily reminders
 - **Phase Change Alerts** - Know when you're entering a new cycle phase
+- **Phase-Specific Wellness Tips** - Daily tips tailored to your current phase:
+  - Menstrual: Rest, iron-rich foods, gentle movement
+  - Follicular: Creative projects, new activities, social energy
+  - Ovulatory: Communication, high-intensity workouts, peak energy
+  - Luteal: Nesting, completion, self-care preparation
+- **Menopause Wellness Tips** - Daily tips for bone, heart, brain health and sleep
+- **Quiet Hours** - Configure do-not-disturb periods (respects your sleep!)
 - **Configurable Settings** - Toggle each notification type on/off
-- **Smart Scheduling** - Notifications adapt to your cycle data
+- **Smart Scheduling** - Notifications adapt to your cycle data and life stage
+- **Deep Linking** - Tap notifications to navigate to relevant screens
 
 ### Cycle Tracking (Regular & Perimenopause)
 - Beautiful cycle wheel visualization showing current day and phase

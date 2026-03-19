@@ -3,7 +3,7 @@ import { View, Text, ScrollView, Pressable, Switch, Alert } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Animated, { FadeInDown, FadeInUp } from 'react-native-reanimated';
-import { ArrowLeft, Bell, Calendar, Sparkles, Moon, Clock, ChevronRight, BellOff } from 'lucide-react-native';
+import { ArrowLeft, Bell, Calendar, Sparkles, Moon, Clock, ChevronRight, BellOff, Heart, Droplets, Sun, Volume2 } from 'lucide-react-native';
 import { router } from 'expo-router';
 import * as Haptics from 'expo-haptics';
 import { useThemeStore, getTheme } from '@/lib/theme-store';
@@ -40,6 +40,13 @@ const TIME_OPTIONS = [
   { label: '8:00 PM', value: '20:00' },
 ];
 
+const QUIET_HOURS_OPTIONS = [
+  { label: '9 PM - 7 AM', start: '21:00', end: '07:00' },
+  { label: '10 PM - 8 AM', start: '22:00', end: '08:00' },
+  { label: '11 PM - 7 AM', start: '23:00', end: '07:00' },
+  { label: '11 PM - 9 AM', start: '23:00', end: '09:00' },
+];
+
 const REMINDER_DAYS_OPTIONS = [
   { label: '1 day before', value: 1 },
   { label: '2 days before', value: 2 },
@@ -55,12 +62,17 @@ export default function NotificationSettingsScreen() {
   const lifeStage = useCycleStore((s) => s.lifeStage);
   const getDaysUntilNextPeriod = useCycleStore((s) => s.getDaysUntilNextPeriod);
   const getCurrentPhase = useCycleStore((s) => s.getCurrentPhase);
+  const cycleLength = useCycleStore((s) => s.cycleLength);
+  const getDayOfCycle = useCycleStore((s) => s.getDayOfCycle);
 
   const [settings, setSettings] = useState<NotificationSettings>(defaultNotificationSettings);
   const [permissionGranted, setPermissionGranted] = useState(false);
   const [showTimePicker, setShowTimePicker] = useState(false);
   const [showDaysPicker, setShowDaysPicker] = useState(false);
+  const [showQuietHoursPicker, setShowQuietHoursPicker] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+
+  const isNonCycling = lifeStage === 'menopause' || lifeStage === 'postmenopause';
 
   const [fontsLoaded] = useFonts({
     Quicksand_400Regular,
@@ -79,10 +91,35 @@ export default function NotificationSettingsScreen() {
     const stored = await getNotificationSettings();
     setSettings(stored);
 
-    // Check permission status
     const hasPermission = await requestNotificationPermissions();
     setPermissionGranted(hasPermission);
     setIsLoading(false);
+  };
+
+  const getCycleData = () => {
+    const currentPhase = getCurrentPhase();
+    const currentPhaseInfo = phaseInfo[currentPhase];
+    const phases = ['menstrual', 'follicular', 'ovulatory', 'luteal'] as const;
+    const currentIndex = phases.indexOf(currentPhase);
+    const nextPhase = phases[(currentIndex + 1) % 4];
+    const nextPhaseInfo = phaseInfo[nextPhase];
+    const dayOfCycle = getDayOfCycle();
+    const daysUntilPeriod = getDaysUntilNextPeriod();
+
+    // Calculate days until ovulation (roughly mid-cycle)
+    const ovulationDay = Math.round(cycleLength / 2);
+    const daysUntilOvulation = dayOfCycle < ovulationDay ? ovulationDay - dayOfCycle : cycleLength - dayOfCycle + ovulationDay;
+
+    return {
+      daysUntilPeriod,
+      currentPhase,
+      phaseEmoji: currentPhaseInfo.emoji,
+      daysUntilNextPhase: Math.ceil((28 - daysUntilPeriod) / 4),
+      nextPhaseName: nextPhaseInfo.name,
+      nextPhaseEmoji: nextPhaseInfo.emoji,
+      daysUntilOvulation,
+      lifeStage,
+    };
   };
 
   const updateSetting = async <K extends keyof NotificationSettings>(
@@ -94,25 +131,22 @@ export default function NotificationSettingsScreen() {
     setSettings(newSettings);
     await saveNotificationSettings(newSettings);
 
-    // Reschedule notifications with new settings
     if (newSettings.enabled && permissionGranted) {
-      const currentPhase = getCurrentPhase();
-      const currentPhaseInfo = phaseInfo[currentPhase];
-      const phases = ['menstrual', 'follicular', 'ovulatory', 'luteal'];
-      const currentIndex = phases.indexOf(currentPhase);
-      const nextPhase = phases[(currentIndex + 1) % 4] as keyof typeof phaseInfo;
-      const nextPhaseInfo = phaseInfo[nextPhase];
-
-      await scheduleAllNotifications(newSettings, {
-        daysUntilPeriod: getDaysUntilNextPeriod(),
-        currentPhase,
-        phaseEmoji: currentPhaseInfo.emoji,
-        daysUntilNextPhase: Math.ceil((28 - getDaysUntilNextPeriod()) / 4), // Approximate
-        nextPhaseName: nextPhaseInfo.name,
-        nextPhaseEmoji: nextPhaseInfo.emoji,
-      });
+      await scheduleAllNotifications(newSettings, getCycleData());
     } else if (!newSettings.enabled) {
       await cancelAllNotifications();
+    }
+  };
+
+  const updateQuietHours = async (start: string, end: string) => {
+    Haptics.selectionAsync();
+    const newSettings = { ...settings, quietHoursStart: start, quietHoursEnd: end };
+    setSettings(newSettings);
+    await saveNotificationSettings(newSettings);
+    setShowQuietHoursPicker(false);
+
+    if (newSettings.enabled && permissionGranted) {
+      await scheduleAllNotifications(newSettings, getCycleData());
     }
   };
 
@@ -152,6 +186,13 @@ export default function NotificationSettingsScreen() {
 
   const getDaysLabel = (value: number) => {
     return REMINDER_DAYS_OPTIONS.find((d) => d.value === value)?.label || `${value} days before`;
+  };
+
+  const getQuietHoursLabel = () => {
+    const option = QUIET_HOURS_OPTIONS.find(
+      (o) => o.start === settings.quietHoursStart && o.end === settings.quietHoursEnd
+    );
+    return option?.label || `${settings.quietHoursStart} - ${settings.quietHoursEnd}`;
   };
 
   if (!fontsLoaded || isLoading) return null;
@@ -258,88 +299,144 @@ export default function NotificationSettingsScreen() {
 
           {settings.enabled && (
             <>
-              {/* Period Reminders */}
-              <Animated.View entering={FadeInUp.delay(200).duration(400)} className="px-6 mb-4">
-                <Text style={{ fontFamily: 'Quicksand_600SemiBold', color: theme.text.muted }} className="text-xs mb-3 uppercase tracking-wide">
-                  Period Reminders
-                </Text>
-                <View
-                  className="rounded-2xl overflow-hidden"
-                  style={{ backgroundColor: theme.bg.card, borderWidth: 1, borderColor: theme.border.light }}
-                >
-                  <View className="p-4 flex-row items-center justify-between border-b" style={{ borderColor: theme.border.light }}>
-                    <View className="flex-row items-center flex-1">
-                      <View
-                        className="w-10 h-10 rounded-full items-center justify-center mr-3"
-                        style={{ backgroundColor: `${theme.accent.pink}20` }}
-                      >
-                        <Calendar size={18} color={theme.accent.pink} />
-                      </View>
-                      <View className="flex-1">
-                        <Text style={{ fontFamily: 'Quicksand_500Medium', color: theme.text.primary }} className="text-sm">
-                          Period Reminders
-                        </Text>
-                        <Text style={{ fontFamily: 'Quicksand_400Regular', color: theme.text.muted }} className="text-xs">
-                          Get notified before your period starts
-                        </Text>
-                      </View>
-                    </View>
-                    <Switch
-                      value={settings.periodReminders}
-                      onValueChange={(value) => updateSetting('periodReminders', value)}
-                      trackColor={{ false: theme.border.light, true: `${theme.accent.pink}50` }}
-                      thumbColor={settings.periodReminders ? theme.accent.pink : theme.text.muted}
-                    />
-                  </View>
-
-                  {settings.periodReminders && (
-                    <Pressable
-                      onPress={() => setShowDaysPicker(!showDaysPicker)}
-                      className="p-4 flex-row items-center justify-between"
-                    >
-                      <Text style={{ fontFamily: 'Quicksand_400Regular', color: theme.text.secondary }} className="text-sm">
-                        Remind me
-                      </Text>
-                      <View className="flex-row items-center">
-                        <Text style={{ fontFamily: 'Quicksand_500Medium', color: theme.accent.pink }} className="text-sm">
-                          {getDaysLabel(settings.periodReminderDays)}
-                        </Text>
-                        <ChevronRight size={16} color={theme.text.muted} style={{ marginLeft: 4 }} />
-                      </View>
-                    </Pressable>
-                  )}
-
-                  {showDaysPicker && settings.periodReminders && (
-                    <View className="px-4 pb-4">
-                      {REMINDER_DAYS_OPTIONS.map((option) => (
-                        <Pressable
-                          key={option.value}
-                          onPress={() => {
-                            updateSetting('periodReminderDays', option.value);
-                            setShowDaysPicker(false);
-                          }}
-                          className="py-2 px-3 rounded-lg mb-1"
-                          style={{
-                            backgroundColor: settings.periodReminderDays === option.value ? `${theme.accent.pink}15` : 'transparent',
-                          }}
+              {/* Period Reminders - Only for cycling users */}
+              {!isNonCycling && (
+                <Animated.View entering={FadeInUp.delay(200).duration(400)} className="px-6 mb-4">
+                  <Text style={{ fontFamily: 'Quicksand_600SemiBold', color: theme.text.muted }} className="text-xs mb-3 uppercase tracking-wide">
+                    Period & Fertility
+                  </Text>
+                  <View
+                    className="rounded-2xl overflow-hidden"
+                    style={{ backgroundColor: theme.bg.card, borderWidth: 1, borderColor: theme.border.light }}
+                  >
+                    {/* Period Reminders */}
+                    <View className="p-4 flex-row items-center justify-between border-b" style={{ borderColor: theme.border.light }}>
+                      <View className="flex-row items-center flex-1">
+                        <View
+                          className="w-10 h-10 rounded-full items-center justify-center mr-3"
+                          style={{ backgroundColor: `${theme.accent.pink}20` }}
                         >
-                          <Text
-                            style={{
-                              fontFamily: 'Quicksand_500Medium',
-                              color: settings.periodReminderDays === option.value ? theme.accent.pink : theme.text.secondary,
-                            }}
-                            className="text-sm"
-                          >
-                            {option.label}
+                          <Calendar size={18} color={theme.accent.pink} />
+                        </View>
+                        <View className="flex-1">
+                          <Text style={{ fontFamily: 'Quicksand_500Medium', color: theme.text.primary }} className="text-sm">
+                            Period Reminders
                           </Text>
-                        </Pressable>
-                      ))}
+                          <Text style={{ fontFamily: 'Quicksand_400Regular', color: theme.text.muted }} className="text-xs">
+                            Get notified before your period
+                          </Text>
+                        </View>
+                      </View>
+                      <Switch
+                        value={settings.periodReminders}
+                        onValueChange={(value) => updateSetting('periodReminders', value)}
+                        trackColor={{ false: theme.border.light, true: `${theme.accent.pink}50` }}
+                        thumbColor={settings.periodReminders ? theme.accent.pink : theme.text.muted}
+                      />
                     </View>
-                  )}
-                </View>
-              </Animated.View>
 
-              {/* Daily Wellness Check-in */}
+                    {settings.periodReminders && (
+                      <Pressable
+                        onPress={() => setShowDaysPicker(!showDaysPicker)}
+                        className="p-4 flex-row items-center justify-between border-b"
+                        style={{ borderColor: theme.border.light }}
+                      >
+                        <Text style={{ fontFamily: 'Quicksand_400Regular', color: theme.text.secondary }} className="text-sm">
+                          Remind me
+                        </Text>
+                        <View className="flex-row items-center">
+                          <Text style={{ fontFamily: 'Quicksand_500Medium', color: theme.accent.pink }} className="text-sm">
+                            {getDaysLabel(settings.periodReminderDays)}
+                          </Text>
+                          <ChevronRight size={16} color={theme.text.muted} style={{ marginLeft: 4 }} />
+                        </View>
+                      </Pressable>
+                    )}
+
+                    {showDaysPicker && settings.periodReminders && (
+                      <View className="px-4 pb-4 border-b" style={{ borderColor: theme.border.light }}>
+                        {REMINDER_DAYS_OPTIONS.map((option) => (
+                          <Pressable
+                            key={option.value}
+                            onPress={() => {
+                              updateSetting('periodReminderDays', option.value);
+                              setShowDaysPicker(false);
+                            }}
+                            className="py-2 px-3 rounded-lg mb-1"
+                            style={{
+                              backgroundColor: settings.periodReminderDays === option.value ? `${theme.accent.pink}15` : 'transparent',
+                            }}
+                          >
+                            <Text
+                              style={{
+                                fontFamily: 'Quicksand_500Medium',
+                                color: settings.periodReminderDays === option.value ? theme.accent.pink : theme.text.secondary,
+                              }}
+                              className="text-sm"
+                            >
+                              {option.label}
+                            </Text>
+                          </Pressable>
+                        ))}
+                      </View>
+                    )}
+
+                    {/* Fertile Window Alerts */}
+                    <View className="p-4 flex-row items-center justify-between border-b" style={{ borderColor: theme.border.light }}>
+                      <View className="flex-row items-center flex-1">
+                        <View
+                          className="w-10 h-10 rounded-full items-center justify-center mr-3"
+                          style={{ backgroundColor: `${theme.accent.purple}20` }}
+                        >
+                          <Droplets size={18} color={theme.accent.purple} />
+                        </View>
+                        <View className="flex-1">
+                          <Text style={{ fontFamily: 'Quicksand_500Medium', color: theme.text.primary }} className="text-sm">
+                            Fertile Window
+                          </Text>
+                          <Text style={{ fontFamily: 'Quicksand_400Regular', color: theme.text.muted }} className="text-xs">
+                            Alert when fertile window starts
+                          </Text>
+                        </View>
+                      </View>
+                      <Switch
+                        value={settings.fertileWindowAlerts}
+                        onValueChange={(value) => updateSetting('fertileWindowAlerts', value)}
+                        trackColor={{ false: theme.border.light, true: `${theme.accent.purple}50` }}
+                        thumbColor={settings.fertileWindowAlerts ? theme.accent.purple : theme.text.muted}
+                      />
+                    </View>
+
+                    {/* Ovulation Alerts */}
+                    <View className="p-4 flex-row items-center justify-between">
+                      <View className="flex-row items-center flex-1">
+                        <View
+                          className="w-10 h-10 rounded-full items-center justify-center mr-3"
+                          style={{ backgroundColor: `${theme.accent.lavender}20` }}
+                        >
+                          <Heart size={18} color={theme.accent.lavender} />
+                        </View>
+                        <View className="flex-1">
+                          <Text style={{ fontFamily: 'Quicksand_500Medium', color: theme.text.primary }} className="text-sm">
+                            Ovulation Day
+                          </Text>
+                          <Text style={{ fontFamily: 'Quicksand_400Regular', color: theme.text.muted }} className="text-xs">
+                            Notify on estimated ovulation
+                          </Text>
+                        </View>
+                      </View>
+                      <Switch
+                        value={settings.ovulationAlerts}
+                        onValueChange={(value) => updateSetting('ovulationAlerts', value)}
+                        trackColor={{ false: theme.border.light, true: `${theme.accent.lavender}50` }}
+                        thumbColor={settings.ovulationAlerts ? theme.accent.lavender : theme.text.muted}
+                      />
+                    </View>
+                  </View>
+                </Animated.View>
+              )}
+
+              {/* Daily Wellness */}
               <Animated.View entering={FadeInUp.delay(250).duration(400)} className="px-6 mb-4">
                 <Text style={{ fontFamily: 'Quicksand_600SemiBold', color: theme.text.muted }} className="text-xs mb-3 uppercase tracking-wide">
                   Daily Wellness
@@ -348,6 +445,7 @@ export default function NotificationSettingsScreen() {
                   className="rounded-2xl overflow-hidden"
                   style={{ backgroundColor: theme.bg.card, borderWidth: 1, borderColor: theme.border.light }}
                 >
+                  {/* Daily Check-in */}
                   <View className="p-4 flex-row items-center justify-between border-b" style={{ borderColor: theme.border.light }}>
                     <View className="flex-row items-center flex-1">
                       <View
@@ -361,7 +459,7 @@ export default function NotificationSettingsScreen() {
                           Daily Check-In
                         </Text>
                         <Text style={{ fontFamily: 'Quicksand_400Regular', color: theme.text.muted }} className="text-xs">
-                          Gentle reminder to track how you feel
+                          Reminder to track how you feel
                         </Text>
                       </View>
                     </View>
@@ -376,7 +474,8 @@ export default function NotificationSettingsScreen() {
                   {settings.dailyWellnessCheckIn && (
                     <Pressable
                       onPress={() => setShowTimePicker(!showTimePicker)}
-                      className="p-4 flex-row items-center justify-between"
+                      className="p-4 flex-row items-center justify-between border-b"
+                      style={{ borderColor: theme.border.light }}
                     >
                       <View className="flex-row items-center">
                         <Clock size={16} color={theme.text.muted} style={{ marginRight: 8 }} />
@@ -394,7 +493,7 @@ export default function NotificationSettingsScreen() {
                   )}
 
                   {showTimePicker && settings.dailyWellnessCheckIn && (
-                    <View className="px-4 pb-4">
+                    <View className="px-4 pb-4 border-b" style={{ borderColor: theme.border.light }}>
                       <View className="flex-row flex-wrap" style={{ gap: 8 }}>
                         {TIME_OPTIONS.map((option) => (
                           <Pressable
@@ -424,45 +523,157 @@ export default function NotificationSettingsScreen() {
                       </View>
                     </View>
                   )}
+
+                  {/* Wellness Tips */}
+                  <View className="p-4 flex-row items-center justify-between">
+                    <View className="flex-row items-center flex-1">
+                      <View
+                        className="w-10 h-10 rounded-full items-center justify-center mr-3"
+                        style={{ backgroundColor: `${theme.accent.blush}20` }}
+                      >
+                        <Sun size={18} color={theme.accent.blush} />
+                      </View>
+                      <View className="flex-1">
+                        <Text style={{ fontFamily: 'Quicksand_500Medium', color: theme.text.primary }} className="text-sm">
+                          Wellness Tips
+                        </Text>
+                        <Text style={{ fontFamily: 'Quicksand_400Regular', color: theme.text.muted }} className="text-xs">
+                          {isNonCycling ? 'Daily wellness inspiration' : 'Phase-specific wellness tips'}
+                        </Text>
+                      </View>
+                    </View>
+                    <Switch
+                      value={settings.wellnessTips}
+                      onValueChange={(value) => updateSetting('wellnessTips', value)}
+                      trackColor={{ false: theme.border.light, true: `${theme.accent.blush}50` }}
+                      thumbColor={settings.wellnessTips ? theme.accent.blush : theme.text.muted}
+                    />
+                  </View>
                 </View>
               </Animated.View>
 
-              {/* Phase Change Alerts */}
-              <Animated.View entering={FadeInUp.delay(300).duration(400)} className="px-6 mb-6">
+              {/* Phase Change Alerts - Only for cycling users */}
+              {!isNonCycling && (
+                <Animated.View entering={FadeInUp.delay(300).duration(400)} className="px-6 mb-4">
+                  <Text style={{ fontFamily: 'Quicksand_600SemiBold', color: theme.text.muted }} className="text-xs mb-3 uppercase tracking-wide">
+                    Cycle Phases
+                  </Text>
+                  <View
+                    className="rounded-2xl p-4 flex-row items-center justify-between"
+                    style={{ backgroundColor: theme.bg.card, borderWidth: 1, borderColor: theme.border.light }}
+                  >
+                    <View className="flex-row items-center flex-1">
+                      <View
+                        className="w-10 h-10 rounded-full items-center justify-center mr-3"
+                        style={{ backgroundColor: `${theme.accent.lavender}20` }}
+                      >
+                        <Moon size={18} color={theme.accent.lavender} />
+                      </View>
+                      <View className="flex-1">
+                        <Text style={{ fontFamily: 'Quicksand_500Medium', color: theme.text.primary }} className="text-sm">
+                          Phase Change Alerts
+                        </Text>
+                        <Text style={{ fontFamily: 'Quicksand_400Regular', color: theme.text.muted }} className="text-xs">
+                          Know when entering a new phase
+                        </Text>
+                      </View>
+                    </View>
+                    <Switch
+                      value={settings.phaseChangeAlerts}
+                      onValueChange={(value) => updateSetting('phaseChangeAlerts', value)}
+                      trackColor={{ false: theme.border.light, true: `${theme.accent.lavender}50` }}
+                      thumbColor={settings.phaseChangeAlerts ? theme.accent.lavender : theme.text.muted}
+                    />
+                  </View>
+                </Animated.View>
+              )}
+
+              {/* Quiet Hours */}
+              <Animated.View entering={FadeInUp.delay(350).duration(400)} className="px-6 mb-6">
                 <Text style={{ fontFamily: 'Quicksand_600SemiBold', color: theme.text.muted }} className="text-xs mb-3 uppercase tracking-wide">
-                  Cycle Phases
+                  Quiet Hours
                 </Text>
                 <View
-                  className="rounded-2xl p-4 flex-row items-center justify-between"
+                  className="rounded-2xl overflow-hidden"
                   style={{ backgroundColor: theme.bg.card, borderWidth: 1, borderColor: theme.border.light }}
                 >
-                  <View className="flex-row items-center flex-1">
-                    <View
-                      className="w-10 h-10 rounded-full items-center justify-center mr-3"
-                      style={{ backgroundColor: `${theme.accent.lavender}20` }}
-                    >
-                      <Moon size={18} color={theme.accent.lavender} />
+                  <View className="p-4 flex-row items-center justify-between border-b" style={{ borderColor: theme.border.light }}>
+                    <View className="flex-row items-center flex-1">
+                      <View
+                        className="w-10 h-10 rounded-full items-center justify-center mr-3"
+                        style={{ backgroundColor: `${theme.text.muted}20` }}
+                      >
+                        <Volume2 size={18} color={theme.text.muted} />
+                      </View>
+                      <View className="flex-1">
+                        <Text style={{ fontFamily: 'Quicksand_500Medium', color: theme.text.primary }} className="text-sm">
+                          Quiet Hours
+                        </Text>
+                        <Text style={{ fontFamily: 'Quicksand_400Regular', color: theme.text.muted }} className="text-xs">
+                          No notifications during sleep
+                        </Text>
+                      </View>
                     </View>
-                    <View className="flex-1">
-                      <Text style={{ fontFamily: 'Quicksand_500Medium', color: theme.text.primary }} className="text-sm">
-                        Phase Change Alerts
-                      </Text>
-                      <Text style={{ fontFamily: 'Quicksand_400Regular', color: theme.text.muted }} className="text-xs">
-                        Know when you're entering a new phase
-                      </Text>
-                    </View>
+                    <Switch
+                      value={settings.quietHoursEnabled}
+                      onValueChange={(value) => updateSetting('quietHoursEnabled', value)}
+                      trackColor={{ false: theme.border.light, true: `${theme.accent.purple}50` }}
+                      thumbColor={settings.quietHoursEnabled ? theme.accent.purple : theme.text.muted}
+                    />
                   </View>
-                  <Switch
-                    value={settings.phaseChangeAlerts}
-                    onValueChange={(value) => updateSetting('phaseChangeAlerts', value)}
-                    trackColor={{ false: theme.border.light, true: `${theme.accent.lavender}50` }}
-                    thumbColor={settings.phaseChangeAlerts ? theme.accent.lavender : theme.text.muted}
-                  />
+
+                  {settings.quietHoursEnabled && (
+                    <Pressable
+                      onPress={() => setShowQuietHoursPicker(!showQuietHoursPicker)}
+                      className="p-4 flex-row items-center justify-between"
+                    >
+                      <Text style={{ fontFamily: 'Quicksand_400Regular', color: theme.text.secondary }} className="text-sm">
+                        Quiet period
+                      </Text>
+                      <View className="flex-row items-center">
+                        <Text style={{ fontFamily: 'Quicksand_500Medium', color: theme.accent.purple }} className="text-sm">
+                          {getQuietHoursLabel()}
+                        </Text>
+                        <ChevronRight size={16} color={theme.text.muted} style={{ marginLeft: 4 }} />
+                      </View>
+                    </Pressable>
+                  )}
+
+                  {showQuietHoursPicker && settings.quietHoursEnabled && (
+                    <View className="px-4 pb-4">
+                      {QUIET_HOURS_OPTIONS.map((option) => (
+                        <Pressable
+                          key={option.label}
+                          onPress={() => updateQuietHours(option.start, option.end)}
+                          className="py-2 px-3 rounded-lg mb-1"
+                          style={{
+                            backgroundColor:
+                              settings.quietHoursStart === option.start && settings.quietHoursEnd === option.end
+                                ? `${theme.accent.purple}15`
+                                : 'transparent',
+                          }}
+                        >
+                          <Text
+                            style={{
+                              fontFamily: 'Quicksand_500Medium',
+                              color:
+                                settings.quietHoursStart === option.start && settings.quietHoursEnd === option.end
+                                  ? theme.accent.purple
+                                  : theme.text.secondary,
+                            }}
+                            className="text-sm"
+                          >
+                            {option.label}
+                          </Text>
+                        </Pressable>
+                      ))}
+                    </View>
+                  )}
                 </View>
               </Animated.View>
 
               {/* Test Notification */}
-              <Animated.View entering={FadeInUp.delay(350).duration(400)} className="px-6">
+              <Animated.View entering={FadeInUp.delay(400).duration(400)} className="px-6">
                 <Pressable
                   onPress={handleTestNotification}
                   className="p-4 rounded-2xl items-center"
