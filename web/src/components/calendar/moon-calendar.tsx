@@ -1,0 +1,250 @@
+"use client";
+
+import { useState, useMemo } from "react";
+import { motion } from "framer-motion";
+import { ChevronLeft, ChevronRight } from "lucide-react";
+import { getMoonPhase } from "@/lib/cycle/moon-phase";
+import { moonPhaseInfo } from "@/lib/cycle/data";
+import type { MoonPhase } from "@/lib/cycle/types";
+
+const WEEKDAYS = ["M", "T", "W", "T", "F", "S", "S"];
+
+interface CycleDay {
+  isPeriod: boolean;
+  isFertile: boolean;
+  isOvulation: boolean;
+}
+
+interface MoonCalendarProps {
+  isRegular: boolean;
+  lastPeriodStart: string | null;
+  cycleLength: number;
+  periodLength: number;
+  onSetPeriodStart?: (date: Date) => void;
+}
+
+function getMoonEmoji(phase: MoonPhase): string {
+  return moonPhaseInfo[phase].emoji;
+}
+
+function getCycleDayInfo(
+  date: Date,
+  lastPeriodStart: string | null,
+  cycleLength: number,
+  periodLength: number
+): CycleDay {
+  if (!lastPeriodStart) return { isPeriod: false, isFertile: false, isOvulation: false };
+
+  const start = new Date(lastPeriodStart);
+  const diffMs = date.getTime() - start.getTime();
+  const daysSince = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+  const dayOfCycle = ((daysSince % cycleLength) + cycleLength) % cycleLength + 1;
+
+  const ovulationDay = cycleLength - 14;
+  const fertileStart = ovulationDay - 5;
+  const fertileEnd = ovulationDay + 1;
+
+  return {
+    isPeriod: dayOfCycle <= periodLength,
+    isFertile: dayOfCycle >= fertileStart && dayOfCycle <= fertileEnd,
+    isOvulation: dayOfCycle === ovulationDay,
+  };
+}
+
+function getDaysInMonth(year: number, month: number): number {
+  return new Date(year, month + 1, 0).getDate();
+}
+
+function getFirstDayOfWeek(year: number, month: number): number {
+  const day = new Date(year, month, 1).getDay();
+  return day === 0 ? 6 : day - 1; // Monday = 0
+}
+
+export function MoonCalendar({
+  isRegular,
+  lastPeriodStart,
+  cycleLength,
+  periodLength,
+  onSetPeriodStart,
+}: MoonCalendarProps) {
+  const today = new Date();
+  const [currentMonth, setCurrentMonth] = useState(today.getMonth());
+  const [currentYear, setCurrentYear] = useState(today.getFullYear());
+
+  const monthName = new Date(currentYear, currentMonth).toLocaleString("default", { month: "long" });
+
+  const calendarDays = useMemo(() => {
+    const daysInMonth = getDaysInMonth(currentYear, currentMonth);
+    const firstDay = getFirstDayOfWeek(currentYear, currentMonth);
+    const days: Array<{
+      date: Date | null;
+      day: number;
+      moonPhase: MoonPhase;
+      moonEmoji: string;
+      cycle: CycleDay;
+      isToday: boolean;
+    }> = [];
+
+    // Empty cells before first day
+    for (let i = 0; i < firstDay; i++) {
+      days.push({ date: null, day: 0, moonPhase: "new_moon", moonEmoji: "", cycle: { isPeriod: false, isFertile: false, isOvulation: false }, isToday: false });
+    }
+
+    for (let d = 1; d <= daysInMonth; d++) {
+      const date = new Date(currentYear, currentMonth, d);
+      const moonPhase = getMoonPhase(date);
+      const cycle = isRegular
+        ? getCycleDayInfo(date, lastPeriodStart, cycleLength, periodLength)
+        : { isPeriod: false, isFertile: false, isOvulation: false };
+      const isToday =
+        d === today.getDate() &&
+        currentMonth === today.getMonth() &&
+        currentYear === today.getFullYear();
+
+      days.push({
+        date,
+        day: d,
+        moonPhase,
+        moonEmoji: getMoonEmoji(moonPhase),
+        cycle,
+        isToday,
+      });
+    }
+
+    return days;
+  }, [currentMonth, currentYear, isRegular, lastPeriodStart, cycleLength, periodLength, today]);
+
+  function prevMonth() {
+    if (currentMonth === 0) {
+      setCurrentMonth(11);
+      setCurrentYear((y) => y - 1);
+    } else {
+      setCurrentMonth((m) => m - 1);
+    }
+  }
+
+  function nextMonth() {
+    if (currentMonth === 11) {
+      setCurrentMonth(0);
+      setCurrentYear((y) => y + 1);
+    } else {
+      setCurrentMonth((m) => m + 1);
+    }
+  }
+
+  function handleDayClick(date: Date | null) {
+    if (!date || !isRegular || !onSetPeriodStart) return;
+    onSetPeriodStart(date);
+  }
+
+  return (
+    <div className="rounded-[20px] border border-border-light bg-bg-card shadow-sm p-4 sm:p-6">
+      {/* Month navigation */}
+      <div className="flex items-center justify-between mb-6">
+        <button
+          onClick={prevMonth}
+          className="p-2 rounded-full hover:bg-bg-secondary transition-colors"
+        >
+          <ChevronLeft className="h-5 w-5 text-text-secondary" />
+        </button>
+        <h2 className="font-cormorant text-xl font-semibold text-text-primary">
+          {monthName} {currentYear}
+        </h2>
+        <button
+          onClick={nextMonth}
+          className="p-2 rounded-full hover:bg-bg-secondary transition-colors"
+        >
+          <ChevronRight className="h-5 w-5 text-text-secondary" />
+        </button>
+      </div>
+
+      {/* Weekday headers */}
+      <div className="grid grid-cols-7 gap-1 mb-2">
+        {WEEKDAYS.map((day, i) => (
+          <div
+            key={i}
+            className="text-center text-xs font-quicksand font-semibold text-text-muted py-1"
+          >
+            {day}
+          </div>
+        ))}
+      </div>
+
+      {/* Calendar grid */}
+      <div className="grid grid-cols-7 gap-1">
+        {calendarDays.map((cell, i) => {
+          if (!cell.date) {
+            return <div key={`empty-${i}`} className="aspect-square" />;
+          }
+
+          const isPeriod = cell.cycle.isPeriod;
+          const isFertile = cell.cycle.isFertile && !isPeriod;
+          const isOvulation = cell.cycle.isOvulation;
+
+          return (
+            <motion.button
+              key={cell.day}
+              whileTap={isRegular ? { scale: 0.92 } : undefined}
+              onClick={() => handleDayClick(cell.date)}
+              className={`
+                relative flex flex-col items-center justify-center aspect-square rounded-full
+                transition-colors text-xs font-quicksand
+                ${isPeriod ? "bg-accent-pink/20" : ""}
+                ${isFertile ? "bg-accent-lavender/20" : ""}
+                ${isOvulation ? "ring-2 ring-accent-purple/40" : ""}
+                ${cell.isToday ? "ring-2 ring-accent-purple" : ""}
+                ${isRegular ? "cursor-pointer hover:bg-bg-secondary/60" : "cursor-default"}
+              `}
+            >
+              <span
+                className={`
+                  text-[11px] font-medium leading-none
+                  ${isPeriod ? "text-accent-pink font-bold" : "text-text-secondary"}
+                  ${cell.isToday ? "text-accent-purple font-bold" : ""}
+                `}
+              >
+                {cell.day}
+              </span>
+              <span className="text-sm leading-none mt-0.5">{cell.moonEmoji}</span>
+            </motion.button>
+          );
+        })}
+      </div>
+
+      {/* Legend */}
+      <div className="mt-5 flex flex-wrap gap-4 justify-center">
+        {isRegular ? (
+          <>
+            <div className="flex items-center gap-1.5">
+              <div className="w-3 h-3 rounded-full bg-accent-pink/30" />
+              <span className="text-xs text-text-muted font-quicksand">Period</span>
+            </div>
+            <div className="flex items-center gap-1.5">
+              <div className="w-3 h-3 rounded-full bg-accent-lavender/30" />
+              <span className="text-xs text-text-muted font-quicksand">Fertile</span>
+            </div>
+            <div className="flex items-center gap-1.5">
+              <div className="w-3 h-3 rounded-full ring-2 ring-accent-purple/40" />
+              <span className="text-xs text-text-muted font-quicksand">Ovulation</span>
+            </div>
+            <div className="flex items-center gap-1.5">
+              <div className="w-3 h-3 rounded-full ring-2 ring-accent-purple" />
+              <span className="text-xs text-text-muted font-quicksand">Today</span>
+            </div>
+          </>
+        ) : (
+          <div className="flex items-center gap-1.5">
+            <div className="w-3 h-3 rounded-full ring-2 ring-accent-purple" />
+            <span className="text-xs text-text-muted font-quicksand">Today</span>
+          </div>
+        )}
+      </div>
+
+      {isRegular && (
+        <p className="text-center text-xs text-text-muted font-quicksand mt-3">
+          Tap any date to set as Day 1 of your period
+        </p>
+      )}
+    </div>
+  );
+}

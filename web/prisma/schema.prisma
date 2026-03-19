@@ -1,0 +1,222 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+// ==================== Auth Models (NextAuth.js v5) ====================
+
+model User {
+  id              String    @id @default(cuid())
+  name            String?
+  email           String    @unique
+  emailVerified   DateTime?
+  image           String?
+  passwordHash    String?
+  twoFactorSecret String?
+  twoFactorEnabled Boolean  @default(false)
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  accounts           Account[]
+  sessions           Session[]
+  moodEntries        MoodEntry[]
+  partnerInvites     PartnerInvite[]   @relation("InviteCreator")
+  sharedCycleData    SharedCycleData?
+  partnershipAsUser    Partnership?    @relation("PartnershipUser")
+  partnershipAsPartner Partnership?    @relation("PartnershipPartner")
+  stripeCustomerId   String?           @unique
+  subscription       Subscription?
+  aiConversations    AIConversation[]
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+// ==================== Subscription ====================
+
+model Subscription {
+  id                     String   @id @default(cuid())
+  userId                 String   @unique
+  user                   User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  stripeSubscriptionId   String   @unique
+  stripePriceId          String
+  stripeCurrentPeriodEnd DateTime
+  status                 String
+  plan                   String
+  createdAt              DateTime @default(now())
+  updatedAt              DateTime @updatedAt
+}
+
+// ==================== AI Conversations ====================
+
+model AIConversation {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title     String?
+  summary   String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  messages  AIMessage[]
+
+  @@index([userId])
+}
+
+model AIMessage {
+  id             String         @id @default(cuid())
+  conversationId String
+  conversation   AIConversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  role           String
+  content        String
+  tokenCount     Int?
+  createdAt      DateTime       @default(now())
+
+  @@index([conversationId])
+}
+
+// ==================== Mood & Wellness ====================
+
+model MoodEntry {
+  id         String   @id @default(cuid())
+  userId     String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  date       DateTime
+  mood       Int
+  energy     Int
+  notes      String?
+  cyclePhase String?
+  dayOfCycle Int?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@unique([userId, date])
+  @@index([userId])
+  @@index([date])
+}
+
+// ==================== Partner System ====================
+
+model PartnerInvite {
+  id        String    @id @default(cuid())
+  code      String    @unique
+  creatorId String
+  creator   User      @relation("InviteCreator", fields: [creatorId], references: [id], onDelete: Cascade)
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
+}
+
+model Partnership {
+  id        String   @id @default(cuid())
+  userId    String   @unique
+  user      User     @relation("PartnershipUser", fields: [userId], references: [id], onDelete: Cascade)
+  partnerId String   @unique
+  partner   User     @relation("PartnershipPartner", fields: [partnerId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+}
+
+model SharedCycleData {
+  id           String   @id @default(cuid())
+  userId       String   @unique
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  lifeStage    String
+  currentPhase String
+  dayOfCycle   Int?
+  cycleLength  Int?
+  moonPhase    String?
+  lastUpdated  DateTime @default(now())
+}
+
+// ==================== Community (Anonymous) ====================
+
+model CommunityStory {
+  id         String         @id @default(cuid())
+  category   String
+  lifeStage  String
+  title      String
+  content    String
+  hearts     Int            @default(0)
+  isApproved Boolean        @default(true)
+  createdAt  DateTime       @default(now())
+  comments   StoryComment[]
+
+  @@index([category])
+  @@index([lifeStage])
+  @@index([createdAt])
+}
+
+model StoryComment {
+  id        String         @id @default(cuid())
+  storyId   String
+  story     CommunityStory @relation(fields: [storyId], references: [id], onDelete: Cascade)
+  content   String
+  hearts    Int            @default(0)
+  createdAt DateTime       @default(now())
+
+  @@index([storyId])
+  @@index([createdAt])
+}
+
+model ChatChannel {
+  id          String        @id @default(cuid())
+  name        String
+  description String
+  emoji       String
+  color       String
+  sortOrder   Int           @default(0)
+  isActive    Boolean       @default(true)
+  createdAt   DateTime      @default(now())
+  messages    ChatMessage[]
+
+  @@index([sortOrder])
+}
+
+model ChatMessage {
+  id        String      @id @default(cuid())
+  channelId String
+  channel   ChatChannel @relation(fields: [channelId], references: [id], onDelete: Cascade)
+  lifeStage String?
+  content   String
+  hearts    Int         @default(0)
+  createdAt DateTime    @default(now())
+
+  @@index([channelId])
+  @@index([createdAt])
+}

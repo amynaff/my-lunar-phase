@@ -1,0 +1,116 @@
+@import "tailwindcss";
+
+@theme inline {
+  --font-family-cormorant: var(--font-cormorant), "Cormorant Garamond", serif;
+  --font-family-quicksand: var(--font-quicksand), "Quicksand", sans-serif;
+
+  --color-bg-primary: var(--bg-primary);
+  --color-bg-secondary: var(--bg-secondary);
+  --color-bg-tertiary: var(--bg-tertiary);
+  --color-bg-card: var(--bg-card);
+  --color-bg-card-solid: var(--bg-card-solid);
+  --color-bg-input: var(--bg-input);
+
+  --color-text-primary: var(--text-primary);
+  --color-text-secondary: var(--text-secondary);
+  --color-text-tertiary: var(--text-tertiary);
+  --color-text-muted: var(--text-muted);
+  --color-text-accent: var(--text-accent);
+
+  --color-border-light: var(--border-light);
+  --color-border-medium: var(--border-medium);
+
+  --color-accent-pink: var(--accent-pink);
+  --color-accent-purple: var(--accent-purple);
+  --color-accent-lavender: var(--accent-lavender);
+  --color-accent-rose: var(--accent-rose);
+  --color-accent-blush: var(--accent-blush);
+
+  --color-phase-menstrual: var(--phase-menstrual);
+  --color-phase-follicular: var(--phase-follicular);
+  --color-phase-ovulatory: var(--phase-ovulatory);
+  --color-phase-luteal: var(--phase-luteal);
+}
+
+:root {
+  --bg-primary: #f8f7ff;
+  --bg-secondary: #f0edff;
+  --bg-tertiary: #fdf2f8;
+  --bg-card: rgba(255, 255, 255, 0.92);
+  --bg-card-solid: #ffffff;
+  --bg-input: rgba(255, 255, 255, 0.95);
+
+  --text-primary: #2d1a5e;
+  --text-secondary: #4a3485;
+  --text-tertiary: #6d4fc4;
+  --text-muted: #8b7ab8;
+  --text-accent: #7c5ed6;
+
+  --border-light: rgba(157, 132, 237, 0.25);
+  --border-medium: rgba(157, 132, 237, 0.4);
+
+  --accent-pink: #ff6289;
+  --accent-purple: #9d84ed;
+  --accent-lavender: #c4b5fd;
+  --accent-rose: #f9a8d4;
+  --accent-blush: #ff8aa6;
+
+  --overlay: rgba(0, 0, 0, 0.4);
+  --tab-bar: rgba(255, 255, 255, 0.95);
+
+  --phase-menstrual: #be185d;
+  --phase-follicular: #ec4899;
+  --phase-ovulatory: #f9a8d4;
+  --phase-luteal: #9333ea;
+
+  --stage-regular: #9d84ed;
+  --stage-perimenopause: #f59e0b;
+  --stage-menopause: #8b5cf6;
+  --stage-postmenopause: #ec4899;
+
+  --moon-new: #1e1b4b;
+  --moon-waxing-crescent: #4c1d95;
+  --moon-first-quarter: #6d28d9;
+  --moon-waxing-gibbous: #7c3aed;
+  --moon-full: #f5f3ff;
+  --moon-waning-gibbous: #8b5cf6;
+  --moon-last-quarter: #a78bfa;
+  --moon-waning-crescent: #c4b5fd;
+}
+
+.dark {
+  --bg-primary: #0f0a1a;
+  --bg-secondary: #1a1428;
+  --bg-tertiary: #251d35;
+  --bg-card: rgba(37, 29, 53, 0.9);
+  --bg-card-solid: #251d35;
+  --bg-input: rgba(37, 29, 53, 0.95);
+
+  --text-primary: #f0ebff;
+  --text-secondary: #d4c7f7;
+  --text-tertiary: #b9a6f7;
+  --text-muted: #7a6a9e;
+  --text-accent: #c4b5fd;
+
+  --border-light: rgba(185, 166, 247, 0.15);
+  --border-medium: rgba(185, 166, 247, 0.25);
+
+  --accent-pink: #ff6289;
+  --accent-purple: #a78bfa;
+  --accent-lavender: #c4b5fd;
+  --accent-rose: #f9a8d4;
+  --accent-blush: #ff8aa6;
+
+  --overlay: rgba(0, 0, 0, 0.6);
+  --tab-bar: rgba(15, 10, 26, 0.98);
+}
+
+body {
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: var(--font-quicksand), sans-serif;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-cormorant), serif;
+}
