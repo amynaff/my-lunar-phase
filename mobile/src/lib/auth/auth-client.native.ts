@@ -1,5 +1,7 @@
 import { createAuthClient } from "better-auth/react";
-import { expoClient } from "@better-auth/expo/client";
+// Import directly from dist path to bypass Metro's broken .cjs→.mjs resolution for this package
+// @ts-ignore - types are declared at @better-auth/expo/client but file resolves to dist/client.js
+import { expoClient } from "@better-auth/expo/dist/client.js";
 import * as SecureStore from "expo-secure-store";
 
 export const authClient = createAuthClient({
