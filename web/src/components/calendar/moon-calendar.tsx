@@ -3,9 +3,9 @@
 import { useState, useMemo } from "react";
 import { motion } from "framer-motion";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import { getMoonPhase } from "@/lib/cycle/moon-phase";
-import { moonPhaseInfo } from "@/lib/cycle/data";
-import type { MoonPhase } from "@/lib/cycle/types";
+import { getMoonPhase, getMoonPhaseCycleEquivalent } from "@/lib/cycle/moon-phase";
+import { moonPhaseInfo, moonEnergyLabels } from "@/lib/cycle/data";
+import type { CyclePhase, LifeStage, MoonPhase } from "@/lib/cycle/types";
 
 const WEEKDAYS = ["M", "T", "W", "T", "F", "S", "S"];
 
@@ -17,6 +17,7 @@ interface CycleDay {
 
 interface MoonCalendarProps {
   isRegular: boolean;
+  lifeStage?: LifeStage;
   lastPeriodStart: string | null;
   cycleLength: number;
   periodLength: number;
@@ -60,8 +61,16 @@ function getFirstDayOfWeek(year: number, month: number): number {
   return day === 0 ? 6 : day - 1; // Monday = 0
 }
 
+const moonEnergyColors: Record<string, string> = {
+  menstrual: "#1e1b4b",    // New Moon — deep indigo
+  follicular: "#6d28d9",   // Waxing — violet
+  ovulatory: "#f5f3ff",    // Full Moon — luminous
+  luteal: "#a78bfa",       // Waning — soft purple
+};
+
 export function MoonCalendar({
   isRegular,
+  lifeStage,
   lastPeriodStart,
   cycleLength,
   periodLength,
@@ -73,6 +82,8 @@ export function MoonCalendar({
 
   const monthName = new Date(currentYear, currentMonth).toLocaleString("default", { month: "long" });
 
+  const isMoonOnly = lifeStage === "menopause" || lifeStage === "postmenopause";
+
   const calendarDays = useMemo(() => {
     const daysInMonth = getDaysInMonth(currentYear, currentMonth);
     const firstDay = getFirstDayOfWeek(currentYear, currentMonth);
@@ -81,13 +92,14 @@ export function MoonCalendar({
       day: number;
       moonPhase: MoonPhase;
       moonEmoji: string;
+      moonEnergy: CyclePhase;
       cycle: CycleDay;
       isToday: boolean;
     }> = [];
 
     // Empty cells before first day
     for (let i = 0; i < firstDay; i++) {
-      days.push({ date: null, day: 0, moonPhase: "new_moon", moonEmoji: "", cycle: { isPeriod: false, isFertile: false, isOvulation: false }, isToday: false });
+      days.push({ date: null, day: 0, moonPhase: "new_moon", moonEmoji: "", moonEnergy: "menstrual", cycle: { isPeriod: false, isFertile: false, isOvulation: false }, isToday: false });
     }
 
     for (let d = 1; d <= daysInMonth; d++) {
@@ -106,6 +118,7 @@ export function MoonCalendar({
         day: d,
         moonPhase,
         moonEmoji: getMoonEmoji(moonPhase),
+        moonEnergy: getMoonPhaseCycleEquivalent(moonPhase) as CyclePhase,
         cycle,
         isToday,
       });
@@ -180,6 +193,7 @@ export function MoonCalendar({
           const isPeriod = cell.cycle.isPeriod;
           const isFertile = cell.cycle.isFertile && !isPeriod;
           const isOvulation = cell.cycle.isOvulation;
+          const energyColor = isMoonOnly ? moonEnergyColors[cell.moonEnergy] : undefined;
 
           return (
             <motion.button
@@ -189,17 +203,18 @@ export function MoonCalendar({
               className={`
                 relative flex flex-col items-center justify-center aspect-square rounded-full
                 transition-colors text-xs font-quicksand
-                ${isPeriod ? "bg-accent-pink/20" : ""}
-                ${isFertile ? "bg-accent-lavender/20" : ""}
-                ${isOvulation ? "ring-2 ring-accent-purple/40" : ""}
+                ${!isMoonOnly && isPeriod ? "bg-accent-pink/20" : ""}
+                ${!isMoonOnly && isFertile ? "bg-accent-lavender/20" : ""}
+                ${!isMoonOnly && isOvulation ? "ring-2 ring-accent-purple/40" : ""}
                 ${cell.isToday ? "ring-2 ring-accent-purple" : ""}
                 ${isRegular ? "cursor-pointer hover:bg-bg-secondary/60" : "cursor-default"}
               `}
+              style={isMoonOnly ? { backgroundColor: `${energyColor}12` } : undefined}
             >
               <span
                 className={`
                   text-[11px] font-medium leading-none
-                  ${isPeriod ? "text-accent-pink font-bold" : "text-text-secondary"}
+                  ${!isMoonOnly && isPeriod ? "text-accent-pink font-bold" : "text-text-secondary"}
                   ${cell.isToday ? "text-accent-purple font-bold" : ""}
                 `}
               >
@@ -232,6 +247,19 @@ export function MoonCalendar({
               <span className="text-xs text-text-muted font-quicksand">Today</span>
             </div>
           </>
+        ) : isMoonOnly ? (
+          <>
+            {(["menstrual", "follicular", "ovulatory", "luteal"] as CyclePhase[]).map((phase) => (
+              <div key={phase} className="flex items-center gap-1.5">
+                <div className="w-3 h-3 rounded-full" style={{ backgroundColor: moonEnergyColors[phase] }} />
+                <span className="text-xs text-text-muted font-quicksand">{moonEnergyLabels[phase].name}</span>
+              </div>
+            ))}
+            <div className="flex items-center gap-1.5">
+              <div className="w-3 h-3 rounded-full ring-2 ring-accent-purple" />
+              <span className="text-xs text-text-muted font-quicksand">Today</span>
+            </div>
+          </>
         ) : (
           <div className="flex items-center gap-1.5">
             <div className="w-3 h-3 rounded-full ring-2 ring-accent-purple" />
@@ -240,9 +268,13 @@ export function MoonCalendar({
         )}
       </div>
 
-      {isRegular && (
+      {isRegular ? (
         <p className="text-center text-xs text-text-muted font-quicksand mt-3">
-          Tap any date to set as Day 1 of your period
+          Tap any date to set as Day 1 of your cycle
+        </p>
+      ) : (
+        <p className="text-center text-xs text-text-muted font-quicksand mt-3 italic">
+          Follow the moon&apos;s natural rhythm — new moons for intention, full moons for release
         </p>
       )}
     </div>

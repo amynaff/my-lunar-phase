@@ -102,6 +102,15 @@ export const moonPhaseInfo: Record<MoonPhase, MoonPhaseInfo> = {
   },
 };
 
+// Moon energy labels for menopause/postmenopause users
+// Maps cycle phase equivalents to moon-based energy descriptions
+export const moonEnergyLabels: Record<CyclePhase, { name: string; description: string }> = {
+  menstrual: { name: "Rest & Reflect", description: "New Moon energy — turn inward, set intentions" },
+  follicular: { name: "Rise & Create", description: "Waxing Moon energy — fresh starts, new ideas" },
+  ovulatory: { name: "Shine & Connect", description: "Full Moon energy — peak radiance, celebrate" },
+  luteal: { name: "Release & Restore", description: "Waning Moon energy — let go, wind down" },
+};
+
 export const lifeStageInfo: Record<LifeStage, LifeStageInfo> = {
   regular: {
     name: "Regular Cycles",

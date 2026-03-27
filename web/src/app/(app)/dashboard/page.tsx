@@ -3,10 +3,13 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
-import { Sparkles, Apple, Dumbbell, Heart, Moon, Calendar } from "lucide-react";
+import { Sparkles, Apple, Dumbbell, Heart, Moon, Calendar, Droplets, BookOpen } from "lucide-react";
 import { CycleWheel } from "@/components/cycle/cycle-wheel";
 import { MoonPhaseCard } from "@/components/cycle/moon-phase-card";
 import { PhaseInfoCard } from "@/components/cycle/phase-info-card";
+import { CycleInsightsCard } from "@/components/cycle/cycle-insights-card";
+import { LogPeriodModal } from "@/components/cycle/log-period-modal";
+import { QuickCheckIn } from "@/components/journal/quick-check-in";
 import { useCycleData } from "@/hooks/use-cycle-data";
 import { useCycleStore } from "@/stores/cycle-store";
 import { useRouter } from "next/navigation";
@@ -112,6 +115,9 @@ export default function DashboardPage() {
     }
   }, [hydrated, hasCompletedOnboarding, router]);
 
+  const [showPeriodLog, setShowPeriodLog] = useState(false);
+  const [showQuickCheckIn, setShowQuickCheckIn] = useState(false);
+
   if (!hydrated || !hasCompletedOnboarding) return null;
 
   const activeAffirmations = isRegular
@@ -193,23 +199,52 @@ export default function DashboardPage() {
             </motion.div>
           )}
 
-          {/* Mood quick log */}
-          <Link
-            href="/log-mood"
-            className="flex items-center gap-3 p-4 rounded-[20px] border border-border-light bg-bg-card hover:bg-bg-secondary/50 transition-colors"
-          >
-            <div className="flex items-center justify-center w-10 h-10 rounded-full bg-accent-rose/15">
-              <Calendar className="h-5 w-5 text-accent-pink" />
-            </div>
-            <div>
-              <p className="font-quicksand font-semibold text-text-primary text-sm">
-                Log Today's Mood
-              </p>
-              <p className="text-xs text-text-muted font-quicksand">
-                Track your mood & energy
-              </p>
-            </div>
-          </Link>
+          {/* Period log button (regular users only) */}
+          {isRegular && (
+            <button
+              onClick={() => setShowPeriodLog(true)}
+              className="flex items-center gap-3 p-4 rounded-[20px] border border-accent-pink/20 bg-accent-pink/5 hover:bg-accent-pink/10 transition-colors text-left w-full"
+            >
+              <div className="flex items-center justify-center w-10 h-10 rounded-full bg-accent-pink/15">
+                <Droplets className="h-5 w-5 text-accent-pink" />
+              </div>
+              <div>
+                <p className="font-quicksand font-semibold text-text-primary text-sm">Log Period</p>
+                <p className="text-xs text-text-muted font-quicksand">Period started? Tap to update Day 1</p>
+              </div>
+            </button>
+          )}
+
+          {/* Quick actions row */}
+          <div className="flex gap-2">
+            <Link
+              href="/log-mood"
+              className="flex-1 flex items-center gap-3 p-4 rounded-[20px] border border-border-light bg-bg-card hover:bg-bg-secondary/50 transition-colors"
+            >
+              <div className="flex items-center justify-center w-10 h-10 rounded-full bg-accent-rose/15">
+                <Calendar className="h-5 w-5 text-accent-pink" />
+              </div>
+              <div>
+                <p className="font-quicksand font-semibold text-text-primary text-sm">Log Mood</p>
+                <p className="text-xs text-text-muted font-quicksand">Track mood & energy</p>
+              </div>
+            </Link>
+            <button
+              onClick={() => setShowQuickCheckIn(true)}
+              className="flex-1 flex items-center gap-3 p-4 rounded-[20px] border border-border-light bg-bg-card hover:bg-bg-secondary/50 transition-colors text-left"
+            >
+              <div className="flex items-center justify-center w-10 h-10 rounded-full bg-accent-purple/15">
+                <BookOpen className="h-5 w-5 text-accent-purple" />
+              </div>
+              <div>
+                <p className="font-quicksand font-semibold text-text-primary text-sm">Journal</p>
+                <p className="text-xs text-text-muted font-quicksand">Quick check-in</p>
+              </div>
+            </button>
+          </div>
+
+          {/* Cycle insights (regular users) */}
+          <CycleInsightsCard />
         </div>
       </div>
 
@@ -271,6 +306,10 @@ export default function DashboardPage() {
           ))}
         </div>
       </motion.div>
+
+      {/* Modals */}
+      <LogPeriodModal open={showPeriodLog} onClose={() => setShowPeriodLog(false)} />
+      <QuickCheckIn open={showQuickCheckIn} onClose={() => setShowQuickCheckIn(false)} />
     </div>
   );
 }

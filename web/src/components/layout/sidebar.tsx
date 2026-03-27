@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Home, Apple, Dumbbell, Heart, MessageCircle, Users, Settings, Sparkles, Moon, FlaskConical, CreditCard } from "lucide-react";
+import { Home, Apple, Dumbbell, Heart, MessageCircle, Users, Settings, Sparkles, Moon, FlaskConical, CreditCard, BookOpen, Calendar, GraduationCap, TrendingUp } from "lucide-react";
 import { cn } from "@/lib/cn";
 
 const mainNav = [
@@ -10,14 +10,18 @@ const mainNav = [
   { href: "/nutrition", label: "Nutrition", icon: Apple },
   { href: "/movement", label: "Movement", icon: Dumbbell },
   { href: "/selfcare", label: "Care", icon: Heart },
+  { href: "/journal", label: "Journal", icon: BookOpen },
 ];
 
 const secondaryNav = [
   { href: "/luna-ai", label: "Luna AI", icon: Sparkles },
   { href: "/log-mood", label: "Log Mood", icon: Moon },
+  { href: "/calendar", label: "Calendar", icon: Calendar },
   { href: "/community", label: "Community", icon: MessageCircle },
   { href: "/partner", label: "Partner", icon: Users },
   { href: "/labs-guide", label: "Labs Guide", icon: FlaskConical },
+  { href: "/cycle-history", label: "Cycle History", icon: TrendingUp },
+  { href: "/hormonal-education", label: "Education", icon: GraduationCap },
 ];
 
 const bottomNav = [

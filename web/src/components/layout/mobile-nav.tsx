@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Home, Apple, Dumbbell, Heart, CalendarDays } from "lucide-react";
+import { Home, Apple, Dumbbell, Heart, BookOpen } from "lucide-react";
 import { cn } from "@/lib/cn";
 
 const tabs = [
@@ -10,7 +10,7 @@ const tabs = [
   { href: "/nutrition", label: "Nourish", icon: Apple },
   { href: "/movement", label: "Move", icon: Dumbbell },
   { href: "/selfcare", label: "Care", icon: Heart },
-  { href: "/calendar", label: "Calendar", icon: CalendarDays },
+  { href: "/journal", label: "Journal", icon: BookOpen },
 ];
 
 export function MobileNav() {

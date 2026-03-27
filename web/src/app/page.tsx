@@ -117,7 +117,7 @@ export default function LandingPage() {
           <Link href="#features" className="hover:text-text-primary transition-colors">Features</Link>
           <Link href="#pricing" className="hover:text-text-primary transition-colors">Pricing</Link>
           <Link href="/sign-up" className="px-6 py-2.5 rounded-full bg-gradient-to-r from-accent-purple to-accent-pink text-white shadow-lg shadow-accent-purple/35">
-            Coming Soon
+            Web App
           </Link>
         </nav>
         <Link href="/sign-up" className="lg:hidden px-5 py-2 rounded-full bg-gradient-to-r from-accent-purple to-accent-pink text-white text-sm font-quicksand font-semibold">

@@ -1,8 +1,8 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useImperativeHandle, forwardRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Send, Sparkles, Loader2 } from "lucide-react";
+import { Send, Sparkles, Loader2, Activity } from "lucide-react";
 import { MessageBubble } from "./message-bubble";
 import { useCycleData } from "@/hooks/use-cycle-data";
 
@@ -13,7 +13,15 @@ interface Message {
   timestamp: Date;
 }
 
-export function ChatInterface() {
+export interface ChatInterfaceHandle {
+  sendMessage: (content: string) => void;
+}
+
+interface ChatInterfaceProps {
+  onSymptomCheckerOpen?: () => void;
+}
+
+export const ChatInterface = forwardRef<ChatInterfaceHandle, ChatInterfaceProps>(function ChatInterface({ onSymptomCheckerOpen }, ref) {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -23,6 +31,8 @@ export function ChatInterface() {
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" });
   }, [messages]);
+
+  useImperativeHandle(ref, () => ({ sendMessage }));
 
   const suggestions = [
     "What should I eat today?",
@@ -121,6 +131,15 @@ export function ChatInterface() {
                   {s}
                 </button>
               ))}
+              {onSymptomCheckerOpen && (
+                <button
+                  onClick={onSymptomCheckerOpen}
+                  className="px-4 py-2 text-sm rounded-xl border border-accent-pink/30 bg-accent-pink/5 text-accent-pink font-quicksand font-semibold hover:bg-accent-pink/10 transition-colors flex items-center gap-1.5"
+                >
+                  <Activity className="h-3.5 w-3.5" />
+                  Symptom Checker
+                </button>
+              )}
             </div>
           </motion.div>
         )}
@@ -152,6 +171,16 @@ export function ChatInterface() {
           }}
           className="flex items-center gap-3"
         >
+          {onSymptomCheckerOpen && (
+            <button
+              type="button"
+              onClick={onSymptomCheckerOpen}
+              className="flex items-center justify-center w-11 h-11 rounded-full bg-accent-pink/10 text-accent-pink hover:bg-accent-pink/20 transition-colors shrink-0"
+              title="Symptom Checker"
+            >
+              <Activity className="h-5 w-5" />
+            </button>
+          )}
           <input
             type="text"
             value={input}
@@ -171,4 +200,4 @@ export function ChatInterface() {
       </div>
     </div>
   );
-}
+});

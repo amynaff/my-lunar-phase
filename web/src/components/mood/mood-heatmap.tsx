@@ -3,6 +3,8 @@
 import { useState, useMemo } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useMoodStore, getMoodColor } from "@/stores/mood-store";
+import { getMoonPhase } from "@/lib/cycle/moon-phase";
+import { moonPhaseInfo } from "@/lib/cycle/data";
 
 export function MoodHeatmap() {
   const [currentDate, setCurrentDate] = useState(new Date());
@@ -14,16 +16,19 @@ export function MoodHeatmap() {
   const days = useMemo(() => {
     const firstDay = new Date(year, month, 1).getDay();
     const daysInMonth = new Date(year, month + 1, 0).getDate();
-    const cells: Array<{ day: number | null; date: string; mood?: number }> = [];
+    const cells: Array<{ day: number | null; date: string; mood?: number; moonEmoji: string }> = [];
 
     for (let i = 0; i < firstDay; i++) {
-      cells.push({ day: null, date: "" });
+      cells.push({ day: null, date: "", moonEmoji: "" });
     }
 
     for (let d = 1; d <= daysInMonth; d++) {
       const dateStr = `${year}-${String(month + 1).padStart(2, "0")}-${String(d).padStart(2, "0")}`;
       const entry = entries[dateStr];
-      cells.push({ day: d, date: dateStr, mood: entry?.mood });
+      const dateObj = new Date(year, month, d);
+      const moonPhase = getMoonPhase(dateObj);
+      const moonEmoji = moonPhaseInfo[moonPhase].emoji;
+      cells.push({ day: d, date: dateStr, mood: entry?.mood, moonEmoji });
     }
 
     return cells;
@@ -63,13 +68,18 @@ export function MoodHeatmap() {
         {days.map((cell, i) => (
           <div
             key={i}
-            className="aspect-square flex items-center justify-center rounded-lg text-xs font-quicksand"
+            className="aspect-square flex flex-col items-center justify-center rounded-lg text-xs font-quicksand"
             style={{
               backgroundColor: cell.mood ? `${getMoodColor(cell.mood)}30` : undefined,
               color: cell.mood ? getMoodColor(cell.mood) : "var(--text-muted)",
             }}
           >
-            {cell.day}
+            {cell.day && (
+              <>
+                <span className="text-[10px] leading-none font-medium">{cell.day}</span>
+                <span className="text-[11px] leading-none mt-0.5">{cell.moonEmoji}</span>
+              </>
+            )}
           </div>
         ))}
       </div>
