@@ -194,7 +194,7 @@ Quick steps:
 - Anonymous community: stories, comments, chat channels
 - Partner data sharing via invite codes
 - Labs guide for hormone testing
-- Premium subscriptions: Free / $9.99 monthly / $79.99 annual
+- Premium subscriptions: Free / $6.99 monthly / $59.99 annual
 - Dark mode with system preference detection
 - Mobile-responsive design
 - CORS support for mobile app compatibility

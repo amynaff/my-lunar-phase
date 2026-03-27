@@ -10,7 +10,7 @@ const plans = [
     period: "forever",
     features: [
       "Basic cycle tracking",
-      "30-day history",
+      "60-day history",
       "3 symptoms per day",
       "Community access",
       "Moon phase wisdom",
@@ -21,7 +21,7 @@ const plans = [
   },
   {
     name: "Monthly",
-    price: "$9.99",
+    price: "$6.99",
     period: "/month",
     features: [
       "Everything in Free",
@@ -38,13 +38,13 @@ const plans = [
   },
   {
     name: "Annual",
-    price: "$79.99",
+    price: "$59.99",
     period: "/year",
-    badge: "Save 33%",
+    badge: "Save 29%",
     features: [
       "Everything in Monthly",
-      "$6.67/month equivalent",
-      "2 months free",
+      "$5/month equivalent",
+      "Save vs monthly",
       "Early feature access",
     ],
     cta: "Start Annual",

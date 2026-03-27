@@ -153,7 +153,7 @@ export default function LandingPage() {
 
           <motion.div variants={fadeUp} className="flex items-center justify-center gap-3.5 flex-wrap mb-12">
             <Link href="/sign-up" className="inline-flex items-center gap-2.5 px-9 py-4 rounded-2xl bg-gradient-to-r from-accent-rose to-accent-purple text-white font-quicksand font-bold text-base shadow-[0_8px_32px_rgba(157,132,237,0.4)] hover:-translate-y-0.5 transition-transform">
-              Start 30-Day Free Trial
+              Start 60-Day Free Trial
             </Link>
             <Link href="#stages" className="inline-flex items-center gap-2 px-8 py-4 rounded-2xl bg-white/65 border border-border-medium text-text-secondary font-quicksand font-semibold backdrop-blur-sm hover:-translate-y-0.5 transition-transform">
               See how it works &rarr;
@@ -463,7 +463,7 @@ export default function LandingPage() {
           {/* Free */}
           <div className="bg-white rounded-[28px] border border-border-light p-7">
             <p className="text-[11px] font-quicksand font-bold tracking-[0.1em] uppercase text-text-muted mb-2.5">Free Trial</p>
-            <p className="font-cormorant text-[44px] font-light text-text-primary leading-none">$0 <span className="text-[14px] font-quicksand font-normal text-text-muted">/ 30 days</span></p>
+            <p className="font-cormorant text-[44px] font-light text-text-primary leading-none">$0 <span className="text-[14px] font-quicksand font-normal text-text-muted">/ 60 days</span></p>
             <p className="text-[13px] text-text-secondary font-quicksand mt-2.5 mb-6 leading-snug">Full access to everything. No credit card required.</p>
             <ul className="space-y-0 mb-6">
               {["All life stages", "Phase nutrition & movement", "Self-care & affirmations", "Moon phase wisdom", "Labs guide", "iOS & Web app"].map((f) => (
@@ -479,7 +479,7 @@ export default function LandingPage() {
           {/* Monthly */}
           <div className="bg-white rounded-[28px] border border-border-light p-7">
             <p className="text-[11px] font-quicksand font-bold tracking-[0.1em] uppercase text-text-muted mb-2.5">Monthly</p>
-            <p className="font-cormorant text-[44px] font-light text-text-primary leading-none">$9.99 <span className="text-[14px] font-quicksand font-normal text-text-muted">/ month</span></p>
+            <p className="font-cormorant text-[44px] font-light text-text-primary leading-none">$6.99 <span className="text-[14px] font-quicksand font-normal text-text-muted">/ month</span></p>
             <p className="text-[13px] text-text-secondary font-quicksand mt-2.5 mb-6 leading-snug">Everything, unlimited. Cancel anytime.</p>
             <ul className="space-y-0 mb-6">
               {["Everything in Free", "Partner support & sharing", "Pattern analysis", "Advanced symptom tracking", "Unlimited history", "Community access"].map((f) => (
@@ -497,7 +497,7 @@ export default function LandingPage() {
             <span className="absolute -top-2.5 right-5 px-3.5 py-1 rounded-full bg-gradient-to-r from-accent-pink to-accent-rose text-white text-[10px] font-quicksand font-extrabold tracking-wide uppercase">Best Value</span>
             <p className="text-[11px] font-quicksand font-bold tracking-[0.1em] uppercase text-white/60 mb-2.5">Annual</p>
             <p className="font-cormorant text-[44px] font-light text-white leading-none">$59.99 <span className="text-[14px] font-quicksand font-normal text-white/60">/ year</span></p>
-            <p className="text-[13px] text-white/70 font-quicksand mt-2.5 mb-6 leading-snug">Save 50% — just $5/month. Best deal.</p>
+            <p className="text-[13px] text-white/70 font-quicksand mt-2.5 mb-6 leading-snug">Save 29% — just $5/month. Best deal.</p>
             <ul className="space-y-0 mb-6">
               {["Everything in Free", "Partner support & sharing", "Pattern analysis", "Advanced symptom tracking", "Unlimited history", "Community access"].map((f) => (
                 <li key={f} className="flex items-center gap-2 py-2 border-b border-white/15 text-[13px] text-white font-quicksand">
@@ -506,7 +506,7 @@ export default function LandingPage() {
               ))}
             </ul>
             <Link href="/sign-up" className="block text-center py-3.5 rounded-2xl bg-white text-text-primary font-quicksand font-bold shadow-[0_4px_18px_rgba(0,0,0,0.14)] hover:-translate-y-0.5 transition-transform">
-              Get Annual — Save 50%
+              Get Annual — Save 29%
             </Link>
           </div>
         </div>
@@ -543,6 +543,7 @@ export default function LandingPage() {
       <footer className="border-t border-border-light px-6 md:px-12 py-9 flex flex-col md:flex-row items-center justify-between gap-4">
         <span className="font-cormorant text-lg font-semibold text-text-primary">MyLunarPhase</span>
         <div className="flex items-center gap-6 text-[13px] text-text-muted font-quicksand">
+          <Link href="/suggestions" className="hover:text-text-secondary transition-colors font-semibold text-accent-purple">Suggest a Feature</Link>
           <Link href="/privacy" className="hover:text-text-secondary transition-colors">Privacy Policy</Link>
           <Link href="/terms" className="hover:text-text-secondary transition-colors">Terms of Service</Link>
         </div>

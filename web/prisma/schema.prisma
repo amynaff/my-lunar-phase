@@ -220,3 +220,20 @@ model ChatMessage {
   @@index([channelId])
   @@index([createdAt])
 }
+
+// ==================== Feature Suggestions ====================
+
+model Suggestion {
+  id        String   @id @default(cuid())
+  name      String?
+  email     String?
+  category  String
+  title     String
+  detail    String
+  hearts    Int      @default(0)
+  status    String   @default("new")
+  createdAt DateTime @default(now())
+
+  @@index([category])
+  @@index([createdAt])
+}

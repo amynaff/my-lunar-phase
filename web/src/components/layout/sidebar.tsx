@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Home, Apple, Dumbbell, Heart, MessageCircle, Users, Settings, Sparkles, Moon, FlaskConical, CreditCard, BookOpen, Calendar, GraduationCap, TrendingUp } from "lucide-react";
+import { Home, Apple, Dumbbell, Heart, MessageCircle, Users, Settings, Sparkles, Moon, FlaskConical, CreditCard, BookOpen, Calendar, GraduationCap, TrendingUp, Lightbulb } from "lucide-react";
 import { cn } from "@/lib/cn";
 
 const mainNav = [
@@ -25,6 +25,7 @@ const secondaryNav = [
 ];
 
 const bottomNav = [
+  { href: "/suggestions", label: "Suggest a Feature", icon: Lightbulb },
   { href: "/settings", label: "Settings", icon: Settings },
   { href: "/settings/billing", label: "Billing", icon: CreditCard },
 ];

@@ -19,14 +19,14 @@ export const PLANS = {
   free: { name: "Free", price: 0, priceId: null },
   monthly: {
     name: "Monthly",
-    price: 9.99,
+    price: 6.99,
     get priceId() {
       return process.env.STRIPE_MONTHLY_PRICE_ID!;
     },
   },
   annual: {
     name: "Annual",
-    price: 79.99,
+    price: 59.99,
     get priceId() {
       return process.env.STRIPE_ANNUAL_PRICE_ID!;
     },

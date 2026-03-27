@@ -45,8 +45,8 @@
 
 1. Go to [Stripe Dashboard](https://dashboard.stripe.com)
 2. Create two products with recurring prices:
-   - Monthly: $9.99/month → copy Price ID to `STRIPE_MONTHLY_PRICE_ID`
-   - Annual: $79.99/year → copy Price ID to `STRIPE_ANNUAL_PRICE_ID`
+   - Monthly: $6.99/month → copy Price ID to `STRIPE_MONTHLY_PRICE_ID`
+   - Annual: $59.99/year → copy Price ID to `STRIPE_ANNUAL_PRICE_ID`
 3. Copy Secret Key → `STRIPE_SECRET_KEY`
 4. Copy Publishable Key → `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY`
 5. Set up webhook endpoint: `https://yourdomain.com/api/stripe/webhook`

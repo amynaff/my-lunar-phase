@@ -31,7 +31,7 @@ interface SubscriptionConfirmProps {
 
 export default function SubscriptionConfirm({
   plan = "Premium",
-  amount = "$9.99/mo",
+  amount = "$6.99/mo",
   name,
 }: SubscriptionConfirmProps) {
   const greeting = name ? `Hi ${name},` : "Hi there,";
