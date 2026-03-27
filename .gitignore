@@ -1,7 +1,11 @@
 # Local environment files
 .env
-backend/.env
-mobile/.env
+.env.*
+!.env.example
+backend/.env*
+mobile/.env*
+web/.env*
+!web/.env.example
 
 # Node modules
 node_modules/
