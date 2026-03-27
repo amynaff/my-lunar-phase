@@ -33,6 +33,7 @@
 }
 
 :root {
+  color-scheme: light;
   --bg-primary: #f8f7ff;
   --bg-secondary: #f0edff;
   --bg-tertiary: #fdf2f8;
@@ -79,6 +80,7 @@
 }
 
 .dark {
+  color-scheme: dark;
   --bg-primary: #0f0a1a;
   --bg-secondary: #1a1428;
   --bg-tertiary: #251d35;
