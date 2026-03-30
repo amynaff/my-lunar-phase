@@ -81,7 +81,6 @@ export default function SignInPage() {
           Continue with Google
         </button>
 
-        {/* Apple Sign-In — uncomment when credentials are configured
         <button
           onClick={() => signIn("apple", { callbackUrl: "/dashboard" })}
           className="w-full flex items-center justify-center gap-3 py-3.5 rounded-2xl border border-border-light bg-bg-secondary font-quicksand font-semibold text-sm text-text-primary hover:brightness-95 transition-all"
@@ -91,7 +90,6 @@ export default function SignInPage() {
           </svg>
           Continue with Apple
         </button>
-        */}
       </div>
 
       {/* Divider */}
