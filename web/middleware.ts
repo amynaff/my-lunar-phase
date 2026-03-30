@@ -82,7 +82,9 @@ export function middleware(request: NextRequest) {
   ) {
     const token =
       request.cookies.get("next-auth.session-token")?.value ||
-      request.cookies.get("__Secure-next-auth.session-token")?.value;
+      request.cookies.get("__Secure-next-auth.session-token")?.value ||
+      request.cookies.get("authjs.session-token")?.value ||
+      request.cookies.get("__Secure-authjs.session-token")?.value;
 
     if (!token) {
       const signInUrl = new URL("/sign-in", request.url);
