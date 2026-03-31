@@ -172,30 +172,9 @@ export default function DashboardPage() {
               transition={{ duration: 0.5, delay: 0.1 }}
               className="rounded-[20px] border border-border-light bg-bg-card p-5"
             >
-              <div className="flex items-center gap-3 mb-3">
-                <div
-                  className="flex items-center justify-center w-10 h-10 rounded-full text-xl"
-                  style={{ backgroundColor: `${currentMoonInfo.color}20` }}
-                >
-                  {currentMoonInfo.emoji}
-                </div>
-                <div>
-                  <h3 className="font-cormorant text-lg font-semibold text-text-primary">
-                    {currentMoonInfo.name}
-                  </h3>
-                  <p className="text-xs text-text-accent font-quicksand font-medium">
-                    {currentMoonInfo.energy}
-                  </p>
-                </div>
-              </div>
               <p className="text-sm text-text-secondary font-quicksand leading-relaxed">
-                {currentMoonInfo.description}
+                {currentLifeStageInfo.description}
               </p>
-              <div className="mt-3">
-                <span className="text-xs text-text-muted font-quicksand">
-                  {currentLifeStageInfo.description}
-                </span>
-              </div>
             </motion.div>
           )}
 
