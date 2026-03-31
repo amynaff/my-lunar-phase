@@ -1129,19 +1129,6 @@ export default function NutritionPage() {
           </div>
         </motion.div>
 
-        {/* Moon Phase Calendar */}
-        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.05 }}>
-          <PhaseCalendar
-            isRegular={false}
-            lifeStage={lifeStage}
-            lastPeriodStart={lastPeriodStart}
-            cycleLength={cycleLength}
-            periodLength={periodLength}
-            selectedPhase={selectedPhase}
-            onSelectPhase={setSelectedPhase}
-          />
-        </motion.div>
-
         {/* Phase card */}
         <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="rounded-[20px] border border-border-light bg-bg-card p-6 mb-6">
           <h2 className="font-cormorant text-xl font-semibold text-text-primary">{lifeStageData.title}</h2>
@@ -1297,23 +1284,6 @@ export default function NutritionPage() {
             </p>
           </div>
         </div>
-      </motion.div>
-
-      {/* Phase Calendar */}
-      <motion.div
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.05 }}
-      >
-        <PhaseCalendar
-          isRegular={isRegular}
-          lifeStage={lifeStage}
-          lastPeriodStart={lastPeriodStart}
-          cycleLength={cycleLength}
-          periodLength={periodLength}
-          selectedPhase={selectedPhase}
-          onSelectPhase={setSelectedPhase}
-        />
       </motion.div>
 
       {/* Phase card */}
