@@ -1,19 +1,166 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { Suspense, useState, useMemo } from "react";
+import { useSearchParams } from "next/navigation";
 import { motion } from "framer-motion";
-import { BookOpen, Plus, Flame, Sparkles, Trash2, Edit3, ChevronLeft, ChevronRight } from "lucide-react";
+import { BookOpen, Plus, Flame, Sparkles, Trash2, Edit3, ChevronLeft, ChevronRight, ClipboardCheck } from "lucide-react";
 import { useJournalStore, journalPrompts, moonJournalPrompts, journalTags, type JournalEntry } from "@/stores/journal-store";
 import { useCycleData } from "@/hooks/use-cycle-data";
 import { JournalEntryModal } from "@/components/journal/journal-entry-modal";
 import { QuickCheckIn } from "@/components/journal/quick-check-in";
+import { DailyCheckInForm } from "@/components/daily-checkin/daily-checkin-form";
+import { CheckInHistory } from "@/components/daily-checkin/checkin-history";
+import { InsightsPanel } from "@/components/daily-checkin/insights-panel";
+import { useDailyCheckInStore } from "@/stores/daily-checkin-store";
+import { useMounted } from "@/hooks/use-mounted";
 import { phaseInfo } from "@/lib/cycle/data";
 
 type ViewMode = "week" | "month" | "all";
+type CheckInView = "today" | "history" | "insights";
 
 const DAYS_SHORT = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
 export default function JournalPage() {
+  return (
+    <Suspense fallback={null}>
+      <JournalPageContent />
+    </Suspense>
+  );
+}
+
+function JournalPageContent() {
+  const { currentPhase, currentMoonPhase, isRegular, dayOfCycle, lifeStage } = useCycleData();
+
+  // Show unified daily check-in for peri/meno/postmeno users
+  const isPeriMeno = lifeStage === "perimenopause" || lifeStage === "menopause" || lifeStage === "postmenopause";
+
+  if (isPeriMeno) {
+    return <DailyTrackerView />;
+  }
+
+  return <ClassicJournalView />;
+}
+
+// ============================================================
+// DAILY TRACKER VIEW — for peri/meno/postmeno users
+// ============================================================
+function DailyTrackerView() {
+  const searchParams = useSearchParams();
+  const mounted = useMounted();
+  const initialView = searchParams.get("view") === "insights" ? "insights" as CheckInView : "today" as CheckInView;
+  const [checkinView, setCheckinView] = useState<CheckInView>(initialView);
+  const [editingDate, setEditingDate] = useState<string | null>(null);
+  const streak = useDailyCheckInStore((s) => s.getStreakCount());
+  const total = useDailyCheckInStore((s) => s.getTotalEntries());
+  const thisWeek = useDailyCheckInStore((s) => s.getEntriesThisWeek());
+
+  // Display 0 on server, real values after hydration to avoid mismatch
+  const displayStreak = mounted ? streak : 0;
+  const displayTotal = mounted ? total : 0;
+  const displayThisWeek = mounted ? thisWeek : 0;
+
+  function handleEditDate(date: string) {
+    setEditingDate(date);
+    setCheckinView("today");
+  }
+
+  const todayStr = useMemo(() => {
+    const d = new Date();
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+  }, []);
+
+  return (
+    <div className="max-w-2xl mx-auto px-4 lg:px-8 py-6">
+      {/* Header */}
+      <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} className="mb-6">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="flex items-center justify-center w-10 h-10 rounded-full bg-accent-pink/15">
+              <ClipboardCheck className="h-5 w-5 text-accent-pink" />
+            </div>
+            <div>
+              <h1 className="font-cormorant text-3xl font-semibold text-text-primary">Daily Check-In</h1>
+              <p className="text-sm text-text-secondary font-quicksand">Track symptoms, mood & lifestyle</p>
+            </div>
+          </div>
+        </div>
+      </motion.div>
+
+      {/* Stats row */}
+      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.05 }} className="grid grid-cols-3 gap-3 mb-6">
+        <div className="rounded-2xl border border-border-light bg-bg-card p-4 text-center">
+          <div className="flex items-center justify-center gap-1 mb-1">
+            <Flame className="h-4 w-4 text-accent-pink" />
+            <span className="text-xl font-cormorant font-semibold text-text-primary">{displayStreak}</span>
+          </div>
+          <p className="text-[10px] text-text-muted font-quicksand uppercase tracking-wider">Day Streak</p>
+        </div>
+        <div className="rounded-2xl border border-border-light bg-bg-card p-4 text-center">
+          <span className="text-xl font-cormorant font-semibold text-text-primary">{displayTotal}</span>
+          <p className="text-[10px] text-text-muted font-quicksand uppercase tracking-wider">Total Check-Ins</p>
+        </div>
+        <div className="rounded-2xl border border-border-light bg-bg-card p-4 text-center">
+          <span className="text-xl font-cormorant font-semibold text-text-primary">{displayThisWeek}</span>
+          <p className="text-[10px] text-text-muted font-quicksand uppercase tracking-wider">This Week</p>
+        </div>
+      </motion.div>
+
+      {/* View toggle */}
+      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="flex gap-1 mb-6 p-1 rounded-xl bg-bg-secondary/50">
+        <button
+          onClick={() => { setCheckinView("today"); setEditingDate(null); }}
+          className={`flex-1 py-2 rounded-lg text-xs font-quicksand font-semibold transition-colors ${
+            checkinView === "today" ? "bg-bg-card text-text-primary shadow-sm" : "text-text-muted hover:text-text-secondary"
+          }`}
+        >
+          {editingDate && editingDate !== todayStr ? "Edit Entry" : "Today"}
+        </button>
+        <button
+          onClick={() => { setCheckinView("history"); setEditingDate(null); }}
+          className={`flex-1 py-2 rounded-lg text-xs font-quicksand font-semibold transition-colors ${
+            checkinView === "history" ? "bg-bg-card text-text-primary shadow-sm" : "text-text-muted hover:text-text-secondary"
+          }`}
+        >
+          History
+        </button>
+        <button
+          onClick={() => { setCheckinView("insights"); setEditingDate(null); }}
+          className={`flex-1 py-2 rounded-lg text-xs font-quicksand font-semibold transition-colors ${
+            checkinView === "insights" ? "bg-bg-card text-text-primary shadow-sm" : "text-text-muted hover:text-text-secondary"
+          }`}
+        >
+          Insights
+        </button>
+      </motion.div>
+
+      {/* Content */}
+      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }}>
+        {checkinView === "today" ? (
+          <DailyCheckInForm
+            date={editingDate || undefined}
+            onSaved={() => {
+              if (editingDate) {
+                setEditingDate(null);
+                setCheckinView("history");
+              }
+            }}
+          />
+        ) : checkinView === "history" ? (
+          <CheckInHistory onEditDate={handleEditDate} />
+        ) : (
+          <InsightsPanel />
+        )}
+      </motion.div>
+    </div>
+  );
+}
+
+// ============================================================
+// CLASSIC JOURNAL VIEW — for regular cycle users
+// ============================================================
+type PageMode = "journal" | "checkin" | "insights";
+
+function ClassicJournalView() {
   const { currentPhase, currentMoonPhase, isRegular, dayOfCycle } = useCycleData();
   const entries = useJournalStore((s) => s.entries);
   const getEntriesByWeek = useJournalStore((s) => s.getEntriesByWeek);
@@ -23,8 +170,23 @@ export default function JournalPage() {
   const getEntriesThisWeek = useJournalStore((s) => s.getEntriesThisWeek);
   const deleteEntry = useJournalStore((s) => s.deleteEntry);
 
+  const searchParams = useSearchParams();
+  const initialPageMode = searchParams.get("view") === "insights" ? "insights" as PageMode
+    : searchParams.get("view") === "checkin" ? "checkin" as PageMode : "journal" as PageMode;
+  const [pageMode, setPageMode] = useState<PageMode>(initialPageMode);
+  const [checkinEditDate, setCheckinEditDate] = useState<string | null>(null);
+
+  const initialDate = useMemo(() => {
+    const dateParam = searchParams.get("date");
+    if (dateParam) {
+      const parsed = new Date(dateParam + "T12:00:00");
+      if (!isNaN(parsed.getTime())) return parsed;
+    }
+    return new Date();
+  }, [searchParams]);
+
   const [viewMode, setViewMode] = useState<ViewMode>("week");
-  const [selectedDate, setSelectedDate] = useState(new Date());
+  const [selectedDate, setSelectedDate] = useState(initialDate);
   const [showEntryModal, setShowEntryModal] = useState(false);
   const [showQuickCheckIn, setShowQuickCheckIn] = useState(false);
   const [editingEntry, setEditingEntry] = useState<JournalEntry | undefined>();
@@ -84,13 +246,14 @@ export default function JournalPage() {
     setShowEntryModal(true);
   }
 
-  const streak = getStreakCount();
-  const total = getTotalEntries();
-  const thisWeek = getEntriesThisWeek();
+  const mounted = useMounted();
+  const streak = mounted ? getStreakCount() : 0;
+  const total = mounted ? getTotalEntries() : 0;
+  const thisWeek = mounted ? getEntriesThisWeek() : 0;
   const phaseData = phaseInfo[currentPhase];
 
   return (
-    <div className="max-w-4xl mx-auto px-4 lg:px-8 py-6">
+    <div className={`mx-auto px-4 lg:px-8 py-6 ${pageMode === "journal" ? "max-w-4xl" : "max-w-2xl"}`}>
       {/* Header */}
       <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} className="mb-6">
         <div className="flex items-center justify-between">
@@ -99,28 +262,76 @@ export default function JournalPage() {
               <BookOpen className="h-5 w-5 text-accent-purple" />
             </div>
             <div>
-              <h1 className="font-cormorant text-3xl font-semibold text-text-primary">Journal</h1>
-              <p className="text-sm text-text-secondary font-quicksand">Reflect, release, grow</p>
+              <h1 className="font-cormorant text-3xl font-semibold text-text-primary">
+                {pageMode === "journal" ? "Journal" : pageMode === "checkin" ? "Daily Check-In" : "Insights"}
+              </h1>
+              <p className="text-sm text-text-secondary font-quicksand">
+                {pageMode === "journal" ? "Reflect, release, grow" : pageMode === "checkin" ? "Track symptoms, mood & lifestyle" : "Your patterns & trends"}
+              </p>
             </div>
           </div>
-          <div className="flex gap-2">
-            <button
-              onClick={() => setShowQuickCheckIn(true)}
-              className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-accent-pink/10 hover:bg-accent-pink/20 text-accent-pink text-xs font-quicksand font-semibold transition-colors"
-            >
-              <Sparkles className="h-3.5 w-3.5" />
-              Check-In
-            </button>
-            <button
-              onClick={handleNewEntry}
-              className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-accent-purple text-white text-xs font-quicksand font-semibold hover:opacity-90 transition-opacity"
-            >
-              <Plus className="h-3.5 w-3.5" />
-              New Entry
-            </button>
-          </div>
+          {pageMode === "journal" && (
+            <div className="flex gap-2">
+              <button
+                onClick={() => setShowQuickCheckIn(true)}
+                className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-accent-pink/10 hover:bg-accent-pink/20 text-accent-pink text-xs font-quicksand font-semibold transition-colors"
+              >
+                <Sparkles className="h-3.5 w-3.5" />
+                Quick
+              </button>
+              <button
+                onClick={handleNewEntry}
+                className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-accent-purple text-white text-xs font-quicksand font-semibold hover:opacity-90 transition-opacity"
+              >
+                <Plus className="h-3.5 w-3.5" />
+                New Entry
+              </button>
+            </div>
+          )}
         </div>
       </motion.div>
+
+      {/* Page mode tabs */}
+      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.03 }} className="flex gap-1 mb-6 p-1 rounded-xl bg-bg-secondary/50">
+        {([
+          { mode: "journal" as PageMode, label: "Journal" },
+          { mode: "checkin" as PageMode, label: "Check-In" },
+          { mode: "insights" as PageMode, label: "Insights" },
+        ]).map(({ mode, label }) => (
+          <button
+            key={mode}
+            onClick={() => { setPageMode(mode); setCheckinEditDate(null); }}
+            className={`flex-1 py-2 rounded-lg text-xs font-quicksand font-semibold transition-colors ${
+              pageMode === mode ? "bg-bg-card text-text-primary shadow-sm" : "text-text-muted hover:text-text-secondary"
+            }`}
+          >
+            {label}
+          </button>
+        ))}
+      </motion.div>
+
+      {/* Check-In view */}
+      {pageMode === "checkin" && (
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
+          <DailyCheckInForm
+            date={checkinEditDate || undefined}
+            onSaved={() => {
+              if (checkinEditDate) setCheckinEditDate(null);
+            }}
+          />
+        </motion.div>
+      )}
+
+      {/* Insights view */}
+      {pageMode === "insights" && (
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
+          <InsightsPanel />
+        </motion.div>
+      )}
+
+      {/* Journal view */}
+      {pageMode === "journal" && (
+        <>
 
       {/* Stats row */}
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.05 }} className="grid grid-cols-3 gap-3 mb-6">
@@ -313,6 +524,8 @@ export default function JournalPage() {
         initialPrompt={selectedPrompt}
       />
       <QuickCheckIn open={showQuickCheckIn} onClose={() => setShowQuickCheckIn(false)} />
+        </>
+      )}
     </div>
   );
 }

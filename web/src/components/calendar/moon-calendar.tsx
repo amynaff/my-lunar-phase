@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useMemo } from "react";
+import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { getMoonPhase, getMoonPhaseCycleEquivalent } from "@/lib/cycle/moon-phase";
@@ -22,6 +23,7 @@ interface MoonCalendarProps {
   cycleLength: number;
   periodLength: number;
   onSetPeriodStart?: (date: Date) => void;
+  onDayClick?: (date: Date) => void;
 }
 
 function getMoonEmoji(phase: MoonPhase): string {
@@ -75,7 +77,9 @@ export function MoonCalendar({
   cycleLength,
   periodLength,
   onSetPeriodStart,
+  onDayClick,
 }: MoonCalendarProps) {
+  const router = useRouter();
   const today = new Date();
   const [currentMonth, setCurrentMonth] = useState(today.getMonth());
   const [currentYear, setCurrentYear] = useState(today.getFullYear());
@@ -146,37 +150,43 @@ export function MoonCalendar({
   }
 
   function handleDayClick(date: Date | null) {
-    if (!date || !isRegular || !onSetPeriodStart) return;
-    onSetPeriodStart(date);
+    if (!date) return;
+    if (onDayClick) {
+      onDayClick(date);
+      return;
+    }
+    // Default: navigate to journal for that date
+    const dateStr = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
+    router.push(`/journal?date=${dateStr}`);
   }
 
   return (
-    <div className="rounded-[20px] border border-border-light bg-bg-card shadow-sm p-4 sm:p-6">
+    <div className="rounded-[20px] border border-border-light bg-bg-card shadow-sm p-5 sm:p-8">
       {/* Month navigation */}
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex items-center justify-between mb-8">
         <button
           onClick={prevMonth}
-          className="p-2 rounded-full hover:bg-bg-secondary transition-colors"
+          className="p-2.5 rounded-full hover:bg-bg-secondary transition-colors"
         >
-          <ChevronLeft className="h-5 w-5 text-text-secondary" />
+          <ChevronLeft className="h-6 w-6 text-text-secondary" />
         </button>
-        <h2 className="font-cormorant text-xl font-semibold text-text-primary">
+        <h2 className="font-cormorant text-2xl font-semibold text-text-primary">
           {monthName} {currentYear}
         </h2>
         <button
           onClick={nextMonth}
-          className="p-2 rounded-full hover:bg-bg-secondary transition-colors"
+          className="p-2.5 rounded-full hover:bg-bg-secondary transition-colors"
         >
-          <ChevronRight className="h-5 w-5 text-text-secondary" />
+          <ChevronRight className="h-6 w-6 text-text-secondary" />
         </button>
       </div>
 
       {/* Weekday headers */}
-      <div className="grid grid-cols-7 gap-1 mb-2">
+      <div className="grid grid-cols-7 gap-2 mb-3">
         {WEEKDAYS.map((day, i) => (
           <div
             key={i}
-            className="text-center text-xs font-quicksand font-semibold text-text-muted py-1"
+            className="text-center text-sm font-quicksand font-semibold text-text-muted py-1"
           >
             {day}
           </div>
@@ -184,7 +194,7 @@ export function MoonCalendar({
       </div>
 
       {/* Calendar grid */}
-      <div className="grid grid-cols-7 gap-1">
+      <div className="grid grid-cols-7 gap-2">
         {calendarDays.map((cell, i) => {
           if (!cell.date) {
             return <div key={`empty-${i}`} className="aspect-square" />;
@@ -198,36 +208,35 @@ export function MoonCalendar({
           return (
             <motion.button
               key={cell.day}
-              whileTap={isRegular ? { scale: 0.92 } : undefined}
+              whileTap={{ scale: 0.92 }}
               onClick={() => handleDayClick(cell.date)}
               className={`
                 relative flex flex-col items-center justify-center aspect-square rounded-full
-                transition-colors text-xs font-quicksand
+                transition-colors text-sm font-quicksand cursor-pointer hover:bg-bg-secondary/60
                 ${!isMoonOnly && isPeriod ? "bg-accent-pink/20" : ""}
                 ${!isMoonOnly && isFertile ? "bg-accent-lavender/20" : ""}
                 ${!isMoonOnly && isOvulation ? "ring-2 ring-accent-purple/40" : ""}
                 ${cell.isToday ? "ring-2 ring-accent-purple" : ""}
-                ${isRegular ? "cursor-pointer hover:bg-bg-secondary/60" : "cursor-default"}
               `}
               style={isMoonOnly ? { backgroundColor: `${energyColor}12` } : undefined}
             >
               <span
                 className={`
-                  text-[11px] font-medium leading-none
+                  text-sm font-medium leading-none
                   ${!isMoonOnly && isPeriod ? "text-accent-pink font-bold" : "text-text-secondary"}
                   ${cell.isToday ? "text-accent-purple font-bold" : ""}
                 `}
               >
                 {cell.day}
               </span>
-              <span className="text-sm leading-none mt-0.5">{cell.moonEmoji}</span>
+              <span className="text-lg leading-none mt-0.5">{cell.moonEmoji}</span>
             </motion.button>
           );
         })}
       </div>
 
       {/* Legend */}
-      <div className="mt-5 flex flex-wrap gap-4 justify-center">
+      <div className="mt-6 flex flex-wrap gap-5 justify-center">
         {isRegular ? (
           <>
             <div className="flex items-center gap-1.5">
@@ -268,12 +277,11 @@ export function MoonCalendar({
         )}
       </div>
 
-      {isRegular ? (
-        <p className="text-center text-xs text-text-muted font-quicksand mt-3">
-          Tap any date to set as Day 1 of your cycle
-        </p>
-      ) : (
-        <p className="text-center text-xs text-text-muted font-quicksand mt-3 italic">
+      <p className="text-center text-xs text-text-muted font-quicksand mt-3">
+        Tap any date to open your journal
+      </p>
+      {!isRegular && (
+        <p className="text-center text-xs text-text-muted font-quicksand mt-1 italic">
           Follow the moon&apos;s natural rhythm — new moons for intention, full moons for release
         </p>
       )}
