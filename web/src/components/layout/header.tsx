@@ -1,12 +1,115 @@
 "use client";
 
 import Link from "next/link";
-import { Moon, Sun, Menu, X, LogOut } from "lucide-react";
+import { usePathname } from "next/navigation";
+import { Moon, Sun, Menu, X, LogOut, Home, Apple, Dumbbell, Heart, BookOpen, Sparkles, Calendar, MessageCircle, Users, FlaskConical, BarChart3, TrendingUp, GraduationCap, Lightbulb, Settings, CreditCard } from "lucide-react";
 import { useThemeStore } from "@/stores/theme-store";
 import { useSession } from "@/hooks/use-session";
 import { signOut } from "next-auth/react";
 import { useState } from "react";
-import { Sidebar } from "./sidebar";
+import { cn } from "@/lib/cn";
+
+const mainNav = [
+  { href: "/dashboard", label: "Home", icon: Home },
+  { href: "/nutrition", label: "Nutrition", icon: Apple },
+  { href: "/movement", label: "Movement", icon: Dumbbell },
+  { href: "/selfcare", label: "Care", icon: Heart },
+  { href: "/journal", label: "Journal", icon: BookOpen },
+];
+
+const secondaryNav = [
+  { href: "/luna-ai", label: "Luna AI", icon: Sparkles },
+  { href: "/log-mood", label: "Log Mood", icon: Moon },
+  { href: "/calendar", label: "Calendar", icon: Calendar },
+  { href: "/community", label: "Community", icon: MessageCircle },
+  { href: "/partner", label: "Partner", icon: Users },
+  { href: "/labs-guide", label: "Labs Guide", icon: FlaskConical },
+  { href: "/journal?view=insights", label: "Insights", icon: BarChart3 },
+  { href: "/cycle-history", label: "Cycle History", icon: TrendingUp },
+  { href: "/hormonal-education", label: "Education", icon: GraduationCap },
+];
+
+const bottomNav = [
+  { href: "/suggestions", label: "Suggest a Feature", icon: Lightbulb },
+  { href: "/settings", label: "Settings", icon: Settings },
+  { href: "/settings/billing", label: "Billing", icon: CreditCard },
+];
+
+function MobileSidebar({ onNavigate }: { onNavigate: () => void }) {
+  const pathname = usePathname();
+
+  return (
+    <div className="flex flex-col h-full px-4 py-6">
+      <Link href="/dashboard" onClick={onNavigate} className="flex items-center gap-2 px-3 mb-8">
+        <Moon className="h-7 w-7 text-accent-purple" />
+        <span className="font-cormorant text-2xl font-semibold text-text-primary">
+          MyLunarPhase
+        </span>
+      </Link>
+
+      <nav className="flex-1 flex flex-col gap-1">
+        <p className="px-3 mb-2 text-xs uppercase tracking-wider text-text-muted font-quicksand font-semibold">
+          Main
+        </p>
+        {mainNav.map(({ href, label, icon: Icon }) => (
+          <Link
+            key={href}
+            href={href}
+            onClick={onNavigate}
+            className={cn(
+              "flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-quicksand font-medium transition-colors",
+              pathname === href
+                ? "bg-accent-purple/15 text-accent-purple"
+                : "text-text-secondary hover:bg-bg-secondary hover:text-text-primary"
+            )}
+          >
+            <Icon className="h-5 w-5" />
+            {label}
+          </Link>
+        ))}
+
+        <p className="px-3 mt-6 mb-2 text-xs uppercase tracking-wider text-text-muted font-quicksand font-semibold">
+          Features
+        </p>
+        {secondaryNav.map(({ href, label, icon: Icon }) => (
+          <Link
+            key={href}
+            href={href}
+            onClick={onNavigate}
+            className={cn(
+              "flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-quicksand font-medium transition-colors",
+              pathname === href
+                ? "bg-accent-purple/15 text-accent-purple"
+                : "text-text-secondary hover:bg-bg-secondary hover:text-text-primary"
+            )}
+          >
+            <Icon className="h-5 w-5" />
+            {label}
+          </Link>
+        ))}
+      </nav>
+
+      <div className="flex flex-col gap-1 pt-4 border-t border-border-light">
+        {bottomNav.map(({ href, label, icon: Icon }) => (
+          <Link
+            key={href}
+            href={href}
+            onClick={onNavigate}
+            className={cn(
+              "flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-quicksand font-medium transition-colors",
+              pathname === href
+                ? "bg-accent-purple/15 text-accent-purple"
+                : "text-text-secondary hover:bg-bg-secondary hover:text-text-primary"
+            )}
+          >
+            <Icon className="h-5 w-5" />
+            {label}
+          </Link>
+        ))}
+      </div>
+    </div>
+  );
+}
 
 export function Header() {
   const { mode, toggle } = useThemeStore();
@@ -60,8 +163,8 @@ export function Header() {
             className="absolute inset-0 bg-black/40"
             onClick={() => setMobileMenuOpen(false)}
           />
-          <div className="relative w-64 h-full">
-            <Sidebar />
+          <div className="relative w-64 h-full bg-bg-card-solid border-r border-border-light shadow-xl overflow-y-auto">
+            <MobileSidebar onNavigate={() => setMobileMenuOpen(false)} />
           </div>
         </div>
       )}
