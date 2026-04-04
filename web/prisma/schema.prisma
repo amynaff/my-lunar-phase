@@ -32,6 +32,7 @@ model User {
   stripeCustomerId   String?           @unique
   subscription       Subscription?
   aiConversations    AIConversation[]
+  healthIntegrations HealthIntegration[]
 }
 
 model Account {
@@ -219,6 +220,48 @@ model ChatMessage {
 
   @@index([channelId])
   @@index([createdAt])
+}
+
+// ==================== Health Integrations ====================
+
+model HealthIntegration {
+  id            String   @id @default(cuid())
+  userId        String
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  provider      String   // withings, oura, fitbit, garmin, whoop, google_fit
+  accessToken   String
+  refreshToken  String?
+  expiresAt     DateTime?
+  providerUserId String?
+  scopes        String?
+  connectedAt   DateTime @default(now())
+  lastSyncAt    DateTime?
+  updatedAt     DateTime @updatedAt
+
+  measurements  HealthMeasurement[]
+
+  @@unique([userId, provider])
+  @@index([userId])
+}
+
+model HealthMeasurement {
+  id              String   @id @default(cuid())
+  integrationId   String
+  integration     HealthIntegration @relation(fields: [integrationId], references: [id], onDelete: Cascade)
+  userId          String
+  provider        String
+  type            String   // temperature, weight, blood_pressure, heart_rate, sleep, spo2, hrv
+  value           Float
+  unit            String   // celsius, kg, mmHg, bpm, hours, percent, ms
+  secondaryValue  Float?   // e.g. diastolic for blood_pressure
+  measuredAt      DateTime
+  deviceId        String?
+  metadata        String?  // JSON string for extra data
+  createdAt       DateTime @default(now())
+
+  @@index([userId, type])
+  @@index([userId, measuredAt])
+  @@index([integrationId])
 }
 
 // ==================== Feature Suggestions ====================
