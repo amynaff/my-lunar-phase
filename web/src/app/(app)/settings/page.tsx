@@ -1,8 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { motion } from "framer-motion";
-import { Settings, Moon, Calendar, Trash2, CreditCard, Loader2 } from "lucide-react";
+import { Settings, Moon, Calendar, Trash2, CreditCard, Loader2, Unplug, RefreshCw, Check } from "lucide-react";
 import Link from "next/link";
 import { useCycleStore } from "@/stores/cycle-store";
 import { ThemeToggle } from "@/components/shared/theme-toggle";
@@ -18,6 +18,18 @@ import {
   DialogDescription,
   DialogFooter,
 } from "@/components/ui/dialog";
+
+interface Integration {
+  provider: string;
+  displayName: string;
+  description: string;
+  icon: string;
+  measurements: string[];
+  connected: boolean;
+  connectedAt: string | null;
+  lastSyncAt: string | null;
+  available: boolean;
+}
 
 const lifeStages: LifeStage[] = ["regular", "perimenopause", "menopause", "postmenopause"];
 
@@ -37,6 +49,60 @@ export default function SettingsPage() {
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [deleteConfirmText, setDeleteConfirmText] = useState("");
+  const [integrations, setIntegrations] = useState<Integration[]>([]);
+  const [syncingProvider, setSyncingProvider] = useState<string | null>(null);
+  const [disconnectingProvider, setDisconnectingProvider] = useState<string | null>(null);
+  const [justConnected, setJustConnected] = useState<string | null>(null);
+
+  const fetchIntegrations = useCallback(async () => {
+    try {
+      const res = await fetch("/api/integrations");
+      if (res.ok) {
+        const data = await res.json();
+        setIntegrations(data.integrations);
+      }
+    } catch {
+      // Silently fail
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchIntegrations();
+
+    // Check URL params for success/error
+    const params = new URLSearchParams(window.location.search);
+    const connected = params.get("connected");
+    if (connected) {
+      setJustConnected(connected);
+      setTimeout(() => setJustConnected(null), 3000);
+      // Clean URL
+      window.history.replaceState({}, "", "/settings");
+    }
+  }, [fetchIntegrations]);
+
+  async function handleSync(provider: string) {
+    setSyncingProvider(provider);
+    try {
+      await fetch(`/api/integrations/${provider}/sync`, { method: "POST" });
+      await fetchIntegrations();
+    } catch {
+      // Silently fail
+    } finally {
+      setSyncingProvider(null);
+    }
+  }
+
+  async function handleDisconnect(provider: string) {
+    setDisconnectingProvider(provider);
+    try {
+      await fetch(`/api/integrations/${provider}/disconnect`, { method: "POST" });
+      await fetchIntegrations();
+    } catch {
+      // Silently fail
+    } finally {
+      setDisconnectingProvider(null);
+    }
+  }
 
   async function handleDeleteAccount() {
     if (deleteConfirmText !== "DELETE") return;
@@ -191,11 +257,99 @@ export default function SettingsPage() {
           </motion.div>
         )}
 
-        {/* Theme */}
+        {/* Connected Devices */}
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
+          className="rounded-[20px] border border-border-light bg-bg-card p-6"
+        >
+          <div className="flex items-center gap-2 mb-4">
+            <Unplug className="h-4 w-4 text-accent-purple" />
+            <h2 className="text-xs uppercase tracking-wider text-text-accent font-quicksand font-semibold">
+              Connected Devices
+            </h2>
+          </div>
+          <p className="text-xs text-text-muted font-quicksand mb-4">
+            Connect your health devices to sync temperature, sleep, heart rate, and more.
+          </p>
+          <div className="space-y-3">
+            {integrations.map((integration) => (
+              <div
+                key={integration.provider}
+                className={`flex items-center justify-between p-3 rounded-[16px] border transition-colors ${
+                  integration.connected
+                    ? "border-green-500/30 bg-green-500/5"
+                    : "border-border-light bg-bg-secondary/50"
+                }`}
+              >
+                <div className="flex items-center gap-3 min-w-0">
+                  <span className="text-xl flex-shrink-0">{integration.icon}</span>
+                  <div className="min-w-0">
+                    <p className="font-quicksand font-semibold text-xs text-text-primary flex items-center gap-1.5">
+                      {integration.displayName}
+                      {justConnected === integration.provider && (
+                        <span className="inline-flex items-center gap-0.5 text-green-600 text-[10px] font-medium">
+                          <Check className="h-3 w-3" /> Connected!
+                        </span>
+                      )}
+                    </p>
+                    <p className="text-[10px] text-text-muted font-quicksand truncate">
+                      {integration.connected && integration.lastSyncAt
+                        ? `Last synced ${new Date(integration.lastSyncAt).toLocaleDateString()}`
+                        : integration.description}
+                    </p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-1.5 flex-shrink-0">
+                  {integration.connected ? (
+                    <>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleSync(integration.provider)}
+                        disabled={syncingProvider === integration.provider}
+                        className="h-7 px-2 text-xs"
+                      >
+                        <RefreshCw className={`h-3 w-3 ${syncingProvider === integration.provider ? "animate-spin" : ""}`} />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleDisconnect(integration.provider)}
+                        disabled={disconnectingProvider === integration.provider}
+                        className="h-7 px-2 text-xs text-red-500 hover:text-red-600 hover:bg-red-500/10"
+                      >
+                        {disconnectingProvider === integration.provider ? (
+                          <Loader2 className="h-3 w-3 animate-spin" />
+                        ) : (
+                          "Disconnect"
+                        )}
+                      </Button>
+                    </>
+                  ) : (
+                    <a
+                      href={integration.available ? `/api/integrations/${integration.provider}/connect` : undefined}
+                      className={`inline-flex items-center gap-1.5 h-7 px-3 rounded-lg text-xs font-quicksand font-semibold transition-colors ${
+                        integration.available
+                          ? "bg-accent-purple/10 text-accent-purple hover:bg-accent-purple/20"
+                          : "bg-bg-secondary text-text-muted cursor-not-allowed"
+                      }`}
+                    >
+                      {integration.available ? "Connect" : "Coming Soon"}
+                    </a>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        </motion.div>
+
+        {/* Theme */}
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.25 }}
           className="rounded-[20px] border border-border-light bg-bg-card p-6"
         >
           <div className="flex items-center justify-between">
@@ -215,7 +369,7 @@ export default function SettingsPage() {
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.25 }}
+          transition={{ delay: 0.3 }}
         >
           <Link
             href="/settings/billing"
@@ -240,7 +394,7 @@ export default function SettingsPage() {
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3 }}
+          transition={{ delay: 0.35 }}
           className="rounded-[20px] border border-red-500/20 bg-red-500/5 p-6"
         >
           <div className="flex items-center gap-2 mb-2">
