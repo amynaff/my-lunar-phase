@@ -6,23 +6,33 @@ import { Sidebar } from "@/components/layout/sidebar";
 import { Header } from "@/components/layout/header";
 import { MobileNav } from "@/components/layout/mobile-nav";
 import { GradientBackground } from "@/components/shared/gradient-background";
-import { useCycleStore } from "@/stores/cycle-store";
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
-  const hasCompletedOnboarding = useCycleStore((s) => s.hasCompletedOnboarding);
-  const [checked, setChecked] = useState(false);
+  const [ready, setReady] = useState(false);
 
   useEffect(() => {
-    // Wait for hydration from localStorage before checking
-    if (!hasCompletedOnboarding) {
+    // Read directly from localStorage to avoid Zustand hydration race
+    try {
+      const raw = localStorage.getItem("luna-cycle-storage");
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        const state = parsed?.state;
+        // If they have a life stage set OR completed onboarding, let them through
+        if (state?.hasCompletedOnboarding || state?.lifeStage !== "regular" || state?.lastPeriodStart) {
+          setReady(true);
+          return;
+        }
+      }
+      // No stored data = brand new user → onboarding
       router.replace("/onboarding");
-    } else {
-      setChecked(true);
+    } catch {
+      // If localStorage fails, just let them through
+      setReady(true);
     }
-  }, [hasCompletedOnboarding, router]);
+  }, [router]);
 
-  if (!checked) {
+  if (!ready) {
     return (
       <GradientBackground>
         <div className="min-h-screen" />
