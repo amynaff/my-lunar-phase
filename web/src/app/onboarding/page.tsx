@@ -37,6 +37,18 @@ export default function OnboardingPage() {
     setSelectedStage(stage);
   }
 
+  async function saveToServer(data: Record<string, unknown>) {
+    try {
+      await fetch("/api/cycle-data", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
+    } catch {
+      // Local store still saves, server sync will catch up
+    }
+  }
+
   function handleNextFromStage() {
     if (!selectedStage) return;
     setLifeStage(selectedStage);
@@ -46,6 +58,12 @@ export default function OnboardingPage() {
     } else {
       // Non-cycling stages skip cycle config
       completeOnboarding();
+      saveToServer({
+        lifeStage: selectedStage,
+        cycleLength: 28,
+        periodLength: 5,
+        hasCompletedOnboarding: true,
+      });
       router.push("/dashboard");
     }
   }
@@ -53,10 +71,18 @@ export default function OnboardingPage() {
   function handleFinish() {
     setCycleLength(cycleLengthValue);
     setPeriodLength(periodLengthValue);
+    const lastPeriodISO = lastPeriodDate ? new Date(lastPeriodDate).toISOString() : null;
     if (lastPeriodDate) {
       setLastPeriodStart(new Date(lastPeriodDate));
     }
     completeOnboarding();
+    saveToServer({
+      lifeStage: selectedStage,
+      cycleLength: cycleLengthValue,
+      periodLength: periodLengthValue,
+      lastPeriodStart: lastPeriodISO,
+      hasCompletedOnboarding: true,
+    });
     router.push("/dashboard");
   }
 
