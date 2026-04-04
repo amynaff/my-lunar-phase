@@ -155,9 +155,9 @@ export default function LandingPage() {
             <Link href="/sign-up" className="inline-flex items-center gap-2.5 px-9 py-4 rounded-2xl bg-gradient-to-r from-accent-rose to-accent-purple text-white font-quicksand font-bold text-base shadow-[0_8px_32px_rgba(157,132,237,0.4)] hover:-translate-y-0.5 transition-transform">
               Start 60-Day Free Trial
             </Link>
-            <Link href="#stages" className="inline-flex items-center gap-2 px-8 py-4 rounded-2xl bg-white/65 border border-border-medium text-text-secondary font-quicksand font-semibold backdrop-blur-sm hover:-translate-y-0.5 transition-transform">
+            <a href="#stages" className="inline-flex items-center gap-2 px-8 py-4 rounded-2xl bg-white/65 border border-border-medium text-text-secondary font-quicksand font-semibold backdrop-blur-sm hover:-translate-y-0.5 transition-transform" onClick={(e) => { e.preventDefault(); document.getElementById('stages')?.scrollIntoView({ behavior: 'smooth' }); }}>
               See how it works &rarr;
-            </Link>
+            </a>
           </motion.div>
 
           {/* Store pills */}
