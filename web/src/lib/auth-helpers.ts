@@ -15,6 +15,7 @@ export function corsHeaders(origin?: string | null) {
     /^https?:\/\/127\.0\.0\.1(:\d+)?$/,
     /\.dev\.vibecode\.run$/,
     /\.vibecode\.run$/,
+    /^https:\/\/(www\.)?mylunarphase\.com$/,
   ];
 
   const isAllowed = origin && allowedOrigins.some((pattern) => pattern.test(origin));
