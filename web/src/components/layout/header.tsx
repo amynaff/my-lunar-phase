@@ -106,6 +106,13 @@ function MobileSidebar({ onNavigate }: { onNavigate: () => void }) {
             {label}
           </Link>
         ))}
+        <button
+          onClick={() => signOut({ callbackUrl: "/sign-in" })}
+          className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-quicksand font-medium text-red-500 hover:bg-red-500/10 transition-colors mt-2"
+        >
+          <LogOut className="h-5 w-5" />
+          Sign Out
+        </button>
       </div>
     </div>
   );

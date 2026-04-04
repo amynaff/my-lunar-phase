@@ -12,7 +12,7 @@ export default function PrivacyPage() {
       </header>
       <div className="max-w-3xl mx-auto px-6 py-12">
         <h1 className="font-cormorant text-4xl font-semibold text-text-primary mb-4">Privacy Policy</h1>
-        <p className="text-sm text-text-muted font-quicksand mb-10">Last updated: March 28, 2026</p>
+        <p className="text-sm text-text-muted font-quicksand mb-10">Last updated: April 4, 2026</p>
 
         <div className="font-quicksand text-text-secondary space-y-8 text-[15px] leading-relaxed">
 
@@ -33,9 +33,10 @@ export default function PrivacyPage() {
             <h2 className="font-cormorant text-2xl text-text-primary mb-3">What We Store &amp; Why</h2>
             <p className="mb-3">We only store what is necessary for the app to work for you:</p>
             <ul className="space-y-2 ml-4">
-              <li className="flex gap-2"><span className="text-accent-purple flex-shrink-0">-</span><span><strong>Email &amp; password</strong> &mdash; So you can sign in to your account. Passwords are encrypted and we cannot see them.</span></li>
-              <li className="flex gap-2"><span className="text-accent-purple flex-shrink-0">-</span><span><strong>Cycle &amp; mood data</strong> &mdash; So the app can give you personalized phase-based guidance. This stays in your account.</span></li>
-              <li className="flex gap-2"><span className="text-accent-purple flex-shrink-0">-</span><span><strong>Journal entries</strong> &mdash; Private to you. No one else can see them, including us.</span></li>
+              <li className="flex gap-2"><span className="text-accent-purple flex-shrink-0">-</span><span><strong>Email &amp; password</strong> &mdash; So you can sign in to your account. Passwords are hashed with bcrypt and we cannot see them.</span></li>
+              <li className="flex gap-2"><span className="text-accent-purple flex-shrink-0">-</span><span><strong>Cycle &amp; period data</strong> &mdash; Your period dates, cycle length, and life stage are <strong>encrypted with AES-256-GCM</strong> before being stored. Even if someone accessed our database, they could not read your cycle data.</span></li>
+              <li className="flex gap-2"><span className="text-accent-purple flex-shrink-0">-</span><span><strong>Mood &amp; journal entries</strong> &mdash; Private to you. Journal notes are <strong>encrypted at the application level</strong> before storage. No one can see them, including us.</span></li>
+              <li className="flex gap-2"><span className="text-accent-purple flex-shrink-0">-</span><span><strong>Connected device data</strong> &mdash; If you connect health devices (like Withings, Oura, or Fitbit), we store the health measurements they send (temperature, sleep, heart rate). This data is encrypted and only used to provide you with wellness insights.</span></li>
               <li className="flex gap-2"><span className="text-accent-purple flex-shrink-0">-</span><span><strong>Community posts</strong> &mdash; Fully anonymous. They cannot be traced back to your account.</span></li>
               <li className="flex gap-2"><span className="text-accent-purple flex-shrink-0">-</span><span><strong>Partner sharing</strong> &mdash; Only happens if you explicitly opt in. You choose what to share and can revoke access anytime.</span></li>
             </ul>
@@ -91,12 +92,27 @@ export default function PrivacyPage() {
 
           <section>
             <h2 className="font-cormorant text-2xl text-text-primary mb-3">Data Security</h2>
-            <p>Your data is protected with industry-standard security:</p>
+            <p>Your health data deserves the highest level of protection. We go beyond industry standards:</p>
             <ul className="space-y-2 ml-4 mt-3">
-              <li className="flex gap-2"><span className="text-accent-purple flex-shrink-0">-</span><span>All data is encrypted in transit (HTTPS/TLS)</span></li>
-              <li className="flex gap-2"><span className="text-accent-purple flex-shrink-0">-</span><span>Database is encrypted at rest</span></li>
-              <li className="flex gap-2"><span className="text-accent-purple flex-shrink-0">-</span><span>Passwords are hashed and cannot be viewed by anyone, including us</span></li>
-              <li className="flex gap-2"><span className="text-accent-purple flex-shrink-0">-</span><span>Payment information is handled entirely by Stripe and never touches our servers</span></li>
+              <li className="flex gap-2"><span className="text-accent-purple flex-shrink-0">-</span><span><strong>Application-level encryption (AES-256-GCM)</strong> &mdash; Your sensitive health data (period dates, cycle logs, mood notes, health device measurements) is encrypted <em>before</em> it reaches the database. Even if the database were breached, your data would be unreadable without the encryption key.</span></li>
+              <li className="flex gap-2"><span className="text-accent-purple flex-shrink-0">-</span><span><strong>Unique encryption per value</strong> &mdash; Each piece of data is encrypted with its own random initialization vector, so identical information produces completely different encrypted output.</span></li>
+              <li className="flex gap-2"><span className="text-accent-purple flex-shrink-0">-</span><span><strong>Encrypted in transit</strong> &mdash; All data between your device and our servers is protected with HTTPS/TLS.</span></li>
+              <li className="flex gap-2"><span className="text-accent-purple flex-shrink-0">-</span><span><strong>Encrypted at rest</strong> &mdash; Our database provider (Supabase) encrypts all stored data at the infrastructure level, in addition to our application-level encryption.</span></li>
+              <li className="flex gap-2"><span className="text-accent-purple flex-shrink-0">-</span><span><strong>Passwords are hashed</strong> &mdash; Using bcrypt with salt rounds. We cannot view or recover your password.</span></li>
+              <li className="flex gap-2"><span className="text-accent-purple flex-shrink-0">-</span><span><strong>Payment security</strong> &mdash; Credit card information is handled entirely by Stripe (PCI-compliant) and never touches our servers.</span></li>
+              <li className="flex gap-2"><span className="text-accent-purple flex-shrink-0">-</span><span><strong>Cross-device sync</strong> &mdash; Your cycle data syncs securely across devices so you never lose your data. All synced data is encrypted before transmission and storage.</span></li>
+            </ul>
+          </section>
+
+          <section>
+            <h2 className="font-cormorant text-2xl text-text-primary mb-3">Connected Health Devices</h2>
+            <p>When you connect a health device (such as Withings, Oura Ring, Fitbit, or others):</p>
+            <ul className="space-y-2 ml-4 mt-3">
+              <li className="flex gap-2"><span className="text-accent-purple flex-shrink-0">-</span><span>We use OAuth 2.0 to securely connect &mdash; we never see your device account password.</span></li>
+              <li className="flex gap-2"><span className="text-accent-purple flex-shrink-0">-</span><span>We only request the minimum data needed (temperature, sleep, heart rate) &mdash; never contacts, location, or other unrelated data.</span></li>
+              <li className="flex gap-2"><span className="text-accent-purple flex-shrink-0">-</span><span>Health measurements are encrypted with AES-256-GCM before storage.</span></li>
+              <li className="flex gap-2"><span className="text-accent-purple flex-shrink-0">-</span><span>You can disconnect any device at any time from Settings, which permanently deletes all associated data.</span></li>
+              <li className="flex gap-2"><span className="text-accent-purple flex-shrink-0">-</span><span>We do not share your device data with any third party.</span></li>
             </ul>
           </section>
 
