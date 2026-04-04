@@ -206,9 +206,11 @@ const phaseNutritionData: Record<CyclePhase, PhaseNutritionData> = {
         icon: Pill,
         iconColor: "#3b82f6",
         sources: [
-          { name: "Fish", description: "Natural iodine from seafood" },
-          { name: "Seaweed (Kelp, Dulse)", description: "Concentrated plant-based iodine" },
-          { name: "Lemons", description: "Trace iodine with vitamin C" },
+          { name: "Seaweed", description: "Kelp, kombu, nori, wakame — richest natural source. Dried nori (10g) provides 100–232 mcg. Use kelp sparingly as some varieties are extremely high" },
+          { name: "Fish & Shellfish", description: "Cod (3 oz baked): ~99–158 mcg, oysters (3 oz): ~93 mcg. Shrimp, tuna, salmon, and haddock are also good sources" },
+          { name: "Iodized Salt", description: "One of the most accessible sources — about 71 mcg per ¼ teaspoon" },
+          { name: "Dairy", description: "Milk (~56–85 mcg/cup), Greek yogurt (up to ~116 mcg/8 oz), and cheese contribute modestly" },
+          { name: "Eggs", description: "One large egg (especially the yolk) provides about 26 mcg — a convenient everyday option" },
         ],
       },
       {
@@ -231,8 +233,7 @@ const phaseNutritionData: Record<CyclePhase, PhaseNutritionData> = {
         icon: Leaf,
         iconColor: "#22c55e",
         sources: [
-          { name: "Wild Salmon", description: "EPA and DHA rich" },
-          { name: "Sardines", description: "Omega-3s plus calcium" },
+          { name: "Fatty Fish", description: "Salmon, mackerel, sardines — rich in EPA and DHA" },
           { name: "Walnuts", description: "Plant-based ALA" },
           { name: "Flaxseeds & Chia Seeds", description: "Fiber plus omega-3s" },
         ],
@@ -252,14 +253,14 @@ const phaseNutritionData: Record<CyclePhase, PhaseNutritionData> = {
       },
     ],
     foods: [
-      { name: "Fish", description: "Natural iodine and protein" },
-      { name: "Seaweed (Kelp, Dulse)", description: "Concentrated iodine" },
+      { name: "Seaweed", description: "Kelp, kombu, nori, wakame — richest natural iodine source. Use kelp sparingly" },
+      { name: "Fish & Shellfish", description: "Cod, oysters, shrimp, tuna, salmon — iodine and protein from the sea" },
+      { name: "Iodized Salt", description: "Accessible everyday iodine source — ~71 mcg per ¼ teaspoon" },
       { name: "Lemons", description: "Vitamin C and trace minerals" },
       { name: "Wheat Germ", description: "Richest vitamin E source" },
       { name: "Whole Grains", description: "B vitamins and fiber" },
       { name: "Sweet Potatoes", description: "Beta-carotene and vitamin E" },
-      { name: "Wild Salmon", description: "Omega-3s and protein" },
-      { name: "Sardines", description: "Omega-3s and calcium" },
+      { name: "Fatty Fish", description: "Salmon, mackerel, sardines — omega-3s and protein" },
       { name: "Walnuts", description: "Plant-based omega-3s" },
       { name: "Flaxseeds", description: "Lignans and omega-3s" },
       { name: "Chia Seeds", description: "Fiber and omega-3s" },
@@ -399,7 +400,7 @@ const phaseNutritionData: Record<CyclePhase, PhaseNutritionData> = {
       { name: "Sesame Seeds", description: "Calcium and lignans" },
     ],
     herbs: [
-      { name: "Kelp", description: "Iodine and trace minerals" },
+      { name: "Kelp", description: "Rich in iodine and trace minerals — use sparingly as some varieties are extremely high in iodine" },
       { name: "Dandelion Greens", description: "Liver support" },
       { name: "Parsley", description: "Cleansing and mineral-rich" },
       { name: "Watercress", description: "Nutrient-dense green" },
@@ -498,10 +499,9 @@ const phaseNutritionData: Record<CyclePhase, PhaseNutritionData> = {
         icon: Sun,
         iconColor: "#0891b2",
         sources: [
-          { name: "Wild Salmon & Sardines", description: "Highest EPA/DHA content" },
+          { name: "Fatty Fish", description: "Salmon, mackerel, sardines — highest EPA/DHA content" },
           { name: "Walnuts & Flaxseeds", description: "Plant-based omega-3s" },
           { name: "Chia Seeds", description: "ALA omega-3s plus fiber" },
-          { name: "Fatty Fish", description: "Mackerel, herring, trout" },
         ],
       },
       {
@@ -511,7 +511,7 @@ const phaseNutritionData: Record<CyclePhase, PhaseNutritionData> = {
         icon: Sun,
         iconColor: "#f59e0b",
         sources: [
-          { name: "Fatty Fish", description: "Natural vitamin D" },
+          { name: "Fatty Fish", description: "Salmon, mackerel, sardines — natural vitamin D" },
           { name: "Eggs", description: "Vitamin D in yolks" },
           { name: "Mushrooms", description: "Sun-exposed for vitamin D" },
           { name: "Fortified Foods", description: "Milk, cereals, orange juice" },
@@ -532,7 +532,7 @@ const phaseNutritionData: Record<CyclePhase, PhaseNutritionData> = {
       { name: "Avocados", description: "Healthy fats and potassium" },
       { name: "Chicken & Turkey", description: "Tryptophan and B vitamins" },
       { name: "Sunflower Seeds", description: "Vitamin E and selenium" },
-      { name: "Wild Salmon & Sardines", description: "Omega-3s and vitamin D" },
+      { name: "Fatty Fish", description: "Salmon, mackerel, sardines — omega-3s and vitamin D" },
       { name: "Walnuts & Flaxseeds", description: "Plant omega-3s" },
       { name: "Eggs & Mushrooms", description: "B12 and vitamin D" },
       { name: "Sweet Potatoes", description: "Complex carbs and B6" },
@@ -597,6 +597,7 @@ interface LifeStageNutritionData {
   herbs: HerbItem[];
   herbNotes: string[];
   supplements: Supplement[];
+  seedCycling: SeedCyclingWeek[];
   focusAreas: Array<{ name: string; description: string }>;
   tips: string[];
   avoid: string[];
@@ -609,21 +610,23 @@ const lifeStageNutritionData: Record<string, LifeStageNutritionData> = {
     description:
       "Support your body through hormonal transitions with anti-inflammatory foods, phytoestrogens, and targeted supplementation for bone, brain, and heart health.",
     foods: [
-      { name: "Fatty Fish", description: "Salmon, mackerel for omega-3s" },
-      { name: "Flaxseeds", description: "Phytoestrogens and fiber" },
-      { name: "Leafy Greens", description: "Calcium and iron" },
-      { name: "Cruciferous Veggies", description: "Broccoli, Brussels sprouts for estrogen metabolism" },
-      { name: "Berries", description: "Antioxidants for brain health" },
-      { name: "Nuts & Seeds", description: "Healthy fats and minerals" },
-      { name: "Legumes", description: "Plant protein and fiber" },
-      { name: "Whole Grains", description: "B vitamins and sustained energy" },
-      { name: "Fermented Foods", description: "Gut health and nutrient absorption" },
-      { name: "Eggs", description: "Complete protein and choline" },
-      { name: "Greek Yogurt", description: "Calcium and probiotics" },
-      { name: "Olive Oil", description: "Heart-healthy fats" },
-      { name: "Sweet Potatoes", description: "Complex carbs and vitamin A" },
-      { name: "Bone Broth", description: "Collagen and minerals" },
-      { name: "Dark Chocolate", description: "Magnesium and mood boost" },
+      { name: "Ground Flaxseeds", description: "Rich in lignans and omega-3s — grind for better absorption, add to smoothies or yogurt" },
+      { name: "Tofu & Tempeh", description: "Plant-based phytoestrogens that may ease hot flashes — aim for 1-2 servings daily" },
+      { name: "Fatty Fish", description: "Salmon, mackerel, sardines — omega-3s for heart, brain, and mood. Try for 2 portions per week" },
+      { name: "Kale & Collard Greens", description: "Calcium and vitamin K for bones without relying solely on dairy" },
+      { name: "Broccoli & Brussels Sprouts", description: "Support estrogen metabolism and act as natural cooling foods" },
+      { name: "Blueberries & Strawberries", description: "Packed with antioxidants that protect brain health and reduce inflammation" },
+      { name: "Almonds & Pumpkin Seeds", description: "Magnesium-rich for better sleep, energy, and muscle recovery" },
+      { name: "Chickpeas & Lentils", description: "Plant protein and fiber to support blood sugar and satiety" },
+      { name: "Oats & Quinoa", description: "Whole grains for steady energy, B vitamins, and digestive health" },
+      { name: "Greek Yogurt", description: "Combines calcium with protein and probiotics — great base for smoothie bowls" },
+      { name: "Eggs", description: "Complete protein with choline for brain health and vitamin D" },
+      { name: "Avocados", description: "Heart-healthy fats and potassium to support blood pressure" },
+      { name: "Extra Virgin Olive Oil", description: "Anti-inflammatory fats — use as your primary cooking oil" },
+      { name: "Chia Seeds & Walnuts", description: "Plant-based omega-3s and fiber for heart and digestive support" },
+      { name: "Fermented Foods", description: "Kimchi, sauerkraut, kefir — support gut health and nutrient absorption" },
+      { name: "Sweet Potatoes", description: "Complex carbs with vitamin A for skin and sustained energy" },
+      { name: "Dark Chocolate (70%+)", description: "Magnesium boost and mood support — enjoy in moderation" },
     ],
     herbs: [
       { name: "Black Cohosh", description: "Hot flash relief" },
@@ -638,19 +641,26 @@ const lifeStageNutritionData: Record<string, LifeStageNutritionData> = {
       { name: "Valerian Root", description: "Sleep support" },
     ],
     herbNotes: [
-      "Black Cohosh: use for 6 months max, then take a break",
-      "Maca Root may take 6-8 weeks for full effect",
-      "Consult a practitioner before combining herbs with HRT",
+      "Black Cohosh: use for 6 months max, then take a break. Avoid if you have liver concerns or a history of breast cancer",
+      "Maca Root may take 6-8 weeks for full effect — be patient with adaptogens",
+      "Always consult your doctor before combining herbs or supplements with HRT or other medications",
+      "Choose third-party tested brands (USP, NSF, or ConsumerLab verified) for quality and purity",
+      "Supplements support but don't replace a balanced diet — start with food first, then fill gaps",
     ],
     supplements: [
-      { name: "Magnesium Glycinate", dosage: "400mg", description: "Sleep and muscle relaxation" },
-      { name: "Vitamin D3", dosage: "2000-4000 IU", description: "Bone health and mood" },
-      { name: "B-Complex", dosage: "", description: "Energy and nervous system" },
-      { name: "Omega-3", dosage: "1000-2000mg", description: "Heart and brain health" },
-      { name: "Calcium", dosage: "1000mg", description: "Bone density preservation" },
-      { name: "Vitamin K2", dosage: "100mcg", description: "Directs calcium to bones" },
-      { name: "Vitamin E", dosage: "400 IU", description: "Hot flash reduction" },
-      { name: "Iron", dosage: "If needed", description: "Only if blood tests indicate deficiency" },
+      { name: "Vitamin D3 + K2", dosage: "1000-2000 IU + 100mcg", description: "Many women are deficient — essential for calcium absorption, bone density, mood, and immune function. K2 helps direct calcium into bones instead of arteries. Get levels tested first" },
+      { name: "Magnesium Glycinate", dosage: "300-400mg", description: "Supports sleep, mood stability, muscle relaxation, and may ease anxiety and migraines. Take at night for best results — glycinate form is gentler on digestion" },
+      { name: "Omega-3 (EPA + DHA)", dosage: "1000-2000mg", description: "Anti-inflammatory support for heart, joints, mood, and dry skin. Especially important if you don't eat fatty fish regularly — look for fish oil or algae-based options" },
+      { name: "Calcium", dosage: "500-1000mg", description: "Counters accelerated bone loss during perimenopause. Prioritize food sources first (dairy, leafy greens, fortified milks) and supplement only to fill the gap — total intake should be 1000-1200mg/day" },
+      { name: "B-Complex (with B12)", dosage: "", description: "Supports energy, mood, and nerve health. B12 absorption can decline during this stage — useful if you're fatigued, plant-based, or have low levels on bloodwork" },
+      { name: "Soy Isoflavones", dosage: "40-80mg", description: "Plant compounds that mildly mimic estrogen and may modestly ease hot flashes. Whole food sources (tofu, edamame) are preferred over high-dose pills — effects are often subtle" },
+      { name: "Vitamin E", dosage: "200-400 IU", description: "May help with mild hot flashes — use lower doses to avoid bleeding risks. Not a standalone solution for severe symptoms" },
+      { name: "Probiotics", dosage: "10B+ CFU", description: "Supports gut health, which plays a role in hormone metabolism and nutrient absorption. Look for multi-strain formulas with research backing" },
+      { name: "Iron", dosage: "Only if tested low", description: "Do not supplement without bloodwork — excess iron carries risks. Only needed if heavy perimenopause bleeding is causing deficiency" },
+    ],
+    seedCycling: [
+      { label: "Week 1-2", phase: "Follicular", seeds: "Pumpkin + Flax Seeds", amount: "1-2 tbsp each daily" },
+      { label: "Week 3-4", phase: "Luteal", seeds: "Sunflower + Sesame Seeds", amount: "1-2 tbsp each daily" },
     ],
     focusAreas: [
       { name: "Hot Flash Relief", description: "Phytoestrogens, sage, and cooling foods" },
@@ -660,18 +670,20 @@ const lifeStageNutritionData: Record<string, LifeStageNutritionData> = {
       { name: "Weight Management", description: "Protein priority, fiber, and strength training" },
     ],
     tips: [
-      "Increase protein intake to preserve muscle mass",
-      "Prioritize calcium from food first, supplement to fill gaps",
-      "Phytoestrogens from soy and flax can help ease symptoms",
-      "Stay hydrated - aim for 8+ glasses of water daily",
-      "Strength training is essential for bone density",
+      "Follow a Mediterranean-style eating pattern — plants first, healthy fats, moderate dairy and fish",
+      "Prioritize protein at every meal to preserve muscle mass as metabolism shifts",
+      "Get calcium from food first — supplement only to fill gaps",
+      "Blend a power smoothie: Greek yogurt + berries + ground flaxseed + spinach",
+      "Stay well-hydrated — water and herbal teas help with temperature regulation",
+      "Focus on nutrient density over calories as metabolism naturally slows",
+      "Strength training paired with good nutrition is your best tool for bone health",
     ],
     avoid: [
-      "Spicy foods (can trigger hot flashes)",
-      "Excessive caffeine",
-      "Alcohol (disrupts sleep)",
-      "Refined sugar",
-      "Processed foods",
+      "Spicy foods (common hot flash trigger)",
+      "Excess caffeine (can worsen anxiety and sleep issues)",
+      "Alcohol (disrupts sleep and worsens hot flashes)",
+      "Refined sugar and white flour",
+      "Highly processed and packaged foods",
     ],
   },
   menopause: {
@@ -680,19 +692,21 @@ const lifeStageNutritionData: Record<string, LifeStageNutritionData> = {
     description:
       "Post-menopausal nutrition focuses on protecting bone density, heart health, brain function, and maintaining muscle mass through targeted nutrition.",
     foods: [
-      { name: "Salmon & Sardines", description: "Omega-3s and vitamin D" },
-      { name: "Leafy Greens", description: "Calcium, K, and folate" },
-      { name: "Berries", description: "Brain-protective antioxidants" },
-      { name: "Nuts & Seeds", description: "Heart-healthy fats" },
-      { name: "Legumes", description: "Fiber and plant protein" },
-      { name: "Whole Grains", description: "Fiber and B vitamins" },
-      { name: "Olive Oil", description: "Heart-protective fats" },
-      { name: "Eggs", description: "Protein, D, and choline" },
-      { name: "Greek Yogurt", description: "Calcium and probiotics" },
-      { name: "Tofu", description: "Isoflavones and protein" },
-      { name: "Avocados", description: "Healthy fats and potassium" },
-      { name: "Broccoli", description: "Calcium and fiber" },
-      { name: "Oranges", description: "Vitamin C for collagen" },
+      { name: "Fatty Fish", description: "Salmon, mackerel, sardines — omega-3s, vitamin D, and calcium from edible bones. A bone health powerhouse" },
+      { name: "Tofu & Edamame", description: "Isoflavones and complete plant protein — versatile in stir-fries, soups, and salads" },
+      { name: "Spinach & Kale", description: "Calcium, vitamin K, and folate — essential for bone density and heart health" },
+      { name: "Broccoli & Cauliflower", description: "Calcium, fiber, and compounds that support estrogen balance" },
+      { name: "Berries & Citrus", description: "Antioxidants for brain protection, plus vitamin C for collagen production" },
+      { name: "Ground Flaxseeds", description: "Lignans and omega-3s — sprinkle on oatmeal, salads, or blend into smoothies" },
+      { name: "Almonds & Brazil Nuts", description: "Magnesium for energy, selenium for thyroid support, and healthy fats" },
+      { name: "Lentils & Black Beans", description: "High-fiber plant protein for blood sugar stability and digestive health" },
+      { name: "Oats & Brown Rice", description: "Whole grains for B vitamins, fiber, and slow-release energy" },
+      { name: "Greek Yogurt", description: "Calcium, protein, and probiotics in one — top with fruit and seeds for a complete snack" },
+      { name: "Eggs & Lean Poultry", description: "High-quality protein with choline and B12 to maintain muscle and nerve health" },
+      { name: "Avocados", description: "Heart-healthy monounsaturated fats and potassium for blood pressure support" },
+      { name: "Extra Virgin Olive Oil", description: "Anti-inflammatory Mediterranean staple — use for cooking and dressings" },
+      { name: "Dried Figs & Apricots", description: "Natural calcium and iron source — a satisfying sweet alternative" },
+      { name: "Bone Broth", description: "Collagen, minerals, and gelatin for joint comfort and gut lining support" },
     ],
     herbs: [
       { name: "Black Cohosh", description: "Symptom management" },
@@ -707,21 +721,25 @@ const lifeStageNutritionData: Record<string, LifeStageNutritionData> = {
       { name: "Hawthorn", description: "Heart health" },
     ],
     herbNotes: [
-      "St. John's Wort interacts with many medications - check with your doctor",
-      "Turmeric absorbs best with black pepper and fat",
-      "Ginkgo may thin blood - avoid before surgery",
+      "St. John's Wort interacts with many medications including blood thinners and antidepressants — always check with your doctor",
+      "Turmeric absorbs best with black pepper and a source of fat",
+      "Ginkgo may thin blood — stop at least 2 weeks before any surgery",
+      "No supplement is a proven cure-all — if symptoms are severe, talk to your doctor about HRT or non-hormonal prescriptions",
+      "Always choose third-party tested products (USP, NSF, or ConsumerLab verified) for safety",
     ],
     supplements: [
-      { name: "Magnesium Glycinate", dosage: "400mg", description: "Sleep, mood, bones" },
-      { name: "Calcium + D3", dosage: "1200mg + 2000 IU", description: "Bone density" },
-      { name: "Vitamin K2", dosage: "100-200mcg", description: "Calcium utilization" },
-      { name: "Omega-3", dosage: "1000-2000mg", description: "Heart and brain" },
-      { name: "Vitamin B12", dosage: "1000mcg", description: "Energy and nerve health" },
-      { name: "CoQ10", dosage: "100-200mg", description: "Heart and cellular energy" },
-      { name: "Collagen Peptides", dosage: "10g", description: "Skin, joints, bones" },
-      { name: "Probiotics", dosage: "10B CFU", description: "Gut and immune health" },
-      { name: "Boron", dosage: "3mg", description: "Bone mineral retention" },
+      { name: "Vitamin D3 + K2", dosage: "1000-2000 IU + 100-200mcg", description: "The foundation for bone health after menopause — D3 drives calcium absorption while K2 ensures it goes to bones, not arteries. Get your levels checked and adjust dose accordingly" },
+      { name: "Calcium", dosage: "500-600mg", description: "Supplement only to close the gap between food intake and 1200mg daily target. Split doses for better absorption — too much at once isn't well utilized. Food sources always come first" },
+      { name: "Magnesium Glycinate", dosage: "300-400mg", description: "Supports sleep quality, mood, bone health, and muscle comfort. A common deficiency at this stage — take at bedtime for the best sleep benefit" },
+      { name: "Omega-3 (EPA + DHA)", dosage: "1000-2000mg", description: "Heart-protective and anti-inflammatory — supports joint comfort, brain function, mood stability, and skin hydration. Fish oil or algae-based for plant-based diets" },
+      { name: "Vitamin B12", dosage: "1000mcg", description: "Absorption naturally declines with age — supports energy, nerve health, and cognitive function. Especially important if you eat less meat or have low levels on labs" },
+      { name: "CoQ10", dosage: "100-200mg", description: "Supports heart and cellular energy production — helpful for fatigue and cardiovascular protection as natural CoQ10 levels decline" },
+      { name: "Collagen Peptides", dosage: "10g", description: "Supports skin elasticity, joint comfort, and bone matrix — dissolves easily into coffee, smoothies, or soups" },
+      { name: "Probiotics", dosage: "10B+ CFU", description: "Gut health impacts hormone metabolism, immune function, and nutrient absorption. Choose multi-strain formulas with clinical research" },
+      { name: "Creatine", dosage: "3-5g", description: "Emerging evidence supports muscle preservation and strength when paired with resistance training — safe and well-studied for long-term use" },
+      { name: "Boron", dosage: "3mg", description: "A trace mineral that helps your body retain calcium and magnesium — a small addition with meaningful bone support" },
     ],
+    seedCycling: [],
     focusAreas: [
       { name: "Bone Health", description: "Calcium, D3, K2, and weight-bearing exercise are essential" },
       { name: "Heart Health", description: "Omega-3s, olive oil, fiber, and regular cardio" },
@@ -730,19 +748,20 @@ const lifeStageNutritionData: Record<string, LifeStageNutritionData> = {
       { name: "Skin Health", description: "Collagen, vitamin C, hydration, and healthy fats" },
     ],
     tips: [
-      "Protein needs increase after menopause - aim for 1.2g per kg body weight",
-      "Weight-bearing exercise is non-negotiable for bone health",
-      "Mediterranean diet pattern is optimal for heart protection",
-      "B12 absorption decreases with age - consider supplementation",
-      "Stay socially active - it's as important as diet for longevity",
-      "Focus on anti-inflammatory foods to manage joint discomfort",
+      "Aim for 25-30g protein per meal to maintain muscle mass and stay full longer",
+      "A Mediterranean or DASH-style eating pattern is ideal for heart and bone protection",
+      "Weight-bearing exercise paired with nutrition is your strongest defense for bone health",
+      "B12 absorption decreases with age — food sources plus supplementation is a smart combo",
+      "Hydrate consistently — water and green tea support metabolism and temperature comfort",
+      "Focus on nutrient-dense whole foods over counting calories as metabolism adjusts",
+      "Combine calcium-rich foods with vitamin D sources for best absorption",
     ],
     avoid: [
-      "Excessive sodium (bone loss)",
-      "Sugary drinks (inflammation)",
-      "Trans fats (heart risk)",
-      "Excessive alcohol",
-      "Highly processed foods",
+      "Excess sodium (accelerates bone calcium loss)",
+      "Sugary drinks and added sugars (drive inflammation)",
+      "Trans fats and fried foods (increase heart risk)",
+      "Excessive alcohol (weakens bones and disrupts sleep)",
+      "Heavily processed and packaged foods",
     ],
   },
 };
@@ -1220,6 +1239,32 @@ export default function NutritionPage() {
               ))}
             </div>
           </CollapsibleSection>
+
+          {/* Seed Cycling */}
+          {lifeStageData.seedCycling.length > 0 && (
+            <CollapsibleSection title="Seed Cycling Protocol" subtitle="4 seeds across cycle phases" icon={Sparkles} iconColor="#8b5cf6">
+              <div className="space-y-4">
+                {lifeStageData.seedCycling.map((week) => (
+                  <div key={week.label} className="rounded-xl border border-border-light bg-bg-secondary/30 p-4">
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className="font-quicksand font-semibold text-sm text-text-primary">
+                        {week.label}
+                      </span>
+                      <span className="text-xs text-text-accent font-quicksand">
+                        ({week.phase})
+                      </span>
+                    </div>
+                    <p className="font-quicksand font-medium text-sm text-accent-purple">
+                      {week.seeds}
+                    </p>
+                    <p className="text-xs text-text-muted font-quicksand mt-1">
+                      {week.amount}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </CollapsibleSection>
+          )}
         </motion.div>
 
         {/* Tips */}

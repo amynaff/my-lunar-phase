@@ -512,6 +512,27 @@ export default function LandingPage() {
         </div>
       </section>
 
+      {/* ═══ OUR PHILOSOPHY ═══ */}
+      <section className="px-6 py-24">
+        <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} className="max-w-[720px] mx-auto">
+          <Eyebrow>Our Philosophy</Eyebrow>
+          <h2 className="font-cormorant text-[clamp(32px,5vw,52px)] font-light text-text-primary leading-[1.1] tracking-tight mb-8 text-center">
+            Moon &amp; Body: A Beautiful Parallel,<br />Not a Scientific Claim
+          </h2>
+          <div className="space-y-5 text-[15px] leading-relaxed text-text-secondary font-quicksand">
+            <p>
+              Many ancient cultures observed a poetic parallel between the lunar cycle (about 29.5 days) and the average length of the menstrual cycle, inspiring stories, rituals, and traditions that linked women&apos;s bodies to the moon and the natural world. However, large-scale scientific research has found no consistent correlation or causal link between lunar phases and menstrual cycles or period timing. Studies analyzing millions of cycles (including data from popular period-tracking apps) show that any apparent alignments occur by chance rather than through any reliable synchronization influenced by the moon&apos;s light or gravity.
+            </p>
+            <p>
+              Our app is not based on any medical or scientific claim that lunar phases control, predict, or alter your cycle. Instead, it is intentionally designed as a gentle invitation to reconnect with nature&apos;s rhythms while honoring your own. By weaving lunar phase awareness together with tracking the four key stages of a woman&apos;s life — menstrual/reproductive years, perimenopause, menopause, and postmenopause — we offer a space for mindfulness, self-awareness, and empowerment.
+            </p>
+            <p>
+              Whether you&apos;re flowing with the moon&apos;s waxing and waning or navigating the beautiful transitions of your body across life&apos;s seasons, this tool is here to help you stay grounded in the natural world and deeply attuned to your personal rhythms — without any pseudoscience, just pure connection.
+            </p>
+          </div>
+        </motion.div>
+      </section>
+
       {/* ═══ FINAL CTA ═══ */}
       <section className="px-6 pt-24 pb-32 text-center">
         <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} className="max-w-[680px] mx-auto">

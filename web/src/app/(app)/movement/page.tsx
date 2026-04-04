@@ -1,7 +1,8 @@
 "use client";
 
-import { motion } from "framer-motion";
-import { Dumbbell, Clock, Flame, Zap } from "lucide-react";
+import { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { Dumbbell, Clock, Flame, Zap, ChevronDown, ChevronUp, Heart, Shield, Sparkles } from "lucide-react";
 import { useCycleData } from "@/hooks/use-cycle-data";
 import { phaseInfo, moonPhaseInfo } from "@/lib/cycle/data";
 import type { CyclePhase } from "@/lib/cycle/types";
@@ -13,6 +14,204 @@ interface Exercise {
   duration: string;
   intensity: "Low" | "Moderate" | "High" | "Low-Moderate" | "Moderate-High";
 }
+
+interface ExerciseCategory {
+  title: string;
+  priority: string;
+  icon: React.ElementType;
+  iconColor: string;
+  description: string;
+  frequency: string;
+  exercises: Exercise[];
+  note?: string;
+}
+
+interface WeeklyDay {
+  day: string;
+  activity: string;
+}
+
+interface LifeStageMovementData {
+  title: string;
+  subtitle: string;
+  overview: string;
+  categories: ExerciseCategory[];
+  weeklyRoutine: WeeklyDay[];
+  tips: string[];
+}
+
+/* ------------------------------------------------------------------ */
+/*  LIFE STAGE EXERCISE DATA                                           */
+/* ------------------------------------------------------------------ */
+
+const lifeStageMovementData: Record<string, LifeStageMovementData> = {
+  perimenopause: {
+    title: "Perimenopause Movement",
+    subtitle: "Strength, Balance & Relief",
+    overview:
+      "Your body is navigating a major hormonal shift — and movement is one of the most powerful tools you have. A balanced mix of strength, cardio, flexibility, and pelvic floor work can ease symptoms like hot flashes, mood swings, and sleep disruption while protecting your bones, muscles, and heart for the long run.",
+    categories: [
+      {
+        title: "Strength Training",
+        priority: "#1 Priority",
+        icon: Dumbbell,
+        iconColor: "#8b5cf6",
+        description:
+          "This is your most impactful exercise right now. Resistance training fights muscle loss, revs up metabolism, strengthens bones, and helps with weight and blood sugar balance. Focus on compound movements that work multiple muscles at once.",
+        frequency: "2-3x per week, 30-45 min",
+        exercises: [
+          { name: "Squats & Goblet Squats", description: "Build leg and glute strength while engaging your core — use dumbbells or bodyweight", duration: "Part of routine", intensity: "Moderate" },
+          { name: "Deadlifts", description: "Strengthen your entire posterior chain — start light and focus on form before adding weight", duration: "Part of routine", intensity: "Moderate-High" },
+          { name: "Rows & Presses", description: "Bent-over rows for posture and upper back, overhead press for shoulders — resistance bands work great too", duration: "Part of routine", intensity: "Moderate" },
+          { name: "Glute Bridges & Lunges", description: "Hip stability and lower body strength — add a resistance band for extra challenge", duration: "Part of routine", intensity: "Moderate" },
+        ],
+        note: "Aim for 8-12 reps with enough weight to feel challenged on the last few. Gradually increase weight or reps over time.",
+      },
+      {
+        title: "Cardio & Heart Health",
+        priority: "Essential",
+        icon: Heart,
+        iconColor: "#ef4444",
+        description:
+          "Moderate cardio supports your heart, helps manage weight, lifts your mood through endorphins, and may reduce the intensity of hot flashes. Prioritize weight-bearing options when possible for added bone benefits.",
+        frequency: "30 min most days, 150+ min/week total",
+        exercises: [
+          { name: "Brisk Walking", description: "The most accessible and bone-friendly cardio — add hills or intervals to boost intensity", duration: "30-45 min", intensity: "Moderate" },
+          { name: "Swimming & Water Aerobics", description: "Gentle on joints and naturally cooling — especially helpful on hot flash days", duration: "30-45 min", intensity: "Moderate" },
+          { name: "Cycling", description: "Stationary or outdoor — builds leg endurance with minimal joint impact", duration: "30-40 min", intensity: "Moderate" },
+          { name: "Dancing", description: "Zumba, ballroom, or freestyle — joyful movement that builds coordination and balance", duration: "30-45 min", intensity: "Moderate" },
+        ],
+        note: "A note on HIIT: short interval sessions (20-30 min, 2x/week max) can be effective, but may spike cortisol or trigger hot flashes. Use sparingly and prioritize recovery.",
+      },
+      {
+        title: "Balance & Flexibility",
+        priority: "Recovery & Stability",
+        icon: Sparkles,
+        iconColor: "#22c55e",
+        description:
+          "These practices reduce fall risk, ease joint stiffness, calm your nervous system, and can directly help with hot flashes, anxiety, and sleep quality. Think of this as your body's reset button.",
+        frequency: "2-3x per week, or 10-20 min daily",
+        exercises: [
+          { name: "Yoga", description: "Gentle or restorative styles — child's pose, cat-cow, and legs-up-the-wall are especially soothing", duration: "25-40 min", intensity: "Low" },
+          { name: "Tai Chi", description: "Slow, flowing sequences that improve balance, calm the mind, and support joint mobility", duration: "20-30 min", intensity: "Low" },
+          { name: "Pilates", description: "Core strength and pelvic floor support — mat-based is perfect for home practice", duration: "30-40 min", intensity: "Low-Moderate" },
+          { name: "Stretching & Foam Rolling", description: "Post-workout recovery for tight muscles — focus on hips, lower back, and shoulders", duration: "10-20 min", intensity: "Low" },
+        ],
+      },
+      {
+        title: "Pelvic Floor Work",
+        priority: "Daily Practice",
+        icon: Shield,
+        iconColor: "#f59e0b",
+        description:
+          "Hormonal changes can weaken pelvic floor muscles, affecting bladder control and comfort. Consistent, gentle strengthening makes a real difference — and pairs beautifully with yoga and Pilates.",
+        frequency: "Daily, several short sets",
+        exercises: [
+          { name: "Kegel Holds", description: "Contract the muscles you'd use to stop urine flow — hold 5-10 seconds, relax, repeat 10-15 times", duration: "5 min", intensity: "Low" },
+          { name: "Pelvic Tilts", description: "Lying on your back, gently tilt your pelvis to engage deep core and pelvic floor muscles", duration: "5-10 min", intensity: "Low" },
+        ],
+      },
+    ],
+    weeklyRoutine: [
+      { day: "Mon / Wed / Fri", activity: "30-45 min strength training (full body)" },
+      { day: "Tue / Thu", activity: "30-45 min brisk walk or swim + 10 min yoga" },
+      { day: "Saturday", activity: "Longer walk or dance class + balance work" },
+      { day: "Sunday", activity: "Rest day — gentle yoga or tai chi + stretching" },
+      { day: "Daily", activity: "Pelvic floor exercises + short walks when possible" },
+    ],
+    tips: [
+      "Warm up for 5-10 minutes before every session and cool down with gentle stretching after",
+      "Pair exercise with protein-rich meals afterward to support muscle repair",
+      "On tough symptom days, lower the intensity — a gentle walk still counts",
+      "Track your workouts — most women notice real improvements in energy and mood within 4-8 weeks",
+      "Start with bodyweight or light resistance if you're new to strength training and build gradually",
+      "Hydrate well before, during, and after movement — it helps with temperature regulation too",
+    ],
+  },
+  menopause: {
+    title: "Menopause Movement",
+    subtitle: "Protect, Strengthen & Thrive",
+    overview:
+      "Movement after menopause isn't just about fitness — it's about protecting the bones, muscles, heart, and brain that serve you for decades to come. A consistent routine built around strength, weight-bearing cardio, and balance work is your best investment in long-term vitality and independence.",
+    categories: [
+      {
+        title: "Strength Training",
+        priority: "#1 Priority",
+        icon: Dumbbell,
+        iconColor: "#8b5cf6",
+        description:
+          "Muscle loss accelerates after menopause, which slows metabolism and weakens bones. Resistance training is the single best way to counter both. Focus on major muscle groups with compound exercises and progressively challenge yourself.",
+        frequency: "2-3x per week, 30-45 min",
+        exercises: [
+          { name: "Squats & Step-Ups", description: "Functional lower body strength for daily life — use a chair or bench for step-ups if needed", duration: "Part of routine", intensity: "Moderate" },
+          { name: "Deadlifts & Hip Hinges", description: "Build posterior chain strength — Romanian deadlifts with dumbbells are a great starting point", duration: "Part of routine", intensity: "Moderate" },
+          { name: "Push-Ups & Overhead Press", description: "Upper body and shoulder strength — modify push-ups on knees or against a wall as needed", duration: "Part of routine", intensity: "Moderate" },
+          { name: "Rows & Resistance Band Work", description: "Upper back strength for posture — seated rows or banded pull-aparts are joint-friendly options", duration: "Part of routine", intensity: "Moderate" },
+        ],
+        note: "Aim for 8-12 reps where the last 2-3 feel challenging. Progressive overload — gradually adding weight or reps — is how you build real results.",
+      },
+      {
+        title: "Weight-Bearing Cardio",
+        priority: "Heart & Bone Health",
+        icon: Heart,
+        iconColor: "#ef4444",
+        description:
+          "Heart disease risk rises after menopause, making cardiovascular exercise essential. Choose weight-bearing activities whenever possible — they do double duty by supporting bone density too.",
+        frequency: "30 min most days, 150+ min/week total",
+        exercises: [
+          { name: "Walking & Stair Climbing", description: "Weight-bearing and accessible — take the stairs, walk after meals, or try Nordic walking for extra upper body work", duration: "30-45 min", intensity: "Moderate" },
+          { name: "Swimming & Water Exercise", description: "Full-body cardio that's gentle on joints — great if you have arthritis or joint discomfort", duration: "30-45 min", intensity: "Moderate" },
+          { name: "Cycling", description: "Low-impact endurance builder — indoor classes or outdoor rides for fresh air and scenery", duration: "30-40 min", intensity: "Moderate" },
+          { name: "Dancing & Group Classes", description: "Social, joyful movement that sharpens coordination and balance — try line dancing or low-impact aerobics", duration: "30-45 min", intensity: "Moderate" },
+        ],
+      },
+      {
+        title: "Balance & Flexibility",
+        priority: "Fall Prevention & Comfort",
+        icon: Sparkles,
+        iconColor: "#22c55e",
+        description:
+          "Balance naturally declines with age, increasing fall and fracture risk. Regular practice keeps you steady, mobile, and confident. These activities also ease joint stiffness and support better sleep.",
+        frequency: "2-3x per week, or 10-20 min daily",
+        exercises: [
+          { name: "Yoga", description: "Focus on standing balance poses, gentle twists, and hip openers — restorative styles are wonderful for stress relief", duration: "25-40 min", intensity: "Low" },
+          { name: "Tai Chi & Qigong", description: "Evidence-based for fall prevention — slow, intentional movements that sharpen proprioception and calm the mind", duration: "20-30 min", intensity: "Low" },
+          { name: "Balance Drills", description: "Single-leg stands, heel-to-toe walks, and stability ball work — practice near a wall or chair for safety", duration: "10-15 min", intensity: "Low" },
+          { name: "Stretching & Foam Rolling", description: "Daily mobility work for hips, spine, and shoulders — helps with morning stiffness and post-workout recovery", duration: "10-20 min", intensity: "Low" },
+        ],
+      },
+      {
+        title: "Pelvic Floor Work",
+        priority: "Daily Practice",
+        icon: Shield,
+        iconColor: "#f59e0b",
+        description:
+          "Pelvic floor strength supports bladder control, core stability, and comfort. It's a small daily practice with meaningful long-term payoff — especially when combined with Pilates or yoga.",
+        frequency: "Daily, several short sets",
+        exercises: [
+          { name: "Kegel Holds", description: "Engage and hold pelvic floor muscles for 5-10 seconds, relax fully, repeat 10-15 times per set", duration: "5 min", intensity: "Low" },
+          { name: "Pelvic Tilts & Bridges", description: "Lying on your back, combine pelvic floor engagement with gentle hip lifts for deeper core connection", duration: "5-10 min", intensity: "Low" },
+        ],
+      },
+    ],
+    weeklyRoutine: [
+      { day: "Mon / Wed / Fri", activity: "30-45 min strength training (full body)" },
+      { day: "Tue / Thu", activity: "30-45 min walking or swimming + 10 min yoga" },
+      { day: "Saturday", activity: "Longer walk, hike, or dance class + balance drills" },
+      { day: "Sunday", activity: "Rest day — gentle yoga, tai chi, or stretching" },
+      { day: "Daily", activity: "Pelvic floor exercises + movement throughout the day" },
+    ],
+    tips: [
+      "Always warm up with 5-10 minutes of light movement and cool down with stretching",
+      "Pair workouts with protein and calcium-rich foods to support muscle and bone repair",
+      "Consistency beats intensity — showing up regularly matters more than pushing hard",
+      "Listen to your body and adjust on high-fatigue or joint-discomfort days",
+      "Start where you are — bodyweight exercises and short walks are a powerful beginning",
+      "Track your progress — strength, balance, and energy improvements often surprise you within weeks",
+      "Stay hydrated and prioritize sleep — recovery is where the real benefits happen",
+    ],
+  },
+};
 
 const phaseExercises: Record<CyclePhase, { overview: string; exercises: Exercise[] }> = {
   menstrual: {
@@ -436,9 +635,122 @@ const intensityColors: Record<string, string> = {
   High: "#ef4444",
 };
 
+/* ------------------------------------------------------------------ */
+/*  COLLAPSIBLE CATEGORY COMPONENT                                     */
+/* ------------------------------------------------------------------ */
+
+function CategorySection({
+  category,
+  defaultOpen = false,
+}: {
+  category: ExerciseCategory;
+  defaultOpen?: boolean;
+}) {
+  const [isOpen, setIsOpen] = useState(defaultOpen);
+  const Icon = category.icon;
+
+  return (
+    <div className="rounded-[20px] border border-border-light bg-bg-card overflow-hidden">
+      <button
+        onClick={() => setIsOpen(!isOpen)}
+        className="flex items-center justify-between w-full p-5 text-left"
+      >
+        <div className="flex items-center gap-3">
+          <div
+            className="flex items-center justify-center w-10 h-10 rounded-full"
+            style={{ backgroundColor: `${category.iconColor}20` }}
+          >
+            <Icon className="h-5 w-5" style={{ color: category.iconColor }} />
+          </div>
+          <div>
+            <p className="font-quicksand font-semibold text-sm text-text-primary">
+              {category.title}
+            </p>
+            <p className="text-xs text-text-muted font-quicksand">
+              {category.priority} · {category.frequency}
+            </p>
+          </div>
+        </div>
+        {isOpen ? (
+          <ChevronUp className="h-5 w-5 text-text-muted" />
+        ) : (
+          <ChevronDown className="h-5 w-5 text-text-muted" />
+        )}
+      </button>
+      <AnimatePresence>
+        {isOpen && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: "auto", opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            className="overflow-hidden"
+          >
+            <div className="px-5 pb-5 space-y-4">
+              <p className="text-sm text-text-secondary font-quicksand leading-relaxed">
+                {category.description}
+              </p>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                {category.exercises.map((exercise) => (
+                  <div
+                    key={exercise.name}
+                    className="rounded-xl border border-border-light bg-bg-secondary/30 p-4"
+                  >
+                    <div className="flex items-start justify-between mb-2">
+                      <h4 className="font-quicksand font-semibold text-sm text-text-primary">
+                        {exercise.name}
+                      </h4>
+                      <span
+                        className="px-2 py-0.5 rounded-lg text-[10px] font-quicksand font-semibold shrink-0 ml-2"
+                        style={{
+                          backgroundColor: `${intensityColors[exercise.intensity]}15`,
+                          color: intensityColors[exercise.intensity],
+                        }}
+                      >
+                        {exercise.intensity}
+                      </span>
+                    </div>
+                    <p className="text-xs text-text-muted font-quicksand leading-relaxed">
+                      {exercise.description}
+                    </p>
+                    {exercise.duration !== "Part of routine" && (
+                      <div className="flex items-center gap-1.5 text-text-muted mt-2">
+                        <Clock className="h-3 w-3" />
+                        <span className="text-[11px] font-quicksand">{exercise.duration}</span>
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+
+              {category.note && (
+                <div className="rounded-xl bg-accent-purple/5 border border-accent-purple/15 p-4">
+                  <p className="text-xs text-text-secondary font-quicksand leading-relaxed">
+                    💡 {category.note}
+                  </p>
+                </div>
+              )}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/*  MAIN PAGE                                                          */
+/* ------------------------------------------------------------------ */
+
 export default function MovementPage() {
-  const { currentPhase, currentPhaseInfo, isRegular, currentMoonPhase, currentMoonInfo } =
+  const { currentPhase, currentPhaseInfo, isRegular, currentMoonPhase, currentMoonInfo, lifeStage } =
     useCycleData();
+
+  const isLifeStageUser = !isRegular;
+  const lifeStageData = isLifeStageUser
+    ? lifeStageMovementData[lifeStage === "postmenopause" ? "menopause" : lifeStage] || lifeStageMovementData.menopause
+    : null;
 
   const movement = isRegular
     ? phaseExercises[currentPhase]
@@ -450,6 +762,114 @@ export default function MovementPage() {
     ? `${currentPhaseInfo.name} Phase - ${phaseInfo[currentPhase].emoji} ${currentPhaseInfo.description}`
     : `${currentMoonInfo.name} - ${currentMoonInfo.emoji} ${currentMoonInfo.energy}`;
 
+  // ---- LIFE STAGE VIEW (peri/menopause) ----
+  if (isLifeStageUser && lifeStageData) {
+    return (
+      <div className="max-w-4xl mx-auto px-4 lg:px-8 py-6 pb-32">
+        {/* Header */}
+        <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} className="mb-8">
+          <div className="flex items-center gap-3 mb-2">
+            <div className="flex items-center justify-center w-10 h-10 rounded-full" style={{ backgroundColor: `${displayColor}20` }}>
+              <Dumbbell className="h-5 w-5" style={{ color: displayColor }} />
+            </div>
+            <div>
+              <h1 className="font-cormorant text-3xl font-semibold text-text-primary">Movement</h1>
+              <p className="text-sm text-text-secondary font-quicksand">{currentMoonInfo.name} - {currentMoonInfo.emoji} {currentMoonInfo.energy}</p>
+            </div>
+          </div>
+        </motion.div>
+
+        {/* Overview Card */}
+        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="rounded-[20px] border border-border-light bg-bg-card p-6 mb-6">
+          <h2 className="font-cormorant text-xl font-semibold text-text-primary">{lifeStageData.title}</h2>
+          <p className="text-sm text-accent-purple font-quicksand font-medium mt-1">{lifeStageData.subtitle}</p>
+          <p className="text-sm text-text-secondary font-quicksand leading-relaxed mt-3">{lifeStageData.overview}</p>
+        </motion.div>
+
+        {/* Exercise Categories */}
+        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }} className="mb-6 space-y-4">
+          {lifeStageData.categories.map((category, index) => (
+            <CategorySection key={category.title} category={category} defaultOpen={index === 0} />
+          ))}
+        </motion.div>
+
+        {/* Sample Weekly Routine */}
+        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="mb-6">
+          <h2 className="font-cormorant text-xl font-semibold text-text-primary mb-4">Sample Weekly Routine</h2>
+          <div className="rounded-[20px] border border-border-light bg-bg-card p-5 space-y-3">
+            {lifeStageData.weeklyRoutine.map((day) => (
+              <div key={day.day} className="flex items-start gap-3">
+                <span className="font-quicksand font-semibold text-sm text-accent-purple min-w-[120px] shrink-0">{day.day}</span>
+                <p className="text-sm text-text-secondary font-quicksand">{day.activity}</p>
+              </div>
+            ))}
+          </div>
+        </motion.div>
+
+        {/* Tips */}
+        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.25 }} className="mb-6">
+          <h2 className="font-cormorant text-xl font-semibold text-text-primary mb-4">Tips for Success</h2>
+          <div className="rounded-[20px] border border-border-light bg-bg-card p-5 space-y-3">
+            {lifeStageData.tips.map((tip, i) => (
+              <div key={i} className="flex items-start gap-3">
+                <Sparkles className="h-4 w-4 text-accent-pink shrink-0 mt-0.5" />
+                <p className="text-sm text-text-secondary font-quicksand">{tip}</p>
+              </div>
+            ))}
+          </div>
+        </motion.div>
+
+        {/* Today's Moon Phase Movement */}
+        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }} className="mb-6">
+          <h2 className="font-cormorant text-xl font-semibold text-text-primary mb-4">
+            Today&apos;s Moon Energy: {currentMoonInfo.emoji} {currentMoonInfo.name}
+          </h2>
+          <div className="rounded-[20px] border border-border-light bg-bg-card p-6 mb-4">
+            <p className="text-sm text-text-secondary font-quicksand leading-relaxed">
+              {movement.overview}
+            </p>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {movement.exercises.map((exercise, index) => (
+              <motion.div
+                key={exercise.name}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.35 + index * 0.08 }}
+                className="rounded-[20px] border border-border-light bg-bg-card p-6 hover:bg-bg-secondary/30 transition-colors"
+              >
+                <div className="flex items-start justify-between mb-3">
+                  <h3 className="font-cormorant text-lg font-semibold text-text-primary">{exercise.name}</h3>
+                  <span
+                    className="px-2.5 py-1 rounded-xl text-[10px] font-quicksand font-semibold"
+                    style={{
+                      backgroundColor: `${intensityColors[exercise.intensity]}15`,
+                      color: intensityColors[exercise.intensity],
+                    }}
+                  >
+                    {exercise.intensity}
+                  </span>
+                </div>
+                <p className="text-sm text-text-secondary font-quicksand leading-relaxed mb-4">{exercise.description}</p>
+                <div className="flex items-center gap-4">
+                  <div className="flex items-center gap-1.5 text-text-muted">
+                    <Clock className="h-3.5 w-3.5" />
+                    <span className="text-xs font-quicksand">{exercise.duration}</span>
+                  </div>
+                  <div className="flex items-center gap-1.5 text-text-muted">
+                    <Zap className="h-3.5 w-3.5" />
+                    <span className="text-xs font-quicksand">{exercise.intensity} Intensity</span>
+                  </div>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </motion.div>
+      </div>
+    );
+  }
+
+  // ---- REGULAR CYCLE VIEW ----
   return (
     <div className="max-w-4xl mx-auto px-4 lg:px-8 py-6">
       <motion.div

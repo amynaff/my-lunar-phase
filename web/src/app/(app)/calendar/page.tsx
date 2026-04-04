@@ -23,7 +23,7 @@ export default function CalendarPage() {
   }
 
   return (
-    <div className="max-w-lg mx-auto px-4 lg:px-8 py-6">
+    <div className="max-w-3xl mx-auto px-4 lg:px-8 py-6">
       <motion.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -78,7 +78,6 @@ export default function CalendarPage() {
           lastPeriodStart={lastPeriodStart}
           cycleLength={cycleLength}
           periodLength={periodLength}
-          onSetPeriodStart={setLastPeriodStart}
         />
       </motion.div>
 
