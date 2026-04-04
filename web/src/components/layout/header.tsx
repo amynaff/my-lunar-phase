@@ -134,7 +134,13 @@ export function Header() {
           MyLunarPhase
         </Link>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1">
+          <Link
+            href="/settings"
+            className="p-2 rounded-xl hover:bg-bg-secondary"
+          >
+            <Settings className="h-5 w-5 text-text-secondary" />
+          </Link>
           <button
             onClick={toggle}
             className="p-2 rounded-xl hover:bg-bg-secondary"
@@ -145,14 +151,6 @@ export function Header() {
               <Sun className="h-5 w-5 text-text-secondary" />
             )}
           </button>
-          {user && (
-            <button
-              onClick={() => signOut({ callbackUrl: "/sign-in" })}
-              className="p-2 rounded-xl hover:bg-bg-secondary"
-            >
-              <LogOut className="h-5 w-5 text-text-secondary" />
-            </button>
-          )}
         </div>
       </header>
 
