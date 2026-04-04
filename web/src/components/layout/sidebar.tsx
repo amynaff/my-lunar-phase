@@ -2,7 +2,8 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Home, Apple, Dumbbell, Heart, MessageCircle, Users, Settings, Sparkles, Moon, FlaskConical, CreditCard, BookOpen, Calendar, GraduationCap, TrendingUp, Lightbulb, BarChart3 } from "lucide-react";
+import { Home, Apple, Dumbbell, Heart, MessageCircle, Users, Settings, Sparkles, Moon, FlaskConical, CreditCard, BookOpen, Calendar, GraduationCap, TrendingUp, Lightbulb, BarChart3, LogOut } from "lucide-react";
+import { signOut } from "next-auth/react";
 import { cn } from "@/lib/cn";
 
 const mainNav = [
@@ -99,6 +100,13 @@ export function Sidebar() {
             {label}
           </Link>
         ))}
+        <button
+          onClick={() => signOut({ callbackUrl: "/sign-in" })}
+          className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-quicksand font-medium text-red-500 hover:bg-red-500/10 transition-colors mt-2"
+        >
+          <LogOut className="h-5 w-5" />
+          Sign Out
+        </button>
       </div>
     </aside>
   );
