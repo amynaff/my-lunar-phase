@@ -33,6 +33,7 @@ model User {
   subscription       Subscription?
   aiConversations    AIConversation[]
   healthIntegrations HealthIntegration[]
+  cycleData          CycleData?
 }
 
 model Account {
@@ -220,6 +221,24 @@ model ChatMessage {
 
   @@index([channelId])
   @@index([createdAt])
+}
+
+// ==================== Cycle Data (encrypted, server-persisted) ====================
+
+model CycleData {
+  id                  String   @id @default(cuid())
+  userId              String   @unique
+  user                User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  lifeStage           String   // regular, perimenopause, menopause, postmenopause
+  cycleLength         Int      @default(28)
+  periodLength        Int      @default(5)
+  lastPeriodStart     String?  // encrypted ISO date
+  periodLogs          String?  // encrypted JSON array
+  hasCompletedOnboarding Boolean @default(false)
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+
+  @@index([userId])
 }
 
 // ==================== Health Integrations ====================

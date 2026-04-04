@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { requireAuth } from "@/lib/auth-helpers";
 import { prisma } from "@/lib/prisma";
+import { decryptIfEncrypted } from "@/lib/encryption";
 
 export async function GET(
   req: NextRequest,
@@ -17,7 +18,14 @@ export async function GET(
     where: { userId_date: { userId: user!.id, date: dateObj } },
   });
 
-  return NextResponse.json({ entry: entry || null });
+  if (!entry) return NextResponse.json({ entry: null });
+
+  return NextResponse.json({
+    entry: {
+      ...entry,
+      notes: entry.notes ? decryptIfEncrypted(entry.notes) : null,
+    },
+  });
 }
 
 export async function DELETE(
