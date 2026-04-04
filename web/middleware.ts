@@ -14,6 +14,7 @@ const publicPaths = [
   "/api/health",
   "/api/ai-chat",
   "/api/community",
+  "/api/integrations/withings/webhook",
 ];
 
 const corsOriginPatterns = [
@@ -21,6 +22,7 @@ const corsOriginPatterns = [
   /^https?:\/\/127\.0\.0\.1(:\d+)?$/,
   /\.dev\.vibecode\.run$/,
   /\.vibecode\.run$/,
+  /^https:\/\/(www\.)?mylunarphase\.com$/,
 ];
 
 function isPublicPath(pathname: string): boolean {
