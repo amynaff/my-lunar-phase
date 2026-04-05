@@ -35,11 +35,29 @@
 
 ## 3. Apple Sign-In Setup
 
-1. Go to [Apple Developer Portal](https://developer.apple.com)
-2. Register a Services ID for Sign in with Apple
-3. Set return URL: `https://yourdomain.com/api/auth/callback/apple`
-4. Generate a client secret (P8 key → JWT)
-5. Set `APPLE_CLIENT_ID` and `APPLE_CLIENT_SECRET`
+Apple Sign In **requires HTTPS** — it will not work on `localhost`.
+
+1. Go to [Apple Developer Portal](https://developer.apple.com) → Certificates, Identifiers & Profiles
+2. Under **Identifiers**, create a **Services ID** (not an App ID):
+   - Description: `My Lunar Phase Sign In`
+   - Identifier: `com.mylunarphase.siwa` (or your chosen reverse-domain)
+   - Enable **Sign in with Apple** → Configure
+   - Primary App ID: select `com.mylunarphase.app`
+   - Domains: `mylunarphase.com`
+   - Return URLs: `https://mylunarphase.com/api/auth/callback/apple`
+3. Note your **Team ID** (10 chars, top-right of Apple Developer portal)
+4. The private key file is at `~/Documents/AuthKey_53THZT6U4L,mlp_appledev.p8` (Key ID: `53THZT6U4L`)
+5. Generate the client secret JWT:
+   ```bash
+   node scripts/generate-apple-secret.mjs \
+     --key-file ~/Documents/AuthKey_53THZT6U4L,mlp_appledev.p8 \
+     --team-id  <YOUR_TEAM_ID> \
+     --key-id   53THZT6U4L \
+     --client-id com.mylunarphase.siwa
+   ```
+6. Copy the output JWT → `APPLE_CLIENT_SECRET`
+7. Set `APPLE_CLIENT_ID` = `com.mylunarphase.siwa`
+8. Re-run this script every ~5 months (JWT expires after 6 months max)
 
 ## 4. Stripe Setup
 
