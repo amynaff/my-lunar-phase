@@ -20,4 +20,19 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default nextConfig;
+// Wrap with Sentry only when the package is installed
+let exportedConfig: NextConfig = nextConfig;
+
+try {
+  const { withSentryConfig } = require("@sentry/nextjs");
+  exportedConfig = withSentryConfig(nextConfig, {
+    silent: !process.env.SENTRY_AUTH_TOKEN,
+    org: process.env.SENTRY_ORG,
+    project: process.env.SENTRY_PROJECT,
+    disableLogger: true,
+  });
+} catch {
+  // @sentry/nextjs not installed — skip wrapping
+}
+
+export default exportedConfig;

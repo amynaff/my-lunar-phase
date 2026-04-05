@@ -1,13 +1,21 @@
 "use client";
 
+import { useEffect } from "react";
 import { Moon } from "lucide-react";
 
 export default function Error({
+  error,
   reset,
 }: {
   error: Error;
   reset: () => void;
 }) {
+  useEffect(() => {
+    // Sentry's client SDK automatically captures errors surfaced by the
+    // React error boundary when installed. Log here for local dev visibility.
+    console.error(error);
+  }, [error]);
+
   return (
     <div className="min-h-screen flex flex-col items-center justify-center px-4 bg-bg-primary">
       <Moon className="h-16 w-16 text-accent-pink mb-6" />

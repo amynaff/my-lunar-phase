@@ -95,6 +95,13 @@ export default function RootLayout({
             }),
           }}
         />
+        {process.env.NEXT_PUBLIC_PLAUSIBLE_DOMAIN && (
+          <script
+            defer
+            data-domain={process.env.NEXT_PUBLIC_PLAUSIBLE_DOMAIN}
+            src="https://plausible.io/js/script.js"
+          />
+        )}
       </head>
       <body
         className={`${cormorant.variable} ${quicksand.variable} antialiased`}
