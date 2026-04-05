@@ -1,0 +1,6 @@
+# Security Policy for MyLunarPhase
+# https://securitytxt.org/
+
+Contact: mailto:security@mylunarphase.com
+Preferred-Languages: en
+Expires: 2027-04-05T00:00:00.000Z

@@ -17,10 +17,16 @@ const quicksand = Quicksand({
   display: "swap",
 });
 
+const siteUrl = process.env.NEXT_PUBLIC_APP_URL || "https://mylunarphase.com";
+const siteName = "MyLunarPhase";
+const title = "MyLunarPhase | Women's Hormone Wellness";
+const description =
+  "Personalized nutrition, movement, self-care, and moon phase wisdom for every stage — from regular cycles to perimenopause and menopause.";
+
 export const metadata: Metadata = {
-  title: "MyLunarPhase | Women's Hormone Wellness",
-  description:
-    "A comprehensive women's hormone wellness platform with personalized nutrition, movement, self-care, AI reflection, moon phase wisdom, and partner support.",
+  metadataBase: new URL(siteUrl),
+  title,
+  description,
   keywords: [
     "women's health",
     "cycle tracking",
@@ -32,6 +38,27 @@ export const metadata: Metadata = {
     "nutrition",
     "self-care",
   ],
+  openGraph: {
+    type: "website",
+    locale: "en_US",
+    url: siteUrl,
+    siteName,
+    title,
+    description,
+    images: [
+      {
+        url: "/opengraph-image",
+        width: 1200,
+        height: 630,
+        alt: "MyLunarPhase — Women's Hormone Wellness",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title,
+    description,
+  },
 };
 
 export default function RootLayout({
@@ -43,6 +70,31 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <head>
         <meta name="color-scheme" content="light dark" />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "WebApplication",
+              name: siteName,
+              url: siteUrl,
+              description,
+              applicationCategory: "HealthApplication",
+              operatingSystem: "Web, iOS, Android",
+              offers: {
+                "@type": "Offer",
+                price: "6.99",
+                priceCurrency: "USD",
+                description: "Monthly subscription with 60-day free trial",
+              },
+              author: {
+                "@type": "Organization",
+                name: "MyLunarPhase",
+                url: siteUrl,
+              },
+            }),
+          }}
+        />
       </head>
       <body
         className={`${cormorant.variable} ${quicksand.variable} antialiased`}
