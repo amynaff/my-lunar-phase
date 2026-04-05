@@ -16,19 +16,20 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   useCycleSync();
 
   useEffect(() => {
-    // Check localStorage first, then fall back to server check
+    // The ONLY reliable gate is hasCompletedOnboarding.
+    // Check localStorage first, then fall back to server check.
     try {
       const raw = localStorage.getItem("luna-cycle-storage");
       if (raw) {
         const parsed = JSON.parse(raw);
         const state = parsed?.state;
-        if (state?.hasCompletedOnboarding || state?.lifeStage !== "regular" || state?.lastPeriodStart) {
+        if (state?.hasCompletedOnboarding === true) {
           setReady(true);
           return;
         }
       }
 
-      // No local data — check server (new device for existing user)
+      // No local confirmation — check server (new device for existing user)
       fetch("/api/cycle-data")
         .then((res) => res.ok ? res.json() : null)
         .then((data) => {
@@ -41,7 +42,17 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
         })
         .catch(() => router.replace("/onboarding"));
     } catch {
-      setReady(true);
+      // If localStorage is unavailable, check server
+      fetch("/api/cycle-data")
+        .then((res) => res.ok ? res.json() : null)
+        .then((data) => {
+          if (data?.cycleData?.hasCompletedOnboarding) {
+            setReady(true);
+          } else {
+            router.replace("/onboarding");
+          }
+        })
+        .catch(() => router.replace("/onboarding"));
     }
   }, [router]);
 

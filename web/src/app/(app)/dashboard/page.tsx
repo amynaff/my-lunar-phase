@@ -10,8 +10,10 @@ import { PhaseInfoCard } from "@/components/cycle/phase-info-card";
 import { CycleInsightsCard } from "@/components/cycle/cycle-insights-card";
 import { LogPeriodModal } from "@/components/cycle/log-period-modal";
 import { QuickCheckIn } from "@/components/journal/quick-check-in";
+import { WelcomeCard } from "@/components/dashboard/welcome-card";
 import { useCycleData } from "@/hooks/use-cycle-data";
 import { useCycleStore } from "@/stores/cycle-store";
+import { lifeStageInfo } from "@/lib/cycle/data";
 import { useRouter } from "next/navigation";
 
 const quickActions = [
@@ -120,6 +122,8 @@ export default function DashboardPage() {
 
   if (!hydrated || !hasCompletedOnboarding) return null;
 
+  const stageInfo = lifeStageInfo[lifeStage];
+
   const activeAffirmations = isRegular
     ? (cycleAffirmations[currentPhase] || cycleAffirmations.follicular)
     : (moonAffirmations[currentMoonPhase] || moonAffirmations.new_moon);
@@ -128,19 +132,36 @@ export default function DashboardPage() {
 
   return (
     <div className="max-w-4xl mx-auto px-4 lg:px-8 py-6">
+      {/* Welcome card for first-time users */}
+      <WelcomeCard />
+
       <motion.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         className="mb-8"
       >
-        <h1 className="font-cormorant text-3xl font-semibold text-text-primary">
-          Welcome Back
-        </h1>
-        <p className="text-sm text-text-secondary font-quicksand mt-1">
-          {isRegular
-            ? `Day ${dayOfCycle} of your cycle`
-            : `Guided by the ${currentMoonInfo.name}`}
-        </p>
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="font-cormorant text-3xl font-semibold text-text-primary">
+              Welcome Back
+            </h1>
+            <p className="text-sm text-text-secondary font-quicksand mt-1">
+              {isRegular
+                ? `Day ${dayOfCycle} of your cycle`
+                : `Guided by the ${currentMoonInfo.name}`}
+            </p>
+          </div>
+          <Link
+            href="/settings"
+            className="flex items-center gap-2 px-3 py-1.5 rounded-full border border-border-light bg-bg-card hover:bg-bg-secondary/50 transition-colors"
+            title="Change life stage in settings"
+          >
+            <span className="text-base">{stageInfo.emoji}</span>
+            <span className="text-xs font-quicksand font-medium text-text-secondary hidden sm:inline">
+              {stageInfo.name}
+            </span>
+          </Link>
+        </div>
       </motion.div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
