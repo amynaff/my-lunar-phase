@@ -15,23 +15,94 @@ import {
   BarChart3,
   Calendar,
   FileText,
+  Moon,
 } from "lucide-react";
 import { useDailyCheckInStore } from "@/stores/daily-checkin-store";
+import { useCycleStore } from "@/stores/cycle-store";
 import {
   analyzeCheckIns,
   type InsightsSummary,
   type SymptomFrequency,
   type TriggerCorrelation,
 } from "@/lib/insights/analyze-checkins";
-import { severityConfig } from "@/stores/symptom-store";
+import { severityConfig, getSymptomById } from "@/stores/symptom-store";
+import type { CyclePhase } from "@/lib/cycle/types";
+import { phaseInfo } from "@/lib/cycle/data";
+
+// ── Compute phase for a specific date ──
+function getPhaseForDate(
+  dateStr: string,
+  lastPeriodStart: string | null,
+  cycleLength: number,
+  periodLength: number
+): CyclePhase {
+  if (!lastPeriodStart) return "follicular";
+  const start = new Date(lastPeriodStart);
+  const date = new Date(dateStr + "T12:00:00");
+  const daysSinceStart = Math.floor((date.getTime() - start.getTime()) / (1000 * 60 * 60 * 24));
+  if (daysSinceStart < 0) return "follicular";
+  const dayOfCycle = (((daysSinceStart % cycleLength) + cycleLength) % cycleLength) + 1;
+  if (dayOfCycle <= periodLength) return "menstrual";
+  if (dayOfCycle <= 13) return "follicular";
+  if (dayOfCycle <= 17) return "ovulatory";
+  return "luteal";
+}
+
+const PHASES: CyclePhase[] = ["menstrual", "follicular", "ovulatory", "luteal"];
 
 type TimeRange = 7 | 14 | 30 | 90;
 
 export function InsightsPanel() {
   const entries = useDailyCheckInStore((s) => s.entries);
   const [timeRange, setTimeRange] = useState<TimeRange>(30);
+  const { lastPeriodStart, cycleLength, periodLength } = useCycleStore();
 
   const insights = useMemo(() => analyzeCheckIns(entries, timeRange), [entries, timeRange]);
+
+  // Mood by phase data
+  const moodByPhase = useMemo(() => {
+    const cutoff = new Date();
+    cutoff.setDate(cutoff.getDate() - timeRange);
+    const cutoffStr = cutoff.toISOString().split("T")[0];
+    const recent = entries.filter((e) => e.date >= cutoffStr && e.mood !== null);
+    const grouped: Record<CyclePhase, number[]> = { menstrual: [], follicular: [], ovulatory: [], luteal: [] };
+    for (const entry of recent) {
+      if (entry.mood === null) continue;
+      const phase = getPhaseForDate(entry.date, lastPeriodStart, cycleLength, periodLength);
+      grouped[phase].push(entry.mood);
+    }
+    return PHASES.map((phase) => ({
+      phase,
+      avg: grouped[phase].length > 0 ? Math.round((grouped[phase].reduce((a, b) => a + b, 0) / grouped[phase].length) * 10) / 10 : null,
+      count: grouped[phase].length,
+    }));
+  }, [entries, timeRange, lastPeriodStart, cycleLength, periodLength]);
+
+  // Symptom by phase data
+  const symptomByPhase = useMemo(() => {
+    const cutoff = new Date();
+    cutoff.setDate(cutoff.getDate() - timeRange);
+    const cutoffStr = cutoff.toISOString().split("T")[0];
+    const recent = entries.filter((e) => e.date >= cutoffStr);
+    // Count symptoms per phase
+    const counts: Record<string, Record<CyclePhase, number>> = {};
+    for (const entry of recent) {
+      const phase = getPhaseForDate(entry.date, lastPeriodStart, cycleLength, periodLength);
+      for (const s of entry.symptoms) {
+        if (!counts[s.symptomId]) counts[s.symptomId] = { menstrual: 0, follicular: 0, ovulatory: 0, luteal: 0 };
+        counts[s.symptomId][phase]++;
+      }
+    }
+    const total = (c: Record<CyclePhase, number>) => Object.values(c).reduce((a, b) => a + b, 0);
+    return Object.entries(counts)
+      .map(([symptomId, phaseCounts]) => {
+        const sym = getSymptomById(symptomId);
+        const peakPhase = PHASES.reduce((best, p) => phaseCounts[p] > phaseCounts[best] ? p : best, PHASES[0]);
+        return { symptomId, name: sym?.name || symptomId, icon: sym?.icon || "?", phaseCounts, peakPhase, total: total(phaseCounts) };
+      })
+      .sort((a, b) => b.total - a.total)
+      .slice(0, 5);
+  }, [entries, timeRange, lastPeriodStart, cycleLength, periodLength]);
 
   if (insights.totalCheckIns === 0) {
     return (
@@ -80,6 +151,16 @@ export function InsightsPanel() {
       {/* Weekly Breakdown */}
       {insights.weeklySummaries.length > 1 && (
         <WeeklyBreakdown summaries={insights.weeklySummaries} />
+      )}
+
+      {/* Mood by Phase */}
+      {lastPeriodStart && moodByPhase.some((m) => m.count > 0) && (
+        <MoodByPhaseChart data={moodByPhase} />
+      )}
+
+      {/* Symptom Frequency by Phase */}
+      {symptomByPhase.length > 0 && lastPeriodStart && (
+        <SymptomByPhasePanel data={symptomByPhase} />
       )}
 
       {/* Trigger Correlations */}
@@ -496,6 +577,129 @@ function CorrelationsCard({ correlations }: { correlations: TriggerCorrelation[]
       </div>
       <p className="text-[10px] text-text-muted font-quicksand mt-3 italic">
         These patterns are based on your logged data. Discuss with your healthcare provider for personalized guidance.
+      </p>
+    </motion.div>
+  );
+}
+
+// ── Mood by Phase Chart ──
+function MoodByPhaseChart({ data }: { data: { phase: CyclePhase; avg: number | null; count: number }[] }) {
+  const moodEmojis = ["", "😢", "😕", "😐", "🙂", "😊"];
+  const hasData = data.some((d) => d.count > 0);
+  if (!hasData) return null;
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      className="rounded-[20px] border border-border-light bg-bg-card p-5"
+    >
+      <div className="flex items-center gap-2 mb-4">
+        <Moon className="h-4 w-4 text-accent-purple" />
+        <p className="text-sm font-quicksand font-semibold text-text-primary">Mood by Phase</p>
+      </div>
+      <div className="grid grid-cols-4 gap-2">
+        {data.map(({ phase, avg, count }) => {
+          const info = phaseInfo[phase];
+          const barHeight = avg !== null ? Math.round((avg / 5) * 60) : 0;
+          return (
+            <div key={phase} className="flex flex-col items-center gap-1">
+              {/* Bar */}
+              <div className="relative flex items-end justify-center w-full" style={{ height: 64 }}>
+                {avg !== null ? (
+                  <div
+                    className="w-8 rounded-t-lg transition-all duration-500"
+                    style={{ height: barHeight, backgroundColor: info.color, opacity: 0.75 }}
+                  />
+                ) : (
+                  <div className="w-8 rounded-t-lg bg-bg-secondary" style={{ height: 12, opacity: 0.4 }} />
+                )}
+              </div>
+              {/* Value */}
+              <span className="text-sm font-cormorant font-semibold text-text-primary">
+                {avg !== null ? avg : "—"}
+              </span>
+              {avg !== null && (
+                <span className="text-base leading-none">{moodEmojis[Math.round(avg)] || ""}</span>
+              )}
+              {/* Phase label */}
+              <span className="text-[9px] text-text-muted font-quicksand text-center leading-tight capitalize">
+                {phase}
+              </span>
+              <span className="text-[9px] text-text-muted font-quicksand">
+                {count > 0 ? `${count}d` : "no data"}
+              </span>
+            </div>
+          );
+        })}
+      </div>
+      <p className="text-[10px] text-text-muted font-quicksand mt-3">
+        Average mood (1–5) per cycle phase from your check-ins.
+      </p>
+    </motion.div>
+  );
+}
+
+// ── Symptom Frequency by Phase Panel ──
+function SymptomByPhasePanel({
+  data,
+}: {
+  data: { symptomId: string; name: string; icon: string; phaseCounts: Record<CyclePhase, number>; peakPhase: CyclePhase; total: number }[];
+}) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      className="rounded-[20px] border border-border-light bg-bg-card p-5"
+    >
+      <div className="flex items-center gap-2 mb-1">
+        <BarChart3 className="h-4 w-4 text-accent-pink" />
+        <p className="text-sm font-quicksand font-semibold text-text-primary">Symptoms by Phase</p>
+      </div>
+      <p className="text-[10px] text-text-muted font-quicksand mb-4">
+        Top symptoms and which phase they peak in
+      </p>
+      <div className="space-y-4">
+        {data.map((symptom) => {
+          const maxCount = Math.max(...PHASES.map((p) => symptom.phaseCounts[p]));
+          return (
+            <div key={symptom.symptomId}>
+              <div className="flex items-center gap-2 mb-1.5">
+                <span className="text-sm">{symptom.icon}</span>
+                <span className="text-xs font-quicksand font-medium text-text-primary">{symptom.name}</span>
+                <span
+                  className="ml-auto text-[9px] px-2 py-0.5 rounded-full font-quicksand font-semibold"
+                  style={{
+                    backgroundColor: phaseInfo[symptom.peakPhase].color + "20",
+                    color: phaseInfo[symptom.peakPhase].color,
+                  }}
+                >
+                  peaks in {symptom.peakPhase}
+                </span>
+              </div>
+              <div className="grid grid-cols-4 gap-1">
+                {PHASES.map((phase) => {
+                  const count = symptom.phaseCounts[phase];
+                  const pct = maxCount > 0 ? (count / maxCount) * 100 : 0;
+                  return (
+                    <div key={phase} className="flex flex-col gap-0.5">
+                      <div className="h-1.5 rounded-full bg-bg-secondary overflow-hidden">
+                        <div
+                          className="h-full rounded-full transition-all"
+                          style={{ width: `${pct}%`, backgroundColor: phaseInfo[phase].color, opacity: pct > 0 ? 0.7 : 0 }}
+                        />
+                      </div>
+                      <span className="text-[8px] text-text-muted font-quicksand capitalize truncate">{phase.slice(0, 3)}</span>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+      <p className="text-[10px] text-text-muted font-quicksand mt-3">
+        Each bar shows relative frequency within that phase.
       </p>
     </motion.div>
   );
