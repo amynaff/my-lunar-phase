@@ -2,6 +2,7 @@ import * as Notifications from 'expo-notifications';
 import * as Device from 'expo-device';
 import { Platform } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { api } from './api/api';
 
 // Configure how notifications are handled when app is in foreground
 Notifications.setNotificationHandler({
@@ -144,6 +145,16 @@ export async function requestNotificationPermissions(): Promise<boolean> {
       vibrationPattern: [0, 250],
       lightColor: '#8b5cf6',
     });
+  }
+
+  // Get and register Expo push token with backend
+  try {
+    const tokenData = await Notifications.getExpoPushTokenAsync();
+    await api.post('/api/push-token', { token: tokenData.data }).catch(() => {
+      // Non-fatal: registration fails if user is not authenticated yet
+    });
+  } catch {
+    // Token registration is best-effort
   }
 
   return true;

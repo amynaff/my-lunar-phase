@@ -10,6 +10,7 @@ import { moodRouter } from "./routes/mood";
 import { communityRouter } from "./routes/community";
 import { userRouter } from "./routes/user";
 import { journalRouter } from "./routes/journal";
+import { pushTokenRouter } from "./routes/push-token";
 import { logger } from "hono/logger";
 
 const app = new Hono<{
@@ -73,6 +74,7 @@ app.route("/api/mood", moodRouter);
 app.route("/api/community", communityRouter);
 app.route("/api/user", userRouter);
 app.route("/api/journal", journalRouter);
+app.route("/api/push-token", pushTokenRouter);
 
 const port = Number(process.env.PORT) || 3000;
 

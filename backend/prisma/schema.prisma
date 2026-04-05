@@ -32,6 +32,10 @@ model User {
   // Journal
   journalEntries  JournalEntry[]
   journalInsights JournalInsight[]
+
+  // Push notifications
+  pushToken          String?
+  pushTokenUpdatedAt DateTime?
 }
 
 model Session {
