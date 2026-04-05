@@ -1,16 +1,19 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useState } from 'react';
 import {
   View,
   Text,
   Pressable,
+  Platform,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Animated, { FadeInDown, FadeInUp } from 'react-native-reanimated';
-import { Moon, Sparkles, ArrowRight } from 'lucide-react-native';
+import { Moon, Sparkles, ArrowRight, Mail } from 'lucide-react-native';
 import { router } from 'expo-router';
 import * as Haptics from 'expo-haptics';
+import * as AppleAuthentication from 'expo-apple-authentication';
 import { useThemeStore, getTheme } from '@/lib/theme-store';
+import { signInWithApple } from '@/lib/auth/auth-client';
 import {
   useFonts,
   CormorantGaramond_400Regular,
@@ -37,14 +40,15 @@ const STARS = [
 ];
 
 /**
- * Sign-in screen - This is now OPTIONAL and not a gate.
- * Users are redirected here from settings if they want to sign in.
- * The app starts directly in onboarding without requiring sign-in.
+ * Sign-in screen - Welcome/splash screen with auth options.
+ * Users can sign in with Apple, continue with email, or create an account.
  */
 export default function SignInScreen() {
   const insets = useSafeAreaInsets();
   const mode = useThemeStore((s) => s.mode);
   const theme = getTheme(mode);
+  const [error, setError] = useState<string | null>(null);
+  const [appleLoading, setAppleLoading] = useState(false);
 
   const [fontsLoaded] = useFonts({
     CormorantGaramond_400Regular,
@@ -57,6 +61,37 @@ export default function SignInScreen() {
   const handleContinue = useCallback(() => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     router.replace('/(app)');
+  }, []);
+
+  const handleAppleSignIn = useCallback(async () => {
+    setError(null);
+    setAppleLoading(true);
+    try {
+      const credential = await AppleAuthentication.signInAsync({
+        requestedScopes: [
+          AppleAuthentication.AppleAuthenticationScope.FULL_NAME,
+          AppleAuthentication.AppleAuthenticationScope.EMAIL,
+        ],
+      });
+      await signInWithApple(credential.identityToken!, credential.authorizationCode ?? undefined);
+      router.replace('/(app)');
+    } catch (err: any) {
+      if (err?.code !== 'ERR_REQUEST_CANCELED') {
+        setError(err?.message ?? 'Apple sign-in failed. Please try again.');
+      }
+    } finally {
+      setAppleLoading(false);
+    }
+  }, []);
+
+  const handleContinueWithEmail = useCallback(() => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    router.push('/login');
+  }, []);
+
+  const handleCreateAccount = useCallback(() => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    router.push('/sign-up');
   }, []);
 
   if (!fontsLoaded) return null;
@@ -196,8 +231,25 @@ export default function SignInScreen() {
             </Animated.View>
           </View>
 
-          {/* Bottom section - Get Started button */}
-          <View style={{ paddingHorizontal: 28, paddingBottom: 12 }}>
+          {/* Bottom section - Auth actions */}
+          <View style={{ paddingHorizontal: 28, paddingBottom: 12, gap: 12 }}>
+            {/* Error message */}
+            {error && (
+              <Animated.View entering={FadeInUp.duration(300)}>
+                <Text
+                  style={{
+                    fontFamily: 'Quicksand_400Regular',
+                    fontSize: 13,
+                    color: theme.accent.rose,
+                    textAlign: 'center',
+                    marginBottom: 4,
+                  }}
+                >
+                  {error}
+                </Text>
+              </Animated.View>
+            )}
+
             {/* Get Started button */}
             <Animated.View entering={FadeInUp.delay(450).duration(700)}>
               <Pressable
@@ -234,8 +286,111 @@ export default function SignInScreen() {
               </Pressable>
             </Animated.View>
 
+            {/* Apple Sign-In (iOS only) */}
+            {Platform.OS === 'ios' && (
+              <Animated.View entering={FadeInUp.delay(500).duration(700)}>
+                <AppleAuthentication.AppleAuthenticationButton
+                  buttonType={AppleAuthentication.AppleAuthenticationButtonType.SIGN_IN}
+                  buttonStyle={
+                    isDark
+                      ? AppleAuthentication.AppleAuthenticationButtonStyle.WHITE
+                      : AppleAuthentication.AppleAuthenticationButtonStyle.BLACK
+                  }
+                  cornerRadius={16}
+                  style={{ height: 54, width: '100%' }}
+                  onPress={handleAppleSignIn}
+                />
+              </Animated.View>
+            )}
+
+            {/* Continue with Email */}
+            <Animated.View entering={FadeInUp.delay(550).duration(700)}>
+              <Pressable
+                onPress={handleContinueWithEmail}
+                style={({ pressed }) => ({
+                  opacity: pressed ? 0.75 : 1,
+                  transform: [{ scale: pressed ? 0.98 : 1 }],
+                  backgroundColor: isDark
+                    ? 'rgba(255,255,255,0.08)'
+                    : 'rgba(0,0,0,0.06)',
+                  borderRadius: 16,
+                  paddingVertical: 16,
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  borderWidth: 1,
+                  borderColor: isDark
+                    ? 'rgba(255,255,255,0.12)'
+                    : 'rgba(0,0,0,0.1)',
+                })}
+              >
+                <Mail size={18} color={theme.text.secondary} strokeWidth={1.8} style={{ marginRight: 8 }} />
+                <Text
+                  style={{
+                    fontFamily: 'Quicksand_600SemiBold',
+                    fontSize: 15,
+                    color: theme.text.secondary,
+                  }}
+                >
+                  Continue with Email
+                </Text>
+              </Pressable>
+            </Animated.View>
+
+            {/* Google SSO - Coming Soon */}
+            <Animated.View entering={FadeInUp.delay(580).duration(700)}>
+              <View
+                style={{
+                  borderRadius: 16,
+                  paddingVertical: 16,
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  borderWidth: 1,
+                  borderColor: isDark
+                    ? 'rgba(255,255,255,0.06)'
+                    : 'rgba(0,0,0,0.06)',
+                  opacity: 0.45,
+                }}
+              >
+                <Text
+                  style={{
+                    fontFamily: 'Quicksand_500Medium',
+                    fontSize: 14,
+                    color: theme.text.muted,
+                  }}
+                >
+                  Google Sign-In — Coming soon
+                </Text>
+              </View>
+            </Animated.View>
+
+            {/* Create account link */}
+            <Animated.View entering={FadeInUp.delay(620).duration(700)} style={{ alignItems: 'center', marginTop: 4 }}>
+              <Pressable onPress={handleCreateAccount} hitSlop={12}>
+                <Text
+                  style={{
+                    fontFamily: 'Quicksand_400Regular',
+                    fontSize: 14,
+                    color: theme.text.muted,
+                    textAlign: 'center',
+                  }}
+                >
+                  New here?{' '}
+                  <Text
+                    style={{
+                      fontFamily: 'Quicksand_600SemiBold',
+                      color: theme.accent.purple,
+                    }}
+                  >
+                    Create an account
+                  </Text>
+                </Text>
+              </Pressable>
+            </Animated.View>
+
             {/* Privacy text */}
-            <Animated.View entering={FadeInUp.delay(600).duration(700)} style={{ marginTop: 24 }}>
+            <Animated.View entering={FadeInUp.delay(660).duration(700)} style={{ marginTop: 8 }}>
               <Text
                 style={{
                   fontFamily: 'Quicksand_400Regular',
