@@ -27,11 +27,14 @@ interface CycleStore {
   lifeStage: LifeStage;
   groceryList: GroceryItem[];
   periodLogs: PeriodLog[];
+  profileName: string;
+  profileBirthYear: number | null;
 
   setLastPeriodStart: (date: Date) => void;
   setCycleLength: (days: number) => void;
   setPeriodLength: (days: number) => void;
   setLifeStage: (stage: LifeStage) => void;
+  setProfile: (name: string, birthYear: number | null) => void;
   completeOnboarding: () => void;
   resetOnboarding: () => void;
 
@@ -64,13 +67,16 @@ export const useCycleStore = create<CycleStore>()(
       lifeStage: "regular" as LifeStage,
       groceryList: [],
       periodLogs: [],
+      profileName: "",
+      profileBirthYear: null,
 
       setLastPeriodStart: (date) => set({ lastPeriodStart: date.toISOString() }),
       setCycleLength: (days) => set({ cycleLength: days }),
       setPeriodLength: (days) => set({ periodLength: days }),
       setLifeStage: (stage) => set({ lifeStage: stage }),
+      setProfile: (name, birthYear) => set({ profileName: name, profileBirthYear: birthYear }),
       completeOnboarding: () => set({ hasCompletedOnboarding: true }),
-      resetOnboarding: () => set({ hasCompletedOnboarding: false, lastPeriodStart: null, lifeStage: "regular", periodLogs: [] }),
+      resetOnboarding: () => set({ hasCompletedOnboarding: false, lastPeriodStart: null, lifeStage: "regular", periodLogs: [], profileName: "", profileBirthYear: null }),
 
       logPeriodStart: (date) => {
         const dateStr = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
