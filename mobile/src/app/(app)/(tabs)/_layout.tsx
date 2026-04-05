@@ -11,10 +11,9 @@ import Animated, {
 } from 'react-native-reanimated';
 import {
   Moon,
-  Apple,
-  Heart,
-  Dumbbell,
-  BookOpen,
+  ClipboardList,
+  Sparkles,
+  Grid3x3,
 } from 'lucide-react-native';
 import * as Haptics from 'expo-haptics';
 import { useThemeStore, getTheme } from '@/lib/theme-store';
@@ -127,47 +126,38 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="nutrition"
+        name="log"
         options={{
-          title: 'Nourish',
+          title: 'Log',
           tabBarIcon: ({ focused, color }) => (
-            <TabIcon icon={Apple} label="Nourish" focused={focused} color={color} />
+            <TabIcon icon={ClipboardList} label="Log" focused={focused} color={color} />
           ),
         }}
       />
       <Tabs.Screen
-        name="grocery"
+        name="insights"
         options={{
-          href: null,
-        }}
-      />
-      <Tabs.Screen
-        name="movement"
-        options={{
-          title: 'Move',
+          title: 'Insights',
           tabBarIcon: ({ focused, color }) => (
-            <TabIcon icon={Dumbbell} label="Move" focused={focused} color={color} />
+            <TabIcon icon={Sparkles} label="Insights" focused={focused} color={color} />
           ),
         }}
       />
       <Tabs.Screen
-        name="journal"
+        name="more"
         options={{
-          title: 'Journal',
+          title: 'More',
           tabBarIcon: ({ focused, color }) => (
-            <TabIcon icon={BookOpen} label="Journal" focused={focused} color={color} />
+            <TabIcon icon={Grid3x3} label="More" focused={focused} color={color} />
           ),
         }}
       />
-      <Tabs.Screen
-        name="selfcare"
-        options={{
-          title: 'Self-Care',
-          tabBarIcon: ({ focused, color }) => (
-            <TabIcon icon={Heart} label="Care" focused={focused} color={color} />
-          ),
-        }}
-      />
+      {/* Hidden tabs — accessible via the More screen */}
+      <Tabs.Screen name="nutrition" options={{ href: null }} />
+      <Tabs.Screen name="grocery" options={{ href: null }} />
+      <Tabs.Screen name="movement" options={{ href: null }} />
+      <Tabs.Screen name="journal" options={{ href: null }} />
+      <Tabs.Screen name="selfcare" options={{ href: null }} />
     </Tabs>
   );
 }

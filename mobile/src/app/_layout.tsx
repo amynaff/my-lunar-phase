@@ -1,11 +1,13 @@
 import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
-import { Stack } from 'expo-router';
+import { Stack, useSegments, useRouter } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
+import { useEffect } from 'react';
 import { useColorScheme } from '@/lib/useColorScheme';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { KeyboardProvider } from 'react-native-keyboard-controller';
+import { useSession } from '@/lib/auth/use-session';
 
 export const unstable_settings = {
   // Start directly in the app - no auth gate
@@ -16,10 +18,22 @@ SplashScreen.preventAutoHideAsync();
 
 const queryClient = new QueryClient();
 
+// Auth guard: redirect authenticated users away from sign-in
 function useProtectedRoute() {
-  // Guest-first approach: No route protection needed
-  // Users can use the app freely without signing in
-  // Sign-in is optional and only prompted for cloud features
+  const { data: session, isLoading } = useSession();
+  const segments = useSegments();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (isLoading) return;
+
+    const onSignInScreen = segments[0] === 'sign-in';
+
+    if (session?.user && onSignInScreen) {
+      // Authenticated user landed on sign-in — redirect into the app
+      router.replace('/(app)');
+    }
+  }, [session, isLoading, segments]);
 }
 
 function RootLayoutNav({ colorScheme }: { colorScheme: 'light' | 'dark' | null | undefined }) {
