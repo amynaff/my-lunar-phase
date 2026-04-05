@@ -18,7 +18,8 @@ model User {
   image           String?
   passwordHash    String?
   twoFactorSecret String?
-  twoFactorEnabled Boolean  @default(false)
+  twoFactorEnabled    Boolean  @default(false)
+  weeklyDigestEnabled Boolean  @default(false)
   createdAt       DateTime  @default(now())
   updatedAt       DateTime  @updatedAt
 

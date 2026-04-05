@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { motion } from "framer-motion";
-import { Settings, Moon, Calendar, Trash2, CreditCard, Loader2, Unplug, RefreshCw, Check } from "lucide-react";
+import { Settings, Moon, Calendar, Trash2, CreditCard, Loader2, Unplug, RefreshCw, Check, Mail } from "lucide-react";
 import Link from "next/link";
 import { useCycleStore } from "@/stores/cycle-store";
 import { ThemeToggle } from "@/components/shared/theme-toggle";
@@ -53,6 +53,8 @@ export default function SettingsPage() {
   const [syncingProvider, setSyncingProvider] = useState<string | null>(null);
   const [disconnectingProvider, setDisconnectingProvider] = useState<string | null>(null);
   const [justConnected, setJustConnected] = useState<string | null>(null);
+  const [weeklyDigestEnabled, setWeeklyDigestEnabled] = useState(false);
+  const [isSavingDigest, setIsSavingDigest] = useState(false);
 
   const fetchIntegrations = useCallback(async () => {
     try {
@@ -67,6 +69,10 @@ export default function SettingsPage() {
   }, []);
 
   useEffect(() => {
+    fetch("/api/user/preferences")
+      .then((r) => r.ok ? r.json() : null)
+      .then((data) => { if (data) setWeeklyDigestEnabled(data.weeklyDigestEnabled); })
+      .catch(() => {});
     fetchIntegrations();
 
     // Check URL params for success/error
@@ -101,6 +107,22 @@ export default function SettingsPage() {
       // Silently fail
     } finally {
       setDisconnectingProvider(null);
+    }
+  }
+
+  async function handleToggleDigest(enabled: boolean) {
+    setIsSavingDigest(true);
+    try {
+      const res = await fetch("/api/user/preferences", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ weeklyDigestEnabled: enabled }),
+      });
+      if (res.ok) setWeeklyDigestEnabled(enabled);
+    } catch {
+      // Silently fail
+    } finally {
+      setIsSavingDigest(false);
     }
   }
 
@@ -342,6 +364,46 @@ export default function SettingsPage() {
                 </div>
               </div>
             ))}
+          </div>
+        </motion.div>
+
+        {/* Email Preferences */}
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.22 }}
+          className="rounded-[20px] border border-border-light bg-bg-card p-6"
+        >
+          <div className="flex items-center gap-2 mb-4">
+            <Mail className="h-4 w-4 text-accent-purple" />
+            <h2 className="text-xs uppercase tracking-wider text-text-accent font-quicksand font-semibold">
+              Email Preferences
+            </h2>
+          </div>
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="font-quicksand font-semibold text-sm text-text-primary">
+                Weekly digest emails
+              </p>
+              <p className="text-xs text-text-muted font-quicksand mt-0.5">
+                Receive a personalised weekly summary with phase tips every Sunday.
+              </p>
+            </div>
+            <button
+              onClick={() => handleToggleDigest(!weeklyDigestEnabled)}
+              disabled={isSavingDigest}
+              className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${
+                weeklyDigestEnabled ? "bg-accent-purple" : "bg-border-light"
+              } ${isSavingDigest ? "opacity-60 cursor-not-allowed" : "cursor-pointer"}`}
+              role="switch"
+              aria-checked={weeklyDigestEnabled}
+            >
+              <span
+                className={`inline-block h-4 w-4 transform rounded-full bg-white shadow-sm transition-transform ${
+                  weeklyDigestEnabled ? "translate-x-6" : "translate-x-1"
+                }`}
+              />
+            </button>
           </div>
         </motion.div>
 

@@ -1,5 +1,34 @@
 import type { CyclePhase, LifeStage, MoonPhase, PhaseInfo, MoonPhaseInfo, LifeStageInfo, SymptomDef } from "./types";
 
+export interface PhaseTips {
+  nutrition: string;
+  movement: string;
+  selfcare: string;
+}
+
+export const phaseTips: Record<CyclePhase, PhaseTips> = {
+  menstrual: {
+    nutrition: "Focus on iron-rich foods like lentils, spinach, and dark chocolate to replenish what you lose this week.",
+    movement: "Gentle yoga, walking, or stretching — honor your body's need for rest and slow movement.",
+    selfcare: "Give yourself permission to rest. A warm bath, cozy blanket, and your favourite show are all valid self-care.",
+  },
+  follicular: {
+    nutrition: "Embrace fresh, light foods — sprouts, leafy greens, and lean proteins support rising estrogen and energy.",
+    movement: "Your energy is building! Try a new workout class, go for a run, or enjoy an upbeat dance session.",
+    selfcare: "Journal your intentions for the month ahead. This is your natural planning phase — use it.",
+  },
+  ovulatory: {
+    nutrition: "Support your peak energy with antioxidant-rich foods: berries, cruciferous veggies, and plenty of water.",
+    movement: "Go for your most challenging workout — HIIT, strength training, or a long hike. Your body is at its strongest.",
+    selfcare: "Connect with the people you love. Social energy is high — schedule that dinner, coffee date, or video call.",
+  },
+  luteal: {
+    nutrition: "Reach for magnesium-rich foods (pumpkin seeds, dark chocolate, avocado) to ease PMS symptoms naturally.",
+    movement: "Moderate exercise like Pilates, swimming, or a leisurely walk helps manage mood and bloating.",
+    selfcare: "Reduce your schedule and protect your energy. Say no freely — this phase rewards boundaries.",
+  },
+};
+
 export const phaseInfo: Record<CyclePhase, PhaseInfo> = {
   menstrual: {
     name: "Menstrual",
