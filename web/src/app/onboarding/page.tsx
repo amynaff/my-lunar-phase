@@ -134,7 +134,7 @@ export default function OnboardingPage() {
             className="text-center mb-8"
           >
             <h1 className="font-cormorant text-2xl font-semibold text-text-primary tracking-wide">
-              Luna Flow
+              My Lunar Phase
             </h1>
           </motion.div>
 
@@ -161,7 +161,7 @@ export default function OnboardingPage() {
                     Your body, your rhythm
                   </h2>
                   <p className="text-sm text-text-secondary font-quicksand leading-relaxed mb-2">
-                    Luna Flow helps you track your cycle, understand your phases, and build a wellness routine that works <em>with</em> your body — not against it.
+                    My Lunar Phase helps you track your cycle, understand your phases, and build a wellness routine that works <em>with</em> your body — not against it.
                   </p>
                   <p className="text-xs text-text-muted font-quicksand mb-8">
                     Setup takes less than 2 minutes. Your data stays private.
