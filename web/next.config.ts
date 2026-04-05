@@ -20,12 +20,33 @@ const nextConfig: NextConfig = {
   },
 };
 
+// Wrap with PWA
+let pwaConfig: NextConfig = nextConfig;
+try {
+  const withPWA = require("@ducanh2912/next-pwa").default;
+  pwaConfig = withPWA({
+    dest: "public",
+    cacheOnFrontEndNav: true,
+    aggressiveFrontEndNavCaching: true,
+    reloadOnOnline: true,
+    disable: process.env.NODE_ENV === "development",
+    workboxOptions: {
+      disableDevLogs: true,
+    },
+    fallbacks: {
+      document: "/offline",
+    },
+  })(nextConfig);
+} catch {
+  // @ducanh2912/next-pwa not installed — skip
+}
+
 // Wrap with Sentry only when the package is installed
-let exportedConfig: NextConfig = nextConfig;
+let exportedConfig: NextConfig = pwaConfig;
 
 try {
   const { withSentryConfig } = require("@sentry/nextjs");
-  exportedConfig = withSentryConfig(nextConfig, {
+  exportedConfig = withSentryConfig(pwaConfig, {
     silent: !process.env.SENTRY_AUTH_TOKEN,
     org: process.env.SENTRY_ORG,
     project: process.env.SENTRY_PROJECT,

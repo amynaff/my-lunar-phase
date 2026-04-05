@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Cormorant_Garamond, Quicksand } from "next/font/google";
 import { Providers } from "@/components/providers";
+import { PwaInstallBanner } from "@/components/pwa-install-banner";
 import "./globals.css";
 
 const cormorant = Cormorant_Garamond({
@@ -38,6 +39,19 @@ export const metadata: Metadata = {
     "nutrition",
     "self-care",
   ],
+  manifest: "/manifest.json",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "black-translucent",
+    title: siteName,
+  },
+  icons: {
+    apple: "/apple-touch-icon.png",
+    icon: [
+      { url: "/icon-192.png", sizes: "192x192", type: "image/png" },
+      { url: "/icon-512.png", sizes: "512x512", type: "image/png" },
+    ],
+  },
   openGraph: {
     type: "website",
     locale: "en_US",
@@ -107,6 +121,7 @@ export default function RootLayout({
         className={`${cormorant.variable} ${quicksand.variable} antialiased`}
       >
         <Providers>{children}</Providers>
+        <PwaInstallBanner />
       </body>
     </html>
   );

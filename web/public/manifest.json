@@ -1,0 +1,39 @@
+{
+  "name": "MyLunarPhase",
+  "short_name": "LunarPhase",
+  "description": "Personalized nutrition, movement, self-care, and moon phase wisdom for every stage of your cycle.",
+  "theme_color": "#9d84ed",
+  "background_color": "#f8f7ff",
+  "display": "standalone",
+  "orientation": "portrait",
+  "start_url": "/dashboard",
+  "scope": "/",
+  "categories": ["health", "lifestyle"],
+  "icons": [
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "screenshots": [],
+  "shortcuts": [
+    {
+      "name": "Dashboard",
+      "url": "/dashboard",
+      "description": "View your cycle dashboard"
+    },
+    {
+      "name": "Log Today",
+      "url": "/log",
+      "description": "Log today's symptoms and mood"
+    }
+  ]
+}
