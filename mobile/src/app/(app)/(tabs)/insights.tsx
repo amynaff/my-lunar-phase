@@ -1,11 +1,15 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { View, Text, ScrollView, Pressable } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Animated, { FadeInDown, FadeInUp } from 'react-native-reanimated';
-import { Sparkles, Brain, FlaskConical, TrendingUp, ChevronRight } from 'lucide-react-native';
+import {
+  Sparkles, Brain, FlaskConical, ChevronRight,
+  Salad, Dumbbell, Heart, TrendingUp
+} from 'lucide-react-native';
 import { useThemeStore, getTheme } from '@/lib/theme-store';
-import { useCycleStore, phaseInfo } from '@/lib/cycle-store';
+import { useCycleStore, phaseInfo, CyclePhase } from '@/lib/cycle-store';
+import { useSymptomStore, availableSymptoms } from '@/lib/symptom-store';
 import { router } from 'expo-router';
 import {
   useFonts,
@@ -17,6 +21,265 @@ import {
   Quicksand_500Medium,
   Quicksand_600SemiBold,
 } from '@expo-google-fonts/quicksand';
+
+// ── Phase-specific content ────────────────────────────────────────────────────
+
+const phaseNutritionTips: Record<CyclePhase, { focus: string; tips: string[]; topFoods: string[] }> = {
+  menstrual: {
+    focus: 'Replenish & Nourish',
+    tips: [
+      'Eat iron-rich foods to replenish blood loss',
+      'Pair iron with vitamin C for better absorption',
+      'Avoid caffeine around meals — it blocks iron',
+      'Warm, cooked foods are easier to digest now',
+    ],
+    topFoods: ['Leafy greens', 'Lentils & beans', 'Pumpkin seeds', 'Salmon', 'Avocado', 'Dark chocolate'],
+  },
+  follicular: {
+    focus: 'Energize & Build',
+    tips: [
+      'Increase protein to support rising energy',
+      'Include omega-3s to reduce inflammation',
+      'Fresh, raw foods complement your rising vitality',
+      'Complex carbs fuel new-phase energy',
+    ],
+    topFoods: ['Wild salmon', 'Eggs', 'Flaxseeds', 'Sweet potato', 'Mixed nuts', 'Fermented foods'],
+  },
+  ovulatory: {
+    focus: 'Support Peak Energy',
+    tips: [
+      'Stay well-hydrated — body temperature rises slightly',
+      'Light, fresh meals complement your high energy',
+      'Antioxidant-rich foods support egg health',
+      'Anti-inflammatory foods keep your peak feeling great',
+    ],
+    topFoods: ['Berries', 'Leafy greens', 'Quinoa', 'Tomatoes', 'Bell peppers', 'Watermelon'],
+  },
+  luteal: {
+    focus: 'Balance & Soothe',
+    tips: [
+      'Complex carbs maintain serotonin as progesterone rises',
+      'Magnesium-rich foods ease PMS symptoms',
+      'Reduce sodium to minimize bloating',
+      'Calcium helps with mood swings',
+    ],
+    topFoods: ['Sweet potato', 'Dark chocolate', 'Chickpeas', 'Brown rice', 'Almonds', 'Chamomile tea'],
+  },
+};
+
+const phaseMovementTips: Record<CyclePhase, { recommendation: string; tips: string[]; workouts: string[] }> = {
+  menstrual: {
+    recommendation: 'Rest & Restore',
+    tips: [
+      'Honor your body — gentle movement only',
+      'Heat helps: warm baths before stretching',
+      'Complete rest days are perfectly valid',
+    ],
+    workouts: ['Restorative yoga', 'Gentle stretching', 'Short walks', 'Breathwork'],
+  },
+  follicular: {
+    recommendation: 'Build & Explore',
+    tips: [
+      'Great time to try new workouts',
+      'Your muscles recover faster now',
+      'Push intensity — your energy is rising',
+    ],
+    workouts: ['Strength training', 'HIIT', 'Running', 'Dance classes'],
+  },
+  ovulatory: {
+    recommendation: 'Peak Performance',
+    tips: [
+      'Your highest-intensity window — go for it',
+      'You\'re stronger and more coordinated now',
+      'Great time for group fitness or sports',
+    ],
+    workouts: ['Heavy lifting', 'Cycling', 'Competitive sports', 'Circuit training'],
+  },
+  luteal: {
+    recommendation: 'Steady & Focused',
+    tips: [
+      'Strength training pays off — muscles repair well',
+      'Reduce cardio intensity as PMS approaches',
+      'Pilates and yoga keep energy stable',
+    ],
+    workouts: ['Pilates', 'Strength training', 'Hiking', 'Yoga'],
+  },
+};
+
+const phaseSelfCareTips: Record<CyclePhase, { theme: string; practices: string[] }> = {
+  menstrual: {
+    theme: 'Rest & Reflection',
+    practices: [
+      'Warm bath with Epsom salts',
+      'Journaling and quiet reflection',
+      'Castor oil pack on lower abdomen',
+      'Reduce screen time before bed',
+      'Give yourself permission to cancel plans',
+    ],
+  },
+  follicular: {
+    theme: 'Renewal & Creativity',
+    practices: [
+      'Start a new creative project',
+      'Update your goals and intentions',
+      'Book social plans — your energy is rising',
+      'Try a new recipe or activity',
+      'Declutter a space for fresh energy',
+    ],
+  },
+  ovulatory: {
+    theme: 'Connection & Expression',
+    practices: [
+      'Schedule important conversations',
+      'Connect with friends and community',
+      'Express yourself — speak up, create',
+      'Enjoy outdoor activities',
+      'Prioritize intimacy if it feels right',
+    ],
+  },
+  luteal: {
+    theme: 'Completion & Nourishment',
+    practices: [
+      'Finish projects rather than starting new ones',
+      'Reduce obligations in your calendar',
+      'Prioritize sleep — aim for 8+ hours',
+      'Journaling helps process emotions',
+      'Magnesium bath before bed',
+    ],
+  },
+};
+
+// ── Symptom Trend Chart ───────────────────────────────────────────────────────
+
+function SymptomTrendChart({ accentColor, theme }: { accentColor: string; theme: ReturnType<typeof getTheme> }) {
+  const getRecentEntries = useSymptomStore(s => s.getRecentEntries);
+  const getMostCommonSymptoms = useSymptomStore(s => s.getMostCommonSymptoms);
+
+  const chartData = useMemo(() => {
+    const entries = getRecentEntries(30);
+    if (entries.length === 0) return null;
+
+    // Build a 30-day grid (days with/without logs)
+    const today = new Date();
+    const days: { hasLog: boolean; count: number }[] = [];
+    for (let i = 29; i >= 0; i--) {
+      const d = new Date(today);
+      d.setDate(d.getDate() - i);
+      const dateStr = d.toISOString().split('T')[0];
+      const entry = entries.find(e => e.date === dateStr);
+      days.push({ hasLog: !!entry, count: entry?.symptoms.length ?? 0 });
+    }
+
+    // Top 4 symptoms from last 30 days
+    const topRaw = getMostCommonSymptoms(4);
+    const topSymptoms = topRaw
+      .map(({ symptomId }) => availableSymptoms.find(s => s.id === symptomId))
+      .filter(Boolean) as typeof availableSymptoms;
+
+    // Frequency counts as percentages of logged days
+    const symptomFrequency = topRaw.map(({ symptomId, count }) => ({
+      id: symptomId,
+      count,
+      pct: entries.length > 0 ? Math.round((count / entries.length) * 100) : 0,
+    }));
+
+    return { days, topSymptoms, symptomFrequency, totalLogged: entries.length };
+  }, [getRecentEntries, getMostCommonSymptoms]);
+
+  if (!chartData || chartData.totalLogged === 0) {
+    return (
+      <View
+        className="rounded-2xl p-5 border items-center"
+        style={{ backgroundColor: theme.bg.card, borderColor: theme.border.light }}
+      >
+        <TrendingUp size={28} color={theme.text.muted} style={{ marginBottom: 8 }} />
+        <Text
+          style={{ fontFamily: 'Quicksand_600SemiBold', color: theme.text.secondary }}
+          className="text-sm text-center"
+        >
+          Log symptoms for 7+ days to see your trends
+        </Text>
+      </View>
+    );
+  }
+
+  return (
+    <View
+      className="rounded-2xl p-5 border"
+      style={{ backgroundColor: theme.bg.card, borderColor: theme.border.light }}
+    >
+      {/* 30-day dot grid */}
+      <View className="flex-row flex-wrap mb-4" style={{ gap: 3 }}>
+        {chartData.days.map((day, i) => (
+          <View
+            key={i}
+            style={{
+              width: 8,
+              height: 8,
+              borderRadius: 4,
+              backgroundColor: day.hasLog
+                ? day.count > 3 ? accentColor : `${accentColor}70`
+                : `${accentColor}18`,
+            }}
+          />
+        ))}
+      </View>
+      <Text
+        style={{ fontFamily: 'Quicksand_400Regular', color: theme.text.tertiary, fontSize: 11 }}
+        className="mb-4"
+      >
+        {chartData.totalLogged} log{chartData.totalLogged !== 1 ? 's' : ''} in the last 30 days
+      </Text>
+
+      {/* Top symptom frequency bars */}
+      {chartData.topSymptoms.length > 0 && (
+        <>
+          <Text
+            style={{ fontFamily: 'Quicksand_600SemiBold', color: theme.text.primary }}
+            className="text-sm mb-3"
+          >
+            Most frequent symptoms
+          </Text>
+          {chartData.symptomFrequency.map((item, i) => {
+            const sym = chartData.topSymptoms[i];
+            if (!sym) return null;
+            return (
+              <View key={item.id} className="mb-2.5">
+                <View className="flex-row items-center justify-between mb-1">
+                  <Text
+                    style={{ fontFamily: 'Quicksand_500Medium', color: theme.text.secondary, fontSize: 12 }}
+                  >
+                    {sym.icon} {sym.name}
+                  </Text>
+                  <Text
+                    style={{ fontFamily: 'Quicksand_600SemiBold', color: accentColor, fontSize: 11 }}
+                  >
+                    {item.pct}%
+                  </Text>
+                </View>
+                <View
+                  className="rounded-full overflow-hidden"
+                  style={{ height: 5, backgroundColor: `${accentColor}18` }}
+                >
+                  <View
+                    style={{
+                      height: 5,
+                      width: `${item.pct}%`,
+                      backgroundColor: accentColor,
+                      borderRadius: 9999,
+                    }}
+                  />
+                </View>
+              </View>
+            );
+          })}
+        </>
+      )}
+    </View>
+  );
+}
+
+// ── Main Screen ───────────────────────────────────────────────────────────────
 
 export default function InsightsScreen() {
   const insets = useSafeAreaInsets();
@@ -36,6 +299,9 @@ export default function InsightsScreen() {
   const currentPhase = getCurrentPhase();
   const info = phaseInfo[currentPhase];
   const dayOfCycle = getDayOfCycle();
+  const nutrition = phaseNutritionTips[currentPhase];
+  const movement = phaseMovementTips[currentPhase];
+  const selfCare = phaseSelfCareTips[currentPhase];
 
   if (!fontsLoaded) return null;
 
@@ -135,59 +401,143 @@ export default function InsightsScreen() {
             </LinearGradient>
           </Animated.View>
 
-          {/* Coming Soon — Analytics */}
-          <Animated.View
-            entering={FadeInUp.delay(300).duration(600)}
-            className="mx-6 mt-5"
-          >
+          {/* Nutrition Tips */}
+          <Animated.View entering={FadeInUp.delay(280).duration(600)} className="mx-6 mt-5">
+            <View className="flex-row items-center mb-3">
+              <Salad size={16} color={theme.accent.pink} />
+              <Text
+                style={{ fontFamily: 'Quicksand_600SemiBold', color: theme.text.primary }}
+                className="text-base ml-2"
+              >
+                Nutrition — {nutrition.focus}
+              </Text>
+            </View>
             <View
               className="rounded-2xl p-5 border"
               style={{ backgroundColor: theme.bg.card, borderColor: theme.border.light }}
             >
-              <View className="flex-row items-center mb-3">
-                <View
-                  className="w-10 h-10 rounded-full items-center justify-center mr-3"
-                  style={{ backgroundColor: `${theme.accent.purple}15` }}
-                >
-                  <TrendingUp size={20} color={theme.accent.purple} />
-                </View>
-                <View className="flex-1">
+              {nutrition.tips.map((tip, i) => (
+                <View key={i} className="flex-row mb-2.5">
+                  <Text style={{ color: theme.accent.pink, fontSize: 13 }}>•  </Text>
                   <Text
-                    style={{ fontFamily: 'Quicksand_600SemiBold', color: theme.text.primary }}
-                    className="text-base"
+                    style={{ fontFamily: 'Quicksand_400Regular', color: theme.text.secondary, flex: 1 }}
+                    className="text-sm leading-5"
                   >
-                    Detailed Analytics
+                    {tip}
                   </Text>
+                </View>
+              ))}
+              <View className="mt-3 pt-3 border-t flex-row flex-wrap" style={{ borderTopColor: theme.border.light, gap: 6 }}>
+                {nutrition.topFoods.map(food => (
                   <View
-                    className="px-2 py-0.5 rounded-full mt-0.5 self-start"
-                    style={{ backgroundColor: `${theme.accent.pink}20` }}
+                    key={food}
+                    className="px-2.5 py-1 rounded-full"
+                    style={{ backgroundColor: `${theme.accent.pink}15` }}
                   >
                     <Text
-                      style={{ fontFamily: 'Quicksand_600SemiBold', color: theme.accent.pink }}
-                      className="text-xs"
+                      style={{ fontFamily: 'Quicksand_500Medium', color: theme.accent.pink, fontSize: 11 }}
                     >
-                      Coming Soon
+                      {food}
                     </Text>
                   </View>
-                </View>
+                ))}
               </View>
+            </View>
+          </Animated.View>
+
+          {/* Movement Tips */}
+          <Animated.View entering={FadeInUp.delay(340).duration(600)} className="mx-6 mt-5">
+            <View className="flex-row items-center mb-3">
+              <Dumbbell size={16} color={info.color} />
               <Text
-                style={{ fontFamily: 'Quicksand_400Regular', color: theme.text.secondary }}
-                className="text-sm leading-5"
+                style={{ fontFamily: 'Quicksand_600SemiBold', color: theme.text.primary }}
+                className="text-base ml-2"
               >
-                Trend charts and mood heatmaps are on the way. Soon you'll be able to visualize patterns in your cycle, energy, and symptoms over time.
+                Movement — {movement.recommendation}
               </Text>
             </View>
+            <View
+              className="rounded-2xl p-5 border"
+              style={{ backgroundColor: theme.bg.card, borderColor: theme.border.light }}
+            >
+              {movement.tips.map((tip, i) => (
+                <View key={i} className="flex-row mb-2.5">
+                  <Text style={{ color: info.color, fontSize: 13 }}>•  </Text>
+                  <Text
+                    style={{ fontFamily: 'Quicksand_400Regular', color: theme.text.secondary, flex: 1 }}
+                    className="text-sm leading-5"
+                  >
+                    {tip}
+                  </Text>
+                </View>
+              ))}
+              <View className="mt-3 pt-3 border-t flex-row flex-wrap" style={{ borderTopColor: theme.border.light, gap: 6 }}>
+                {movement.workouts.map(w => (
+                  <View
+                    key={w}
+                    className="px-2.5 py-1 rounded-full"
+                    style={{ backgroundColor: `${info.color}15` }}
+                  >
+                    <Text
+                      style={{ fontFamily: 'Quicksand_500Medium', color: info.color, fontSize: 11 }}
+                    >
+                      {w}
+                    </Text>
+                  </View>
+                ))}
+              </View>
+            </View>
+          </Animated.View>
+
+          {/* Self-Care Suggestions */}
+          <Animated.View entering={FadeInUp.delay(400).duration(600)} className="mx-6 mt-5">
+            <View className="flex-row items-center mb-3">
+              <Heart size={16} color={theme.accent.purple} />
+              <Text
+                style={{ fontFamily: 'Quicksand_600SemiBold', color: theme.text.primary }}
+                className="text-base ml-2"
+              >
+                Self-Care — {selfCare.theme}
+              </Text>
+            </View>
+            <View
+              className="rounded-2xl p-5 border"
+              style={{ backgroundColor: theme.bg.card, borderColor: theme.border.light }}
+            >
+              {selfCare.practices.map((practice, i) => (
+                <View key={i} className="flex-row mb-2.5">
+                  <Text style={{ color: theme.accent.purple, fontSize: 13 }}>•  </Text>
+                  <Text
+                    style={{ fontFamily: 'Quicksand_400Regular', color: theme.text.secondary, flex: 1 }}
+                    className="text-sm leading-5"
+                  >
+                    {practice}
+                  </Text>
+                </View>
+              ))}
+            </View>
+          </Animated.View>
+
+          {/* Symptom Trend Chart */}
+          <Animated.View entering={FadeInUp.delay(460).duration(600)} className="mx-6 mt-5">
+            <View className="flex-row items-center mb-3">
+              <TrendingUp size={16} color={theme.accent.purple} />
+              <Text
+                style={{ fontFamily: 'Quicksand_600SemiBold', color: theme.text.primary }}
+                className="text-base ml-2"
+              >
+                Symptom Trends — Last 30 Days
+              </Text>
+            </View>
+            <SymptomTrendChart accentColor={info.color} theme={theme} />
           </Animated.View>
 
           {/* Luna AI Card */}
           <Animated.View
-            entering={FadeInUp.delay(400).duration(600)}
-            className="mx-6 mt-4"
+            entering={FadeInUp.delay(520).duration(600)}
+            className="mx-6 mt-5"
           >
-            <Pressable
-              onPress={() => router.push('/luna-ai' as any)}
-            >
+            <Pressable onPress={() => router.push('/luna-ai' as any)}>
               <LinearGradient
                 colors={[`${theme.accent.purple}20`, `${theme.accent.purple}08`]}
                 start={{ x: 0, y: 0 }}
@@ -223,7 +573,7 @@ export default function InsightsScreen() {
 
           {/* Labs Guide Card */}
           <Animated.View
-            entering={FadeInUp.delay(480).duration(600)}
+            entering={FadeInUp.delay(580).duration(600)}
             className="mx-6 mt-4"
           >
             <Pressable
