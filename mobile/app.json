@@ -3,27 +3,40 @@
     "name": "MyLunarPhase",
     "slug": "mylunarphase",
     "scheme": "my-lunar-phase",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "orientation": "portrait",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.mylunarphase.app",
-      "buildNumber": "2",
+      "buildNumber": "3",
       "infoPlist": {
-        "NSMicrophoneUsageDescription": "MyLunarPhase uses the microphone to record audio tracks that the app attaches to your creations.",
+        "NSMicrophoneUsageDescription": "My Lunar Phase uses the microphone to record voice journal entries.",
+        "NSUserNotificationsUsageDescription": "My Lunar Phase sends reminders for your period, ovulation, and daily wellness check-ins.",
         "UIBackgroundModes": [
           "remote-notification"
         ]
       }
     },
     "android": {
-      "edgeToEdgeEnabled": true
+      "package": "com.mylunarphase.app",
+      "versionCode": 3,
+      "edgeToEdgeEnabled": true,
+      "permissions": [
+        "android.permission.RECEIVE_BOOT_COMPLETED",
+        "android.permission.VIBRATE"
+      ]
     },
     "plugins": [
       "expo-router",
-      "expo-apple-authentication"
+      "expo-apple-authentication",
+      [
+        "expo-notifications",
+        {
+          "color": "#c4b5fd"
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true
