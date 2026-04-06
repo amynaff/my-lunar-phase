@@ -1,19 +1,41 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { signIn } from "next-auth/react";
+import { useSearchParams } from "next/navigation";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { Mail, Lock, Eye, EyeOff, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
+// Map NextAuth error codes to human-readable messages
+const AUTH_ERRORS: Record<string, string> = {
+  OAuthSignin: "Could not start OAuth sign in. Please try again.",
+  OAuthCallback: "OAuth sign in failed. Check that the app is correctly configured.",
+  OAuthCreateAccount: "Could not create account via OAuth. Please try email sign up.",
+  OAuthAccountNotLinked: "This email is already linked to a different sign-in method.",
+  Callback: "Sign in callback failed. Please try again.",
+  AccessDenied: "Access denied. You may have cancelled the sign-in.",
+  Verification: "The sign in link has expired. Please request a new one.",
+  Default: "An unexpected error occurred. Please try again.",
+};
+
 export default function SignInPage() {
+  const searchParams = useSearchParams();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
+
+  // Pick up ?error= set by NextAuth after a failed OAuth flow
+  useEffect(() => {
+    const oauthError = searchParams.get("error");
+    if (oauthError) {
+      setError(AUTH_ERRORS[oauthError] ?? AUTH_ERRORS.Default);
+    }
+  }, [searchParams]);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();

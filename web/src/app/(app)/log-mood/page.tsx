@@ -6,6 +6,7 @@ import { MoodEntryForm } from "@/components/mood/mood-entry-form";
 import { MoodHeatmap } from "@/components/mood/mood-heatmap";
 import { MoodTrendChart } from "@/components/mood/mood-trend-chart";
 import { SymptomSummary } from "@/components/mood/symptom-summary";
+import { MoodByPhase } from "@/components/mood/mood-by-phase";
 
 export default function LogMoodPage() {
   return (
@@ -75,6 +76,14 @@ export default function LogMoodPage() {
             transition={{ delay: 0.25 }}
           >
             <SymptomSummary />
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3 }}
+          >
+            <MoodByPhase />
           </motion.div>
         </div>
       </div>

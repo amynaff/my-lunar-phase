@@ -8,6 +8,7 @@ import { useCycleStore } from "@/stores/cycle-store";
 import { useCycleData } from "@/hooks/use-cycle-data";
 import { MoonCalendar } from "@/components/calendar/moon-calendar";
 import { LogPeriodModal } from "@/components/cycle/log-period-modal";
+import { PastPeriodsList } from "@/components/cycle/past-periods-list";
 
 // ── Compute historical cycle lengths from period logs ──
 function computeCycleLengths(periodLogs: { startDate: string; endDate: string | null }[]): number[] {
@@ -248,6 +249,11 @@ export default function CycleHistoryPage() {
           <p className="text-sm text-text-secondary font-quicksand mt-3 leading-relaxed">{currentPhaseInfo.description}</p>
         </motion.div>
       )}
+
+      {/* Past Periods scrollable list */}
+      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.18 }} className="mb-6">
+        <PastPeriodsList />
+      </motion.div>
 
       {/* Calendar */}
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}>
