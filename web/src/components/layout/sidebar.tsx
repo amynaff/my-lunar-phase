@@ -21,7 +21,7 @@ const secondaryNav = [
   { href: "/community", label: "Community", icon: MessageCircle },
   { href: "/partner", label: "Partner", icon: Users },
   { href: "/labs-guide", label: "Labs Guide", icon: FlaskConical },
-  { href: "/journal?view=insights", label: "Insights", icon: BarChart3 },
+  { href: "/insights", label: "Insights", icon: BarChart3 },
   { href: "/cycle-history", label: "Cycle History", icon: TrendingUp },
   { href: "/hormonal-education", label: "Education", icon: GraduationCap },
 ];

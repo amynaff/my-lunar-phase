@@ -15,6 +15,64 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 
+// Phase meta + partner support tips
+const PHASE_META: Record<string, {
+  emoji: string;
+  color: string;
+  name: string;
+  subtitle: string;
+  supportTips: string[];
+}> = {
+  menstrual: {
+    emoji: "🌑",
+    color: "#be185d",
+    name: "Menstrual Phase",
+    subtitle: "Inner Winter — rest & restoration",
+    supportTips: [
+      "Offer warmth and quiet — low energy is normal right now",
+      "Bring comfort foods or a hot water bottle",
+      "Cancel plans guilt-free; cozy nights in are perfect",
+      "Ask what they need instead of assuming",
+    ],
+  },
+  follicular: {
+    emoji: "🌒",
+    color: "#ec4899",
+    name: "Follicular Phase",
+    subtitle: "Inner Spring — creativity & new beginnings",
+    supportTips: [
+      "Energy is rising — great time for new adventures together",
+      "Encourage their ideas and projects",
+      "Try a new restaurant, hike, or activity",
+      "They're social and collaborative now; make plans!",
+    ],
+  },
+  ovulatory: {
+    emoji: "🌕",
+    color: "#f9a8d4",
+    name: "Ovulatory Phase",
+    subtitle: "Inner Summer — peak energy & connection",
+    supportTips: [
+      "Peak social and communicative energy — quality time counts",
+      "Great week for important conversations",
+      "Plan date nights, social events, or shared workouts",
+      "They feel their most confident and radiant",
+    ],
+  },
+  luteal: {
+    emoji: "🌘",
+    color: "#9333ea",
+    name: "Luteal Phase",
+    subtitle: "Inner Autumn — introspection & slowdown",
+    supportTips: [
+      "Give extra space and patience — emotions may run higher",
+      "Help reduce their to-do list and stress load",
+      "Dark chocolate and magnesium-rich snacks are appreciated",
+      "Don't take withdrawal personally — it's hormonal, not personal",
+    ],
+  },
+};
+
 interface PartnerStatus {
   hasPartner: boolean;
   partnerName?: string;
@@ -156,52 +214,108 @@ export default function PartnerPage() {
           </motion.div>
 
           {/* Partner Cycle Data */}
-          {partnerData && (
-            <motion.div
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.1 }}
-              className="rounded-[20px] border border-border-light bg-bg-card p-6"
-            >
-              <h3 className="text-xs uppercase tracking-wider text-text-accent font-quicksand font-semibold mb-4">
-                Partner&apos;s Cycle
-              </h3>
-              <div className="grid grid-cols-2 gap-4">
-                {partnerData.currentPhase && (
-                  <div className="p-3 rounded-[16px] bg-bg-secondary">
-                    <p className="text-[10px] text-text-muted font-quicksand">Current Phase</p>
-                    <p className="font-quicksand font-semibold text-sm text-text-primary capitalize mt-0.5">
-                      {partnerData.currentPhase}
-                    </p>
-                  </div>
+          {partnerData && (() => {
+            const phase = partnerData.currentPhase?.toLowerCase();
+            const meta = phase ? PHASE_META[phase] : null;
+            return (
+              <>
+                {/* Phase banner */}
+                {meta && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.1 }}
+                    className="rounded-[20px] border p-5"
+                    style={{
+                      borderColor: `${meta.color}30`,
+                      background: `linear-gradient(135deg, ${meta.color}12, ${meta.color}06)`,
+                    }}
+                  >
+                    <div className="flex items-center gap-3 mb-3">
+                      <span className="text-3xl">{meta.emoji}</span>
+                      <div>
+                        <p className="font-cormorant text-lg font-semibold text-text-primary">
+                          {meta.name}
+                        </p>
+                        <p className="text-xs text-text-muted font-quicksand">{meta.subtitle}</p>
+                      </div>
+                      {partnerData.dayOfCycle && (
+                        <span
+                          className="ml-auto text-xs font-quicksand font-semibold px-2.5 py-1 rounded-full"
+                          style={{ backgroundColor: `${meta.color}20`, color: meta.color }}
+                        >
+                          Day {partnerData.dayOfCycle}
+                        </span>
+                      )}
+                    </div>
+
+                    {partnerData.daysUntilNextPeriod !== undefined && (
+                      <p className="text-xs text-text-secondary font-quicksand mb-1">
+                        Next period in <span className="font-semibold" style={{ color: meta.color }}>{partnerData.daysUntilNextPeriod} days</span>
+                      </p>
+                    )}
+                  </motion.div>
                 )}
-                {partnerData.dayOfCycle && (
-                  <div className="p-3 rounded-[16px] bg-bg-secondary">
-                    <p className="text-[10px] text-text-muted font-quicksand">Day of Cycle</p>
-                    <p className="font-quicksand font-semibold text-sm text-text-primary mt-0.5">
-                      Day {partnerData.dayOfCycle}
-                    </p>
-                  </div>
+
+                {/* Support tips */}
+                {meta && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.15 }}
+                    className="rounded-[20px] border border-border-light bg-bg-card p-5"
+                  >
+                    <div className="flex items-center gap-2 mb-3">
+                      <Heart className="h-4 w-4 text-accent-pink" />
+                      <h3 className="text-xs uppercase tracking-wider text-text-accent font-quicksand font-semibold">
+                        How to Support Right Now
+                      </h3>
+                    </div>
+                    <ul className="space-y-2">
+                      {meta.supportTips.map((tip, i) => (
+                        <li key={i} className="flex items-start gap-2.5">
+                          <span className="text-accent-pink mt-0.5 text-xs">✦</span>
+                          <span className="text-sm font-quicksand text-text-secondary leading-relaxed">{tip}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </motion.div>
                 )}
-                {partnerData.daysUntilNextPeriod !== undefined && (
-                  <div className="p-3 rounded-[16px] bg-bg-secondary">
-                    <p className="text-[10px] text-text-muted font-quicksand">Next Period</p>
-                    <p className="font-quicksand font-semibold text-sm text-text-primary mt-0.5">
-                      {partnerData.daysUntilNextPeriod} days
-                    </p>
-                  </div>
+
+                {/* Stats row */}
+                {!meta && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.1 }}
+                    className="rounded-[20px] border border-border-light bg-bg-card p-5"
+                  >
+                    <h3 className="text-xs uppercase tracking-wider text-text-accent font-quicksand font-semibold mb-4">
+                      Partner&apos;s Cycle
+                    </h3>
+                    <div className="grid grid-cols-2 gap-3">
+                      {partnerData.dayOfCycle && (
+                        <div className="p-3 rounded-[16px] bg-bg-secondary">
+                          <p className="text-[10px] text-text-muted font-quicksand">Day of Cycle</p>
+                          <p className="font-quicksand font-semibold text-sm text-text-primary mt-0.5">
+                            Day {partnerData.dayOfCycle}
+                          </p>
+                        </div>
+                      )}
+                      {partnerData.daysUntilNextPeriod !== undefined && (
+                        <div className="p-3 rounded-[16px] bg-bg-secondary">
+                          <p className="text-[10px] text-text-muted font-quicksand">Next Period</p>
+                          <p className="font-quicksand font-semibold text-sm text-text-primary mt-0.5">
+                            {partnerData.daysUntilNextPeriod} days
+                          </p>
+                        </div>
+                      )}
+                    </div>
+                  </motion.div>
                 )}
-                {partnerData.lifeStage && (
-                  <div className="p-3 rounded-[16px] bg-bg-secondary">
-                    <p className="text-[10px] text-text-muted font-quicksand">Life Stage</p>
-                    <p className="font-quicksand font-semibold text-sm text-text-primary capitalize mt-0.5">
-                      {partnerData.lifeStage}
-                    </p>
-                  </div>
-                )}
-              </div>
-            </motion.div>
-          )}
+              </>
+            );
+          })()}
 
           <motion.div
             initial={{ opacity: 0, y: 10 }}
