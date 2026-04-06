@@ -28,6 +28,9 @@ export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title,
   description,
+  alternates: {
+    canonical: "/",
+  },
   keywords: [
     "women's health",
     "cycle tracking",

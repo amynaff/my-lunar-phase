@@ -15,6 +15,9 @@ export const metadata: Metadata = {
     "hormone tracking app",
     "women's health app",
   ],
+  alternates: {
+    canonical: "/blog/period-tracker-app",
+  },
   openGraph: {
     title: "How to Choose a Period Tracker App That Actually Works | MyLunarPhase",
     description:

@@ -16,6 +16,9 @@ export const metadata: Metadata = {
     "white moon cycle",
     "red moon cycle",
   ],
+  alternates: {
+    canonical: "/blog/moon-cycle-menstruation",
+  },
   openGraph: {
     title: "The Lunar Cycle and Menstruation | MyLunarPhase",
     description:

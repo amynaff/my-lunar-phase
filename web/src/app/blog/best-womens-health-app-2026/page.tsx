@@ -15,6 +15,9 @@ export const metadata: Metadata = {
     "best cycle tracking app",
     "MyLunarPhase review",
   ],
+  alternates: {
+    canonical: "/blog/best-womens-health-app-2026",
+  },
   openGraph: {
     title: "Best Women's Health Apps in 2026: A Comparison | MyLunarPhase",
     description:

@@ -16,6 +16,9 @@ export const metadata: Metadata = {
     "perimenopause mood swings",
     "perimenopause tracker",
   ],
+  alternates: {
+    canonical: "/blog/perimenopause-symptoms",
+  },
   openGraph: {
     title: "Perimenopause Symptoms: What's Normal and What Helps | MyLunarPhase",
     description:

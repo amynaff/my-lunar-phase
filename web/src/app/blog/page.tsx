@@ -6,6 +6,9 @@ export const metadata: Metadata = {
   title: "Women's Health Blog | MyLunarPhase",
   description:
     "Expert articles on menstrual cycle phases, perimenopause, hormone wellness, and cycle syncing. Evidence-based guidance for every woman at every life stage.",
+  alternates: {
+    canonical: "/blog",
+  },
   openGraph: {
     title: "Women's Health Blog | MyLunarPhase",
     description:

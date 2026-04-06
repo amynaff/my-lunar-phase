@@ -6,6 +6,9 @@ export const metadata: Metadata = {
   title: "Download MyLunarPhase | Women's Cycle & Wellness App",
   description:
     "Download MyLunarPhase — the women's wellness app for cycle tracking, hormone health, and personalized daily guidance. Available as a web app now. iOS and Android coming soon.",
+  alternates: {
+    canonical: "/download",
+  },
   openGraph: {
     title: "Download MyLunarPhase | Women's Wellness App",
     description:

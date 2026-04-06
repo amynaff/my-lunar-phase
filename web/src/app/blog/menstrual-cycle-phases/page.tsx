@@ -16,6 +16,9 @@ export const metadata: Metadata = {
     "hormone health",
     "period phases",
   ],
+  alternates: {
+    canonical: "/blog/menstrual-cycle-phases",
+  },
   openGraph: {
     title: "The 4 Phases of Your Menstrual Cycle | MyLunarPhase",
     description:
