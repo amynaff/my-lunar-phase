@@ -25,6 +25,7 @@ interface MoodStore {
   markSynced: (date: string) => void;
   getEntriesForMonth: (year: number, month: number) => LocalMoodEntry[];
   getUnsyncedEntries: () => LocalMoodEntry[];
+  getLogStreak: () => number;
 }
 
 export const useMoodStore = create<MoodStore>()(
@@ -64,6 +65,30 @@ export const useMoodStore = create<MoodStore>()(
 
       getUnsyncedEntries: () =>
         Object.values(get().entries).filter((e) => !e.synced),
+
+      getLogStreak: () => {
+        const dates = Object.keys(get().entries).sort().reverse();
+        if (dates.length === 0) return 0;
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        const todayStr = today.toISOString().split("T")[0];
+        const yesterday = new Date(today);
+        yesterday.setDate(today.getDate() - 1);
+        const yesterdayStr = yesterday.toISOString().split("T")[0];
+        if (!dates.includes(todayStr) && !dates.includes(yesterdayStr)) return 0;
+        const startDay = dates.includes(todayStr) ? today : yesterday;
+        let streak = 0;
+        for (let i = 0; i <= dates.length; i++) {
+          const d = new Date(startDay);
+          d.setDate(startDay.getDate() - i);
+          if (dates.includes(d.toISOString().split("T")[0])) {
+            streak++;
+          } else {
+            break;
+          }
+        }
+        return streak;
+      },
     }),
     {
       name: "luna-mood-storage",

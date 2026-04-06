@@ -7,6 +7,7 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import { getMoonPhase, getMoonPhaseCycleEquivalent } from "@/lib/cycle/moon-phase";
 import { moonPhaseInfo, moonEnergyLabels } from "@/lib/cycle/data";
 import type { CyclePhase, LifeStage, MoonPhase } from "@/lib/cycle/types";
+import { useMoodStore, getMoodColor } from "@/stores/mood-store";
 
 const WEEKDAYS = ["M", "T", "W", "T", "F", "S", "S"];
 
@@ -83,6 +84,7 @@ export function MoonCalendar({
   const today = new Date();
   const [currentMonth, setCurrentMonth] = useState(today.getMonth());
   const [currentYear, setCurrentYear] = useState(today.getFullYear());
+  const moodEntries = useMoodStore((s) => s.entries);
 
   const monthName = new Date(currentYear, currentMonth).toLocaleString("default", { month: "long" });
 
@@ -204,6 +206,9 @@ export function MoonCalendar({
           const isFertile = cell.cycle.isFertile && !isPeriod;
           const isOvulation = cell.cycle.isOvulation;
           const energyColor = isMoonOnly ? moonEnergyColors[cell.moonEnergy] : undefined;
+          const dateStr = `${cell.date.getFullYear()}-${String(cell.date.getMonth() + 1).padStart(2, "0")}-${String(cell.date.getDate()).padStart(2, "0")}`;
+          const logEntry = moodEntries[dateStr];
+          const moodDotColor = logEntry ? getMoodColor(logEntry.mood) : null;
 
           return (
             <motion.button
@@ -230,6 +235,12 @@ export function MoonCalendar({
                 {cell.day}
               </span>
               <span className="text-lg leading-none mt-0.5">{cell.moonEmoji}</span>
+              {moodDotColor && (
+                <span
+                  className="absolute bottom-1 left-1/2 -translate-x-1/2 w-1.5 h-1.5 rounded-full"
+                  style={{ backgroundColor: moodDotColor }}
+                />
+              )}
             </motion.button>
           );
         })}
@@ -277,7 +288,11 @@ export function MoonCalendar({
         )}
       </div>
 
-      <p className="text-center text-xs text-text-muted font-quicksand mt-3">
+      <div className="mt-4 flex items-center justify-center gap-1.5">
+        <span className="w-2 h-2 rounded-full bg-green-400 inline-block" />
+        <span className="text-xs text-text-muted font-quicksand">Logged day</span>
+      </div>
+      <p className="text-center text-xs text-text-muted font-quicksand mt-2">
         Tap any date to open your journal
       </p>
       {!isRegular && (

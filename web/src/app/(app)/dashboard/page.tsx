@@ -11,6 +11,7 @@ import { CycleInsightsCard } from "@/components/cycle/cycle-insights-card";
 import { LogPeriodModal } from "@/components/cycle/log-period-modal";
 import { QuickCheckIn } from "@/components/journal/quick-check-in";
 import { WelcomeCard } from "@/components/dashboard/welcome-card";
+import { TodayLogCard } from "@/components/dashboard/today-log-card";
 import { useCycleData } from "@/hooks/use-cycle-data";
 import { useCycleStore } from "@/stores/cycle-store";
 import { lifeStageInfo } from "@/lib/cycle/data";
@@ -248,12 +249,22 @@ export default function DashboardPage() {
         </div>
       </div>
 
+      {/* Today's log card */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.15 }}
+        className="mt-6"
+      >
+        <TodayLogCard />
+      </motion.div>
+
       {/* Quick actions */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.2 }}
-        className="mt-8"
+        className="mt-6"
       >
         <p className="text-xs uppercase tracking-wider text-text-accent font-quicksand font-semibold mb-4">
           Quick Actions
