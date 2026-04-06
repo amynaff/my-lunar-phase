@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Calendar, Clock, TrendingUp, AlertTriangle, CheckCircle, Activity, Sparkles, Bell } from "lucide-react";
+import { Calendar, Clock, TrendingUp, Activity, Sparkles, Bell } from "lucide-react";
 import { useCycleStore } from "@/stores/cycle-store";
 import { useCycleData } from "@/hooks/use-cycle-data";
 import Link from "next/link";
@@ -17,9 +17,6 @@ export function CycleInsightsCard() {
   const { lastPeriodStart, cycleLength, periodLength } = useCycleStore();
 
   if (!isRegular || !lastPeriodStart) return null;
-
-  const isCycleLengthNormal = cycleLength >= 21 && cycleLength <= 35;
-  const isPeriodLengthNormal = periodLength >= 2 && periodLength <= 7;
 
   // Ovulation and fertile window
   const ovulationDay = cycleLength - 14;
@@ -130,29 +127,43 @@ export function CycleInsightsCard() {
         </div>
       </div>
 
-      {/* Status indicators */}
-      <div className="space-y-2 mb-4">
-        <div className="flex items-center gap-2">
-          {isCycleLengthNormal ? (
-            <CheckCircle className="h-3.5 w-3.5 text-green-500" />
-          ) : (
-            <AlertTriangle className="h-3.5 w-3.5 text-amber-500" />
-          )}
-          <span className="text-xs font-quicksand text-text-secondary">
-            Cycle length: {cycleLength} days {isCycleLengthNormal ? "(normal)" : "(outside typical range)"}
-          </span>
-        </div>
-        <div className="flex items-center gap-2">
-          {isPeriodLengthNormal ? (
-            <CheckCircle className="h-3.5 w-3.5 text-green-500" />
-          ) : (
-            <AlertTriangle className="h-3.5 w-3.5 text-amber-500" />
-          )}
-          <span className="text-xs font-quicksand text-text-secondary">
-            Period length: {periodLength} days {isPeriodLengthNormal ? "(normal)" : "(outside typical range)"}
-          </span>
-        </div>
-      </div>
+      {/* Coming Up timeline */}
+      {(() => {
+        const events: { label: string; days: number; emoji: string; color: string }[] = [];
+        const daysUntilFertile = Math.max(0, fertileStart - dayOfCycle);
+
+        if (daysUntilFertile > 0) {
+          events.push({ label: "Fertile window", days: daysUntilFertile, emoji: "🌸", color: "#ec4899" });
+        }
+        if (daysUntilOvulation > 0) {
+          events.push({ label: "Ovulation", days: daysUntilOvulation, emoji: "✨", color: "#f9a8d4" });
+        }
+        if (daysUntilNextPeriod > 0) {
+          events.push({ label: "Period expected", days: daysUntilNextPeriod, emoji: "🌑", color: "#9333ea" });
+        }
+        const upcoming = events.slice(0, 3);
+        if (upcoming.length === 0) return null;
+        return (
+          <div className="mb-4">
+            <p className="text-[10px] uppercase tracking-wider text-text-muted font-quicksand font-semibold mb-2">
+              Coming Up
+            </p>
+            <div className="space-y-1.5">
+              {upcoming.map((ev) => (
+                <div key={ev.label} className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm">{ev.emoji}</span>
+                    <span className="text-xs font-quicksand text-text-secondary">{ev.label}</span>
+                  </div>
+                  <span className="text-xs font-quicksand font-semibold" style={{ color: ev.color }}>
+                    in {ev.days} day{ev.days !== 1 ? "s" : ""}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
+        );
+      })()}
 
       {/* Current phase */}
       <div

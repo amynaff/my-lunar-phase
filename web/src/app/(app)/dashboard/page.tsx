@@ -188,6 +188,7 @@ export default function DashboardPage() {
           {isRegular ? (
             <PhaseInfoCard
               phaseInfo={currentPhaseInfo}
+              currentPhase={currentPhase}
               daysUntilNextPeriod={daysUntilNextPeriod}
             />
           ) : (
