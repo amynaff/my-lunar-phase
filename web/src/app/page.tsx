@@ -114,8 +114,9 @@ export default function LandingPage() {
           <Link href="#stages" className="hover:text-text-primary transition-colors">All Women</Link>
           <Link href="#phases" className="hover:text-text-primary transition-colors">Your Phases</Link>
           <Link href="#luna-ai" className="hover:text-text-primary transition-colors">LunaAI</Link>
-          <Link href="#features" className="hover:text-text-primary transition-colors">Features</Link>
+          <Link href="/blog" className="hover:text-text-primary transition-colors">Blog</Link>
           <Link href="#pricing" className="hover:text-text-primary transition-colors">Pricing</Link>
+          <Link href="/download" className="hover:text-text-primary transition-colors">Download</Link>
           <Link href="/sign-up" className="px-6 py-2.5 rounded-full bg-gradient-to-r from-accent-purple to-accent-pink text-white shadow-lg shadow-accent-purple/35">
             Web App
           </Link>
