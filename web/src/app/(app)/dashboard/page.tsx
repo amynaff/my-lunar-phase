@@ -13,6 +13,7 @@ import { QuickCheckIn } from "@/components/journal/quick-check-in";
 import { WelcomeCard } from "@/components/dashboard/welcome-card";
 import { TodayLogCard } from "@/components/dashboard/today-log-card";
 import { LoggingNudge } from "@/components/dashboard/logging-nudge";
+import { TodaysFocusCard } from "@/components/dashboard/todays-focus-card";
 import { useCycleData } from "@/hooks/use-cycle-data";
 import { useCycleStore } from "@/stores/cycle-store";
 import { lifeStageInfo } from "@/lib/cycle/data";
@@ -94,6 +95,7 @@ const moonAffirmations: Record<string, string[]> = {
 export default function DashboardPage() {
   const router = useRouter();
   const hasCompletedOnboarding = useCycleStore((s) => s.hasCompletedOnboarding);
+  const profileName = useCycleStore((s) => s.profileName);
   const [hydrated, setHydrated] = useState(false);
   const {
     lifeStage,
@@ -145,7 +147,7 @@ export default function DashboardPage() {
         <div className="flex items-center justify-between">
           <div>
             <h1 className="font-cormorant text-3xl font-semibold text-text-primary">
-              Welcome Back
+              {profileName ? `Welcome back, ${profileName.split(" ")[0]}` : "Welcome Back"}
             </h1>
             <p className="text-sm text-text-secondary font-quicksand mt-1">
               {isRegular
@@ -291,6 +293,11 @@ export default function DashboardPage() {
           ))}
         </div>
       </motion.div>
+
+      {/* Today's Focus */}
+      <div className="mt-6">
+        <TodaysFocusCard />
+      </div>
 
       {/* Affirmations */}
       <motion.div

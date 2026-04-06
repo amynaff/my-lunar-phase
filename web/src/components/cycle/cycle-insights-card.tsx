@@ -6,8 +6,14 @@ import { useCycleStore } from "@/stores/cycle-store";
 import { useCycleData } from "@/hooks/use-cycle-data";
 import Link from "next/link";
 
+const SHORT_MONTHS = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+
+function formatShortDate(date: Date): string {
+  return `${SHORT_MONTHS[date.getMonth()]} ${date.getDate()}`;
+}
+
 export function CycleInsightsCard() {
-  const { isRegular, dayOfCycle, daysUntilNextPeriod, currentPhaseInfo } = useCycleData();
+  const { isRegular, dayOfCycle, daysUntilNextPeriod, nextPeriodDate, currentPhaseInfo } = useCycleData();
   const { lastPeriodStart, cycleLength, periodLength } = useCycleStore();
 
   if (!isRegular || !lastPeriodStart) return null;
@@ -72,6 +78,11 @@ export function CycleInsightsCard() {
               : <>{daysUntilNextPeriod} <span className="text-xs text-text-muted font-quicksand">days</span></>
             }
           </p>
+          {nextPeriodDate && daysUntilNextPeriod > 0 && (
+            <p className="text-[10px] text-text-muted font-quicksand mt-0.5">
+              ~{formatShortDate(nextPeriodDate)}
+            </p>
+          )}
         </div>
       </div>
 
