@@ -220,15 +220,15 @@ export default function DashboardPage() {
           {/* Quick actions row */}
           <div className="flex gap-2">
             <Link
-              href="/log-mood"
+              href="/log"
               className="flex-1 flex items-center gap-3 p-4 rounded-[20px] border border-border-light bg-bg-card hover:bg-bg-secondary/50 transition-colors"
             >
               <div className="flex items-center justify-center w-10 h-10 rounded-full bg-accent-rose/15">
                 <Calendar className="h-5 w-5 text-accent-pink" />
               </div>
               <div>
-                <p className="font-quicksand font-semibold text-text-primary text-sm">Log Mood</p>
-                <p className="text-xs text-text-muted font-quicksand">Track mood & energy</p>
+                <p className="font-quicksand font-semibold text-text-primary text-sm">Log Today</p>
+                <p className="text-xs text-text-muted font-quicksand">Mood, energy & symptoms</p>
               </div>
             </Link>
             <button

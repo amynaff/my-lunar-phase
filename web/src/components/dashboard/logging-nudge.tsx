@@ -42,7 +42,7 @@ export function LoggingNudge() {
         </p>
       </div>
       <Link
-        href="/log-mood"
+        href="/log"
         className="text-xs font-quicksand font-semibold text-accent-purple hover:text-accent-purple/80 flex-shrink-0"
       >
         Log now

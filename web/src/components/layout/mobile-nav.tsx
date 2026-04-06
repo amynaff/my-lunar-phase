@@ -8,7 +8,7 @@ import { cn } from "@/lib/cn";
 const tabs = [
   { href: "/dashboard", label: "Home", icon: Home },
   { href: "/nutrition", label: "Nourish", icon: Apple },
-  { href: "/log-mood", label: "Log", icon: Smile },
+  { href: "/log", label: "Log", icon: Smile },
   { href: "/movement", label: "Move", icon: Dumbbell },
   { href: "/journal", label: "Journal", icon: BookOpen },
 ];
@@ -19,7 +19,7 @@ export function MobileNav() {
   return (
     <nav className="lg:hidden fixed bottom-0 left-0 right-0 z-40 flex items-center justify-around px-4 py-2 pb-[env(safe-area-inset-bottom,8px)] border-t border-border-light bg-[var(--tab-bar)] backdrop-blur">
       {tabs.map(({ href, label, icon: Icon }) => {
-        const isActive = pathname === href;
+        const isActive = pathname === href || (href === "/log" && pathname === "/log-mood");
         return (
           <Link
             key={href}

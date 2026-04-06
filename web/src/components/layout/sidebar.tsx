@@ -16,7 +16,7 @@ const mainNav = [
 
 const secondaryNav = [
   { href: "/luna-ai", label: "Luna AI", icon: Sparkles },
-  { href: "/log-mood", label: "Log Mood", icon: Moon },
+  { href: "/log", label: "Log Today", icon: Moon },
   { href: "/calendar", label: "Calendar", icon: Calendar },
   { href: "/community", label: "Community", icon: MessageCircle },
   { href: "/partner", label: "Partner", icon: Users },

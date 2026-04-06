@@ -80,7 +80,7 @@ export function TodayLogCard() {
         </div>
 
         <Link
-          href="/log-mood"
+          href="/log"
           className="text-xs font-quicksand text-text-muted hover:text-text-primary transition-colors flex-shrink-0"
         >
           Edit
@@ -92,7 +92,7 @@ export function TodayLogCard() {
   // Not yet logged
   return (
     <Link
-      href="/log-mood"
+      href="/log"
       className="flex items-center gap-4 p-4 rounded-[20px] border border-border-light bg-bg-card hover:bg-bg-secondary/40 transition-colors group"
     >
       <div className="flex flex-col items-center justify-center w-12 h-12 rounded-full bg-accent-purple/10 flex-shrink-0">

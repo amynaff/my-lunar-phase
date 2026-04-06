@@ -95,7 +95,7 @@ export default function InsightsPage() {
             Start logging your mood and symptoms daily to unlock personalised insights.
           </p>
           <Link
-            href="/log-mood"
+            href="/log"
             className="inline-flex items-center gap-2 px-5 py-2.5 rounded-2xl bg-gradient-to-r from-accent-rose to-accent-purple text-white font-quicksand font-semibold text-sm"
           >
             Log Today
@@ -215,7 +215,7 @@ export default function InsightsPage() {
             className="mt-8 flex gap-3"
           >
             <Link
-              href="/log-mood"
+              href="/log"
               className="flex-1 py-3 rounded-2xl bg-gradient-to-r from-accent-rose to-accent-purple text-white font-quicksand font-semibold text-sm text-center"
             >
               Log Today
