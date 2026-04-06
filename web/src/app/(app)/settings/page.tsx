@@ -2,7 +2,8 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { motion } from "framer-motion";
-import { Settings, Moon, Calendar, Trash2, CreditCard, Loader2, Unplug, RefreshCw, Check, Mail } from "lucide-react";
+import { Settings, Moon, Calendar, Trash2, CreditCard, Loader2, Unplug, RefreshCw, Check, Mail, Bell } from "lucide-react";
+import { usePushNotifications } from "@/hooks/use-push-notifications";
 import Link from "next/link";
 import { useCycleStore } from "@/stores/cycle-store";
 import { ThemeToggle } from "@/components/shared/theme-toggle";
@@ -55,6 +56,7 @@ export default function SettingsPage() {
   const [justConnected, setJustConnected] = useState<string | null>(null);
   const [weeklyDigestEnabled, setWeeklyDigestEnabled] = useState(false);
   const [isSavingDigest, setIsSavingDigest] = useState(false);
+  const { state: pushState, isSupported: pushSupported, subscribe: subscribePush, unsubscribe: unsubscribePush, checkState: checkPushState } = usePushNotifications();
 
   const fetchIntegrations = useCallback(async () => {
     try {
@@ -74,6 +76,7 @@ export default function SettingsPage() {
       .then((data) => { if (data) setWeeklyDigestEnabled(data.weeklyDigestEnabled); })
       .catch(() => {});
     fetchIntegrations();
+    checkPushState();
 
     // Check URL params for success/error
     const params = new URLSearchParams(window.location.search);
@@ -405,6 +408,40 @@ export default function SettingsPage() {
               />
             </button>
           </div>
+
+          {/* Push notification toggle */}
+          {pushSupported && (
+            <div className="flex items-center justify-between mt-4 pt-4 border-t border-border-light">
+              <div className="flex items-start gap-3">
+                <Bell className="h-4 w-4 text-text-muted mt-0.5 flex-shrink-0" />
+                <div>
+                  <p className="font-quicksand font-semibold text-sm text-text-primary">
+                    Evening reminders
+                  </p>
+                  <p className="text-xs text-text-muted font-quicksand mt-0.5">
+                    {pushState === "denied"
+                      ? "Blocked — enable notifications in your browser settings."
+                      : "Daily nudge at 7pm to log your mood and symptoms."}
+                  </p>
+                </div>
+              </div>
+              <button
+                onClick={() => pushState === "granted" ? unsubscribePush() : subscribePush()}
+                disabled={pushState === "loading" || pushState === "denied" || pushState === "unsupported"}
+                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${
+                  pushState === "granted" ? "bg-accent-purple" : "bg-border-light"
+                } ${pushState === "loading" || pushState === "denied" ? "opacity-60 cursor-not-allowed" : "cursor-pointer"}`}
+                role="switch"
+                aria-checked={pushState === "granted"}
+              >
+                <span
+                  className={`inline-block h-4 w-4 transform rounded-full bg-white shadow-sm transition-transform ${
+                    pushState === "granted" ? "translate-x-6" : "translate-x-1"
+                  }`}
+                />
+              </button>
+            </div>
+          )}
         </motion.div>
 
         {/* Theme */}

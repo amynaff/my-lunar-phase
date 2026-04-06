@@ -9,6 +9,7 @@ import { lifeStageInfo } from "@/lib/cycle/data";
 import type { LifeStage } from "@/lib/cycle/types";
 import { GradientBackground } from "@/components/shared/gradient-background";
 import { Button } from "@/components/ui/button";
+import { usePushNotifications } from "@/hooks/use-push-notifications";
 
 const lifeStages: { key: LifeStage; tagline: string }[] = [
   { key: "regular", tagline: "Track your cycle, optimize every phase" },
@@ -37,6 +38,7 @@ export default function OnboardingPage() {
     completeOnboarding,
   } = useCycleStore();
 
+  const { subscribe: subscribePush } = usePushNotifications();
   const [step, setStep] = useState<Step>(0);
   const [selectedStage, setSelectedStage] = useState<LifeStage | null>(null);
   const [cycleLengthValue, setCycleLengthValue] = useState(28);
@@ -90,12 +92,9 @@ export default function OnboardingPage() {
   }
 
   async function handleNotificationStep(requestPermission: boolean) {
-    if (requestPermission && typeof window !== "undefined" && "Notification" in window) {
-      try {
-        await Notification.requestPermission();
-      } catch {
-        // Ignore — not all browsers support this
-      }
+    if (requestPermission) {
+      // Subscribe to push notifications (handles permission request internally)
+      await subscribePush();
     }
     await finishOnboarding();
   }

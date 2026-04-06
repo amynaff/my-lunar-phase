@@ -8,6 +8,29 @@ import {
   addNotificationResponseListener,
 } from "@/lib/notifications";
 import { router } from "expo-router";
+import { getCustomerInfo } from "@/lib/revenuecatClient";
+import { useSubscriptionStore } from "@/lib/subscription-store";
+
+// Sync RevenueCat entitlements → subscription store on app launch
+function useSubscriptionSync() {
+  const upgradeToPremium = useSubscriptionStore((s) => s.upgradeToPremium);
+  const setTier = useSubscriptionStore((s) => s.setTier);
+
+  useEffect(() => {
+    const sync = async () => {
+      const result = await getCustomerInfo();
+      if (!result.ok) return; // RevenueCat not configured or web — leave store as-is
+      const active = result.data.entitlements.active ?? {};
+      const hasPremium = Object.keys(active).length > 0;
+      if (hasPremium) {
+        upgradeToPremium();
+      } else {
+        setTier("free");
+      }
+    };
+    sync();
+  }, [upgradeToPremium, setTier]);
+}
 
 // Initialize notifications when app loads
 function useNotificationSetup() {
@@ -105,6 +128,7 @@ function useNotificationSetup() {
 
 export default function AppLayout() {
   useNotificationSetup();
+  useSubscriptionSync();
 
   return (
     <Stack screenOptions={{ headerShown: false }}>

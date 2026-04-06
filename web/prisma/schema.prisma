@@ -35,6 +35,7 @@ model User {
   aiConversations    AIConversation[]
   healthIntegrations HealthIntegration[]
   cycleData          CycleData?
+  pushSubscriptions  PushSubscription[]
 }
 
 model Account {
@@ -284,6 +285,20 @@ model HealthMeasurement {
   @@index([userId, type])
   @@index([userId, measuredAt])
   @@index([integrationId])
+}
+
+// ==================== Push Notifications ====================
+
+model PushSubscription {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  endpoint  String   @unique
+  p256dh    String
+  auth      String
+  createdAt DateTime @default(now())
+
+  @@index([userId])
 }
 
 // ==================== Feature Suggestions ====================
