@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import { Smile, Calendar } from "lucide-react";
 import { MoodEntryForm } from "@/components/mood/mood-entry-form";
 import { MoodHeatmap } from "@/components/mood/mood-heatmap";
+import { MoodTrendChart } from "@/components/mood/mood-trend-chart";
 
 export default function LogMoodPage() {
   return (
@@ -26,6 +27,15 @@ export default function LogMoodPage() {
             </p>
           </div>
         </div>
+      </motion.div>
+
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.05 }}
+        className="mb-6"
+      >
+        <MoodTrendChart />
       </motion.div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">

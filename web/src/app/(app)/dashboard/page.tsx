@@ -12,6 +12,7 @@ import { LogPeriodModal } from "@/components/cycle/log-period-modal";
 import { QuickCheckIn } from "@/components/journal/quick-check-in";
 import { WelcomeCard } from "@/components/dashboard/welcome-card";
 import { TodayLogCard } from "@/components/dashboard/today-log-card";
+import { LoggingNudge } from "@/components/dashboard/logging-nudge";
 import { useCycleData } from "@/hooks/use-cycle-data";
 import { useCycleStore } from "@/stores/cycle-store";
 import { lifeStageInfo } from "@/lib/cycle/data";
@@ -257,6 +258,7 @@ export default function DashboardPage() {
         className="mt-6"
       >
         <TodayLogCard />
+        <LoggingNudge />
       </motion.div>
 
       {/* Quick actions */}
