@@ -13,3 +13,5 @@ async function initSentry() {
 }
 
 initSentry();
+
+export {};

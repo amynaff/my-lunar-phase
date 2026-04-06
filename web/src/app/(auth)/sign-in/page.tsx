@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { signIn } from "next-auth/react";
 import { useSearchParams } from "next/navigation";
 import { motion } from "framer-motion";
@@ -21,7 +21,7 @@ const AUTH_ERRORS: Record<string, string> = {
   Default: "An unexpected error occurred. Please try again.",
 };
 
-export default function SignInPage() {
+function SignInForm() {
   const searchParams = useSearchParams();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -199,5 +199,13 @@ export default function SignInPage() {
         </Link>
       </p>
     </motion.div>
+  );
+}
+
+export default function SignInPage() {
+  return (
+    <Suspense>
+      <SignInForm />
+    </Suspense>
   );
 }

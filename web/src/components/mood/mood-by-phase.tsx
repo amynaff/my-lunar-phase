@@ -4,7 +4,6 @@ import { useMemo } from "react";
 import { BarChart2 } from "lucide-react";
 import { useMoodStore } from "@/stores/mood-store";
 import { useCycleStore } from "@/stores/cycle-store";
-import { getDayOfCycle } from "@/lib/cycle/phase-calculator";
 
 type Phase = "menstrual" | "follicular" | "ovulation" | "luteal";
 
@@ -69,7 +68,8 @@ export function MoodByPhase() {
     for (const [dateStr, entry] of Object.entries(entries)) {
       const date = new Date(dateStr + "T12:00:00");
       const periodStart = new Date(lastPeriodStart + "T12:00:00");
-      const day = getDayOfCycle(date, periodStart, cycleLength);
+      const daysSinceStart = Math.floor((date.getTime() - periodStart.getTime()) / (1000 * 60 * 60 * 24));
+      const day = (daysSinceStart % cycleLength) + 1;
       if (day < 1 || day > cycleLength) continue;
       const phase = getPhaseForDay(day, cycleLength, periodLength);
       buckets[phase].moods.push(entry.mood);
