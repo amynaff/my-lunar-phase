@@ -7,7 +7,7 @@
  *     --key-file /path/to/AuthKey_XXXXXXXXXX.p8 \
  *     --team-id  <10-char Apple Team ID> \
  *     --key-id   <10-char Key ID from filename> \
- *     --client-id <Apple Services ID e.g. com.mylunarphase.siwa>
+ *     --client-id <Apple Services ID e.g. com.mylunarphase.web>
  *
  * The generated JWT is valid for 6 months (Apple's maximum).
  * Set the output as APPLE_CLIENT_SECRET in your .env / Vercel env vars.
@@ -42,7 +42,7 @@ Example:
     --key-file  ~/Documents/AuthKey_53THZT6U4L,mlp_appledev.p8 \\
     --team-id   ABCDE12345 \\
     --key-id    53THZT6U4L \\
-    --client-id com.mylunarphase.siwa
+    --client-id com.mylunarphase.web
 `);
   process.exit(1);
 }
