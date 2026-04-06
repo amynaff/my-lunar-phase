@@ -4,20 +4,46 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, Calendar, Droplets } from "lucide-react";
 import { useCycleStore } from "@/stores/cycle-store";
+import { useMoodStore, type FlowIntensity } from "@/stores/mood-store";
 
 interface LogPeriodModalProps {
   open: boolean;
   onClose: () => void;
 }
 
+const FLOW_OPTIONS: { value: FlowIntensity; label: string; dots: number }[] = [
+  { value: "spotting", label: "Spotting", dots: 1 },
+  { value: "light", label: "Light", dots: 2 },
+  { value: "medium", label: "Medium", dots: 3 },
+  { value: "heavy", label: "Heavy", dots: 4 },
+];
+
 export function LogPeriodModal({ open, onClose }: LogPeriodModalProps) {
   const { setLastPeriodStart } = useCycleStore();
+  const { setEntry, getEntry } = useMoodStore();
   const [startDate, setStartDate] = useState(() => new Date().toISOString().split("T")[0]);
+  const [flow, setFlow] = useState<FlowIntensity>("medium");
   const [notes, setNotes] = useState("");
   const [saved, setSaved] = useState(false);
 
   function handleSave() {
     setLastPeriodStart(new Date(startDate));
+
+    // Also update today's mood entry with the flow data
+    const today = new Date().toISOString().split("T")[0];
+    if (startDate === today) {
+      const existing = getEntry(today);
+      setEntry({
+        date: today,
+        mood: existing?.mood ?? 3,
+        energy: existing?.energy ?? 3,
+        symptoms: existing?.symptoms ?? [],
+        flow,
+        notes: notes || existing?.notes,
+        synced: false,
+      });
+    }
+
     setSaved(true);
     setTimeout(() => {
       setSaved(false);
@@ -101,6 +127,38 @@ export function LogPeriodModal({ open, onClose }: LogPeriodModalProps) {
                     </button>
                   );
                 })}
+              </div>
+            </div>
+
+            {/* Flow intensity */}
+            <div>
+              <label className="text-xs uppercase tracking-wider text-text-accent font-quicksand font-semibold mb-2 block">
+                Flow Intensity
+              </label>
+              <div className="flex gap-2">
+                {FLOW_OPTIONS.map((opt) => (
+                  <button
+                    key={opt.value}
+                    onClick={() => setFlow(opt.value)}
+                    className={`flex-1 flex flex-col items-center gap-1.5 py-3 rounded-xl border text-xs font-quicksand font-medium transition-colors ${
+                      flow === opt.value
+                        ? "bg-accent-pink/15 border-accent-pink/40 text-accent-pink"
+                        : "bg-bg-card border-border-light text-text-muted hover:bg-bg-secondary"
+                    }`}
+                  >
+                    <span className="flex gap-0.5">
+                      {Array.from({ length: opt.dots }).map((_, i) => (
+                        <span
+                          key={i}
+                          className={`w-1.5 h-1.5 rounded-full ${
+                            flow === opt.value ? "bg-accent-pink" : "bg-text-muted"
+                          }`}
+                        />
+                      ))}
+                    </span>
+                    <span>{opt.label}</span>
+                  </button>
+                ))}
               </div>
             </div>
 

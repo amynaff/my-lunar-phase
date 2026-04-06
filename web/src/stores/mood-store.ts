@@ -3,13 +3,17 @@
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
 
-interface LocalMoodEntry {
+export type FlowIntensity = "spotting" | "light" | "medium" | "heavy";
+
+export interface LocalMoodEntry {
   date: string;
   mood: number;
   energy: number;
   notes?: string;
   cyclePhase?: string;
   dayOfCycle?: number;
+  symptoms: string[];
+  flow?: FlowIntensity;
   synced: boolean;
 }
 

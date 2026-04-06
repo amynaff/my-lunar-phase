@@ -14,17 +14,18 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Invalid input", details: parsed.error.flatten() }, { status: 400 });
   }
 
-  const { date, mood, energy, notes, cyclePhase, dayOfCycle } = parsed.data;
+  const { date, mood, energy, notes, cyclePhase, dayOfCycle, symptoms, flow } = parsed.data;
   const dateObj = new Date(date);
   dateObj.setUTCHours(0, 0, 0, 0);
 
   // Encrypt sensitive notes before storing
   const encryptedNotes = notes ? encryptIfAvailable(notes) : null;
+  const symptomsJson = symptoms && symptoms.length > 0 ? JSON.stringify(symptoms) : null;
 
   const entry = await prisma.moodEntry.upsert({
     where: { userId_date: { userId: user!.id, date: dateObj } },
-    update: { mood, energy, notes: encryptedNotes, cyclePhase, dayOfCycle },
-    create: { userId: user!.id, date: dateObj, mood, energy, notes: encryptedNotes, cyclePhase, dayOfCycle },
+    update: { mood, energy, notes: encryptedNotes, cyclePhase, dayOfCycle, symptoms: symptomsJson, flow: flow ?? null },
+    create: { userId: user!.id, date: dateObj, mood, energy, notes: encryptedNotes, cyclePhase, dayOfCycle, symptoms: symptomsJson, flow: flow ?? null },
   });
 
   // Decrypt before returning to client
@@ -32,6 +33,7 @@ export async function POST(req: NextRequest) {
     entry: {
       ...entry,
       notes: entry.notes ? decryptIfEncrypted(entry.notes) : null,
+      symptoms: entry.symptoms ? JSON.parse(entry.symptoms) : [],
     },
   });
 }
