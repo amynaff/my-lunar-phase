@@ -2,14 +2,14 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Home, Apple, Dumbbell, Heart, BookOpen } from "lucide-react";
+import { Home, Apple, Dumbbell, Smile, BookOpen } from "lucide-react";
 import { cn } from "@/lib/cn";
 
 const tabs = [
   { href: "/dashboard", label: "Home", icon: Home },
   { href: "/nutrition", label: "Nourish", icon: Apple },
+  { href: "/log-mood", label: "Log", icon: Smile },
   { href: "/movement", label: "Move", icon: Dumbbell },
-  { href: "/selfcare", label: "Care", icon: Heart },
   { href: "/journal", label: "Journal", icon: BookOpen },
 ];
 

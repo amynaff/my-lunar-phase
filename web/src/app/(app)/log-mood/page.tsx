@@ -5,6 +5,7 @@ import { Smile, Calendar } from "lucide-react";
 import { MoodEntryForm } from "@/components/mood/mood-entry-form";
 import { MoodHeatmap } from "@/components/mood/mood-heatmap";
 import { MoodTrendChart } from "@/components/mood/mood-trend-chart";
+import { SymptomSummary } from "@/components/mood/symptom-summary";
 
 export default function LogMoodPage() {
   return (
@@ -53,19 +54,29 @@ export default function LogMoodPage() {
           <MoodEntryForm />
         </motion.div>
 
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
-        >
-          <div className="flex items-center gap-2 mb-3">
-            <Calendar className="h-4 w-4 text-accent-purple" />
-            <h2 className="text-xs uppercase tracking-wider text-text-accent font-quicksand font-semibold">
-              Mood Calendar
-            </h2>
-          </div>
-          <MoodHeatmap />
-        </motion.div>
+        <div className="space-y-6">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+          >
+            <div className="flex items-center gap-2 mb-3">
+              <Calendar className="h-4 w-4 text-accent-purple" />
+              <h2 className="text-xs uppercase tracking-wider text-text-accent font-quicksand font-semibold">
+                Mood Calendar
+              </h2>
+            </div>
+            <MoodHeatmap />
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.25 }}
+          >
+            <SymptomSummary />
+          </motion.div>
+        </div>
       </div>
     </div>
   );
