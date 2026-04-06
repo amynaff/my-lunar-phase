@@ -8,6 +8,7 @@ import { cn } from "@/lib/cn";
 
 const mainNav = [
   { href: "/dashboard", label: "Home", icon: Home },
+  { href: "/log", label: "Log Today", icon: Moon },
   { href: "/nutrition", label: "Nutrition", icon: Apple },
   { href: "/movement", label: "Movement", icon: Dumbbell },
   { href: "/selfcare", label: "Care", icon: Heart },
@@ -16,7 +17,6 @@ const mainNav = [
 
 const secondaryNav = [
   { href: "/luna-ai", label: "Luna AI", icon: Sparkles },
-  { href: "/log", label: "Log Today", icon: Moon },
   { href: "/calendar", label: "Calendar", icon: Calendar },
   { href: "/community", label: "Community", icon: MessageCircle },
   { href: "/partner", label: "Partner", icon: Users },
