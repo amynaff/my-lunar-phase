@@ -152,6 +152,31 @@ export default function LogPage() {
               </div>
             )}
 
+            {(todayEntry.sleepHours !== undefined || todayEntry.waterGlasses !== undefined) && (
+              <div className="mt-4 flex gap-4">
+                {todayEntry.sleepHours !== undefined && (
+                  <div>
+                    <p className="text-xs uppercase tracking-wider text-text-muted font-quicksand font-semibold mb-1">
+                      Sleep
+                    </p>
+                    <p className="font-quicksand font-bold text-text-primary text-sm">
+                      {todayEntry.sleepHours}h
+                    </p>
+                  </div>
+                )}
+                {todayEntry.waterGlasses !== undefined && todayEntry.waterGlasses > 0 && (
+                  <div>
+                    <p className="text-xs uppercase tracking-wider text-text-muted font-quicksand font-semibold mb-1">
+                      Water
+                    </p>
+                    <p className="font-quicksand font-bold text-text-primary text-sm">
+                      {todayEntry.waterGlasses} glasses
+                    </p>
+                  </div>
+                )}
+              </div>
+            )}
+
             {todayEntry.notes && (
               <div className="mt-4">
                 <p className="text-xs uppercase tracking-wider text-text-muted font-quicksand font-semibold mb-1">

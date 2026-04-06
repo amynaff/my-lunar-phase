@@ -9,6 +9,8 @@ export const moodEntrySchema = z.object({
   dayOfCycle: z.number().int().min(1).max(60).optional(),
   symptoms: z.array(z.string()).optional(),
   flow: z.enum(["spotting", "light", "medium", "heavy"]).optional(),
+  sleepHours: z.number().min(0).max(24).optional(),
+  waterGlasses: z.number().int().min(0).max(20).optional(),
 });
 
 export type MoodEntryInput = z.infer<typeof moodEntrySchema>;

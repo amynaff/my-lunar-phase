@@ -2,7 +2,7 @@
 
 import { useMemo } from "react";
 import { motion } from "framer-motion";
-import { BarChart3, TrendingUp, Activity, Calendar, Droplets, Flame } from "lucide-react";
+import { BarChart3, TrendingUp, Activity, Calendar, Droplets, Flame, Moon } from "lucide-react";
 import Link from "next/link";
 import { useMoodStore } from "@/stores/mood-store";
 import { useCycleStore } from "@/stores/cycle-store";
@@ -48,6 +48,18 @@ function useInsightStats() {
     // Completed periods
     const completedPeriods = periodLogs.filter((l) => l.startDate && l.endDate).length;
 
+    // Sleep average
+    const sleepEntries = allEntries.filter((e) => e.sleepHours !== undefined && e.sleepHours !== null);
+    const avgSleep = sleepEntries.length > 0
+      ? (sleepEntries.reduce((sum, e) => sum + (e.sleepHours ?? 0), 0) / sleepEntries.length).toFixed(1)
+      : null;
+
+    // Water average
+    const waterEntries = allEntries.filter((e) => e.waterGlasses !== undefined && e.waterGlasses !== null && e.waterGlasses > 0);
+    const avgWater = waterEntries.length > 0
+      ? Math.round(waterEntries.reduce((sum, e) => sum + (e.waterGlasses ?? 0), 0) / waterEntries.length)
+      : null;
+
     return {
       avgMood: avgMood.toFixed(1),
       avgEnergy: avgEnergy.toFixed(1),
@@ -55,6 +67,8 @@ function useInsightStats() {
       streak,
       totalLogs,
       completedPeriods,
+      avgSleep,
+      avgWater,
     };
   }, [entries, periodLogs]);
 }
@@ -109,7 +123,7 @@ export default function InsightsPage() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.05 }}
-              className="grid grid-cols-3 gap-3 mb-6"
+              className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 mb-6"
             >
               <div className="rounded-2xl border border-border-light bg-bg-card p-4 text-center">
                 <TrendingUp className="h-4 w-4 text-accent-purple mx-auto mb-1" />
@@ -126,6 +140,20 @@ export default function InsightsPage() {
                 <p className="text-xl font-cormorant font-semibold text-text-primary">{stats.streak}</p>
                 <p className="text-[10px] text-text-muted font-quicksand uppercase tracking-wider">Day Streak</p>
               </div>
+              {stats.avgSleep !== null && (
+                <div className="rounded-2xl border border-border-light bg-bg-card p-4 text-center">
+                  <Moon className="h-4 w-4 text-indigo-400 mx-auto mb-1" />
+                  <p className="text-xl font-cormorant font-semibold text-text-primary">{stats.avgSleep}h</p>
+                  <p className="text-[10px] text-text-muted font-quicksand uppercase tracking-wider">Avg Sleep</p>
+                </div>
+              )}
+              {stats.avgWater !== null && (
+                <div className="rounded-2xl border border-border-light bg-bg-card p-4 text-center">
+                  <Droplets className="h-4 w-4 text-blue-400 mx-auto mb-1" />
+                  <p className="text-xl font-cormorant font-semibold text-text-primary">{stats.avgWater}</p>
+                  <p className="text-[10px] text-text-muted font-quicksand uppercase tracking-wider">Avg Water</p>
+                </div>
+              )}
             </motion.div>
           )}
 

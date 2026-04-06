@@ -127,9 +127,11 @@ model MoodEntry {
   notes      String?
   cyclePhase String?
   dayOfCycle Int?
-  symptoms   String?  // JSON array of symptom ids
-  flow       String?  // spotting | light | medium | heavy
-  createdAt  DateTime @default(now())
+  symptoms     String?  // JSON array of symptom ids
+  flow         String?  // spotting | light | medium | heavy
+  sleepHours   Float?   // hours of sleep last night
+  waterGlasses Int?     // glasses of water consumed
+  createdAt    DateTime @default(now())
   updatedAt  DateTime @updatedAt
 
   @@unique([userId, date])

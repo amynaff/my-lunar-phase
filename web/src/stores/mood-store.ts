@@ -14,6 +14,8 @@ export interface LocalMoodEntry {
   dayOfCycle?: number;
   symptoms: string[];
   flow?: FlowIntensity;
+  sleepHours?: number;
+  waterGlasses?: number;
   synced: boolean;
 }
 

@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { useMoodStore, getMoodColor, getEnergyColor, type FlowIntensity } from "@/stores/mood-store";
+import { Moon, Droplets, Plus, Minus } from "lucide-react";
 import { useCycleData } from "@/hooks/use-cycle-data";
 
 const moodLabels = ["Very Low", "Low", "Neutral", "Good", "Great"];
@@ -84,6 +85,8 @@ export function MoodEntryForm() {
   const [notes, setNotes] = useState("");
   const [selectedSymptoms, setSelectedSymptoms] = useState<string[]>([]);
   const [flow, setFlow] = useState<FlowIntensity | undefined>(undefined);
+  const [sleepHours, setSleepHours] = useState<number | undefined>(undefined);
+  const [waterGlasses, setWaterGlasses] = useState<number>(0);
   const [saved, setSaved] = useState(false);
   const { setEntry } = useMoodStore();
   const { currentPhase, dayOfCycle, isRegular } = useCycleData();
@@ -106,6 +109,8 @@ export function MoodEntryForm() {
       dayOfCycle,
       symptoms: selectedSymptoms,
       flow,
+      sleepHours,
+      waterGlasses: waterGlasses > 0 ? waterGlasses : undefined,
       synced: false,
     };
 
@@ -175,6 +180,65 @@ export function MoodEntryForm() {
           >
             {energyLabels[energy - 1]}
           </span>
+        </div>
+      </div>
+
+      {/* Sleep & Water row */}
+      <div className="grid grid-cols-2 gap-4">
+        {/* Sleep hours */}
+        <div>
+          <label className="text-xs uppercase tracking-wider text-text-accent font-quicksand font-semibold flex items-center gap-1.5">
+            <Moon className="h-3.5 w-3.5" />
+            Sleep
+          </label>
+          <div className="mt-3">
+            <div className="flex items-center gap-3">
+              <input
+                type="range"
+                min={0}
+                max={12}
+                step={0.5}
+                value={sleepHours ?? 0}
+                onChange={(e) => {
+                  const val = Number(e.target.value);
+                  setSleepHours(val === 0 ? undefined : val);
+                }}
+                className="flex-1 accent-accent-purple"
+              />
+              <span className="text-sm font-quicksand font-bold text-accent-purple min-w-[44px] text-center">
+                {sleepHours !== undefined ? `${sleepHours}h` : "–"}
+              </span>
+            </div>
+            <p className="text-[10px] text-text-muted font-quicksand mt-1">hours last night</p>
+          </div>
+        </div>
+
+        {/* Water glasses */}
+        <div>
+          <label className="text-xs uppercase tracking-wider text-text-accent font-quicksand font-semibold flex items-center gap-1.5">
+            <Droplets className="h-3.5 w-3.5" />
+            Water
+          </label>
+          <div className="mt-3 flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() => setWaterGlasses((w) => Math.max(0, w - 1))}
+              className="w-8 h-8 rounded-full border border-border-light bg-bg-secondary flex items-center justify-center text-text-secondary hover:bg-bg-card transition-colors"
+            >
+              <Minus className="h-3.5 w-3.5" />
+            </button>
+            <div className="flex-1 text-center">
+              <span className="text-xl font-quicksand font-bold text-accent-purple">{waterGlasses}</span>
+              <p className="text-[10px] text-text-muted font-quicksand">glasses</p>
+            </div>
+            <button
+              type="button"
+              onClick={() => setWaterGlasses((w) => Math.min(20, w + 1))}
+              className="w-8 h-8 rounded-full border border-border-light bg-bg-secondary flex items-center justify-center text-text-secondary hover:bg-bg-card transition-colors"
+            >
+              <Plus className="h-3.5 w-3.5" />
+            </button>
+          </div>
         </div>
       </div>
 

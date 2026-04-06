@@ -14,7 +14,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Invalid input", details: parsed.error.flatten() }, { status: 400 });
   }
 
-  const { date, mood, energy, notes, cyclePhase, dayOfCycle, symptoms, flow } = parsed.data;
+  const { date, mood, energy, notes, cyclePhase, dayOfCycle, symptoms, flow, sleepHours, waterGlasses } = parsed.data;
   const dateObj = new Date(date);
   dateObj.setUTCHours(0, 0, 0, 0);
 
@@ -24,8 +24,8 @@ export async function POST(req: NextRequest) {
 
   const entry = await prisma.moodEntry.upsert({
     where: { userId_date: { userId: user!.id, date: dateObj } },
-    update: { mood, energy, notes: encryptedNotes, cyclePhase, dayOfCycle, symptoms: symptomsJson, flow: flow ?? null },
-    create: { userId: user!.id, date: dateObj, mood, energy, notes: encryptedNotes, cyclePhase, dayOfCycle, symptoms: symptomsJson, flow: flow ?? null },
+    update: { mood, energy, notes: encryptedNotes, cyclePhase, dayOfCycle, symptoms: symptomsJson, flow: flow ?? null, sleepHours: sleepHours ?? null, waterGlasses: waterGlasses ?? null },
+    create: { userId: user!.id, date: dateObj, mood, energy, notes: encryptedNotes, cyclePhase, dayOfCycle, symptoms: symptomsJson, flow: flow ?? null, sleepHours: sleepHours ?? null, waterGlasses: waterGlasses ?? null },
   });
 
   // Decrypt before returning to client
