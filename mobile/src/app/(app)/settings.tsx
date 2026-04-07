@@ -30,6 +30,8 @@ import {
 import { useCycleStore, phaseInfo, LifeStage, lifeStageInfo } from '@/lib/cycle-store';
 import { useThemeStore, getTheme } from '@/lib/theme-store';
 import { useSubscriptionStore } from '@/lib/subscription-store';
+import { isRevenueCatEnabled } from '@/lib/revenuecatClient';
+import RevenueCatUI from 'react-native-purchases-ui';
 import { authClient } from '@/lib/auth/auth-client';
 import { useInvalidateSession } from '@/lib/auth/use-session';
 import { api } from '@/lib/api/api';
@@ -266,6 +268,27 @@ export default function SettingsScreen() {
                 </View>
               </LinearGradient>
             </Pressable>
+
+            {/* Manage Subscription — visible to premium users via RevenueCat Customer Center */}
+            {isPremium && isRevenueCatEnabled() && (
+              <Pressable
+                onPress={async () => {
+                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                  try {
+                    await RevenueCatUI.presentCustomerCenter();
+                  } catch {
+                    // Customer Center not available on this build
+                  }
+                }}
+                className="mt-2 flex-row items-center justify-between px-4 py-3 rounded-2xl"
+                style={{ backgroundColor: 'rgba(196, 181, 253, 0.08)' }}
+              >
+                <Text style={{ fontFamily: 'Quicksand_500Medium', color: theme.text.secondary }} className="text-sm">
+                  Manage Subscription
+                </Text>
+                <ChevronRight size={16} color={theme.text.muted} />
+              </Pressable>
+            )}
           </Animated.View>
 
           {/* Life Stage Selection */}

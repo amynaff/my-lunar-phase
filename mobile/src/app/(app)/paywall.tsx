@@ -93,12 +93,21 @@ export default function PaywallScreen() {
         const pkgMap: typeof packages = {};
 
         availablePackages.forEach((pkg) => {
-          if (pkg.identifier === '$rc_monthly') {
-            pkgMap.monthly = pkg;
-          } else if (pkg.identifier === '$rc_annual') {
-            pkgMap.yearly = pkg;
-          } else if (pkg.identifier === '$rc_lifetime') {
+          const id = pkg.identifier.toLowerCase();
+          const productId = pkg.product?.identifier?.toLowerCase() ?? '';
+          const isMonthly =
+            id === '$rc_monthly' || id.includes('monthly') || productId.includes('monthly');
+          const isYearly =
+            id === '$rc_annual' || id.includes('annual') || id.includes('yearly') || productId.includes('annual') || productId.includes('yearly');
+          const isLifetime =
+            id === '$rc_lifetime' || id.includes('lifetime') || productId.includes('lifetime');
+
+          if (isLifetime) {
             pkgMap.lifetime = pkg;
+          } else if (isYearly) {
+            pkgMap.yearly = pkg;
+          } else if (isMonthly) {
+            pkgMap.monthly = pkg;
           }
         });
 
