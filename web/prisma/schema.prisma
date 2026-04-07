@@ -32,6 +32,7 @@ model User {
   partnershipAsPartner Partnership?    @relation("PartnershipPartner")
   stripeCustomerId   String?           @unique
   subscription       Subscription?
+  mobileSubscription MobileSubscription?
   aiConversations    AIConversation[]
   healthIntegrations HealthIntegration[]
   cycleData          CycleData?
@@ -301,6 +302,25 @@ model PushSubscription {
   createdAt DateTime @default(now())
 
   @@index([userId])
+}
+
+// ==================== Mobile IAP Subscriptions ====================
+
+model MobileSubscription {
+  id               String   @id @default(cuid())
+  userId           String   @unique
+  user             User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  revenueCatUserId String
+  productId        String
+  entitlementId    String
+  store            String   // "APP_STORE" | "PLAY_STORE"
+  status           String   // "active" | "expired" | "cancelled"
+  expiresAt        DateTime?
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  @@index([userId])
+  @@index([revenueCatUserId])
 }
 
 // ==================== Feature Suggestions ====================

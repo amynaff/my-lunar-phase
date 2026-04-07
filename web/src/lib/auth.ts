@@ -54,10 +54,19 @@ const config: NextAuthConfig = {
     async jwt({ token, user }) {
       if (user) {
         token.id = user.id;
-        const sub = await prisma.subscription.findUnique({
-          where: { userId: user.id },
-        });
-        token.subscriptionPlan = sub?.status === "active" ? sub.plan : "free";
+        const [sub, mobileSub] = await Promise.all([
+          prisma.subscription.findUnique({ where: { userId: user.id } }),
+          prisma.mobileSubscription.findUnique({ where: { userId: user.id } }),
+        ]);
+        const hasWebSub = sub?.status === "active";
+        const hasMobileSub = mobileSub?.status === "active";
+        if (hasWebSub) {
+          token.subscriptionPlan = sub!.plan;
+        } else if (hasMobileSub) {
+          token.subscriptionPlan = "monthly"; // IAP premium
+        } else {
+          token.subscriptionPlan = "free";
+        }
       }
       return token;
     },

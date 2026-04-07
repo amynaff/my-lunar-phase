@@ -10,6 +10,7 @@ import {
 import { useThemeStore, getTheme } from '@/lib/theme-store';
 import { useCycleStore, phaseInfo, CyclePhase } from '@/lib/cycle-store';
 import { useSymptomStore, availableSymptoms } from '@/lib/symptom-store';
+import { useSubscriptionStore } from '@/lib/subscription-store';
 import { router } from 'expo-router';
 import {
   useFonts,
@@ -287,6 +288,7 @@ export default function InsightsScreen() {
   const theme = getTheme(themeMode);
   const getCurrentPhase = useCycleStore(s => s.getCurrentPhase);
   const getDayOfCycle = useCycleStore(s => s.getDayOfCycle);
+  const isPremium = useSubscriptionStore(s => s.tier === 'premium');
 
   const [fontsLoaded] = useFonts({
     CormorantGaramond_400Regular,
@@ -518,7 +520,7 @@ export default function InsightsScreen() {
             </View>
           </Animated.View>
 
-          {/* Symptom Trend Chart */}
+          {/* Symptom Trend Chart — Premium */}
           <Animated.View entering={FadeInUp.delay(460).duration(600)} className="mx-6 mt-5">
             <View className="flex-row items-center mb-3">
               <TrendingUp size={16} color={theme.accent.purple} />
@@ -529,7 +531,42 @@ export default function InsightsScreen() {
                 Symptom Trends — Last 30 Days
               </Text>
             </View>
-            <SymptomTrendChart accentColor={info.color} theme={theme} />
+            {isPremium ? (
+              <SymptomTrendChart accentColor={info.color} theme={theme} />
+            ) : (
+              <Pressable
+                onPress={() => router.push('/paywall')}
+                className="rounded-2xl p-5 border items-center"
+                style={{ backgroundColor: theme.bg.card, borderColor: theme.border.light }}
+              >
+                <View
+                  className="w-12 h-12 rounded-full items-center justify-center mb-3"
+                  style={{ backgroundColor: `${theme.accent.purple}15` }}
+                >
+                  <TrendingUp size={22} color={theme.accent.purple} />
+                </View>
+                <Text
+                  style={{ fontFamily: 'Quicksand_600SemiBold', color: theme.text.primary }}
+                  className="text-base"
+                >
+                  Unlock Symptom Analytics
+                </Text>
+                <Text
+                  style={{ fontFamily: 'Quicksand_400Regular', color: theme.text.tertiary }}
+                  className="text-xs mt-1 text-center"
+                >
+                  Track patterns across your cycles with Premium
+                </Text>
+                <View
+                  className="mt-3 px-4 py-2 rounded-full"
+                  style={{ backgroundColor: theme.accent.purple }}
+                >
+                  <Text style={{ fontFamily: 'Quicksand_600SemiBold', color: '#fff' }} className="text-xs">
+                    Upgrade to Premium
+                  </Text>
+                </View>
+              </Pressable>
+            )}
           </Animated.View>
 
           {/* Luna AI Card */}

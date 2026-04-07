@@ -8,16 +8,24 @@ import {
   addNotificationResponseListener,
 } from "@/lib/notifications";
 import { router } from "expo-router";
-import { getCustomerInfo } from "@/lib/revenuecatClient";
+import { getCustomerInfo, setUserId } from "@/lib/revenuecatClient";
 import { useSubscriptionStore } from "@/lib/subscription-store";
+import { useSession } from "@/lib/auth/use-session";
 
 // Sync RevenueCat entitlements → subscription store on app launch
+// Also identifies the user in RevenueCat so purchases are linked cross-platform
 function useSubscriptionSync() {
   const upgradeToPremium = useSubscriptionStore((s) => s.upgradeToPremium);
   const setTier = useSubscriptionStore((s) => s.setTier);
+  const { data: session } = useSession();
+  const userId = session?.user?.id;
 
   useEffect(() => {
     const sync = async () => {
+      // Identify user in RevenueCat so web + mobile subscriptions stay in sync
+      if (userId) {
+        await setUserId(userId);
+      }
       const result = await getCustomerInfo();
       if (!result.ok) return; // RevenueCat not configured or web — leave store as-is
       const active = result.data.entitlements.active ?? {};
@@ -29,7 +37,7 @@ function useSubscriptionSync() {
       }
     };
     sync();
-  }, [upgradeToPremium, setTier]);
+  }, [userId, upgradeToPremium, setTier]);
 }
 
 // Initialize notifications when app loads
