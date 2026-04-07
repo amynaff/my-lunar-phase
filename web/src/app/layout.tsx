@@ -18,7 +18,19 @@ const quicksand = Quicksand({
   display: "swap",
 });
 
-const siteUrl = process.env.NEXT_PUBLIC_APP_URL || "https://mylunarphase.com";
+function getSiteUrl(): string {
+  const envUrl = process.env.NEXT_PUBLIC_APP_URL;
+  if (envUrl) {
+    try {
+      new URL(envUrl);
+      return envUrl;
+    } catch {
+      // env var is set but not a valid URL — use default
+    }
+  }
+  return "https://mylunarphase.com";
+}
+const siteUrl = getSiteUrl();
 const siteName = "MyLunarPhase";
 const title = "MyLunarPhase | Women's Hormone Wellness";
 const description =
