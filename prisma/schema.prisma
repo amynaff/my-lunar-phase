@@ -28,6 +28,10 @@ model User {
 
   // Mood tracking
   moodEntries     MoodEntry[]
+
+  // Subscriptions
+  subscription        Subscription?
+  mobileSubscription  MobileSubscription?
 }
 
 model Session {
@@ -186,4 +190,37 @@ model ChatMessage {
 
   @@index([channelId])
   @@index([createdAt])
+}
+
+// ==================== Subscriptions ====================
+
+model Subscription {
+  id                      String   @id @default(cuid())
+  userId                  String   @unique
+  user                    User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  stripeSubscriptionId    String   @unique
+  stripePriceId           String
+  stripeCurrentPeriodEnd  DateTime
+  status                  String   // active | past_due | canceled | etc.
+  plan                    String   @default("monthly")
+  createdAt               DateTime @default(now())
+  updatedAt               DateTime @updatedAt
+
+  @@index([userId])
+}
+
+model MobileSubscription {
+  id                String    @id @default(cuid())
+  userId            String    @unique
+  user              User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  revenueCatUserId  String
+  productId         String
+  entitlementId     String    @default("premium")
+  store             String    // APP_STORE | PLAY_STORE
+  status            String    // active | cancelled | expired
+  expiresAt         DateTime?
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+
+  @@index([userId])
 }
