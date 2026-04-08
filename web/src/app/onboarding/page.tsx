@@ -27,6 +27,39 @@ const lifeStages: { key: LifeStage; tagline: string }[] = [
 
 type Step = 0 | 1 | 2 | 3 | 4;
 
+const NOTIFICATION_OPTIONS: Record<LifeStage, { icon: string; text: string }[]> = {
+  regular: [
+    { icon: "🌸", text: "Period arriving in 3 days" },
+    { icon: "✨", text: "Ovulation window approaching" },
+    { icon: "🌙", text: "Daily log reminder (your time)" },
+    { icon: "🔄", text: "Phase change notifications" },
+  ],
+  perimenopause: [
+    { icon: "🗓️", text: "Irregular period alert" },
+    { icon: "🔥", text: "Hot flash & night sweat log" },
+    { icon: "😴", text: "Sleep quality check-in" },
+    { icon: "🧠", text: "Mood & anxiety check-in" },
+    { icon: "🌙", text: "Daily symptom log reminder" },
+  ],
+  menopause: [
+    { icon: "🔥", text: "Hot flash & night sweat check-in" },
+    { icon: "😴", text: "Sleep quality reminder" },
+    { icon: "🧠", text: "Mood & anxiety check-in" },
+    { icon: "🦴", text: "Bone health / calcium & vitamin D" },
+    { icon: "❤️", text: "Heart health & wellness check-in" },
+    { icon: "📝", text: "Daily symptom log" },
+  ],
+  postmenopause: [
+    { icon: "🔥", text: "Hot flash & night sweat check-in" },
+    { icon: "😴", text: "Sleep quality reminder" },
+    { icon: "🧠", text: "Mood & anxiety check-in" },
+    { icon: "🦴", text: "Bone health / calcium & vitamin D" },
+    { icon: "❤️", text: "Heart health & wellness check-in" },
+    { icon: "💪", text: "Strength training or movement reminder" },
+    { icon: "📝", text: "Daily symptom log" },
+  ],
+};
+
 export default function OnboardingPage() {
   const router = useRouter();
   const {
@@ -454,12 +487,7 @@ export default function OnboardingPage() {
                   </div>
 
                   <div className="space-y-3 mb-8">
-                    {[
-                      { icon: "🌸", text: "Period arriving in 3 days" },
-                      { icon: "✨", text: "Ovulation window approaching" },
-                      { icon: "🌙", text: "Daily log reminder (your time)" },
-                      { icon: "🔄", text: "Phase change notifications" },
-                    ].map(({ icon, text }) => (
+                    {(NOTIFICATION_OPTIONS[selectedStage ?? "regular"]).map(({ icon, text }) => (
                       <div key={text} className="flex items-center gap-3 px-3 py-2.5 rounded-xl bg-bg-secondary/50">
                         <span className="text-lg">{icon}</span>
                         <span className="text-sm font-quicksand text-text-secondary">{text}</span>
