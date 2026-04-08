@@ -7,8 +7,36 @@ import { prisma } from "./prisma";
 import bcrypt from "bcryptjs";
 import type { NextAuthConfig } from "next-auth";
 
+// Apple Sign In uses a cross-origin POST for its callback (form_post response mode).
+// Browsers block cookies with sameSite: "lax" on cross-origin POST requests, so the
+// state, pkceCodeVerifier, and callbackUrl cookies are silently dropped — causing the
+// auth flow to complete on Apple's side but produce no session on ours.
+// Fix: set sameSite: "none" + secure: true on all three OAuth flow cookies.
+const isProd = process.env.NODE_ENV === "production";
+const cookiePrefix = isProd ? "__Secure-" : "";
+const secureCookieOptions = {
+  httpOnly: true,
+  sameSite: "none" as const,
+  path: "/",
+  secure: true,
+};
+
 const config: NextAuthConfig = {
   adapter: PrismaAdapter(prisma),
+  cookies: {
+    callbackUrl: {
+      name: `${cookiePrefix}authjs.callback-url`,
+      options: secureCookieOptions,
+    },
+    state: {
+      name: `${cookiePrefix}authjs.state`,
+      options: secureCookieOptions,
+    },
+    pkceCodeVerifier: {
+      name: `${cookiePrefix}authjs.pkce.code_verifier`,
+      options: secureCookieOptions,
+    },
+  },
   providers: [
     Google({
       clientId: process.env.GOOGLE_CLIENT_ID!,
