@@ -1,11 +1,14 @@
 [phases.setup]
-nixPkgs = ["bun", "openssl", "sqlite"]
+nixPkgs = ["bun", "openssl_3", "sqlite", "openssl_3.dev"]
 
 [phases.install]
 cmds = ["bun install"]
 
 [phases.build]
-cmds = []
+cmds = ["bunx prisma generate"]
 
 [start]
 cmd = "ENVIRONMENT=production bash scripts/start"
+
+[variables]
+LD_LIBRARY_PATH = "/nix/store/*-openssl-3*/lib:/usr/lib/x86_64-linux-gnu"
