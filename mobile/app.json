@@ -3,14 +3,14 @@
     "name": "MyLunarPhase",
     "slug": "mylunarphase",
     "scheme": "my-lunar-phase",
-    "version": "1.1.0",
+    "version": "1.2.0",
     "orientation": "portrait",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.mylunarphase.app",
-      "buildNumber": "3",
+      "buildNumber": "4",
       "infoPlist": {
         "NSMicrophoneUsageDescription": "My Lunar Phase uses the microphone to record voice journal entries.",
         "NSUserNotificationsUsageDescription": "My Lunar Phase sends reminders for your period, ovulation, and daily wellness check-ins.",
@@ -21,7 +21,7 @@
     },
     "android": {
       "package": "com.mylunarphase.app",
-      "versionCode": 3,
+      "versionCode": 4,
       "edgeToEdgeEnabled": true,
       "permissions": [
         "android.permission.RECEIVE_BOOT_COMPLETED",
