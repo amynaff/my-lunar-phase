@@ -10,13 +10,12 @@ export const auth = betterAuth({
   baseURL: env.BACKEND_URL,
 
   trustedOrigins: [
-    "vibecode://*/*",
     "exp://*/*",
     "http://localhost:*",
     "http://127.0.0.1:*",
-    "https://*.dev.vibecode.run",
-    "https://*.vibecode.run",
-    "https://*.vibecodeapp.com",
+    "https://mylunarphase.com",
+    "https://*.mylunarphase.com",
+    "https://*.up.railway.app",
     "https://appleid.apple.com",
     env.BACKEND_URL,
   ],
