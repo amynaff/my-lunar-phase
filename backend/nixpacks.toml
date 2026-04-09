@@ -2,7 +2,7 @@
 nixPkgs = ["bun", "openssl_3", "sqlite"]
 
 [phases.install]
-cmds = ["bun install --frozen-lockfile"]
+cmds = ["bun install"]
 
 [phases.build]
 cmds = ["bunx prisma generate"]
