@@ -1,0 +1,8 @@
+[phases.install]
+cmds = ["bun install"]
+
+[phases.build]
+cmds = []
+
+[start]
+cmd = "ENVIRONMENT=production bash scripts/start"
