@@ -460,7 +460,7 @@ ${content}`;
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "grok-4-fast-non-reasoning",
+        model: "grok-2-latest",
         messages: [
           { role: "system", content: systemPrompt },
           { role: "user", content: userMessage },
@@ -576,7 +576,7 @@ Please identify meaningful patterns and provide supportive insights.`;
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "grok-4-fast-non-reasoning",
+        model: "grok-2-latest",
         messages: [
           { role: "system", content: systemPrompt },
           { role: "user", content: userMessage },

@@ -26,7 +26,7 @@ export async function callGrok(
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      model: "grok-4-fast-non-reasoning",
+      model: "grok-2-latest",
       messages,
       max_tokens: options.maxTokens ?? 1000,
       temperature: options.temperature ?? 0.7,

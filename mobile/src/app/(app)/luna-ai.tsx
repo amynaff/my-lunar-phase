@@ -16,7 +16,7 @@ import Animated, { FadeInUp, FadeInDown, FadeIn } from 'react-native-reanimated'
 import { Send, Sparkles, Moon, ArrowLeft, Trash2, Stethoscope, X, Check, AlertCircle } from 'lucide-react-native';
 import { useCycleStore, getMoonPhase, moonPhaseInfo, phaseInfo, perimenopauseSymptoms, menopauseSymptoms, postmenopauseSymptoms } from '@/lib/cycle-store';
 import { useThemeStore, getTheme } from '@/lib/theme-store';
-import { router } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
 import * as Haptics from 'expo-haptics';
 import {
   useFonts,
@@ -95,6 +95,7 @@ export default function LunaAIScreen() {
   const lifeStage = useCycleStore((s) => s.lifeStage);
   const getCurrentPhase = useCycleStore((s) => s.getCurrentPhase);
   const scrollViewRef = useRef<ScrollView>(null);
+  const { prompt: initialPrompt } = useLocalSearchParams<{ prompt?: string }>();
 
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputText, setInputText] = useState('');
@@ -142,6 +143,63 @@ export default function LunaAIScreen() {
   // Accent color based on life stage
   const accentColor =
     lifeStage === 'perimenopause' ? '#f59e0b' : lifeStage === 'menopause' ? '#8b5cf6' : theme.accent.purple;
+
+  const sendMessageWithText = async (text: string) => {
+    if (!text.trim() || isLoading) return;
+
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+
+    const userMessage: Message = {
+      id: Date.now().toString(),
+      role: 'user',
+      content: text.trim(),
+      timestamp: new Date(),
+    };
+
+    setMessages((prev) => [...prev, userMessage]);
+    setInputText('');
+    setIsLoading(true);
+
+    try {
+      const conversationHistory = [...messages, userMessage].slice(-10).map((m) => ({
+        role: m.role,
+        content: m.content,
+      }));
+
+      const response = await fetch(`${BACKEND_URL}/api/ai-chat`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          messages: conversationHistory,
+          lifeStage,
+          currentPhase: lifeStage === 'regular' ? currentPhase : undefined,
+          moonPhase: lifeStage !== 'regular' ? moonInfo.name : undefined,
+        }),
+      });
+
+      if (!response.ok) throw new Error('Failed to get response');
+
+      const data = await response.json();
+      const assistantContent = data.choices?.[0]?.message?.content || "I'm sorry, I couldn't process that. Please try again.";
+
+      setMessages((prev) => [...prev, {
+        id: (Date.now() + 1).toString(),
+        role: 'assistant',
+        content: assistantContent,
+        timestamp: new Date(),
+      }]);
+    } catch (error) {
+      console.error('Chat error:', error);
+      setMessages((prev) => [...prev, {
+        id: (Date.now() + 1).toString(),
+        role: 'assistant',
+        content: "I'm having trouble connecting right now. Please check your connection and try again.",
+        timestamp: new Date(),
+      }]);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const sendMessage = async () => {
     if (!inputText.trim() || isLoading) return;
@@ -295,6 +353,17 @@ export default function LunaAIScreen() {
       }, 100);
     }
   }, [messages]);
+
+  // Auto-send prompt if passed via navigation params
+  useEffect(() => {
+    if (initialPrompt && fontsLoaded) {
+      setInputText(initialPrompt);
+      setTimeout(() => {
+        sendMessageWithText(initialPrompt);
+      }, 300);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [fontsLoaded]);
 
   // Welcome message
   const getWelcomeMessage = () => {

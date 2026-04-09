@@ -101,7 +101,7 @@ aiChatRouter.post("/", async (c) => {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "grok-4-fast-non-reasoning",
+        model: "grok-2-latest",
         messages,
         max_tokens: 1000,
         temperature: 0.7,
@@ -157,7 +157,7 @@ aiChatRouter.post("/quick-advice", async (c) => {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "grok-4-fast-non-reasoning",
+        model: "grok-2-latest",
         messages,
         max_tokens: 200,
         temperature: 0.8,
@@ -238,7 +238,7 @@ Keep your response warm and supportive, around 3-4 paragraphs.`;
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "grok-4-fast-non-reasoning",
+        model: "grok-2-latest",
         messages,
         max_tokens: 800,
         temperature: 0.6,

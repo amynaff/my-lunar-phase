@@ -453,37 +453,37 @@ export default function HomeScreen() {
               entering={FadeInUp.delay(700).duration(600)}
               className="mx-6 mt-6"
             >
-              <Pressable
-                onPress={() => {
-                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                  router.push('/luna-ai');
-                }}
+              <LinearGradient
+                colors={[`${stageColor}25`, `${stageColor}12`, `${theme.accent.lavender}10`]}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 1 }}
+                style={{ borderRadius: 24, padding: 20, borderWidth: 1, borderColor: `${stageColor}30` }}
               >
-                <LinearGradient
-                  colors={[`${stageColor}20`, `${stageColor}10`]}
-                  start={{ x: 0, y: 0 }}
-                  end={{ x: 1, y: 1 }}
-                  style={{ borderRadius: 20, padding: 16, borderWidth: 1, borderColor: `${stageColor}30` }}
+                <Pressable
+                  onPress={() => {
+                    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                    router.push('/luna-ai');
+                  }}
                 >
-                  <View className="flex-row items-center">
+                  <View className="flex-row items-center mb-4">
                     <View
-                      className="w-10 h-10 rounded-full items-center justify-center mr-3"
-                      style={{ backgroundColor: `${stageColor}25` }}
+                      className="w-12 h-12 rounded-full items-center justify-center mr-3"
+                      style={{ backgroundColor: `${stageColor}30` }}
                     >
-                      <Sparkles size={18} color={stageColor} />
+                      <Sparkles size={22} color={stageColor} />
                     </View>
                     <View className="flex-1">
                       <Text
-                        style={{ fontFamily: 'Quicksand_600SemiBold', color: theme.text.primary }}
-                        className="text-base"
+                        style={{ fontFamily: 'CormorantGaramond_600SemiBold', color: theme.text.primary }}
+                        className="text-xl"
                       >
-                        Ask Luna AI
+                        Luna AI
                       </Text>
                       <Text
-                        style={{ fontFamily: 'Quicksand_400Regular', color: theme.text.tertiary }}
+                        style={{ fontFamily: 'Quicksand_400Regular', color: theme.text.secondary }}
                         className="text-xs mt-0.5"
                       >
-                        Get personalized wellness advice
+                        Ask me anything about food, movement & mood
                       </Text>
                     </View>
                     <View
@@ -493,8 +493,34 @@ export default function HomeScreen() {
                       <MessageCircle size={16} color={stageColor} />
                     </View>
                   </View>
-                </LinearGradient>
-              </Pressable>
+                </Pressable>
+
+                {/* Quick Prompt Chips */}
+                <View className="flex-row flex-wrap" style={{ gap: 8 }}>
+                  {[
+                    { label: '🥗 What should I eat today?', prompt: 'What should I eat today to support my wellness?' },
+                    { label: '🏃 Best exercise for my energy?', prompt: 'What exercise suits my energy level and life stage today?' },
+                    { label: '💜 Help me feel better', prompt: 'I need some guidance on how to feel better today — physically and emotionally.' },
+                  ].map((chip) => (
+                    <Pressable
+                      key={chip.label}
+                      onPress={() => {
+                        Haptics.selectionAsync();
+                        router.push({ pathname: '/luna-ai', params: { prompt: chip.prompt } } as any);
+                      }}
+                      className="rounded-full px-4 py-2"
+                      style={{ backgroundColor: `${stageColor}15`, borderWidth: 1, borderColor: `${stageColor}25` }}
+                    >
+                      <Text
+                        style={{ fontFamily: 'Quicksand_500Medium', color: stageColor }}
+                        className="text-xs"
+                      >
+                        {chip.label}
+                      </Text>
+                    </Pressable>
+                  ))}
+                </View>
+              </LinearGradient>
             </Animated.View>
 
             {/* Daily Affirmation */}
@@ -895,37 +921,37 @@ export default function HomeScreen() {
             entering={FadeInUp.delay(700).duration(600)}
             className="mx-6 mt-6"
           >
-            <Pressable
-              onPress={() => {
-                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                router.push('/luna-ai');
-              }}
+            <LinearGradient
+              colors={[`${theme.accent.purple}25`, `${theme.accent.lavender}15`, `${theme.accent.pink}10`]}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+              style={{ borderRadius: 24, padding: 20, borderWidth: 1, borderColor: `${theme.accent.purple}30` }}
             >
-              <LinearGradient
-                colors={[`${theme.accent.purple}20`, `${theme.accent.purple}10`]}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 1 }}
-                style={{ borderRadius: 20, padding: 16, borderWidth: 1, borderColor: `${theme.accent.purple}30` }}
+              <Pressable
+                onPress={() => {
+                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                  router.push('/luna-ai');
+                }}
               >
-                <View className="flex-row items-center">
+                <View className="flex-row items-center mb-4">
                   <View
-                    className="w-10 h-10 rounded-full items-center justify-center mr-3"
-                    style={{ backgroundColor: `${theme.accent.purple}25` }}
+                    className="w-12 h-12 rounded-full items-center justify-center mr-3"
+                    style={{ backgroundColor: `${theme.accent.purple}30` }}
                   >
-                    <Sparkles size={18} color={theme.accent.purple} />
+                    <Sparkles size={22} color={theme.accent.purple} />
                   </View>
                   <View className="flex-1">
                     <Text
-                      style={{ fontFamily: 'Quicksand_600SemiBold', color: theme.text.primary }}
-                      className="text-base"
+                      style={{ fontFamily: 'CormorantGaramond_600SemiBold', color: theme.text.primary }}
+                      className="text-xl"
                     >
-                      Ask Luna AI
+                      Luna AI
                     </Text>
                     <Text
-                      style={{ fontFamily: 'Quicksand_400Regular', color: theme.text.tertiary }}
+                      style={{ fontFamily: 'Quicksand_400Regular', color: theme.text.secondary }}
                       className="text-xs mt-0.5"
                     >
-                      Get personalized cycle advice
+                      Ask me anything about food, movement & mood
                     </Text>
                   </View>
                   <View
@@ -935,8 +961,34 @@ export default function HomeScreen() {
                     <MessageCircle size={16} color={theme.accent.purple} />
                   </View>
                 </View>
-              </LinearGradient>
-            </Pressable>
+              </Pressable>
+
+              {/* Quick Prompt Chips */}
+              <View className="flex-row flex-wrap" style={{ gap: 8 }}>
+                {[
+                  { label: '🥗 What should I eat today?', prompt: `What should I eat today? I'm in my ${info.name.toLowerCase()} phase.` },
+                  { label: '🏃 Best exercise for my energy?', prompt: `What's the best exercise for my energy levels today in my ${info.name.toLowerCase()} phase?` },
+                  { label: '💜 Help me feel better', prompt: 'I need some guidance on how to feel better today. What do you suggest?' },
+                ].map((chip) => (
+                  <Pressable
+                    key={chip.label}
+                    onPress={() => {
+                      Haptics.selectionAsync();
+                      router.push({ pathname: '/luna-ai', params: { prompt: chip.prompt } } as any);
+                    }}
+                    className="rounded-full px-4 py-2"
+                    style={{ backgroundColor: `${theme.accent.purple}15`, borderWidth: 1, borderColor: `${theme.accent.purple}25` }}
+                  >
+                    <Text
+                      style={{ fontFamily: 'Quicksand_500Medium', color: theme.accent.purple }}
+                      className="text-xs"
+                    >
+                      {chip.label}
+                    </Text>
+                  </Pressable>
+                ))}
+              </View>
+            </LinearGradient>
           </Animated.View>
 
           {/* Daily Affirmation */}
