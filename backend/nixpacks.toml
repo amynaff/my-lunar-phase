@@ -9,3 +9,6 @@ cmds = ["bunx prisma generate"]
 
 [start]
 cmd = "ENVIRONMENT=production bash scripts/start"
+
+[variables]
+LD_LIBRARY_PATH = "/nix/var/nix/profiles/default/lib"
