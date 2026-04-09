@@ -69,6 +69,7 @@ export default function OnboardingPage() {
     setPeriodLength,
     setLastPeriodStart,
     completeOnboarding,
+    lifeStage: storedLifeStage,
   } = useCycleStore();
 
   const { subscribe: subscribePush } = usePushNotifications();
@@ -487,7 +488,7 @@ export default function OnboardingPage() {
                   </div>
 
                   <div className="space-y-3 mb-8">
-                    {(NOTIFICATION_OPTIONS[selectedStage ?? "regular"]).map(({ icon, text }) => (
+                    {(NOTIFICATION_OPTIONS[selectedStage ?? storedLifeStage ?? "regular"]).map(({ icon, text }) => (
                       <div key={text} className="flex items-center gap-3 px-3 py-2.5 rounded-xl bg-bg-secondary/50">
                         <span className="text-lg">{icon}</span>
                         <span className="text-sm font-quicksand text-text-secondary">{text}</span>

@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
-import { Sparkles, Apple, Dumbbell, Heart, Moon, Calendar, Droplets, BookOpen } from "lucide-react";
+import { Sparkles, Apple, Dumbbell, Heart, Moon, Calendar, Droplets, BookOpen, MessageCircle } from "lucide-react";
 import { CycleWheel } from "@/components/cycle/cycle-wheel";
 import { MoonPhaseCard } from "@/components/cycle/moon-phase-card";
 import { PhaseInfoCard } from "@/components/cycle/phase-info-card";
@@ -252,6 +252,49 @@ export default function DashboardPage() {
           <CycleInsightsCard />
         </div>
       </div>
+
+      {/* Luna AI — prominent card */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.12 }}
+        className="mt-6"
+      >
+        <Link
+          href="/luna-ai"
+          className="block w-full rounded-[24px] p-5 bg-gradient-to-br from-accent-purple/20 via-accent-lavender/15 to-accent-pink/10 border border-accent-purple/20 hover:border-accent-purple/40 transition-all"
+        >
+          <div className="flex items-center gap-3 mb-4">
+            <div className="flex items-center justify-center w-10 h-10 rounded-full bg-accent-purple/20">
+              <Sparkles className="h-5 w-5 text-accent-purple" />
+            </div>
+            <div>
+              <p className="font-cormorant text-xl font-semibold text-text-primary">Ask Luna AI</p>
+              <p className="text-xs font-quicksand text-text-secondary">Your personal wellness guide</p>
+            </div>
+            <MessageCircle className="h-4 w-4 text-accent-purple ml-auto" />
+          </div>
+          <p className="text-sm font-quicksand text-text-secondary mb-4 leading-relaxed">
+            What do you need today? Ask about food, movement, mood, or anything wellness-related.
+          </p>
+        </Link>
+        {/* Quick prompt chips */}
+        <div className="flex gap-2 mt-3 flex-wrap">
+          {[
+            { label: "🥗 What should I eat?", prompt: "What should I eat today based on my cycle phase?" },
+            { label: "💪 Best exercise for me?", prompt: "What exercise is best for my body today?" },
+            { label: "✨ Help me feel better", prompt: "I need help feeling better today. What do you recommend?" },
+          ].map(({ label, prompt }) => (
+            <Link
+              key={label}
+              href={`/luna-ai?prompt=${encodeURIComponent(prompt)}`}
+              className="px-3 py-1.5 rounded-full text-xs font-quicksand font-medium bg-bg-card border border-border-light text-text-secondary hover:border-accent-purple/40 hover:text-accent-purple transition-all"
+            >
+              {label}
+            </Link>
+          ))}
+        </div>
+      </motion.div>
 
       {/* Today's log card */}
       <motion.div
