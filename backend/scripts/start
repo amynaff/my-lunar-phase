@@ -6,6 +6,13 @@ set -o pipefail
 # Load shared environment setup
 source "$(dirname "$0")/env.sh"
 
+# Make Nix-installed OpenSSL visible to dynamically linked binaries (e.g. Prisma)
+OPENSSL_LIB=$(find /nix/store -maxdepth 4 -name 'libssl.so.3' 2>/dev/null | head -1 | xargs -r dirname)
+if [[ -n "${OPENSSL_LIB}" ]]; then
+  export LD_LIBRARY_PATH="${OPENSSL_LIB}:${LD_LIBRARY_PATH:-}"
+  echo "OpenSSL found at: ${OPENSSL_LIB}"
+fi
+
 # Backup the database before proceeding.
 if [[ "${ENVIRONMENT}" == "production" ]] && [[ -f "${DATABASE_FILE}" ]]; then
   DATABASE_BACKUP_FILE="${DATABASE_FILE}-$(date +%s)"
