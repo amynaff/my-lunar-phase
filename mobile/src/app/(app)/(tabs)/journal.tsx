@@ -4,7 +4,6 @@ import {
   Text,
   ScrollView,
   Pressable,
-  Dimensions,
   Alert,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -17,15 +16,11 @@ import Animated, {
 import {
   BookOpen,
   Plus,
-  Calendar,
   ChevronLeft,
   ChevronRight,
   Flame,
   Mic,
-  Play,
   Sparkles,
-  Search,
-  Filter,
   Zap,
   Moon,
   Trash2,
@@ -46,8 +41,6 @@ import { useCycleStore, phaseInfo, CyclePhase } from '@/lib/cycle-store';
 import { useJournalStore, journalPrompts, JournalEntry } from '@/lib/journal-store';
 import { JournalEntryModal } from '@/components/JournalEntryModal';
 import { QuickCheckInSheet } from '@/components/QuickCheckInSheet';
-
-const { width } = Dimensions.get('window');
 
 type ViewMode = 'week' | 'month' | 'all';
 
@@ -223,110 +216,88 @@ export default function JournalScreen() {
             className="px-6"
           >
             <View className="flex-row items-center justify-between mb-2">
-              <View>
-                <Text
-                  style={{ fontFamily: 'CormorantGaramond_400Regular', color: theme.text.muted }}
-                  className="text-sm tracking-widest uppercase"
-                >
-                  Reflect & Remember
-                </Text>
-                <Text
-                  style={{ fontFamily: 'CormorantGaramond_600SemiBold', color: theme.text.primary }}
-                  className="text-3xl mt-1"
-                >
-                  Journal
-                </Text>
-              </View>
-              <View className="flex-row items-center" style={{ gap: 10 }}>
+              <Text
+                style={{ fontFamily: 'CormorantGaramond_600SemiBold', color: theme.text.primary }}
+                className="text-3xl"
+              >
+                Journal
+              </Text>
+              <View className="flex-row items-center" style={{ gap: 8 }}>
                 {/* Quick Check-In Button */}
                 <Pressable
                   onPress={() => {
                     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
                     setShowQuickCheckIn(true);
                   }}
-                  className="w-12 h-12 rounded-full items-center justify-center"
-                  style={{ backgroundColor: `${theme.accent.pink}` }}
+                  className="h-10 px-4 rounded-full items-center justify-center flex-row"
+                  style={{ backgroundColor: `${theme.accent.pink}18`, gap: 6 }}
                 >
-                  <Zap size={22} color="#fff" />
+                  <Zap size={16} color={theme.accent.pink} />
+                  <Text
+                    style={{ fontFamily: 'Quicksand_600SemiBold', color: theme.accent.pink }}
+                    className="text-xs"
+                  >
+                    Quick
+                  </Text>
                 </Pressable>
                 {/* New Entry Button */}
                 <Pressable
                   onPress={() => openNewEntry()}
-                  className="w-12 h-12 rounded-full items-center justify-center"
-                  style={{ backgroundColor: theme.accent.purple }}
+                  className="h-10 px-4 rounded-full items-center justify-center flex-row"
+                  style={{ backgroundColor: theme.accent.purple, gap: 6 }}
                 >
-                  <Plus size={24} color="#fff" />
+                  <Plus size={16} color="#fff" />
+                  <Text
+                    style={{ fontFamily: 'Quicksand_600SemiBold', color: '#fff' }}
+                    className="text-xs"
+                  >
+                    New
+                  </Text>
                 </Pressable>
               </View>
             </View>
           </Animated.View>
 
-          {/* Stats Row */}
+          {/* Stats Row — lightweight inline strip */}
           <Animated.View
             entering={FadeInUp.delay(150).duration(600)}
-            className="px-6 mt-4"
+            className="px-6 mt-3"
           >
-            <View className="flex-row" style={{ gap: 12 }}>
-              <View
-                className="flex-1 p-4 rounded-2xl border"
-                style={{ backgroundColor: theme.bg.card, borderColor: theme.border.light }}
-              >
-                <View className="flex-row items-center mb-1">
-                  <Flame size={16} color="#f59e0b" />
-                  <Text
-                    style={{ fontFamily: 'Quicksand_600SemiBold', color: '#f59e0b' }}
-                    className="text-xl ml-2"
-                  >
+            <View
+              className="flex-row rounded-2xl px-4 py-3"
+              style={{ backgroundColor: theme.bg.card }}
+            >
+              <View className="flex-1 items-center">
+                <View className="flex-row items-center" style={{ gap: 4 }}>
+                  <Flame size={14} color="#f59e0b" />
+                  <Text style={{ fontFamily: 'Quicksand_600SemiBold', color: '#f59e0b' }} className="text-lg">
                     {streak}
                   </Text>
                 </View>
-                <Text
-                  style={{ fontFamily: 'Quicksand_400Regular', color: theme.text.tertiary }}
-                  className="text-xs"
-                >
-                  Day streak
+                <Text style={{ fontFamily: 'Quicksand_400Regular', color: theme.text.tertiary }} className="text-xs mt-0.5">
+                  streak
                 </Text>
               </View>
-
               <View
-                className="flex-1 p-4 rounded-2xl border"
-                style={{ backgroundColor: theme.bg.card, borderColor: theme.border.light }}
-              >
-                <View className="flex-row items-center mb-1">
-                  <BookOpen size={16} color={theme.accent.purple} />
-                  <Text
-                    style={{ fontFamily: 'Quicksand_600SemiBold', color: theme.accent.purple }}
-                    className="text-xl ml-2"
-                  >
-                    {entriesThisWeek}
-                  </Text>
-                </View>
-                <Text
-                  style={{ fontFamily: 'Quicksand_400Regular', color: theme.text.tertiary }}
-                  className="text-xs"
-                >
-                  This week
+                style={{ width: 1, backgroundColor: theme.border.light, marginVertical: 4 }}
+              />
+              <View className="flex-1 items-center">
+                <Text style={{ fontFamily: 'Quicksand_600SemiBold', color: theme.accent.purple }} className="text-lg">
+                  {entriesThisWeek}
+                </Text>
+                <Text style={{ fontFamily: 'Quicksand_400Regular', color: theme.text.tertiary }} className="text-xs mt-0.5">
+                  this week
                 </Text>
               </View>
-
               <View
-                className="flex-1 p-4 rounded-2xl border"
-                style={{ backgroundColor: theme.bg.card, borderColor: theme.border.light }}
-              >
-                <View className="flex-row items-center mb-1">
-                  <Calendar size={16} color={theme.accent.pink} />
-                  <Text
-                    style={{ fontFamily: 'Quicksand_600SemiBold', color: theme.accent.pink }}
-                    className="text-xl ml-2"
-                  >
-                    {totalEntries}
-                  </Text>
-                </View>
-                <Text
-                  style={{ fontFamily: 'Quicksand_400Regular', color: theme.text.tertiary }}
-                  className="text-xs"
-                >
-                  Total entries
+                style={{ width: 1, backgroundColor: theme.border.light, marginVertical: 4 }}
+              />
+              <View className="flex-1 items-center">
+                <Text style={{ fontFamily: 'Quicksand_600SemiBold', color: theme.accent.pink }} className="text-lg">
+                  {totalEntries}
+                </Text>
+                <Text style={{ fontFamily: 'Quicksand_400Regular', color: theme.text.tertiary }} className="text-xs mt-0.5">
+                  total
                 </Text>
               </View>
             </View>
@@ -490,84 +461,14 @@ export default function JournalScreen() {
             </Animated.View>
           )}
 
-          {/* Journal Prompts - Quick Start */}
+          {/* Entries List */}
           <Animated.View
             entering={FadeInUp.delay(250).duration(600)}
             className="px-6 mt-6"
           >
-            <View className="flex-row items-center mb-3">
-              <Sparkles size={16} color={theme.accent.purple} />
-              <Text
-                style={{ fontFamily: 'Quicksand_600SemiBold', color: theme.text.primary }}
-                className="text-sm ml-2"
-              >
-                Today's Prompts
-              </Text>
-              <View
-                className="px-2 py-0.5 rounded-full ml-2"
-                style={{ backgroundColor: `${phaseInfo[currentPhase]?.color || theme.accent.purple}20` }}
-              >
-                <Text
-                  style={{
-                    fontFamily: 'Quicksand_500Medium',
-                    color: phaseInfo[currentPhase]?.color || theme.accent.purple,
-                  }}
-                  className="text-xs"
-                >
-                  {phasePromptData.theme}
-                </Text>
-              </View>
-            </View>
-
-            <ScrollView
-              horizontal
-              showsHorizontalScrollIndicator={false}
-              contentContainerStyle={{ paddingRight: 20 }}
-            >
-              {phasePromptData.prompts.slice(0, 3).map((prompt, index) => (
-                <Pressable
-                  key={index}
-                  onPress={() => openNewEntry(prompt)}
-                  className="mr-3 p-4 rounded-2xl border"
-                  style={{
-                    backgroundColor: theme.bg.card,
-                    borderColor: theme.border.light,
-                    width: width * 0.7,
-                  }}
-                >
-                  <Text
-                    style={{ fontFamily: 'Quicksand_400Regular', color: theme.text.secondary }}
-                    className="text-sm leading-5"
-                    numberOfLines={2}
-                  >
-                    {prompt}
-                  </Text>
-                  <View className="flex-row items-center mt-3">
-                    <View
-                      className="px-3 py-1.5 rounded-full"
-                      style={{ backgroundColor: `${theme.accent.purple}15` }}
-                    >
-                      <Text
-                        style={{ fontFamily: 'Quicksand_500Medium', color: theme.accent.purple }}
-                        className="text-xs"
-                      >
-                        Start writing
-                      </Text>
-                    </View>
-                  </View>
-                </Pressable>
-              ))}
-            </ScrollView>
-          </Animated.View>
-
-          {/* Entries List */}
-          <Animated.View
-            entering={FadeInUp.delay(300).duration(600)}
-            className="px-6 mt-6"
-          >
             <Text
               style={{ fontFamily: 'Quicksand_600SemiBold', color: theme.text.primary }}
-              className="text-lg mb-4"
+              className="text-base mb-3"
             >
               {viewMode === 'week'
                 ? 'This Week'
@@ -578,29 +479,35 @@ export default function JournalScreen() {
 
             {displayedEntries.length === 0 ? (
               <View
-                className="p-8 rounded-2xl border items-center"
+                className="p-6 rounded-2xl border items-center"
                 style={{ backgroundColor: theme.bg.card, borderColor: theme.border.light }}
               >
-                <BookOpen size={40} color={theme.text.tertiary} />
+                <BookOpen size={32} color={theme.text.tertiary} />
                 <Text
                   style={{ fontFamily: 'Quicksand_500Medium', color: theme.text.secondary }}
-                  className="text-base mt-4"
+                  className="text-sm mt-3"
                 >
-                  No entries yet
+                  Nothing here yet
                 </Text>
-                <Text
-                  style={{ fontFamily: 'Quicksand_400Regular', color: theme.text.tertiary }}
-                  className="text-sm text-center mt-1"
+                <Pressable
+                  onPress={() => openNewEntry(phasePromptData.prompts[0])}
+                  className="mt-3 px-4 py-2 rounded-full"
+                  style={{ backgroundColor: `${theme.accent.purple}15` }}
                 >
-                  Tap the + button to write your first journal entry
-                </Text>
+                  <Text
+                    style={{ fontFamily: 'Quicksand_600SemiBold', color: theme.accent.purple }}
+                    className="text-xs"
+                  >
+                    Start writing
+                  </Text>
+                </Pressable>
               </View>
             ) : (
-              <View style={{ gap: 12 }}>
+              <View style={{ gap: 10 }}>
                 {displayedEntries.map((entry, index) => (
                   <Animated.View
                     key={entry.id}
-                    entering={FadeInUp.delay(350 + index * 50).duration(400)}
+                    entering={FadeInUp.delay(300 + index * 50).duration(400)}
                   >
                     <Pressable
                       onPress={() => openEditEntry(entry)}
@@ -609,7 +516,7 @@ export default function JournalScreen() {
                     >
                       {/* Entry Header */}
                       <View className="flex-row items-center justify-between mb-2">
-                        <View className="flex-row items-center flex-1">
+                        <View className="flex-row items-center flex-1 flex-wrap" style={{ gap: 6 }}>
                           <Text
                             style={{ fontFamily: 'Quicksand_500Medium', color: theme.text.tertiary }}
                             className="text-xs"
@@ -617,43 +524,29 @@ export default function JournalScreen() {
                             {formatDate(entry.date)} · {formatTime(entry.createdAt)}
                           </Text>
                           {entry.cyclePhase && phaseInfo[entry.cyclePhase as CyclePhase] && (
-                            <View
-                              className="px-2 py-0.5 rounded-full ml-2"
+                            <Text
                               style={{
-                                backgroundColor: `${phaseInfo[entry.cyclePhase as CyclePhase].color}15`,
+                                fontFamily: 'Quicksand_400Regular',
+                                color: phaseInfo[entry.cyclePhase as CyclePhase].color,
                               }}
+                              className="text-xs"
                             >
-                              <Text
-                                className="text-xs"
-                                style={{
-                                  fontFamily: 'Quicksand_500Medium',
-                                  color: phaseInfo[entry.cyclePhase as CyclePhase].color,
-                                }}
-                              >
-                                {phaseInfo[entry.cyclePhase as CyclePhase].emoji} Day {entry.dayOfCycle}
-                              </Text>
-                            </View>
+                              {phaseInfo[entry.cyclePhase as CyclePhase].emoji} Day {entry.dayOfCycle}
+                            </Text>
                           )}
                         </View>
-                        <View className="flex-row items-center" style={{ gap: 8 }}>
+                        <View className="flex-row items-center" style={{ gap: 6 }}>
                           {entry.voiceMemoUri && (
-                            <View
-                              className="w-6 h-6 rounded-full items-center justify-center"
-                              style={{ backgroundColor: `${theme.accent.purple}15` }}
-                            >
-                              <Mic size={12} color={theme.accent.purple} />
-                            </View>
+                            <Mic size={12} color={theme.text.tertiary} />
                           )}
                           <Pressable
                             onPress={(e) => {
                               e.stopPropagation();
                               confirmDeleteEntry(entry);
                             }}
-                            className="w-6 h-6 rounded-full items-center justify-center"
-                            style={{ backgroundColor: `${theme.accent.pink}15` }}
                             hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
                           >
-                            <Trash2 size={12} color={theme.accent.pink} />
+                            <Trash2 size={14} color={theme.text.tertiary} />
                           </Pressable>
                         </View>
                       </View>
@@ -668,20 +561,6 @@ export default function JournalScreen() {
                         </Text>
                       )}
 
-                      {/* Prompt (if used) */}
-                      {entry.prompt && (
-                        <View className="flex-row items-start mb-2">
-                          <Sparkles size={12} color={theme.accent.purple} style={{ marginTop: 2 }} />
-                          <Text
-                            style={{ fontFamily: 'Quicksand_400Regular', color: theme.accent.purple }}
-                            className="text-xs ml-1 flex-1"
-                            numberOfLines={1}
-                          >
-                            {entry.prompt}
-                          </Text>
-                        </View>
-                      )}
-
                       {/* Content Preview */}
                       <Text
                         style={{ fontFamily: 'Quicksand_400Regular', color: theme.text.secondary }}
@@ -693,27 +572,33 @@ export default function JournalScreen() {
 
                       {/* Tags */}
                       {entry.tags.length > 0 && (
-                        <View className="flex-row flex-wrap mt-3" style={{ gap: 6 }}>
-                          {entry.tags.slice(0, 4).map((tagId) => {
-                            const tag = journalPrompts[currentPhase]
-                              ? { id: tagId, label: tagId, emoji: '' }
-                              : { id: tagId, label: tagId, emoji: '' };
-                            return (
-                              <View
-                                key={tagId}
-                                className="px-2 py-1 rounded-full"
-                                style={{ backgroundColor: `${theme.accent.lavender}20` }}
+                        <View className="flex-row flex-wrap mt-2" style={{ gap: 6 }}>
+                          {entry.tags.slice(0, 4).map((tagId) => (
+                            <View
+                              key={tagId}
+                              className="px-2 py-0.5 rounded-full"
+                              style={{ backgroundColor: `${theme.accent.purple}12` }}
+                            >
+                              <Text
+                                style={{ fontFamily: 'Quicksand_400Regular', color: theme.text.tertiary }}
+                                className="text-xs"
                               >
-                                <Text
-                                  style={{ fontFamily: 'Quicksand_400Regular', color: theme.text.tertiary }}
-                                  className="text-xs"
-                                >
-                                  {tagId}
-                                </Text>
-                              </View>
-                            );
-                          })}
+                                {tagId}
+                              </Text>
+                            </View>
+                          ))}
                         </View>
+                      )}
+
+                      {/* Prompt used */}
+                      {entry.prompt && (
+                        <Text
+                          style={{ fontFamily: 'Quicksand_400Regular', color: theme.text.tertiary }}
+                          className="text-xs italic mt-2"
+                          numberOfLines={1}
+                        >
+                          "{entry.prompt}"
+                        </Text>
                       )}
 
                       {/* Luna's Reflection */}
@@ -722,8 +607,8 @@ export default function JournalScreen() {
                           className="mt-3 p-3 rounded-xl"
                           style={{ backgroundColor: `${theme.accent.purple}08` }}
                         >
-                          <View className="flex-row items-center mb-2">
-                            <Moon size={14} color={theme.accent.purple} />
+                          <View className="flex-row items-center mb-1">
+                            <Moon size={12} color={theme.accent.purple} />
                             <Text
                               style={{ fontFamily: 'Quicksand_600SemiBold', color: theme.accent.purple }}
                               className="text-xs ml-1.5"
@@ -733,7 +618,7 @@ export default function JournalScreen() {
                           </View>
                           <Text
                             style={{ fontFamily: 'Quicksand_400Regular', color: theme.text.secondary }}
-                            className="text-sm leading-5 italic"
+                            className="text-xs leading-4 italic"
                           >
                             {(entry as any).lunaReflection}
                           </Text>
@@ -744,6 +629,46 @@ export default function JournalScreen() {
                 ))}
               </View>
             )}
+          </Animated.View>
+
+          {/* Today's Prompt — at the bottom, as a writing nudge */}
+          <Animated.View
+            entering={FadeInUp.delay(300).duration(600)}
+            className="px-6 mt-6"
+          >
+            <View
+              className="p-4 rounded-2xl border"
+              style={{ backgroundColor: theme.bg.card, borderColor: theme.border.light }}
+            >
+              <View className="flex-row items-center mb-2" style={{ gap: 6 }}>
+                <Sparkles size={14} color={theme.accent.purple} />
+                <Text
+                  style={{ fontFamily: 'Quicksand_600SemiBold', color: theme.accent.purple }}
+                  className="text-xs"
+                >
+                  {phasePromptData.theme}
+                </Text>
+              </View>
+              <Text
+                style={{ fontFamily: 'Quicksand_400Regular', color: theme.text.secondary }}
+                className="text-sm leading-5 italic mb-3"
+                numberOfLines={2}
+              >
+                "{phasePromptData.prompts[0]}"
+              </Text>
+              <Pressable
+                onPress={() => openNewEntry(phasePromptData.prompts[0])}
+                className="self-start px-3 py-1.5 rounded-full"
+                style={{ backgroundColor: `${theme.accent.purple}15` }}
+              >
+                <Text
+                  style={{ fontFamily: 'Quicksand_600SemiBold', color: theme.accent.purple }}
+                  className="text-xs"
+                >
+                  Write to this prompt
+                </Text>
+              </Pressable>
+            </View>
           </Animated.View>
         </ScrollView>
       </LinearGradient>
