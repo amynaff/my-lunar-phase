@@ -3,7 +3,7 @@ import { View, Text, ScrollView, Pressable, Switch, Alert } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Animated, { FadeInDown, FadeInUp } from 'react-native-reanimated';
-import { ArrowLeft, Bell, Calendar, Sparkles, Moon, Clock, ChevronRight, BellOff, Heart, Droplets, Sun, Volume2 } from 'lucide-react-native';
+import { ArrowLeft, Bell, Calendar, Sparkles, Moon, Clock, ChevronRight, BellOff, Heart, Droplets, Sun, Volume2, Flame, Brain, Activity, Clipboard } from 'lucide-react-native';
 import { router } from 'expo-router';
 import * as Haptics from 'expo-haptics';
 import { useThemeStore, getTheme } from '@/lib/theme-store';
@@ -73,6 +73,7 @@ export default function NotificationSettingsScreen() {
   const [isLoading, setIsLoading] = useState(true);
 
   const isNonCycling = lifeStage === 'menopause' || lifeStage === 'postmenopause';
+  const isPerimenopause = lifeStage === 'perimenopause';
 
   const [fontsLoaded] = useFonts({
     Quicksand_400Regular,
@@ -430,6 +431,235 @@ export default function NotificationSettingsScreen() {
                         onValueChange={(value) => updateSetting('ovulationAlerts', value)}
                         trackColor={{ false: theme.border.light, true: `${theme.accent.lavender}50` }}
                         thumbColor={settings.ovulationAlerts ? theme.accent.lavender : theme.text.muted}
+                      />
+                    </View>
+                  </View>
+                </Animated.View>
+              )}
+
+              {/* Menopause Support — menopause & postmenopause only */}
+              {isNonCycling && (
+                <Animated.View entering={FadeInUp.delay(200).duration(400)} className="px-6 mb-4">
+                  <Text style={{ fontFamily: 'Quicksand_600SemiBold', color: theme.text.muted }} className="text-xs mb-3 uppercase tracking-wide">
+                    Menopause Support
+                  </Text>
+                  <View
+                    className="rounded-2xl overflow-hidden"
+                    style={{ backgroundColor: theme.bg.card, borderWidth: 1, borderColor: theme.border.light }}
+                  >
+                    {/* Hot Flash Reminders */}
+                    <View className="p-4 flex-row items-center justify-between border-b" style={{ borderColor: theme.border.light }}>
+                      <View className="flex-row items-center flex-1">
+                        <View className="w-10 h-10 rounded-full items-center justify-center mr-3" style={{ backgroundColor: `${theme.accent.blush}20` }}>
+                          <Flame size={18} color={theme.accent.blush} />
+                        </View>
+                        <View className="flex-1">
+                          <Text style={{ fontFamily: 'Quicksand_500Medium', color: theme.text.primary }} className="text-sm">
+                            Hot Flash Tips
+                          </Text>
+                          <Text style={{ fontFamily: 'Quicksand_400Regular', color: theme.text.muted }} className="text-xs">
+                            Daily cooling strategies & reminders
+                          </Text>
+                        </View>
+                      </View>
+                      <Switch
+                        value={settings.hotFlashReminders}
+                        onValueChange={(value) => updateSetting('hotFlashReminders', value)}
+                        trackColor={{ false: theme.border.light, true: `${theme.accent.blush}50` }}
+                        thumbColor={settings.hotFlashReminders ? theme.accent.blush : theme.text.muted}
+                      />
+                    </View>
+
+                    {/* Mood & Anxiety Check-Ins */}
+                    <View className="p-4 flex-row items-center justify-between border-b" style={{ borderColor: theme.border.light }}>
+                      <View className="flex-row items-center flex-1">
+                        <View className="w-10 h-10 rounded-full items-center justify-center mr-3" style={{ backgroundColor: `${theme.accent.lavender}20` }}>
+                          <Brain size={18} color={theme.accent.lavender} />
+                        </View>
+                        <View className="flex-1">
+                          <Text style={{ fontFamily: 'Quicksand_500Medium', color: theme.text.primary }} className="text-sm">
+                            Mood & Anxiety Check-Ins
+                          </Text>
+                          <Text style={{ fontFamily: 'Quicksand_400Regular', color: theme.text.muted }} className="text-xs">
+                            Afternoon emotional wellness check
+                          </Text>
+                        </View>
+                      </View>
+                      <Switch
+                        value={settings.moodCheckIns}
+                        onValueChange={(value) => updateSetting('moodCheckIns', value)}
+                        trackColor={{ false: theme.border.light, true: `${theme.accent.lavender}50` }}
+                        thumbColor={settings.moodCheckIns ? theme.accent.lavender : theme.text.muted}
+                      />
+                    </View>
+
+                    {/* Sleep Quality */}
+                    <View className="p-4 flex-row items-center justify-between border-b" style={{ borderColor: theme.border.light }}>
+                      <View className="flex-row items-center flex-1">
+                        <View className="w-10 h-10 rounded-full items-center justify-center mr-3" style={{ backgroundColor: `${theme.accent.purple}20` }}>
+                          <Moon size={18} color={theme.accent.purple} />
+                        </View>
+                        <View className="flex-1">
+                          <Text style={{ fontFamily: 'Quicksand_500Medium', color: theme.text.primary }} className="text-sm">
+                            Sleep Quality Reminders
+                          </Text>
+                          <Text style={{ fontFamily: 'Quicksand_400Regular', color: theme.text.muted }} className="text-xs">
+                            Evening wind-down tips
+                          </Text>
+                        </View>
+                      </View>
+                      <Switch
+                        value={settings.sleepQualityReminders}
+                        onValueChange={(value) => updateSetting('sleepQualityReminders', value)}
+                        trackColor={{ false: theme.border.light, true: `${theme.accent.purple}50` }}
+                        thumbColor={settings.sleepQualityReminders ? theme.accent.purple : theme.text.muted}
+                      />
+                    </View>
+
+                    {/* Bone Health */}
+                    <View className="p-4 flex-row items-center justify-between border-b" style={{ borderColor: theme.border.light }}>
+                      <View className="flex-row items-center flex-1">
+                        <View className="w-10 h-10 rounded-full items-center justify-center mr-3" style={{ backgroundColor: `${theme.accent.pink}20` }}>
+                          <Activity size={18} color={theme.accent.pink} />
+                        </View>
+                        <View className="flex-1">
+                          <Text style={{ fontFamily: 'Quicksand_500Medium', color: theme.text.primary }} className="text-sm">
+                            Bone Health
+                          </Text>
+                          <Text style={{ fontFamily: 'Quicksand_400Regular', color: theme.text.muted }} className="text-xs">
+                            Weekly calcium & exercise reminder
+                          </Text>
+                        </View>
+                      </View>
+                      <Switch
+                        value={settings.boneHealthReminders}
+                        onValueChange={(value) => updateSetting('boneHealthReminders', value)}
+                        trackColor={{ false: theme.border.light, true: `${theme.accent.pink}50` }}
+                        thumbColor={settings.boneHealthReminders ? theme.accent.pink : theme.text.muted}
+                      />
+                    </View>
+
+                    {/* Heart Health */}
+                    <View className="p-4 flex-row items-center justify-between">
+                      <View className="flex-row items-center flex-1">
+                        <View className="w-10 h-10 rounded-full items-center justify-center mr-3" style={{ backgroundColor: `${theme.accent.blush}20` }}>
+                          <Heart size={18} color={theme.accent.blush} />
+                        </View>
+                        <View className="flex-1">
+                          <Text style={{ fontFamily: 'Quicksand_500Medium', color: theme.text.primary }} className="text-sm">
+                            Heart Health
+                          </Text>
+                          <Text style={{ fontFamily: 'Quicksand_400Regular', color: theme.text.muted }} className="text-xs">
+                            Weekly cardiovascular wellness reminder
+                          </Text>
+                        </View>
+                      </View>
+                      <Switch
+                        value={settings.heartHealthReminders}
+                        onValueChange={(value) => updateSetting('heartHealthReminders', value)}
+                        trackColor={{ false: theme.border.light, true: `${theme.accent.blush}50` }}
+                        thumbColor={settings.heartHealthReminders ? theme.accent.blush : theme.text.muted}
+                      />
+                    </View>
+                  </View>
+                </Animated.View>
+              )}
+
+              {/* Perimenopause Symptom Tracking */}
+              {isPerimenopause && (
+                <Animated.View entering={FadeInUp.delay(200).duration(400)} className="px-6 mb-4">
+                  <Text style={{ fontFamily: 'Quicksand_600SemiBold', color: theme.text.muted }} className="text-xs mb-3 uppercase tracking-wide">
+                    Symptom Tracking
+                  </Text>
+                  <View
+                    className="rounded-2xl overflow-hidden"
+                    style={{ backgroundColor: theme.bg.card, borderWidth: 1, borderColor: theme.border.light }}
+                  >
+                    <View className="p-4 flex-row items-center justify-between border-b" style={{ borderColor: theme.border.light }}>
+                      <View className="flex-row items-center flex-1">
+                        <View className="w-10 h-10 rounded-full items-center justify-center mr-3" style={{ backgroundColor: `${theme.accent.blush}20` }}>
+                          <Clipboard size={18} color={theme.accent.blush} />
+                        </View>
+                        <View className="flex-1">
+                          <Text style={{ fontFamily: 'Quicksand_500Medium', color: theme.text.primary }} className="text-sm">
+                            Daily Symptom Log
+                          </Text>
+                          <Text style={{ fontFamily: 'Quicksand_400Regular', color: theme.text.muted }} className="text-xs">
+                            Evening reminder to track changes
+                          </Text>
+                        </View>
+                      </View>
+                      <Switch
+                        value={settings.symptomTracking}
+                        onValueChange={(value) => updateSetting('symptomTracking', value)}
+                        trackColor={{ false: theme.border.light, true: `${theme.accent.blush}50` }}
+                        thumbColor={settings.symptomTracking ? theme.accent.blush : theme.text.muted}
+                      />
+                    </View>
+
+                    <View className="p-4 flex-row items-center justify-between border-b" style={{ borderColor: theme.border.light }}>
+                      <View className="flex-row items-center flex-1">
+                        <View className="w-10 h-10 rounded-full items-center justify-center mr-3" style={{ backgroundColor: `${theme.accent.blush}20` }}>
+                          <Flame size={18} color={theme.accent.blush} />
+                        </View>
+                        <View className="flex-1">
+                          <Text style={{ fontFamily: 'Quicksand_500Medium', color: theme.text.primary }} className="text-sm">
+                            Hot Flash Tips
+                          </Text>
+                          <Text style={{ fontFamily: 'Quicksand_400Regular', color: theme.text.muted }} className="text-xs">
+                            Cooling strategies & reminders
+                          </Text>
+                        </View>
+                      </View>
+                      <Switch
+                        value={settings.hotFlashReminders}
+                        onValueChange={(value) => updateSetting('hotFlashReminders', value)}
+                        trackColor={{ false: theme.border.light, true: `${theme.accent.blush}50` }}
+                        thumbColor={settings.hotFlashReminders ? theme.accent.blush : theme.text.muted}
+                      />
+                    </View>
+
+                    <View className="p-4 flex-row items-center justify-between border-b" style={{ borderColor: theme.border.light }}>
+                      <View className="flex-row items-center flex-1">
+                        <View className="w-10 h-10 rounded-full items-center justify-center mr-3" style={{ backgroundColor: `${theme.accent.lavender}20` }}>
+                          <Brain size={18} color={theme.accent.lavender} />
+                        </View>
+                        <View className="flex-1">
+                          <Text style={{ fontFamily: 'Quicksand_500Medium', color: theme.text.primary }} className="text-sm">
+                            Mood & Anxiety Check-Ins
+                          </Text>
+                          <Text style={{ fontFamily: 'Quicksand_400Regular', color: theme.text.muted }} className="text-xs">
+                            Afternoon emotional wellness check
+                          </Text>
+                        </View>
+                      </View>
+                      <Switch
+                        value={settings.moodCheckIns}
+                        onValueChange={(value) => updateSetting('moodCheckIns', value)}
+                        trackColor={{ false: theme.border.light, true: `${theme.accent.lavender}50` }}
+                        thumbColor={settings.moodCheckIns ? theme.accent.lavender : theme.text.muted}
+                      />
+                    </View>
+
+                    <View className="p-4 flex-row items-center justify-between">
+                      <View className="flex-row items-center flex-1">
+                        <View className="w-10 h-10 rounded-full items-center justify-center mr-3" style={{ backgroundColor: `${theme.accent.purple}20` }}>
+                          <Moon size={18} color={theme.accent.purple} />
+                        </View>
+                        <View className="flex-1">
+                          <Text style={{ fontFamily: 'Quicksand_500Medium', color: theme.text.primary }} className="text-sm">
+                            Sleep Quality Reminders
+                          </Text>
+                          <Text style={{ fontFamily: 'Quicksand_400Regular', color: theme.text.muted }} className="text-xs">
+                            Evening wind-down tips
+                          </Text>
+                        </View>
+                      </View>
+                      <Switch
+                        value={settings.sleepQualityReminders}
+                        onValueChange={(value) => updateSetting('sleepQualityReminders', value)}
+                        trackColor={{ false: theme.border.light, true: `${theme.accent.purple}50` }}
+                        thumbColor={settings.sleepQualityReminders ? theme.accent.purple : theme.text.muted}
                       />
                     </View>
                   </View>

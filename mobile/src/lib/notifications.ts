@@ -31,6 +31,13 @@ export interface NotificationSettings {
   quietHoursEnabled: boolean;
   quietHoursStart: string; // HH:MM
   quietHoursEnd: string; // HH:MM
+  // Menopause & perimenopause specific
+  hotFlashReminders: boolean;
+  moodCheckIns: boolean;
+  sleepQualityReminders: boolean;
+  boneHealthReminders: boolean;
+  heartHealthReminders: boolean;
+  symptomTracking: boolean; // perimenopause symptom log
 }
 
 export const defaultNotificationSettings: NotificationSettings = {
@@ -46,6 +53,12 @@ export const defaultNotificationSettings: NotificationSettings = {
   quietHoursEnabled: true,
   quietHoursStart: '22:00',
   quietHoursEnd: '08:00',
+  hotFlashReminders: true,
+  moodCheckIns: true,
+  sleepQualityReminders: true,
+  boneHealthReminders: false,
+  heartHealthReminders: false,
+  symptomTracking: true,
 };
 
 // Phase-specific wellness tips
@@ -537,6 +550,181 @@ export async function scheduleMenopauseWellnessTip(settings: NotificationSetting
   });
 }
 
+// Schedule hot flash / night sweat reminders (menopause/perimenopause)
+export async function scheduleHotFlashReminder(settings: NotificationSettings): Promise<void> {
+  await cancelNotificationsByPrefix('hot-flash');
+  if (!settings.hotFlashReminders) return;
+
+  const notificationHour = getNotificationHour(14, settings); // 2 PM
+
+  const messages = [
+    { title: '🌡️ Hot Flash Tip', body: 'Try cooling breathwork: inhale for 4 counts, exhale for 8 to ease discomfort.' },
+    { title: '💨 Stay Cool', body: 'Dress in layers today. A cooling mist or cold water bottle can help.' },
+    { title: '🧊 Temperature Tip', body: 'Staying well-hydrated helps your body regulate temperature throughout the day.' },
+    { title: '🌬️ Night Sweat Prep', body: 'Keep a cool damp cloth nearby tonight. Breathable fabrics support better sleep.' },
+  ];
+
+  const message = messages[Math.floor(Math.random() * messages.length)];
+
+  await Notifications.scheduleNotificationAsync({
+    identifier: 'hot-flash-daily',
+    content: {
+      title: message.title,
+      body: message.body,
+      data: { type: 'hot-flash' },
+      sound: true,
+    },
+    trigger: {
+      type: Notifications.SchedulableTriggerInputTypes.CALENDAR,
+      hour: notificationHour,
+      minute: 0,
+      repeats: true,
+    },
+  });
+}
+
+// Schedule mood & anxiety check-in (menopause/perimenopause)
+export async function scheduleMoodCheckIn(settings: NotificationSettings): Promise<void> {
+  await cancelNotificationsByPrefix('mood-checkin');
+  if (!settings.moodCheckIns) return;
+
+  const notificationHour = getNotificationHour(15, settings); // 3 PM
+
+  const messages = [
+    { title: '💜 Mood Check-In', body: 'How are you feeling emotionally today? Your feelings are valid and seen.' },
+    { title: '🧘 Mindful Moment', body: 'Hormonal shifts can affect anxiety. Three slow breaths can reset your nervous system.' },
+    { title: '💙 Emotional Wellness', body: 'Be gentle with yourself today. Log your mood to spot patterns over time.' },
+    { title: '🌸 Afternoon Check-In', body: 'How is your energy and mood right now? A short walk can lift both.' },
+  ];
+
+  const message = messages[Math.floor(Math.random() * messages.length)];
+
+  await Notifications.scheduleNotificationAsync({
+    identifier: 'mood-checkin-daily',
+    content: {
+      title: message.title,
+      body: message.body,
+      data: { type: 'mood-checkin' },
+      sound: true,
+    },
+    trigger: {
+      type: Notifications.SchedulableTriggerInputTypes.CALENDAR,
+      hour: notificationHour,
+      minute: 0,
+      repeats: true,
+    },
+  });
+}
+
+// Schedule sleep quality reminder (menopause/perimenopause)
+export async function scheduleSleepQualityReminder(settings: NotificationSettings): Promise<void> {
+  await cancelNotificationsByPrefix('sleep-quality');
+  if (!settings.sleepQualityReminders) return;
+
+  const notificationHour = getNotificationHour(20, settings); // 8 PM
+
+  const messages = [
+    { title: '🌙 Sleep Prep', body: 'Keep your bedroom cool (65–68°F) for better sleep quality tonight.' },
+    { title: '😴 Wind Down Time', body: 'Dim the lights and start your sleep routine. Quality sleep supports hormonal balance.' },
+    { title: '💤 Sleep Tip', body: 'Magnesium-rich foods like almonds before bed can help you sleep more soundly.' },
+    { title: '🛏️ Rest Reminder', body: 'Consistent sleep and wake times help your body find its new rhythm.' },
+  ];
+
+  const message = messages[Math.floor(Math.random() * messages.length)];
+
+  await Notifications.scheduleNotificationAsync({
+    identifier: 'sleep-quality-daily',
+    content: {
+      title: message.title,
+      body: message.body,
+      data: { type: 'sleep-quality' },
+      sound: true,
+    },
+    trigger: {
+      type: Notifications.SchedulableTriggerInputTypes.CALENDAR,
+      hour: notificationHour,
+      minute: 0,
+      repeats: true,
+    },
+  });
+}
+
+// Schedule bone health reminder (menopause/postmenopause)
+export async function scheduleBoneHealthReminder(settings: NotificationSettings): Promise<void> {
+  await cancelNotificationsByPrefix('bone-health');
+  if (!settings.boneHealthReminders) return;
+
+  const notificationHour = getNotificationHour(11, settings); // 11 AM
+
+  await Notifications.scheduleNotificationAsync({
+    identifier: 'bone-health-daily',
+    content: {
+      title: '🦴 Bone Health Reminder',
+      body: 'Did you get enough calcium today? Weight-bearing exercise and dairy or leafy greens support strong bones.',
+      data: { type: 'bone-health' },
+      sound: true,
+    },
+    trigger: {
+      type: Notifications.SchedulableTriggerInputTypes.TIME_INTERVAL,
+      seconds: 7 * 24 * 60 * 60, // weekly
+      repeats: true,
+    },
+  });
+}
+
+// Schedule heart health reminder (menopause/postmenopause)
+export async function scheduleHeartHealthReminder(settings: NotificationSettings): Promise<void> {
+  await cancelNotificationsByPrefix('heart-health');
+  if (!settings.heartHealthReminders) return;
+
+  await Notifications.scheduleNotificationAsync({
+    identifier: 'heart-health-weekly',
+    content: {
+      title: '❤️ Heart Health Check-In',
+      body: '30 minutes of movement today supports cardiovascular wellness. Omega-3s are great for your heart too.',
+      data: { type: 'heart-health' },
+      sound: true,
+    },
+    trigger: {
+      type: Notifications.SchedulableTriggerInputTypes.TIME_INTERVAL,
+      seconds: 7 * 24 * 60 * 60, // weekly
+      repeats: true,
+    },
+  });
+}
+
+// Schedule symptom tracking reminder (perimenopause)
+export async function scheduleSymptomTracking(settings: NotificationSettings): Promise<void> {
+  await cancelNotificationsByPrefix('symptom-tracking');
+  if (!settings.symptomTracking) return;
+
+  const notificationHour = getNotificationHour(18, settings); // 6 PM
+
+  const messages = [
+    { title: '📊 Symptom Log', body: 'Log your symptoms today — spotting patterns helps manage perimenopause.' },
+    { title: '🌿 Track Your Changes', body: 'Note any hot flashes, mood changes, or sleep issues from today.' },
+    { title: '💜 Symptom Check-In', body: 'How has your body felt today? Tracking helps you and your doctor.' },
+  ];
+
+  const message = messages[Math.floor(Math.random() * messages.length)];
+
+  await Notifications.scheduleNotificationAsync({
+    identifier: 'symptom-tracking-daily',
+    content: {
+      title: message.title,
+      body: message.body,
+      data: { type: 'symptom-tracking' },
+      sound: true,
+    },
+    trigger: {
+      type: Notifications.SchedulableTriggerInputTypes.CALENDAR,
+      hour: notificationHour,
+      minute: 0,
+      repeats: true,
+    },
+  });
+}
+
 // Schedule all notifications based on cycle data
 export async function scheduleAllNotifications(
   settings: NotificationSettings,
@@ -557,51 +745,55 @@ export async function scheduleAllNotifications(
   }
 
   const isNonCycling = cycleData.lifeStage === 'menopause' || cycleData.lifeStage === 'postmenopause';
+  const isPerimenopause = cycleData.lifeStage === 'perimenopause';
 
   if (isNonCycling) {
-    // For menopause users, only schedule wellness tips and daily check-in
-    if (settings.dailyWellnessCheckIn) {
-      await scheduleDailyWellnessCheckIn(settings);
-    }
-    if (settings.wellnessTips) {
-      await scheduleMenopauseWellnessTip(settings);
-    }
+    // Menopause / post-menopause: no period or ovulation notifications
+    if (settings.dailyWellnessCheckIn) await scheduleDailyWellnessCheckIn(settings);
+    if (settings.wellnessTips) await scheduleMenopauseWellnessTip(settings);
+    if (settings.hotFlashReminders) await scheduleHotFlashReminder(settings);
+    if (settings.moodCheckIns) await scheduleMoodCheckIn(settings);
+    if (settings.sleepQualityReminders) await scheduleSleepQualityReminder(settings);
+    if (settings.boneHealthReminders) await scheduleBoneHealthReminder(settings);
+    if (settings.heartHealthReminders) await scheduleHeartHealthReminder(settings);
     return;
   }
 
-  // Period reminders
+  // Period reminders (regular + perimenopause)
   if (settings.periodReminders && cycleData.daysUntilPeriod > 0) {
     await schedulePeriodReminder(cycleData.daysUntilPeriod, settings);
   }
 
-  // Fertile window alerts
-  if (settings.fertileWindowAlerts && cycleData.daysUntilOvulation !== undefined && cycleData.daysUntilOvulation > 0) {
-    await scheduleFertileWindowAlert(cycleData.daysUntilOvulation, settings);
-  }
-
-  // Ovulation alerts
-  if (settings.ovulationAlerts && cycleData.daysUntilOvulation !== undefined && cycleData.daysUntilOvulation > 0) {
-    await scheduleOvulationAlert(cycleData.daysUntilOvulation, settings);
+  // Fertile window + ovulation: regular cycles only
+  if (!isPerimenopause) {
+    if (settings.fertileWindowAlerts && cycleData.daysUntilOvulation !== undefined && cycleData.daysUntilOvulation > 0) {
+      await scheduleFertileWindowAlert(cycleData.daysUntilOvulation, settings);
+    }
+    if (settings.ovulationAlerts && cycleData.daysUntilOvulation !== undefined && cycleData.daysUntilOvulation > 0) {
+      await scheduleOvulationAlert(cycleData.daysUntilOvulation, settings);
+    }
+    if (settings.phaseChangeAlerts && cycleData.daysUntilNextPhase > 0) {
+      await schedulePhaseChangeAlert(
+        cycleData.nextPhaseName,
+        cycleData.nextPhaseEmoji,
+        cycleData.daysUntilNextPhase,
+        settings
+      );
+    }
   }
 
   // Daily wellness check-in
-  if (settings.dailyWellnessCheckIn) {
-    await scheduleDailyWellnessCheckIn(settings);
-  }
-
-  // Phase change alerts
-  if (settings.phaseChangeAlerts && cycleData.daysUntilNextPhase > 0) {
-    await schedulePhaseChangeAlert(
-      cycleData.nextPhaseName,
-      cycleData.nextPhaseEmoji,
-      cycleData.daysUntilNextPhase,
-      settings
-    );
-  }
+  if (settings.dailyWellnessCheckIn) await scheduleDailyWellnessCheckIn(settings);
 
   // Wellness tips
-  if (settings.wellnessTips) {
-    await scheduleWellnessTip(cycleData.currentPhase, settings);
+  if (settings.wellnessTips) await scheduleWellnessTip(cycleData.currentPhase, settings);
+
+  // Perimenopause-specific notifications
+  if (isPerimenopause) {
+    if (settings.symptomTracking) await scheduleSymptomTracking(settings);
+    if (settings.hotFlashReminders) await scheduleHotFlashReminder(settings);
+    if (settings.moodCheckIns) await scheduleMoodCheckIn(settings);
+    if (settings.sleepQualityReminders) await scheduleSleepQualityReminder(settings);
   }
 }
 
