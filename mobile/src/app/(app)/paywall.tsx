@@ -412,6 +412,17 @@ export default function PaywallScreen() {
                                 SAVE 44%
                               </Text>
                             </View>
+                            <View
+                              className="ml-2 px-2 py-0.5 rounded-full"
+                              style={{ backgroundColor: 'rgba(196, 181, 253, 0.25)' }}
+                            >
+                              <Text
+                                style={{ fontFamily: 'Quicksand_600SemiBold', color: '#c4b5fd' }}
+                                className="text-xs"
+                              >
+                                7-DAY FREE TRIAL
+                              </Text>
+                            </View>
                           </View>
                           <Text
                             style={{ fontFamily: 'Quicksand_400Regular', color: 'rgba(255,255,255,0.5)' }}
@@ -664,7 +675,7 @@ export default function PaywallScreen() {
             {selectedPlan === 'lifetime'
               ? 'One-time payment, access forever'
               : selectedPlan === 'yearly'
-              ? `${getPrice('yearly')}/year after trial`
+              ? `${getPrice('yearly')}/year after 7-day free trial`
               : `${getPrice('monthly')}/month`}
           </Text>
         </View>

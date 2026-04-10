@@ -352,6 +352,55 @@ export default function HomeScreen() {
               </View>
             </Animated.View>
 
+            {/* Menopause Stat Cards */}
+            <Animated.View
+              entering={FadeInUp.delay(480).duration(600)}
+              className="mx-6 mt-4"
+            >
+              <View className="flex-row" style={{ gap: 12 }}>
+                <View className="flex-1 rounded-2xl p-4 border" style={{ backgroundColor: `${stageColor}10`, borderColor: `${stageColor}25` }}>
+                  <Text
+                    style={{ fontFamily: 'Quicksand_400Regular', color: theme.text.tertiary }}
+                    className="text-xs mb-1"
+                  >
+                    Symptom Streak
+                  </Text>
+                  <Text
+                    style={{ fontFamily: 'Quicksand_600SemiBold', color: stageColor }}
+                    className="text-2xl"
+                  >
+                    —
+                  </Text>
+                  <Text
+                    style={{ fontFamily: 'Quicksand_400Regular', color: theme.text.tertiary }}
+                    className="text-xs mt-0.5"
+                  >
+                    days logged
+                  </Text>
+                </View>
+                <View className="flex-1 rounded-2xl p-4 border" style={{ backgroundColor: theme.bg.card, borderColor: theme.border.light }}>
+                  <Text
+                    style={{ fontFamily: 'Quicksand_400Regular', color: theme.text.tertiary }}
+                    className="text-xs mb-1"
+                  >
+                    Last Log Date
+                  </Text>
+                  <Text
+                    style={{ fontFamily: 'Quicksand_600SemiBold', color: theme.text.primary }}
+                    className="text-base"
+                  >
+                    —
+                  </Text>
+                  <Text
+                    style={{ fontFamily: 'Quicksand_400Regular', color: theme.text.tertiary }}
+                    className="text-xs mt-0.5"
+                  >
+                    no logs yet
+                  </Text>
+                </View>
+              </View>
+            </Animated.View>
+
             {/* Symptom Tracking */}
             <Animated.View
               entering={FadeInUp.delay(500).duration(600)}
@@ -446,6 +495,29 @@ export default function HomeScreen() {
                   </AnimatedPressable>
                 ))}
               </View>
+            </Animated.View>
+
+            {/* View Insights CTA */}
+            <Animated.View
+              entering={FadeInUp.delay(680).duration(600)}
+              className="mx-6 mt-4"
+            >
+              <Pressable
+                onPress={() => {
+                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                  router.push('/(tabs)/insights');
+                }}
+                className="flex-row items-center justify-center rounded-2xl p-4 border"
+                style={{ backgroundColor: `${stageColor}10`, borderColor: `${stageColor}30` }}
+              >
+                <Sparkles size={18} color={stageColor} />
+                <Text
+                  style={{ fontFamily: 'Quicksand_600SemiBold', color: stageColor }}
+                  className="text-base ml-2"
+                >
+                  View Insights
+                </Text>
+              </Pressable>
             </Animated.View>
 
             {/* Luna AI Assistant */}

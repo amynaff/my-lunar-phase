@@ -14,9 +14,11 @@ import {
   ClipboardList,
   Sparkles,
   Grid3x3,
+  Heart,
 } from 'lucide-react-native';
 import * as Haptics from 'expo-haptics';
 import { useThemeStore, getTheme } from '@/lib/theme-store';
+import { useCycleStore } from '@/lib/cycle-store';
 
 interface TabIconProps {
   icon: typeof Moon;
@@ -75,6 +77,8 @@ export default function TabLayout() {
   const insets = useSafeAreaInsets();
   const themeMode = useThemeStore(s => s.mode);
   const theme = getTheme(themeMode);
+  const lifeStage = useCycleStore(s => s.lifeStage);
+  const isNonCycling = lifeStage === 'menopause' || lifeStage === 'postmenopause';
 
   const handleTabPress = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
@@ -138,8 +142,19 @@ export default function TabLayout() {
         name="insights"
         options={{
           title: 'Insights',
+          href: isNonCycling ? null : undefined,
           tabBarIcon: ({ focused, color }) => (
             <TabIcon icon={Sparkles} label="Insights" focused={focused} color={color} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="wellness"
+        options={{
+          title: 'Wellness',
+          href: isNonCycling ? undefined : null,
+          tabBarIcon: ({ focused, color }) => (
+            <TabIcon icon={Heart} label="Wellness" focused={focused} color={color} />
           ),
         }}
       />

@@ -534,6 +534,11 @@ export default function LunaAIScreen() {
                     'Why am I still mentally foggy after a full night of rest?',
                     lifeStage !== 'regular' ? 'Managing hot flashes' : 'How do cortisol and blood sugar impact my recovery?',
                     'Why do I keep waking up at 3 or 4am?',
+                    ...(lifeStage === 'menopause' || lifeStage === 'postmenopause' ? [
+                      '🦴 Bone health tips',
+                      '😴 Sleep support',
+                      '💜 Hormone balance',
+                    ] : []),
                   ].map((suggestion) => (
                     <Pressable
                       key={suggestion}

@@ -178,6 +178,17 @@ export default function OnboardingScreen() {
                         >
                           {info.ageRange}
                         </Text>
+                        {option.stage === 'menopause' && (
+                          <Text
+                            style={{
+                              fontFamily: 'Quicksand_400Regular',
+                              color: isSelected ? 'rgba(255,255,255,0.8)' : '#9d84ed',
+                            }}
+                            className="text-xs mt-0.5"
+                          >
+                            I haven't had a period in over a year
+                          </Text>
+                        )}
                       </View>
                       {isSelected && (
                         <View className="w-6 h-6 rounded-full bg-white items-center justify-center">
@@ -195,6 +206,12 @@ export default function OnboardingScreen() {
               className="text-xs text-center mt-2 px-4"
             >
               {lifeStageInfo[lifeStage].description}
+            </Text>
+            <Text
+              style={{ fontFamily: 'Quicksand_400Regular', color: '#b9a6f7' }}
+              className="text-xs text-center mt-3 px-4"
+            >
+              Not sure? You can change this anytime in settings.
             </Text>
           </View>
         ),
@@ -539,6 +556,45 @@ export default function OnboardingScreen() {
                     <Text style={{ fontFamily: 'Quicksand_400Regular', color: '#5b21b6' }} className="text-sm">
                       {item}
                     </Text>
+                  </View>
+                ))}
+              </View>
+            </View>
+          ),
+        },
+        // Wellness reminders step
+        {
+          title: 'Your wellness reminders',
+          subtitle: 'Stay on top of what matters most for your health',
+          content: (
+            <View className="items-center">
+              <View
+                className="rounded-2xl p-5 w-full border"
+                style={{ backgroundColor: 'rgba(255,255,255,0.8)', borderColor: 'rgba(139, 92, 246, 0.3)' }}
+              >
+                <Text
+                  style={{ fontFamily: 'Quicksand_600SemiBold', color: '#8b5cf6' }}
+                  className="text-xs uppercase tracking-wider mb-4"
+                >
+                  Focus areas for menopause wellness
+                </Text>
+
+                {[
+                  { label: '🦴 Bone health check-ins', note: 'Weight-bearing exercise & calcium' },
+                  { label: '❤️ Heart health monitoring', note: 'Blood pressure, cholesterol, cardio' },
+                  { label: '😴 Sleep quality tracking', note: 'Hot flashes, night sweats patterns' },
+                  { label: '🧠 Cognitive wellness', note: 'Brain health & mental clarity' },
+                  { label: '💜 Symptom logging', note: 'Track changes to share with your doctor' },
+                ].map((item, index) => (
+                  <View key={index} className="flex-row items-start mb-4">
+                    <View className="flex-1">
+                      <Text style={{ fontFamily: 'Quicksand_600SemiBold', color: '#5b21b6' }} className="text-sm">
+                        {item.label}
+                      </Text>
+                      <Text style={{ fontFamily: 'Quicksand_400Regular', color: '#8466db' }} className="text-xs mt-0.5">
+                        {item.note}
+                      </Text>
+                    </View>
                   </View>
                 ))}
               </View>
