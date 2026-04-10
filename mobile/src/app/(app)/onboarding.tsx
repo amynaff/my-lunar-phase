@@ -655,6 +655,45 @@ export default function OnboardingScreen() {
             </View>
           ),
         },
+        // Wellness reminders step
+        {
+          title: 'Your wellness reminders',
+          subtitle: 'Stay on top of what matters most for your health',
+          content: (
+            <View className="items-center">
+              <View
+                className="rounded-2xl p-5 w-full border"
+                style={{ backgroundColor: 'rgba(255,255,255,0.8)', borderColor: 'rgba(236, 72, 153, 0.3)' }}
+              >
+                <Text
+                  style={{ fontFamily: 'Quicksand_600SemiBold', color: '#ec4899' }}
+                  className="text-xs uppercase tracking-wider mb-4"
+                >
+                  Focus areas for post-menopause wellness
+                </Text>
+
+                {[
+                  { label: '🦴 Bone health check-ins', note: 'Weight-bearing exercise & calcium' },
+                  { label: '❤️ Heart health monitoring', note: 'Blood pressure, cholesterol, cardio' },
+                  { label: '😴 Sleep quality tracking', note: 'Rest patterns & recovery' },
+                  { label: '🧠 Cognitive wellness', note: 'Brain health & mental clarity' },
+                  { label: '🌸 Symptom logging', note: 'Track changes to share with your doctor' },
+                ].map((item, index) => (
+                  <View key={index} className="flex-row items-start mb-4">
+                    <View className="flex-1">
+                      <Text style={{ fontFamily: 'Quicksand_600SemiBold', color: '#9d174d' }} className="text-sm">
+                        {item.label}
+                      </Text>
+                      <Text style={{ fontFamily: 'Quicksand_400Regular', color: '#be185d' }} className="text-xs mt-0.5">
+                        {item.note}
+                      </Text>
+                    </View>
+                  </View>
+                ))}
+              </View>
+            </View>
+          ),
+        },
       ];
     }
   };
