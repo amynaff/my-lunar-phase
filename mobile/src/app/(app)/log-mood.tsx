@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import {
   View,
   Text,
@@ -11,7 +11,7 @@ import {
 import { LinearGradient } from "expo-linear-gradient";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter, useLocalSearchParams } from "expo-router";
-import { X, Check } from "lucide-react-native";
+import { X, Check, Moon, Droplets, Plus, Minus } from "lucide-react-native";
 import Animated, {
   FadeIn,
   FadeInDown,
@@ -85,6 +85,55 @@ function LevelSelector({ levels, value, onChange, label }: LevelSelectorProps) {
   );
 }
 
+interface StepperProps {
+  value: number;
+  min: number;
+  max: number;
+  step: number;
+  onChange: (v: number) => void;
+  unit: string;
+  color: string;
+}
+
+function Stepper({ value, min, max, step, onChange, unit, color }: StepperProps) {
+  return (
+    <View className="flex-row items-center justify-between bg-white/5 rounded-2xl px-4 py-3 border border-purple-500/20">
+      <Pressable
+        onPress={() => {
+          if (value > min) {
+            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+            onChange(Math.max(min, value - step));
+          }
+        }}
+        className="w-10 h-10 rounded-full items-center justify-center"
+        style={{ backgroundColor: value > min ? `${color}25` : "transparent" }}
+      >
+        <Minus size={18} color={value > min ? color : "#4b2d7a"} />
+      </Pressable>
+
+      <Text
+        className="text-white text-2xl"
+        style={{ fontFamily: "Cormorant_600SemiBold", minWidth: 80, textAlign: "center" }}
+      >
+        {value}{unit}
+      </Text>
+
+      <Pressable
+        onPress={() => {
+          if (value < max) {
+            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+            onChange(Math.min(max, value + step));
+          }
+        }}
+        className="w-10 h-10 rounded-full items-center justify-center"
+        style={{ backgroundColor: value < max ? `${color}25` : "transparent" }}
+      >
+        <Plus size={18} color={value < max ? color : "#4b2d7a"} />
+      </Pressable>
+    </View>
+  );
+}
+
 export default function LogMoodScreen() {
   const router = useRouter();
   const params = useLocalSearchParams<{ date?: string }>();
@@ -110,6 +159,8 @@ export default function LogMoodScreen() {
   const [mood, setMood] = useState(existingEntry?.mood ?? 3);
   const [energy, setEnergy] = useState(existingEntry?.energy ?? 3);
   const [notes, setNotes] = useState(existingEntry?.notes ?? "");
+  const [sleepHours, setSleepHours] = useState<number>(existingEntry?.sleepHours ?? 7);
+  const [waterGlasses, setWaterGlasses] = useState<number>(existingEntry?.waterGlasses ?? 8);
 
   // Animation
   const saveButtonScale = useSharedValue(1);
@@ -128,11 +179,12 @@ export default function LogMoodScreen() {
         notes: notes.trim() || undefined,
         cyclePhase: lifeStage === "regular" ? currentPhase : undefined,
         dayOfCycle: lifeStage === "regular" ? dayOfCycle : undefined,
+        sleepHours,
+        waterGlasses,
       };
       return moodApi.saveEntry(data);
     },
-    onSuccess: (response) => {
-      // Update local store
+    onSuccess: () => {
       setEntry({
         date: dateKey,
         mood,
@@ -140,17 +192,16 @@ export default function LogMoodScreen() {
         notes: notes.trim() || undefined,
         cyclePhase: lifeStage === "regular" ? currentPhase : undefined,
         dayOfCycle: lifeStage === "regular" ? dayOfCycle : undefined,
+        sleepHours,
+        waterGlasses,
         synced: true,
       });
-      // Invalidate queries
       queryClient.invalidateQueries({ queryKey: ["mood-entries"] });
       queryClient.invalidateQueries({ queryKey: ["mood-stats"] });
-      // Close modal
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       router.back();
     },
     onError: () => {
-      // Still save locally even if server fails
       setEntry({
         date: dateKey,
         mood,
@@ -158,6 +209,8 @@ export default function LogMoodScreen() {
         notes: notes.trim() || undefined,
         cyclePhase: lifeStage === "regular" ? currentPhase : undefined,
         dayOfCycle: lifeStage === "regular" ? dayOfCycle : undefined,
+        sleepHours,
+        waterGlasses,
         synced: false,
       });
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
@@ -226,7 +279,7 @@ export default function LogMoodScreen() {
                   className="text-purple-100 text-xl"
                   style={{ fontFamily: "Cormorant_600SemiBold" }}
                 >
-                  Log Mood & Energy
+                  Daily Check-In
                 </Text>
                 <Text
                   className="text-purple-300/60 text-sm"
@@ -299,8 +352,62 @@ export default function LogMoodScreen() {
                 />
               </Animated.View>
 
+              {/* Sleep & Water */}
+              <Animated.View entering={FadeInDown.delay(400).duration(400)} className="mb-6">
+                <Text
+                  className="text-purple-100 text-lg mb-4"
+                  style={{ fontFamily: "Cormorant_600SemiBold" }}
+                >
+                  Sleep & Hydration
+                </Text>
+
+                {/* Sleep */}
+                <View className="mb-4">
+                  <View className="flex-row items-center mb-2">
+                    <Moon size={16} color="#a78bfa" />
+                    <Text
+                      className="text-purple-300 text-sm ml-2"
+                      style={{ fontFamily: "Quicksand_600SemiBold" }}
+                    >
+                      Hours of sleep
+                    </Text>
+                  </View>
+                  <Stepper
+                    value={sleepHours}
+                    min={0}
+                    max={12}
+                    step={0.5}
+                    onChange={setSleepHours}
+                    unit="h"
+                    color="#a78bfa"
+                  />
+                </View>
+
+                {/* Water */}
+                <View>
+                  <View className="flex-row items-center mb-2">
+                    <Droplets size={16} color="#60a5fa" />
+                    <Text
+                      className="text-purple-300 text-sm ml-2"
+                      style={{ fontFamily: "Quicksand_600SemiBold" }}
+                    >
+                      Glasses of water
+                    </Text>
+                  </View>
+                  <Stepper
+                    value={waterGlasses}
+                    min={0}
+                    max={16}
+                    step={1}
+                    onChange={setWaterGlasses}
+                    unit=" glasses"
+                    color="#60a5fa"
+                  />
+                </View>
+              </Animated.View>
+
               {/* Notes */}
-              <Animated.View entering={FadeInDown.delay(400).duration(400)}>
+              <Animated.View entering={FadeInDown.delay(500).duration(400)}>
                 <Text
                   className="text-purple-100 text-lg mb-3"
                   style={{ fontFamily: "Cormorant_600SemiBold" }}
@@ -323,7 +430,7 @@ export default function LogMoodScreen() {
               </Animated.View>
 
               {/* Save Button */}
-              <Animated.View entering={FadeInDown.delay(500).duration(400)}>
+              <Animated.View entering={FadeInDown.delay(600).duration(400)}>
                 <Pressable
                   onPress={handleSave}
                   disabled={saveMutation.isPending}

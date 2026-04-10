@@ -9,6 +9,8 @@ export interface LocalMoodEntry {
   notes?: string;
   cyclePhase?: string;
   dayOfCycle?: number;
+  sleepHours?: number; // 0-12
+  waterGlasses?: number; // 0-12
   synced: boolean;
 }
 

@@ -48,6 +48,8 @@ export const moodApi = {
     notes?: string;
     cyclePhase?: string;
     dayOfCycle?: number;
+    sleepHours?: number;
+    waterGlasses?: number;
   }): Promise<{ entry: MoodEntry }> => {
     return api.post("/api/mood/entry", data);
   },
