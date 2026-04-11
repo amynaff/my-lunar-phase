@@ -3,7 +3,7 @@ import { createAuthClient } from "better-auth/react";
 // Generic fallback auth client (no expo-specific plugins)
 // iOS/Android uses auth-client.native.ts, Web uses auth-client.web.ts
 export const authClient = createAuthClient({
-  baseURL: (process.env.EXPO_PUBLIC_VIBECODE_BACKEND_URL || process.env.EXPO_PUBLIC_BACKEND_URL)! as string,
+  baseURL: process.env.EXPO_PUBLIC_BACKEND_URL! as string,
 });
 
 export const getAuthCookie = () => "";

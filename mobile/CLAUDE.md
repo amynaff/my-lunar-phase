@@ -21,15 +21,9 @@
 </typescript>
 
 <environment>
-  You are in Vibecode. The system manages git and the dev server (port 8081).
-  DO NOT: manage git, touch the dev server, or check its state.
-  The user views the app through Vibecode App.
-  The user cannot see the code or interact with the terminal. Do not tell the user to do anything with the code or terminal.
+  Backend runs on Railway. Dev server runs on port 8081.
+  Use EXPO_PUBLIC_BACKEND_URL for the backend URL.
   You can see logs in the expo.log file.
-  The Vibecode App has tabs like ENV tab, API tab, LOGS tab. You can ask the user to use these tabs to view the logs, add enviroment variables, or give instructions for APIs like OpenAI, Nanobanana, Grok, Elevenlabs, etc. but first try to implement the functionality yourself.
-  The user is likely non-technical, communicate with them in an easy to understand manner.
-  If the user's request is vague or ambitious, scope down to specific functionality. Do everything for them.
-  For images, use URLs from unsplash.com. You can also tell the user they can use the IMAGES tab to generate and uplooad images.
 </environment>
 
 
@@ -140,10 +134,6 @@
   </outdated_knowledge>
 </mistakes>
 
-<appstore>
-  Cannot assist with App Store or Google Play submission processes (app.json, eas.json, EAS CLI commands).
-  For submission help, click "Share" on the top right corner on the Vibecode App and select "Submit to App Store".
-</appstore> 
 
 <skills>
 You have access to a few skills in the `.claude/skills` folder. Use them to your advantage.

@@ -29,7 +29,7 @@ import {
   CormorantGaramond_600SemiBold,
 } from '@expo-google-fonts/cormorant-garamond';
 
-const BACKEND_URL = (process.env.EXPO_PUBLIC_VIBECODE_BACKEND_URL || process.env.EXPO_PUBLIC_BACKEND_URL)!;
+const BACKEND_URL = process.env.EXPO_PUBLIC_BACKEND_URL!;
 
 interface Message {
   id: string;

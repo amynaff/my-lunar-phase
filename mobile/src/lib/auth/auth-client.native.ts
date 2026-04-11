@@ -5,11 +5,11 @@ import { expoClient } from "@better-auth/expo/dist/client.js";
 import * as SecureStore from "expo-secure-store";
 
 export const authClient = createAuthClient({
-  baseURL: (process.env.EXPO_PUBLIC_VIBECODE_BACKEND_URL || process.env.EXPO_PUBLIC_BACKEND_URL)! as string,
+  baseURL: process.env.EXPO_PUBLIC_BACKEND_URL! as string,
   plugins: [
     expoClient({
-      scheme: "vibecode",
-      storagePrefix: "vibecode",
+      scheme: "lunaflow",
+      storagePrefix: "lunaflow",
       storage: SecureStore,
     }),
   ],

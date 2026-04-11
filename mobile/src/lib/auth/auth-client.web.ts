@@ -2,7 +2,7 @@ import { createAuthClient } from "better-auth/react";
 
 // Web version of auth client - no expo-specific plugins
 export const authClient = createAuthClient({
-  baseURL: (process.env.EXPO_PUBLIC_VIBECODE_BACKEND_URL || process.env.EXPO_PUBLIC_BACKEND_URL)! as string,
+  baseURL: process.env.EXPO_PUBLIC_BACKEND_URL! as string,
 });
 
 // Export getCookie for use in api.ts (not available on web, return empty)
