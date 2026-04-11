@@ -84,7 +84,7 @@ export default function HomeScreen() {
   const [showEditPeriodDates, setShowEditPeriodDates] = useState(false);
   const [showSymptomLogModal, setShowSymptomLogModal] = useState(false);
 
-  const [fontsLoaded] = useFonts({
+  const [fontsLoaded, fontError] = useFonts({
     CormorantGaramond_400Regular,
     CormorantGaramond_600SemiBold,
     Quicksand_400Regular,
@@ -93,11 +93,12 @@ export default function HomeScreen() {
   });
 
   useEffect(() => {
-    if (fontsLoaded) {
+    if (fontsLoaded || fontError) {
+      // Hide splash screen whether fonts loaded or failed (fall back to system fonts)
       SplashScreen.hideAsync();
       setTimeout(() => setIsReady(true), 100);
     }
-  }, [fontsLoaded]);
+  }, [fontsLoaded, fontError]);
 
   useEffect(() => {
     if (isReady && !sessionLoading && session?.user && !hasCompletedOnboarding) {
