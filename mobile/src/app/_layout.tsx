@@ -8,6 +8,24 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { KeyboardProvider } from 'react-native-keyboard-controller';
 import { useSession } from '@/lib/auth/use-session';
+import { Alert } from 'react-native';
+
+// Global JS error handler — surfaces unhandled errors as alerts in TestFlight
+// so we can diagnose crashes without Xcode. Remove before public release.
+if (typeof ErrorUtils !== 'undefined') {
+  const originalHandler = ErrorUtils.getGlobalHandler();
+  ErrorUtils.setGlobalHandler((error: Error, isFatal?: boolean) => {
+    if (isFatal) {
+      SplashScreen.hideAsync().catch(() => {});
+      Alert.alert(
+        'Crash Report (TestFlight Debug)',
+        `${error.name}: ${error.message}\n\n${error.stack?.slice(0, 500) ?? ''}`,
+        [{ text: 'OK' }]
+      );
+    }
+    originalHandler(error, isFatal);
+  });
+}
 
 export const unstable_settings = {
   // Start directly in the app - no auth gate
