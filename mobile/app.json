@@ -6,7 +6,7 @@
     "version": "1.2.0",
     "orientation": "portrait",
     "userInterfaceStyle": "automatic",
-    "newArchEnabled": true,
+    "newArchEnabled": false,
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.mylunarphase.app",
@@ -16,7 +16,8 @@
         "NSUserNotificationsUsageDescription": "My Lunar Phase sends reminders for your period, ovulation, and daily wellness check-ins.",
         "UIBackgroundModes": [
           "remote-notification"
-        ]
+        ],
+        "ITSAppUsesNonExemptEncryption": false
       }
     },
     "android": {
@@ -36,11 +37,25 @@
         {
           "color": "#c4b5fd"
         }
+      ],
+      [
+        "expo-build-properties",
+        {
+          "ios": {
+            "deploymentTarget": "15.1"
+          }
+        }
       ]
     ],
     "experiments": {
       "typedRoutes": true
     },
-    "icon": "./icon.png"
+    "icon": "./icon.png",
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "7e76864d-1ada-4412-8cfb-51e2ffcec304"
+      }
+    }
   }
 }
