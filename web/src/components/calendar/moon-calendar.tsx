@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { getMoonPhase, getMoonPhaseCycleEquivalent } from "@/lib/cycle/moon-phase";
-import { moonPhaseInfo, moonEnergyLabels } from "@/lib/cycle/data";
+import { moonPhaseInfo } from "@/lib/cycle/data";
 import type { CyclePhase, LifeStage, MoonPhase } from "@/lib/cycle/types";
 import { useMoodStore, getMoodColor } from "@/stores/mood-store";
 
@@ -64,12 +64,6 @@ function getFirstDayOfWeek(year: number, month: number): number {
   return day === 0 ? 6 : day - 1; // Monday = 0
 }
 
-const moonEnergyColors: Record<string, string> = {
-  menstrual: "#1e1b4b",    // New Moon — deep indigo
-  follicular: "#6d28d9",   // Waxing — violet
-  ovulatory: "#f5f3ff",    // Full Moon — luminous
-  luteal: "#a78bfa",       // Waning — soft purple
-};
 
 export function MoonCalendar({
   isRegular,
@@ -205,7 +199,6 @@ export function MoonCalendar({
           const isPeriod = cell.cycle.isPeriod;
           const isFertile = cell.cycle.isFertile && !isPeriod;
           const isOvulation = cell.cycle.isOvulation;
-          const energyColor = isMoonOnly ? moonEnergyColors[cell.moonEnergy] : undefined;
           const dateStr = `${cell.date.getFullYear()}-${String(cell.date.getMonth() + 1).padStart(2, "0")}-${String(cell.date.getDate()).padStart(2, "0")}`;
           const logEntry = moodEntries[dateStr];
           const moodDotColor = logEntry ? getMoodColor(logEntry.mood) : null;
@@ -223,7 +216,7 @@ export function MoonCalendar({
                 ${!isMoonOnly && isOvulation ? "ring-2 ring-accent-purple/40" : ""}
                 ${cell.isToday ? "ring-2 ring-accent-purple" : ""}
               `}
-              style={isMoonOnly ? { backgroundColor: `${energyColor}12` } : undefined}
+              style={undefined}
             >
               <span
                 className={`
@@ -269,12 +262,6 @@ export function MoonCalendar({
           </>
         ) : isMoonOnly ? (
           <>
-            {(["menstrual", "follicular", "ovulatory", "luteal"] as CyclePhase[]).map((phase) => (
-              <div key={phase} className="flex items-center gap-1.5">
-                <div className="w-3 h-3 rounded-full" style={{ backgroundColor: moonEnergyColors[phase] }} />
-                <span className="text-xs text-text-muted font-quicksand">{moonEnergyLabels[phase].name}</span>
-              </div>
-            ))}
             <div className="flex items-center gap-1.5">
               <div className="w-3 h-3 rounded-full ring-2 ring-accent-purple" />
               <span className="text-xs text-text-muted font-quicksand">Today</span>
