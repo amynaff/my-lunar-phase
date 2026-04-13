@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Home, Apple, Dumbbell, Heart, MessageCircle, Users, Settings, Sparkles, Moon, FlaskConical, CreditCard, BookOpen, Calendar, GraduationCap, TrendingUp, Lightbulb, BarChart3, LogOut } from "lucide-react";
+import { Home, Apple, Dumbbell, Heart, MessageCircle, Users, Settings, Sparkles, Moon, FlaskConical, CreditCard, BookOpen, Calendar, GraduationCap, TrendingUp, Lightbulb, LogOut } from "lucide-react";
 import { signOut } from "next-auth/react";
 import { cn } from "@/lib/cn";
 
@@ -21,7 +21,6 @@ const secondaryNav = [
   { href: "/community", label: "Community", icon: MessageCircle },
   { href: "/partner", label: "Partner", icon: Users },
   { href: "/labs-guide", label: "Labs Guide", icon: FlaskConical },
-  { href: "/insights", label: "Insights", icon: BarChart3 },
   { href: "/cycle-history", label: "Cycle History", icon: TrendingUp },
   { href: "/hormonal-education", label: "Education", icon: GraduationCap },
 ];
