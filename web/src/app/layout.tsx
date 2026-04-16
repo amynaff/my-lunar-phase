@@ -32,7 +32,7 @@ function getSiteUrl(): string {
 }
 const siteUrl = getSiteUrl();
 const siteName = "MyLunarPhase";
-const title = "MyLunarPhase | Women's Hormone Wellness";
+const title = "MyLunarPhase — Women's Hormone Wellness for Every Life Stage";
 const description =
   "Personalized nutrition, movement, self-care, and moon phase wisdom for every stage — from regular cycles to perimenopause and menopause.";
 
