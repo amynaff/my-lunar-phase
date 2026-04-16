@@ -21,11 +21,10 @@ function useSubscriptionSync() {
   const userId = session?.user?.id;
 
   useEffect(() => {
+    if (!userId) return;
+
     const sync = async () => {
-      // Identify user in RevenueCat so web + mobile subscriptions stay in sync
-      if (userId) {
-        await setUserId(userId);
-      }
+      await setUserId(userId);
       const result = await getCustomerInfo();
       if (!result.ok) return; // RevenueCat not configured or web — leave store as-is
       const active = result.data.entitlements.active ?? {};
@@ -47,6 +46,7 @@ function useNotificationSetup() {
   const getCurrentPhase = useCycleStore((s) => s.getCurrentPhase);
   const cycleLength = useCycleStore((s) => s.cycleLength);
   const getDayOfCycle = useCycleStore((s) => s.getDayOfCycle);
+  const lastPeriodStart = useCycleStore((s) => s.lastPeriodStart);
 
   useEffect(() => {
     const setupNotifications = async () => {
@@ -71,6 +71,9 @@ function useNotificationSetup() {
         });
         return;
       }
+
+      // No cycle data yet (user hasn't completed onboarding)
+      if (!lastPeriodStart) return;
 
       const currentPhase = getCurrentPhase();
       const currentPhaseInfo = phaseInfo[currentPhase];

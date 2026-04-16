@@ -28,8 +28,7 @@ if (typeof ErrorUtils !== 'undefined') {
 }
 
 export const unstable_settings = {
-  // Start directly in the app - no auth gate
-  initialRouteName: '(app)',
+  initialRouteName: 'sign-in',
 };
 
 SplashScreen.preventAutoHideAsync();
@@ -45,11 +44,13 @@ function useProtectedRoute() {
   useEffect(() => {
     if (isLoading) return;
 
-    const onSignInScreen = segments[0] === 'sign-in';
+    const inAuthGroup = segments[0] === 'sign-in' || segments[0] === 'login' || segments[0] === 'sign-up' || segments[0] === 'forgot-password';
+    const inAppGroup = segments[0] === '(app)';
 
-    if (session?.user && onSignInScreen) {
-      // Authenticated user landed on sign-in — redirect into the app
+    if (session?.user && inAuthGroup) {
       router.replace('/(app)');
+    } else if (!session?.user && inAppGroup) {
+      router.replace('/sign-in');
     }
   }, [session, isLoading, segments]);
 }
