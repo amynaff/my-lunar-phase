@@ -54,7 +54,7 @@ app.use("*", async (c, next) => {
 });
 
 // Health check endpoint (version tag to verify deploys)
-app.get("/health", (c) => c.json({ status: "ok", v: 3 }));
+app.get("/health", (c) => c.json({ status: "ok", v: 4 }));
 
 // Protected route example
 app.get("/api/me", (c) => {
@@ -86,7 +86,12 @@ export default {
     const url = new URL(req.url);
     if (url.pathname.startsWith("/api/auth/")) {
       try {
-        return await auth.handler(req);
+        const res = await auth.handler(req);
+        if (res.status >= 400) {
+          const body = await res.clone().text();
+          console.error(`Auth ${req.method} ${url.pathname} → ${res.status}: ${body}`);
+        }
+        return res;
       } catch (e: any) {
         console.error("Auth handler error:", e);
         return new Response(JSON.stringify({ error: e?.message ?? String(e) }), {
