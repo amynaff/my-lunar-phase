@@ -54,7 +54,7 @@ app.use("*", async (c, next) => {
 });
 
 // Health check endpoint (version tag to verify deploys)
-app.get("/health", (c) => c.json({ status: "ok", v: 5 }));
+app.get("/health", (c) => c.json({ status: "ok", v: 6 }));
 
 // Protected route example
 app.get("/api/me", (c) => {
@@ -84,52 +84,27 @@ export default {
   port,
   fetch: async (req: Request, server: any) => {
     const url = new URL(req.url);
-    // Diagnostic: test body parsing directly
-    if (url.pathname === "/api/auth/test-body") {
-      try {
-        const body = await req.json();
-        return new Response(JSON.stringify({ received: body }), {
-          headers: { "Content-Type": "application/json" },
-        });
-      } catch (e: any) {
-        return new Response(JSON.stringify({ parseError: e?.message }), {
-          status: 400,
-          headers: { "Content-Type": "application/json" },
-        });
-      }
-    }
-    // Diagnostic: sign-up via auth.api directly (bypasses auth.handler)
-    if (url.pathname === "/api/auth/test-signup" && req.method === "POST") {
-      try {
-        const body = await req.json();
-        console.log("test-signup body:", JSON.stringify(body));
-        const result = await auth.api.signUpEmail({ body });
-        return new Response(JSON.stringify(result), {
-          headers: { "Content-Type": "application/json" },
-        });
-      } catch (e: any) {
-        console.error("test-signup error:", e);
-        return new Response(JSON.stringify({ error: e?.message, stack: e?.stack }), {
-          status: 500,
-          headers: { "Content-Type": "application/json" },
-        });
-      }
-    }
     if (url.pathname.startsWith("/api/auth/")) {
-      try {
-        const res = await auth.handler(req);
-        if (res.status >= 400) {
-          const body = await res.clone().text();
-          console.error(`Auth ${req.method} ${url.pathname} → ${res.status}: ${body}`);
+      // For POST requests with a body, clone the body into a new Request
+      // so auth.handler gets a fresh body stream (fixes Railway edge proxy issue)
+      if (req.method === "POST") {
+        try {
+          const body = await req.text();
+          const freshReq = new Request(req.url, {
+            method: req.method,
+            headers: req.headers,
+            body,
+          });
+          return await auth.handler(freshReq);
+        } catch (e: any) {
+          console.error("Auth handler error:", e);
+          return new Response(JSON.stringify({ error: e?.message }), {
+            status: 500,
+            headers: { "Content-Type": "application/json" },
+          });
         }
-        return res;
-      } catch (e: any) {
-        console.error("Auth handler error:", e);
-        return new Response(JSON.stringify({ error: e?.message ?? String(e) }), {
-          status: 500,
-          headers: { "Content-Type": "application/json" },
-        });
       }
+      return auth.handler(req);
     }
     return honoFetch(req, server);
   },
