@@ -39,7 +39,10 @@ app.use(
 // Logging
 app.use("*", logger());
 
-// Auth middleware - populates user/session for all routes
+// Mount auth handler BEFORE session middleware so body isn't consumed
+app.on(["GET", "POST"], "/api/auth/*", (c) => auth.handler(c.req.raw));
+
+// Auth middleware - populates user/session for non-auth routes
 app.use("*", async (c, next) => {
   const session = await auth.api.getSession({ headers: c.req.raw.headers });
   if (!session) {
@@ -51,16 +54,6 @@ app.use("*", async (c, next) => {
   c.set("user", session.user);
   c.set("session", session.session);
   await next();
-});
-
-// Mount auth handler
-app.on(["GET", "POST"], "/api/auth/*", async (c) => {
-  try {
-    return await auth.handler(c.req.raw);
-  } catch (err) {
-    console.error("[Auth Error]", err);
-    return c.json({ error: "Internal auth error", detail: String(err) }, 500);
-  }
 });
 
 // Health check endpoint
