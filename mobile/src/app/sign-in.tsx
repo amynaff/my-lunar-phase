@@ -60,7 +60,7 @@ export default function SignInScreen() {
 
   const handleContinue = useCallback(() => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-    router.replace('/(app)');
+    router.push('/sign-up');
   }, []);
 
   const handleAppleSignIn = useCallback(async () => {
