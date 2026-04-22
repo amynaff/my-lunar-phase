@@ -38,12 +38,12 @@ const plans = [
   },
   {
     name: "Annual",
-    price: "$59.99",
+    price: "$49.99",
     period: "/year",
-    badge: "Save 29%",
+    badge: "Save 40%",
     features: [
       "Everything in Monthly",
-      "$5/month equivalent",
+      "$4.17/month equivalent",
       "Save vs monthly",
       "Early feature access",
     ],

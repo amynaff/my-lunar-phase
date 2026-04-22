@@ -12,7 +12,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Download MyLunarPhase | Women's Wellness App",
     description:
-      "Get personalized nutrition, movement, and self-care guidance for every phase of your cycle. Start your 60-day free trial today.",
+      "Get personalized nutrition, movement, and self-care guidance for every phase of your cycle. Start your 7-day free trial today.",
     url: "https://mylunarphase.com/download",
   },
 };
@@ -31,7 +31,7 @@ export default function DownloadPage() {
       "@type": "Offer",
       price: "6.99",
       priceCurrency: "USD",
-      description: "Monthly subscription — 60-day free trial included",
+      description: "Monthly subscription — 7-day free trial included",
     },
     screenshot: "https://mylunarphase.com/opengraph-image",
     author: {
@@ -151,7 +151,7 @@ export default function DownloadPage() {
         <div className="bg-gradient-to-br from-accent-purple/10 to-accent-rose/10 rounded-3xl p-10 border border-border-light">
           <p className="font-cormorant text-3xl text-text-primary mb-2">Simple pricing</p>
           <p className="font-quicksand text-text-secondary mb-6">
-            <strong className="text-accent-purple text-xl">$6.99/month</strong> after your 60-day free trial.
+            <strong className="text-accent-purple text-xl">$6.99/month</strong> after your 7-day free trial.
             No credit card required to start.
           </p>
           <Link

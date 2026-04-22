@@ -464,7 +464,7 @@ export default function LandingPage() {
           {/* Free */}
           <div className="bg-white rounded-[28px] border border-border-light p-7">
             <p className="text-[11px] font-quicksand font-bold tracking-[0.1em] uppercase text-text-muted mb-2.5">Free Trial</p>
-            <p className="font-cormorant text-[44px] font-light text-text-primary leading-none">$0 <span className="text-[14px] font-quicksand font-normal text-text-muted">/ 60 days</span></p>
+            <p className="font-cormorant text-[44px] font-light text-text-primary leading-none">$0 <span className="text-[14px] font-quicksand font-normal text-text-muted">/ 7 days</span></p>
             <p className="text-[13px] text-text-secondary font-quicksand mt-2.5 mb-6 leading-snug">Full access to everything. No credit card required.</p>
             <ul className="space-y-0 mb-6">
               {["All life stages", "Phase nutrition & movement", "Self-care & affirmations", "Moon phase wisdom", "Labs guide", "iOS & Web app"].map((f) => (
@@ -497,8 +497,8 @@ export default function LandingPage() {
           <div className="relative bg-gradient-to-br from-[#3d2b75] to-[#6d4fc4] rounded-[28px] p-7 shadow-[0_28px_64px_rgba(61,43,117,0.38)]">
             <span className="absolute -top-2.5 right-5 px-3.5 py-1 rounded-full bg-gradient-to-r from-accent-pink to-accent-rose text-white text-[10px] font-quicksand font-extrabold tracking-wide uppercase">Best Value</span>
             <p className="text-[11px] font-quicksand font-bold tracking-[0.1em] uppercase text-white/60 mb-2.5">Annual</p>
-            <p className="font-cormorant text-[44px] font-light text-white leading-none">$59.99 <span className="text-[14px] font-quicksand font-normal text-white/60">/ year</span></p>
-            <p className="text-[13px] text-white/70 font-quicksand mt-2.5 mb-6 leading-snug">Save 29% — just $5/month. Best deal.</p>
+            <p className="font-cormorant text-[44px] font-light text-white leading-none">$49.99 <span className="text-[14px] font-quicksand font-normal text-white/60">/ year</span></p>
+            <p className="text-[13px] text-white/70 font-quicksand mt-2.5 mb-6 leading-snug">Save 40% — just $4.17/month. Best deal.</p>
             <ul className="space-y-0 mb-6">
               {["Everything in Free", "Partner support & sharing", "Pattern analysis", "Advanced symptom tracking", "Unlimited history", "Community access"].map((f) => (
                 <li key={f} className="flex items-center gap-2 py-2 border-b border-white/15 text-[13px] text-white font-quicksand">
@@ -507,7 +507,7 @@ export default function LandingPage() {
               ))}
             </ul>
             <Link href="/sign-up" className="block text-center py-3.5 rounded-2xl bg-white text-text-primary font-quicksand font-bold shadow-[0_4px_18px_rgba(0,0,0,0.14)] hover:-translate-y-0.5 transition-transform">
-              Get Annual — Save 29%
+              Get Annual — Save 40%
             </Link>
           </div>
         </div>

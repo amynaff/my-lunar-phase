@@ -32,7 +32,7 @@ const apps = [
     name: "MyLunarPhase",
     emoji: "🌙",
     tagline: "Whole-cycle wellness for every stage of womanhood",
-    price: "$6.99/mo (60-day free trial)",
+    price: "$6.99/mo (7-day free trial)",
     bestFor: "Women who want personalized daily guidance beyond just period prediction",
     pros: [
       "Cycle phase-aware daily guidance (nutrition, movement, self-care)",
@@ -243,14 +243,14 @@ export default function BestWomensHealthApp2026Post() {
             <li><strong className="text-text-primary">For fertility awareness method / birth control</strong> — Natural Cycles (genuinely FDA-cleared)</li>
           </ul>
           <p className="font-quicksand text-text-secondary leading-relaxed">
-            The most important thing? Actually use it. The best app is the one you open every day. Try MyLunarPhase free for 60 days — no credit card required for the trial — and see if it's the right fit.
+            The most important thing? Actually use it. The best app is the one you open every day. Try MyLunarPhase free for 7 days — no credit card required for the trial — and see if it's the right fit.
           </p>
         </section>
 
         {/* CTA */}
         <div className="bg-gradient-to-br from-accent-purple/10 to-accent-rose/10 rounded-3xl p-8 border border-border-light text-center">
           <p className="font-cormorant text-2xl text-text-primary mb-2">
-            Try MyLunarPhase free for 60 days
+            Try MyLunarPhase free for 7 days
           </p>
           <p className="font-quicksand text-sm text-text-secondary mb-5">
             Personalized daily guidance for every phase. No credit card required.

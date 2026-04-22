@@ -2,7 +2,7 @@
 
 import { create } from "zustand";
 
-type SubscriptionPlan = "free" | "monthly" | "annual";
+type SubscriptionPlan = "free" | "trial" | "monthly" | "annual";
 
 interface SubscriptionStore {
   plan: SubscriptionPlan;

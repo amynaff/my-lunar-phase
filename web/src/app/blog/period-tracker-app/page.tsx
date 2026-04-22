@@ -195,7 +195,7 @@ export default function PeriodTrackerAppPost() {
         {/* CTA */}
         <div className="bg-gradient-to-br from-accent-purple/10 to-accent-rose/10 rounded-3xl p-8 border border-border-light text-center">
           <p className="font-cormorant text-2xl text-text-primary mb-2">
-            Try MyLunarPhase free for 60 days
+            Try MyLunarPhase free for 7 days
           </p>
           <p className="font-quicksand text-sm text-text-secondary mb-5">
             Cycle phase guidance, symptom tracking, personalized nutrition, movement, and self-care — for every woman at every stage.

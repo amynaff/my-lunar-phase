@@ -26,7 +26,7 @@ export const PLANS = {
   },
   annual: {
     name: "Annual",
-    price: 59.99,
+    price: 49.99,
     get priceId() {
       return process.env.STRIPE_ANNUAL_PRICE_ID!;
     },

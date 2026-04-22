@@ -82,7 +82,8 @@ const config: NextAuthConfig = {
     async jwt({ token, user }) {
       if (user) {
         token.id = user.id;
-        const [sub, mobileSub] = await Promise.all([
+        const [dbUser, sub, mobileSub] = await Promise.all([
+          prisma.user.findUnique({ where: { id: user.id }, select: { createdAt: true } }),
           prisma.subscription.findUnique({ where: { userId: user.id } }),
           prisma.mobileSubscription.findUnique({ where: { userId: user.id } }),
         ]);
@@ -92,6 +93,11 @@ const config: NextAuthConfig = {
           token.subscriptionPlan = sub!.plan;
         } else if (hasMobileSub) {
           token.subscriptionPlan = "monthly"; // IAP premium
+        } else if (dbUser?.createdAt) {
+          // 7-day free trial: grant premium access to new accounts
+          const trialEnd = new Date(dbUser.createdAt);
+          trialEnd.setDate(trialEnd.getDate() + 7);
+          token.subscriptionPlan = new Date() < trialEnd ? "trial" : "free";
         } else {
           token.subscriptionPlan = "free";
         }

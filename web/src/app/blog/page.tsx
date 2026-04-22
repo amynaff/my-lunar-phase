@@ -135,7 +135,7 @@ export default function BlogIndex() {
             Ready to tune in to your body?
           </p>
           <p className="font-quicksand text-text-secondary mb-6">
-            Start your 60-day free trial and get personalized guidance for your unique cycle.
+            Start your 7-day free trial and get personalized guidance for your unique cycle.
           </p>
           <Link
             href="/sign-up"

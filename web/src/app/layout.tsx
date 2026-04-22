@@ -114,7 +114,7 @@ export default function RootLayout({
                 "@type": "Offer",
                 price: "6.99",
                 priceCurrency: "USD",
-                description: "Monthly subscription with 60-day free trial",
+                description: "Monthly subscription with 7-day free trial",
               },
               author: {
                 "@type": "Organization",

@@ -64,12 +64,14 @@ export default function BillingPage() {
               {plan}
             </p>
             <p className="text-sm text-text-secondary font-quicksand mt-1">
-              {isPremium()
-                ? "You have full access to all features."
-                : "Upgrade to unlock Luna AI, detailed insights, and more."}
+              {plan === "trial"
+                ? "You're on your free trial. Subscribe to keep full access."
+                : isPremium()
+                  ? "You have full access to all features."
+                  : "Upgrade to unlock Luna AI, detailed insights, and more."}
             </p>
           </div>
-          {isPremium() && (
+          {isPremium() && plan !== "trial" && (
             <Button
               variant="outline"
               onClick={handleManageSubscription}

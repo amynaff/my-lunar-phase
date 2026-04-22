@@ -254,7 +254,7 @@ export default function MenstrualCyclePhasesPost() {
             Track your phases with MyLunarPhase
           </p>
           <p className="font-quicksand text-sm text-text-secondary mb-5">
-            Get daily personalized guidance for every phase of your cycle. 60-day free trial.
+            Get daily personalized guidance for every phase of your cycle. 7-day free trial.
           </p>
           <Link
             href="/sign-up"
