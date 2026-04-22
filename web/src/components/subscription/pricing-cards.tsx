@@ -58,7 +58,7 @@ export function PricingCards({ currentPlan }: { currentPlan?: string }) {
     const res = await fetch("/api/stripe/checkout", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ priceId }),
+      body: JSON.stringify({ plan: priceId }),
     });
     const data = await res.json();
     if (data.url) {
