@@ -54,7 +54,7 @@ app.use("*", async (c, next) => {
 });
 
 // Health check endpoint (version tag to verify deploys)
-app.get("/health", (c) => c.json({ status: "ok", v: 4 }));
+app.get("/health", (c) => c.json({ status: "ok", v: 5 }));
 
 // Protected route example
 app.get("/api/me", (c) => {
@@ -84,6 +84,37 @@ export default {
   port,
   fetch: async (req: Request, server: any) => {
     const url = new URL(req.url);
+    // Diagnostic: test body parsing directly
+    if (url.pathname === "/api/auth/test-body") {
+      try {
+        const body = await req.json();
+        return new Response(JSON.stringify({ received: body }), {
+          headers: { "Content-Type": "application/json" },
+        });
+      } catch (e: any) {
+        return new Response(JSON.stringify({ parseError: e?.message }), {
+          status: 400,
+          headers: { "Content-Type": "application/json" },
+        });
+      }
+    }
+    // Diagnostic: sign-up via auth.api directly (bypasses auth.handler)
+    if (url.pathname === "/api/auth/test-signup" && req.method === "POST") {
+      try {
+        const body = await req.json();
+        console.log("test-signup body:", JSON.stringify(body));
+        const result = await auth.api.signUpEmail({ body });
+        return new Response(JSON.stringify(result), {
+          headers: { "Content-Type": "application/json" },
+        });
+      } catch (e: any) {
+        console.error("test-signup error:", e);
+        return new Response(JSON.stringify({ error: e?.message, stack: e?.stack }), {
+          status: 500,
+          headers: { "Content-Type": "application/json" },
+        });
+      }
+    }
     if (url.pathname.startsWith("/api/auth/")) {
       try {
         const res = await auth.handler(req);
