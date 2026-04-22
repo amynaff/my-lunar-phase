@@ -44,6 +44,14 @@ app.on(["GET", "POST"], "/api/auth/*", (c) => auth.handler(c.req.raw));
 
 // Auth middleware - populates user/session for non-auth routes
 app.use("*", async (c, next) => {
+  // Skip session lookup for auth routes — Better Auth handles these directly
+  // and needs to read the request body itself (avoids "Failed to parse JSON")
+  if (c.req.path.startsWith("/api/auth/")) {
+    c.set("user", null);
+    c.set("session", null);
+    await next();
+    return;
+  }
   const session = await auth.api.getSession({ headers: c.req.raw.headers });
   if (!session) {
     c.set("user", null);
