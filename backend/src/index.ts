@@ -54,7 +54,7 @@ app.use("*", async (c, next) => {
 });
 
 // Health check endpoint (version tag to verify deploys)
-app.get("/health", (c) => c.json({ status: "ok", v: 2 }));
+app.get("/health", (c) => c.json({ status: "ok", v: 3 }));
 
 // Protected route example
 app.get("/api/me", (c) => {
@@ -82,10 +82,18 @@ console.log(`Server starting on port ${port}...`);
 const honoFetch = app.fetch;
 export default {
   port,
-  fetch: (req: Request, server: any) => {
+  fetch: async (req: Request, server: any) => {
     const url = new URL(req.url);
     if (url.pathname.startsWith("/api/auth/")) {
-      return auth.handler(req);
+      try {
+        return await auth.handler(req);
+      } catch (e: any) {
+        console.error("Auth handler error:", e);
+        return new Response(JSON.stringify({ error: e?.message ?? String(e) }), {
+          status: 500,
+          headers: { "Content-Type": "application/json" },
+        });
+      }
     }
     return honoFetch(req, server);
   },
