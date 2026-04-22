@@ -54,7 +54,14 @@ app.use("*", async (c, next) => {
 });
 
 // Mount auth handler
-app.on(["GET", "POST"], "/api/auth/*", (c) => auth.handler(c.req.raw));
+app.on(["GET", "POST"], "/api/auth/*", async (c) => {
+  try {
+    return await auth.handler(c.req.raw);
+  } catch (err) {
+    console.error("[Auth Error]", err);
+    return c.json({ error: "Internal auth error", detail: String(err) }, 500);
+  }
+});
 
 // Health check endpoint
 app.get("/health", (c) => c.json({ status: "ok" }));

@@ -308,61 +308,38 @@ export default function SignInScreen() {
               <Pressable
                 onPress={handleContinueWithEmail}
                 style={({ pressed }) => ({
-                  opacity: pressed ? 0.75 : 1,
+                  opacity: pressed ? 0.85 : 1,
                   transform: [{ scale: pressed ? 0.98 : 1 }],
-                  backgroundColor: isDark
-                    ? 'rgba(255,255,255,0.08)'
-                    : 'rgba(0,0,0,0.06)',
-                  borderRadius: 16,
-                  paddingVertical: 16,
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  borderWidth: 1,
-                  borderColor: isDark
-                    ? 'rgba(255,255,255,0.12)'
-                    : 'rgba(0,0,0,0.1)',
                 })}
               >
-                <Mail size={18} color={theme.text.secondary} strokeWidth={1.8} style={{ marginRight: 8 }} />
-                <Text
+                <View
                   style={{
-                    fontFamily: 'Quicksand_600SemiBold',
-                    fontSize: 15,
-                    color: theme.text.secondary,
+                    backgroundColor: isDark
+                      ? 'rgba(255,255,255,0.1)'
+                      : 'rgba(255,255,255,0.85)',
+                    borderRadius: 16,
+                    paddingVertical: 16,
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    borderWidth: 1,
+                    borderColor: isDark
+                      ? 'rgba(255,255,255,0.15)'
+                      : 'rgba(0,0,0,0.12)',
                   }}
                 >
-                  Continue with Email
-                </Text>
+                  <Mail size={18} color={theme.text.secondary} strokeWidth={1.8} style={{ marginRight: 8 }} />
+                  <Text
+                    style={{
+                      fontFamily: 'Quicksand_600SemiBold',
+                      fontSize: 15,
+                      color: theme.text.secondary,
+                    }}
+                  >
+                    Continue with Email
+                  </Text>
+                </View>
               </Pressable>
-            </Animated.View>
-
-            {/* Google SSO - Coming Soon */}
-            <Animated.View entering={FadeInUp.delay(580).duration(700)}>
-              <View
-                style={{
-                  borderRadius: 16,
-                  paddingVertical: 16,
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  borderWidth: 1,
-                  borderColor: isDark
-                    ? 'rgba(255,255,255,0.06)'
-                    : 'rgba(0,0,0,0.06)',
-                  opacity: 0.45,
-                }}
-              >
-                <Text
-                  style={{
-                    fontFamily: 'Quicksand_500Medium',
-                    fontSize: 14,
-                    color: theme.text.muted,
-                  }}
-                >
-                  Google Sign-In — Coming soon
-                </Text>
-              </View>
             </Animated.View>
 
             {/* Create account link */}
