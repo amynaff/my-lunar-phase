@@ -1,0 +1,3 @@
+# Exclude bun lockfile — we use npm for EAS builds (package-lock.json)
+bun.lock
+bun.lockb

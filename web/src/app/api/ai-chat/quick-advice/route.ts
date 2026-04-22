@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { quickAdviceSchema } from "@/lib/validations/ai-chat";
 import { getSystemPrompt, topicPrompts } from "@/lib/ai/system-prompts";
-import { callGrok } from "@/lib/ai/grok-client";
+import { callLunaAI } from "@/lib/ai/luna-ai-client";
 
 export async function POST(req: NextRequest) {
   const body = await req.json();
@@ -19,7 +19,7 @@ export async function POST(req: NextRequest) {
       { role: "user", content: topicPrompts[topic] || topicPrompts.selfcare },
     ];
 
-    const data = await callGrok(messages, { maxTokens: 200, temperature: 0.8 });
+    const data = await callLunaAI(messages, { maxTokens: 200, temperature: 0.8 });
     return NextResponse.json(data);
   } catch (err) {
     console.error("Quick advice error:", err);

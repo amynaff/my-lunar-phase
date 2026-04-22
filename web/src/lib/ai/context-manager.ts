@@ -1,4 +1,4 @@
-import { callGrok } from "./grok-client";
+import { callLunaAI } from "./luna-ai-client";
 import {
   estimateMessagesTokens,
   MAX_CONTEXT_TOKENS,
@@ -76,7 +76,7 @@ async function summarizeMessages(
     : `Summarize this conversation concisely (3-5 sentences), capturing the key topics and important context:\n${conversationText}`;
 
   try {
-    const response = await callGrok(
+    const response = await callLunaAI(
       [
         {
           role: "system",

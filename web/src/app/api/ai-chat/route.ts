@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { chatRequestSchema } from "@/lib/validations/ai-chat";
 import { getSystemPrompt } from "@/lib/ai/system-prompts";
-import { callGrok } from "@/lib/ai/grok-client";
+import { callLunaAI } from "@/lib/ai/luna-ai-client";
 
 export async function POST(req: NextRequest) {
   const body = await req.json();
@@ -20,7 +20,7 @@ export async function POST(req: NextRequest) {
       ...messages,
     ];
 
-    const data = await callGrok(fullMessages);
+    const data = await callLunaAI(fullMessages);
     return NextResponse.json(data);
   } catch (err) {
     console.error("AI chat error:", err);

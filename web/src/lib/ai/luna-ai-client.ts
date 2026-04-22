@@ -1,7 +1,6 @@
 import Anthropic from "@anthropic-ai/sdk";
 
-// Response shape kept identical to the previous Grok client so all callers work unchanged
-interface GrokResponse {
+interface LunaAIResponse {
   choices: Array<{
     message: {
       content: string;
@@ -17,10 +16,10 @@ interface ChatMessage {
 
 const MODEL = "claude-sonnet-4-6";
 
-export async function callGrok(
+export async function callLunaAI(
   messages: ChatMessage[],
   options: { maxTokens?: number; temperature?: number } = {}
-): Promise<GrokResponse> {
+): Promise<LunaAIResponse> {
   const apiKey = process.env.ANTHROPIC_API_KEY;
   if (!apiKey) throw new Error("ANTHROPIC_API_KEY not configured");
 

@@ -1,0 +1,13 @@
+diff --git a/node_modules/react-native-ios-utilities/react-native-ios-utilities.podspec b/node_modules/react-native-ios-utilities/react-native-ios-utilities.podspec
+index 609ca82..f605454 100644
+--- a/node_modules/react-native-ios-utilities/react-native-ios-utilities.podspec
++++ b/node_modules/react-native-ios-utilities/react-native-ios-utilities.podspec
+@@ -172,7 +172,7 @@ Pod::Spec.new do |s|
+   if fabric_enabled
+     s.dependency 'React-RCTFabric'
+     if ENV['RCT_USE_RN_DEP'] != '1'
+-      s.dependency 'RCT-Folly', folly_version
++      s.dependency 'RCT-Folly'
+     end
+   end
+ 

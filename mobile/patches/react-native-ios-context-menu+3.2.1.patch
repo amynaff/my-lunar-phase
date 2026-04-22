@@ -1,0 +1,13 @@
+diff --git a/node_modules/react-native-ios-context-menu/react-native-ios-context-menu.podspec b/node_modules/react-native-ios-context-menu/react-native-ios-context-menu.podspec
+index 3cddfde..bb890d1 100644
+--- a/node_modules/react-native-ios-context-menu/react-native-ios-context-menu.podspec
++++ b/node_modules/react-native-ios-context-menu/react-native-ios-context-menu.podspec
+@@ -162,7 +162,7 @@ Pod::Spec.new do |s|
+   if fabric_enabled
+     s.dependency 'React-RCTFabric'
+     if ENV['RCT_USE_RN_DEP'] != '1'
+-      s.dependency 'RCT-Folly', folly_version
++      s.dependency 'RCT-Folly'
+     end
+   end
+ 
