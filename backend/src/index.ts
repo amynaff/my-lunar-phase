@@ -39,19 +39,8 @@ app.use(
 // Logging
 app.use("*", logger());
 
-// Mount auth handler BEFORE session middleware so body isn't consumed
-app.on(["GET", "POST"], "/api/auth/*", (c) => auth.handler(c.req.raw));
-
 // Auth middleware - populates user/session for non-auth routes
 app.use("*", async (c, next) => {
-  // Skip session lookup for auth routes — Better Auth handles these directly
-  // and needs to read the request body itself (avoids "Failed to parse JSON")
-  if (c.req.path.startsWith("/api/auth/")) {
-    c.set("user", null);
-    c.set("session", null);
-    await next();
-    return;
-  }
   const session = await auth.api.getSession({ headers: c.req.raw.headers });
   if (!session) {
     c.set("user", null);
@@ -64,8 +53,8 @@ app.use("*", async (c, next) => {
   await next();
 });
 
-// Health check endpoint
-app.get("/health", (c) => c.json({ status: "ok" }));
+// Health check endpoint (version tag to verify deploys)
+app.get("/health", (c) => c.json({ status: "ok", v: 2 }));
 
 // Protected route example
 app.get("/api/me", (c) => {
@@ -88,7 +77,16 @@ const port = Number(process.env.PORT) || 3000;
 
 console.log(`Server starting on port ${port}...`);
 
+// Auth routes bypass Hono entirely so middleware can't consume the request body.
+// Better Auth handles its own CORS via trustedOrigins config.
+const honoFetch = app.fetch;
 export default {
   port,
-  fetch: app.fetch,
+  fetch: (req: Request, server: any) => {
+    const url = new URL(req.url);
+    if (url.pathname.startsWith("/api/auth/")) {
+      return auth.handler(req);
+    }
+    return honoFetch(req, server);
+  },
 };
