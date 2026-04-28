@@ -1,8 +1,9 @@
 import { Hono } from "hono";
+import Anthropic from "@anthropic-ai/sdk";
 
 const aiChatRouter = new Hono();
 
-interface GrokResponse {
+interface LunaAIResponse {
   choices: Array<{
     message: {
       content: string;
@@ -21,6 +22,42 @@ interface ChatRequest {
   lifeStage?: "regular" | "perimenopause" | "menopause";
   currentPhase?: string;
   moonPhase?: string;
+}
+
+const MODEL = "claude-sonnet-4-6";
+
+function getClient(): Anthropic {
+  const apiKey = process.env.ANTHROPIC_API_KEY;
+  if (!apiKey) throw new Error("ANTHROPIC_API_KEY not configured");
+  return new Anthropic({ apiKey });
+}
+
+async function callClaude(
+  messages: ChatMessage[],
+  options: { maxTokens?: number } = {}
+): Promise<LunaAIResponse> {
+  const client = getClient();
+
+  const systemMessages = messages.filter((m) => m.role === "system");
+  const conversationMessages = messages.filter((m) => m.role !== "system");
+  const systemPrompt = systemMessages.map((m) => m.content).join("\n\n");
+
+  const response = await client.messages.create({
+    model: MODEL,
+    max_tokens: options.maxTokens ?? 1000,
+    system: systemPrompt || undefined,
+    messages: conversationMessages.map((m) => ({
+      role: m.role as "user" | "assistant",
+      content: m.content,
+    })),
+  });
+
+  const textContent = response.content.find((c) => c.type === "text");
+  const text = textContent?.type === "text" ? textContent.text : "";
+
+  return {
+    choices: [{ message: { role: "assistant", content: text } }],
+  };
 }
 
 // System prompt for Luna wellness assistant
@@ -81,44 +118,18 @@ aiChatRouter.post("/", async (c) => {
       return c.json({ error: "Messages array is required" }, 400);
     }
 
-    const apiKey = process.env.GROK_API_KEY;
-    if (!apiKey) {
-      console.error("GROK_API_KEY not found in environment");
-      return c.json({ error: "AI service not configured" }, 500);
-    }
-
-    // Build messages with system prompt
     const systemPrompt = getSystemPrompt(body.lifeStage, body.currentPhase, body.moonPhase);
     const messages: ChatMessage[] = [
       { role: "system", content: systemPrompt },
       ...body.messages,
     ];
 
-    const response = await fetch("https://api.x.ai/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${apiKey}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        model: "grok-2-latest",
-        messages,
-        max_tokens: 1000,
-        temperature: 0.7,
-      }),
-    });
-
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error("Grok API error:", response.status, errorText);
-      return c.json({ error: "AI service error", details: errorText }, 500);
-    }
-
-    const data = (await response.json()) as GrokResponse;
+    const data = await callClaude(messages, { maxTokens: 1000 });
     return c.json(data);
   } catch (error) {
     console.error("AI chat error:", error);
-    return c.json({ error: "Failed to process chat request" }, 500);
+    const message = error instanceof Error ? error.message : "Failed to process chat request";
+    return c.json({ error: message }, 500);
   }
 });
 
@@ -131,11 +142,6 @@ aiChatRouter.post("/quick-advice", async (c) => {
       currentPhase?: string;
       moonPhase?: string;
     }>();
-
-    const apiKey = process.env.GROK_API_KEY;
-    if (!apiKey) {
-      return c.json({ error: "AI service not configured" }, 500);
-    }
 
     const topicPrompts = {
       nutrition: "Give me a quick nutrition tip for today based on my current phase/stage. Keep it to 2-3 sentences.",
@@ -150,27 +156,7 @@ aiChatRouter.post("/quick-advice", async (c) => {
       { role: "user", content: topicPrompts[body.topic] || topicPrompts.selfcare },
     ];
 
-    const response = await fetch("https://api.x.ai/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${apiKey}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        model: "grok-2-latest",
-        messages,
-        max_tokens: 200,
-        temperature: 0.8,
-      }),
-    });
-
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error("Grok API error:", response.status, errorText);
-      return c.json({ error: "AI service error" }, 500);
-    }
-
-    const data = (await response.json()) as GrokResponse;
+    const data = await callClaude(messages, { maxTokens: 200 });
     return c.json(data);
   } catch (error) {
     console.error("Quick advice error:", error);
@@ -194,11 +180,6 @@ aiChatRouter.post("/symptom-check", async (c) => {
 
     if (!body.symptoms || !Array.isArray(body.symptoms) || body.symptoms.length === 0) {
       return c.json({ error: "At least one symptom is required" }, 400);
-    }
-
-    const apiKey = process.env.GROK_API_KEY;
-    if (!apiKey) {
-      return c.json({ error: "AI service not configured" }, 500);
     }
 
     const symptomCheckerPrompt = `You are Luna, a caring wellness companion helping a woman understand her symptoms.
@@ -231,27 +212,7 @@ Keep your response warm and supportive, around 3-4 paragraphs.`;
       { role: "user", content: `I'm experiencing: ${body.symptoms.join(", ")}` },
     ];
 
-    const response = await fetch("https://api.x.ai/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${apiKey}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        model: "grok-2-latest",
-        messages,
-        max_tokens: 800,
-        temperature: 0.6,
-      }),
-    });
-
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error("Grok API error:", response.status, errorText);
-      return c.json({ error: "AI service error" }, 500);
-    }
-
-    const data = (await response.json()) as GrokResponse;
+    const data = await callClaude(messages, { maxTokens: 800 });
     return c.json(data);
   } catch (error) {
     console.error("Symptom check error:", error);
