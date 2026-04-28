@@ -268,7 +268,7 @@ export default function PerimenopauseSymptomsPost() {
             href="/sign-up"
             className="inline-flex px-8 py-3 rounded-full bg-gradient-to-r from-accent-purple to-accent-rose text-white font-quicksand font-semibold hover:-translate-y-0.5 transition-transform"
           >
-            Start 60-Day Free Trial →
+            Start 7-Day Free Trial →
           </Link>
         </div>
 

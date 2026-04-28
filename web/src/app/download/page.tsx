@@ -84,7 +84,7 @@ export default function DownloadPage() {
               <p className="font-quicksand font-bold text-lg">Web App</p>
             </div>
             <span className="font-quicksand text-xs bg-white/20 px-3 py-1 rounded-full">
-              Start 60-Day Free Trial →
+              Start 7-Day Free Trial →
             </span>
           </Link>
 
@@ -158,7 +158,7 @@ export default function DownloadPage() {
             href="/sign-up"
             className="inline-flex px-10 py-4 rounded-full bg-gradient-to-r from-accent-purple to-accent-rose text-white font-quicksand font-bold text-lg hover:-translate-y-0.5 transition-transform shadow-lg shadow-accent-purple/30"
           >
-            Start 60-Day Free Trial
+            Start 7-Day Free Trial
           </Link>
           <p className="font-quicksand text-xs text-text-muted mt-4">
             Cancel anytime. Your data is always yours.

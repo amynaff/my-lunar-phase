@@ -10,7 +10,7 @@ const plans = [
     period: "forever",
     features: [
       "Basic cycle tracking",
-      "60-day history",
+      "90-day history",
       "3 symptoms per day",
       "Community access",
       "Moon phase wisdom",
