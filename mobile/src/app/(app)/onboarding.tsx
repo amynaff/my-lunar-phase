@@ -167,20 +167,28 @@ export default function OnboardingScreen() {
                           }}
                           className="text-sm"
                         >
-                          {option.stage === 'regular' ? 'Regular Menstrual Cycle' : info.name}
+                          {info.name}
                         </Text>
                         <Text
                           style={{
                             fontFamily: 'Quicksand_400Regular',
                             color: isSelected ? 'rgba(255,255,255,0.9)' : '#8466db',
                           }}
-                          className="text-xs mt-1 leading-4"
+                          className="text-xs mt-1"
                         >
-                          {option.stage === 'regular' && 'I have a monthly period and want to track my cycle phases'}
-                          {option.stage === 'perimenopause' && 'My periods are becoming irregular — the transition before menopause'}
-                          {option.stage === 'menopause' && "I haven't had a period in 12+ months"}
-                          {option.stage === 'postmenopause' && "I'm past menopause and focused on long-term wellness"}
+                          {info.ageRange}
                         </Text>
+                        {option.stage === 'menopause' && (
+                          <Text
+                            style={{
+                              fontFamily: 'Quicksand_400Regular',
+                              color: isSelected ? 'rgba(255,255,255,0.8)' : '#9d84ed',
+                            }}
+                            className="text-xs mt-0.5"
+                          >
+                            I haven't had a period in over a year
+                          </Text>
+                        )}
                       </View>
                       {isSelected && (
                         <View className="w-6 h-6 rounded-full bg-white items-center justify-center">

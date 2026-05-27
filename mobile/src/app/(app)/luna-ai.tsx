@@ -28,17 +28,8 @@ import {
   CormorantGaramond_400Regular,
   CormorantGaramond_600SemiBold,
 } from '@expo-google-fonts/cormorant-garamond';
-import { getAccessToken } from '@/lib/auth/auth-client';
 
 const BACKEND_URL = process.env.EXPO_PUBLIC_BACKEND_URL!;
-
-const getJsonHeaders = async () => {
-  const accessToken = await getAccessToken();
-  return {
-    'Content-Type': 'application/json',
-    ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
-  };
-};
 
 interface Message {
   id: string;
@@ -177,7 +168,7 @@ export default function LunaAIScreen() {
 
       const response = await fetch(`${BACKEND_URL}/api/ai-chat`, {
         method: 'POST',
-        headers: await getJsonHeaders(),
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           messages: conversationHistory,
           lifeStage,
@@ -235,7 +226,9 @@ export default function LunaAIScreen() {
 
       const response = await fetch(`${BACKEND_URL}/api/ai-chat`, {
         method: 'POST',
-        headers: await getJsonHeaders(),
+        headers: {
+          'Content-Type': 'application/json',
+        },
         body: JSON.stringify({
           messages: conversationHistory,
           lifeStage,
@@ -297,7 +290,9 @@ export default function LunaAIScreen() {
     try {
       const response = await fetch(`${BACKEND_URL}/api/ai-chat/symptom-check`, {
         method: 'POST',
-        headers: await getJsonHeaders(),
+        headers: {
+          'Content-Type': 'application/json',
+        },
         body: JSON.stringify({
           symptoms: symptomNames,
           severity: symptomSeverity,

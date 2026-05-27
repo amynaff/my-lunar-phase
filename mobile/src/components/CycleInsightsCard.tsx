@@ -324,7 +324,7 @@ export function CycleInsightsCard({
               <Pressable
                 onPress={() => {
                   Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                  onCheckSymptoms?.() || router.push('/(app)/luna');
+                  onCheckSymptoms?.() || router.push('/luna-ai');
                 }}
                 className="mt-3 py-3 rounded-full items-center"
                 style={{ backgroundColor: theme.accent.pink }}

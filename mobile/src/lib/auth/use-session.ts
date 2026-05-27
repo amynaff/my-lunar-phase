@@ -16,9 +16,5 @@ export const useSession = () => {
 
 export const useInvalidateSession = () => {
   const queryClient = useQueryClient();
-  return async () => {
-    // refetchQueries waits for the refetch to complete (unlike invalidateQueries)
-    // so the auth guard sees the updated session before navigation happens
-    await queryClient.refetchQueries({ queryKey: SESSION_QUERY_KEY });
-  };
+  return () => queryClient.invalidateQueries({ queryKey: SESSION_QUERY_KEY });
 };

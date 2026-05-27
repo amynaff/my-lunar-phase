@@ -1,13 +1,12 @@
 "use client";
 
-import { useEffect, useState, Suspense } from "react";
+import { useState, Suspense } from "react";
 import { motion } from "framer-motion";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { Lock, Eye, EyeOff, Loader2, CheckCircle2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { createSupabaseBrowserClient } from "@/lib/supabase/client";
 
 export default function ResetPasswordPage() {
   return (
@@ -20,8 +19,7 @@ export default function ResetPasswordPage() {
 function ResetPasswordForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const code = searchParams.get("code") || "";
-  const supabase = createSupabaseBrowserClient();
+  const token = searchParams.get("token") || "";
 
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -30,16 +28,6 @@ function ResetPasswordForm() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
-
-  useEffect(() => {
-    if (!code) return;
-
-    supabase.auth.exchangeCodeForSession(code).then(({ error: exchangeError }) => {
-      if (exchangeError) {
-        setError("Invalid or expired reset link. Please request a new reset link.");
-      }
-    });
-  }, [code, supabase.auth]);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -55,7 +43,7 @@ function ResetPasswordForm() {
       return;
     }
 
-    if (!code) {
+    if (!token) {
       setError("Invalid or missing reset token. Please request a new reset link.");
       return;
     }
@@ -63,14 +51,18 @@ function ResetPasswordForm() {
     setIsLoading(true);
 
     try {
-      const { error: updateError } = await supabase.auth.updateUser({ password });
+      const res = await fetch("/api/auth/reset-password", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ token, password }),
+      });
 
-      if (updateError) {
-        setError(updateError.message || "Failed to reset password. The link may have expired.");
+      if (!res.ok) {
+        const data = await res.json();
+        setError(data.error || "Failed to reset password. The link may have expired.");
         return;
       }
 
-      await supabase.auth.signOut();
       setSuccess(true);
       setTimeout(() => router.push("/sign-in"), 3000);
     } catch {

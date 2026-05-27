@@ -8,7 +8,6 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { KeyboardProvider } from 'react-native-keyboard-controller';
 import { useSession } from '@/lib/auth/use-session';
-import { useCycleStore } from '@/lib/cycle-store';
 import { Alert } from 'react-native';
 
 // Global JS error handler — surfaces unhandled errors as alerts in TestFlight
@@ -36,26 +35,24 @@ SplashScreen.preventAutoHideAsync();
 
 const queryClient = new QueryClient();
 
-// Auth guard: redirect authenticated users away from sign-in, allow guests
+// Auth guard: redirect authenticated users away from sign-in
 function useProtectedRoute() {
-  const { data: session, isLoading, isFetched } = useSession();
-  const isGuest = useCycleStore((s) => s.isGuest);
+  const { data: session, isLoading } = useSession();
   const segments = useSegments();
   const router = useRouter();
 
   useEffect(() => {
-    // Wait until the session query has actually completed at least once
-    if (isLoading || !isFetched) return;
+    if (isLoading) return;
 
     const inAuthGroup = segments[0] === 'sign-in' || segments[0] === 'login' || segments[0] === 'sign-up' || segments[0] === 'forgot-password';
     const inAppGroup = segments[0] === '(app)';
 
     if (session?.user && inAuthGroup) {
       router.replace('/(app)');
-    } else if (!session?.user && !isGuest && inAppGroup) {
+    } else if (!session?.user && inAppGroup) {
       router.replace('/sign-in');
     }
-  }, [session, isLoading, isFetched, isGuest, segments]);
+  }, [session, isLoading, segments]);
 }
 
 function RootLayoutNav({ colorScheme }: { colorScheme: 'light' | 'dark' | null | undefined }) {

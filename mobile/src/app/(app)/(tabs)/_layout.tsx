@@ -14,6 +14,7 @@ import {
   ClipboardList,
   Sparkles,
   Grid3x3,
+  Heart,
 } from 'lucide-react-native';
 import * as Haptics from 'expo-haptics';
 import { useThemeStore, getTheme } from '@/lib/theme-store';
@@ -77,6 +78,7 @@ export default function TabLayout() {
   const themeMode = useThemeStore(s => s.mode);
   const theme = getTheme(themeMode);
   const lifeStage = useCycleStore(s => s.lifeStage);
+  const isNonCycling = lifeStage === 'menopause' || lifeStage === 'postmenopause';
 
   const handleTabPress = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
@@ -128,20 +130,31 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="luna"
-        options={{
-          title: 'Luna',
-          tabBarIcon: ({ focused, color }) => (
-            <TabIcon icon={Sparkles} label="Luna" focused={focused} color={color} />
-          ),
-        }}
-      />
-      <Tabs.Screen
         name="log"
         options={{
           title: 'Log',
           tabBarIcon: ({ focused, color }) => (
             <TabIcon icon={ClipboardList} label="Log" focused={focused} color={color} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="insights"
+        options={{
+          title: 'Insights',
+          href: isNonCycling ? null : undefined,
+          tabBarIcon: ({ focused, color }) => (
+            <TabIcon icon={Sparkles} label="Insights" focused={focused} color={color} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="wellness"
+        options={{
+          title: 'Wellness',
+          href: isNonCycling ? undefined : null,
+          tabBarIcon: ({ focused, color }) => (
+            <TabIcon icon={Heart} label="Wellness" focused={focused} color={color} />
           ),
         }}
       />
@@ -154,8 +167,6 @@ export default function TabLayout() {
           ),
         }}
       />
-      <Tabs.Screen name="insights" options={{ href: null }} />
-      <Tabs.Screen name="wellness" options={{ href: null }} />
       {/* Hidden tabs — accessible via the More screen */}
       <Tabs.Screen name="nutrition" options={{ href: null }} />
       <Tabs.Screen name="grocery" options={{ href: null }} />

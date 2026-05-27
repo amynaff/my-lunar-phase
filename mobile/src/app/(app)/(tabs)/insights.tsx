@@ -574,7 +574,7 @@ export default function InsightsScreen() {
             entering={FadeInUp.delay(520).duration(600)}
             className="mx-6 mt-5"
           >
-            <Pressable onPress={() => router.push('/(app)/luna' as any)}>
+            <Pressable onPress={() => router.push('/luna-ai' as any)}>
               <LinearGradient
                 colors={[`${theme.accent.purple}20`, `${theme.accent.purple}08`]}
                 start={{ x: 0, y: 0 }}

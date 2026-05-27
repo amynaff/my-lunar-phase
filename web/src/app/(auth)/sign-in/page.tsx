@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, Suspense } from "react";
+import { signIn } from "next-auth/react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
@@ -8,7 +9,6 @@ import { User, Mail, Lock, Eye, EyeOff, Loader2 } from "lucide-react";
 import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { createSupabaseBrowserClient } from "@/lib/supabase/client";
 
 const AUTH_ERRORS: Record<string, string> = {
   OAuthSignin: "Could not start OAuth sign in. Please try again.",
@@ -43,7 +43,6 @@ type FieldErrors = Partial<Record<keyof SignUpForm, string>>;
 function AuthForm() {
   const searchParams = useSearchParams();
   const router = useRouter();
-  const supabase = createSupabaseBrowserClient();
   const initialMode = searchParams.get("mode") === "signup" ? "signup" : "signin";
   const [mode, setMode] = useState<"signin" | "signup">(initialMode);
 
@@ -92,15 +91,15 @@ function AuthForm() {
     setError("");
     setIsLoading(true);
     try {
-      const result = await supabase.auth.signInWithPassword({
-        email: email.trim(),
+      const result = await signIn("credentials", {
+        email,
         password,
+        redirect: false,
       });
-
-      if (result.error) {
-        setError(result.error.message || "Invalid email or password. Please try again.");
+      if (result?.error) {
+        setError("Invalid email or password. Please try again.");
       } else {
-        router.replace("/dashboard");
+        window.location.href = "/dashboard";
       }
     } catch {
       setError("Something went wrong. Please try again.");
@@ -125,28 +124,22 @@ function AuthForm() {
     }
     setIsLoading(true);
     try {
-      const { data, error: signUpError } = await supabase.auth.signUp({
-        email: signUpForm.email.trim(),
-        password: signUpForm.password,
-        options: {
-          data: {
-            name: signUpForm.name.trim(),
-          },
-          emailRedirectTo: `${window.location.origin}/auth/callback?next=/dashboard`,
-        },
+      const res = await fetch("/api/auth/signup", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: signUpForm.name,
+          email: signUpForm.email,
+          password: signUpForm.password,
+        }),
       });
-
-      if (signUpError) {
-        setError(signUpError.message || "Something went wrong. Please try again.");
+      const data = await res.json();
+      if (!res.ok) {
+        setError(data.error || "Something went wrong. Please try again.");
         return;
       }
-
-      if (data.session) {
-        router.replace("/dashboard");
-      } else {
-        setSuccessMessage("Account created. Check your email to confirm, then sign in.");
-        switchMode("signin");
-      }
+      setSuccessMessage("Account created! Please check your email to verify, then sign in.");
+      switchMode("signin");
     } catch {
       setError("Something went wrong. Please try again.");
     } finally {
@@ -175,12 +168,7 @@ function AuthForm() {
       {/* OAuth Buttons — always visible */}
       <div className="space-y-3 mb-6">
         <button
-          onClick={() =>
-            supabase.auth.signInWithOAuth({
-              provider: "google",
-              options: { redirectTo: `${window.location.origin}/auth/callback?next=/dashboard` },
-            })
-          }
+          onClick={() => signIn("google", { callbackUrl: "/dashboard" })}
           className="w-full flex items-center justify-center gap-3 py-3.5 rounded-2xl border border-border-light bg-bg-secondary font-quicksand font-semibold text-sm text-text-primary hover:brightness-95 transition-all"
         >
           <svg className="h-5 w-5" viewBox="0 0 24 24">
@@ -193,12 +181,7 @@ function AuthForm() {
         </button>
 
         <button
-          onClick={() =>
-            supabase.auth.signInWithOAuth({
-              provider: "apple",
-              options: { redirectTo: `${window.location.origin}/auth/callback?next=/dashboard` },
-            })
-          }
+          onClick={() => signIn("apple", { callbackUrl: "/dashboard" })}
           className="w-full flex items-center justify-center gap-3 py-3.5 rounded-2xl border border-border-light bg-bg-secondary font-quicksand font-semibold text-sm text-text-primary hover:brightness-95 transition-all"
         >
           <svg className="h-5 w-5" viewBox="0 0 24 24" fill="currentColor">

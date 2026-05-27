@@ -14,8 +14,6 @@ import * as Haptics from 'expo-haptics';
 import * as AppleAuthentication from 'expo-apple-authentication';
 import { useThemeStore, getTheme } from '@/lib/theme-store';
 import { signInWithApple } from '@/lib/auth/auth-client';
-import { useInvalidateSession } from '@/lib/auth/use-session';
-import { useCycleStore } from '@/lib/cycle-store';
 import {
   useFonts,
   CormorantGaramond_400Regular,
@@ -51,14 +49,6 @@ export default function SignInScreen() {
   const theme = getTheme(mode);
   const [error, setError] = useState<string | null>(null);
   const [appleLoading, setAppleLoading] = useState(false);
-  const invalidateSession = useInvalidateSession();
-  const setGuest = useCycleStore((s) => s.setGuest);
-
-  const handleExploreAsGuest = useCallback(() => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    setGuest(true);
-    router.replace('/(app)');
-  }, [setGuest]);
 
   const [fontsLoaded] = useFonts({
     CormorantGaramond_400Regular,
@@ -83,12 +73,7 @@ export default function SignInScreen() {
           AppleAuthentication.AppleAuthenticationScope.EMAIL,
         ],
       });
-      const result = await signInWithApple(credential.identityToken!);
-      if (result.error) {
-        setError(result.error.message ?? 'Apple sign-in failed. Please try again.');
-        return;
-      }
-      await invalidateSession();
+      await signInWithApple(credential.identityToken!, credential.authorizationCode ?? undefined);
       router.replace('/(app)');
     } catch (err: any) {
       if (err?.code !== 'ERR_REQUEST_CANCELED') {
@@ -97,7 +82,7 @@ export default function SignInScreen() {
     } finally {
       setAppleLoading(false);
     }
-  }, [invalidateSession]);
+  }, []);
 
   const handleContinueWithEmail = useCallback(() => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
@@ -303,10 +288,7 @@ export default function SignInScreen() {
 
             {/* Apple Sign-In (iOS only) */}
             {Platform.OS === 'ios' && (
-              <Animated.View
-                entering={FadeInUp.delay(500).duration(700)}
-                style={{ opacity: appleLoading ? 0.6 : 1 }}
-              >
+              <Animated.View entering={FadeInUp.delay(500).duration(700)}>
                 <AppleAuthentication.AppleAuthenticationButton
                   buttonType={AppleAuthentication.AppleAuthenticationButtonType.SIGN_IN}
                   buttonStyle={
@@ -316,7 +298,7 @@ export default function SignInScreen() {
                   }
                   cornerRadius={16}
                   style={{ height: 54, width: '100%' }}
-                  onPress={appleLoading ? () => {} : handleAppleSignIn}
+                  onPress={handleAppleSignIn}
                 />
               </Animated.View>
             )}
@@ -379,30 +361,6 @@ export default function SignInScreen() {
                     }}
                   >
                     Create an account
-                  </Text>
-                </Text>
-              </Pressable>
-            </Animated.View>
-
-            {/* Explore as Guest */}
-            <Animated.View entering={FadeInUp.delay(680).duration(700)} style={{ alignItems: 'center', marginTop: 4 }}>
-              <Pressable onPress={handleExploreAsGuest} hitSlop={12}>
-                <Text
-                  style={{
-                    fontFamily: 'Quicksand_500Medium',
-                    fontSize: 14,
-                    color: theme.text.muted,
-                    textAlign: 'center',
-                  }}
-                >
-                  Just exploring?{' '}
-                  <Text
-                    style={{
-                      fontFamily: 'Quicksand_600SemiBold',
-                      color: theme.accent.lavender,
-                    }}
-                  >
-                    Continue as Guest
                   </Text>
                 </Text>
               </Pressable>

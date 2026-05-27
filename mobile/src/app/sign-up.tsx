@@ -16,7 +16,6 @@ import { router } from 'expo-router';
 import * as Haptics from 'expo-haptics';
 import { useThemeStore, getTheme } from '@/lib/theme-store';
 import { authClient } from '@/lib/auth/auth-client';
-import { useInvalidateSession } from '@/lib/auth/use-session';
 import {
   useFonts,
   CormorantGaramond_400Regular,
@@ -39,7 +38,6 @@ export default function SignUpScreen() {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const invalidateSession = useInvalidateSession();
 
   const [fontsLoaded] = useFonts({
     CormorantGaramond_400Regular,
@@ -66,7 +64,6 @@ export default function SignUpScreen() {
       if (result.error) {
         setError(result.error.message ?? 'Sign-up failed. Please try again.');
       } else {
-        await invalidateSession();
         router.replace('/(app)');
       }
     } catch (err: any) {
@@ -74,7 +71,7 @@ export default function SignUpScreen() {
     } finally {
       setLoading(false);
     }
-  }, [name, email, password, invalidateSession]);
+  }, [name, email, password]);
 
   if (!fontsLoaded) return null;
 

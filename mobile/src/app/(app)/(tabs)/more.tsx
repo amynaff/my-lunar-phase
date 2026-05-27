@@ -79,7 +79,7 @@ export default function MoreScreen() {
       title: 'Luna AI',
       description: 'Your wellness guide',
       color: theme.accent.purple,
-      onPress: () => router.push('/(app)/luna' as any),
+      onPress: () => router.push('/luna-ai' as any),
     },
     {
       icon: FlaskConical,

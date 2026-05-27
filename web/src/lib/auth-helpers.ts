@@ -1,59 +1,12 @@
+import { auth } from "./auth";
 import { NextResponse } from "next/server";
-import { headers } from "next/headers";
-import { prisma } from "./prisma";
-import { createSupabaseServerClient, createSupabaseTokenClient } from "./supabase/server";
-
-type AuthUser = {
-  id: string;
-  email: string;
-  name?: string | null;
-};
-
-async function ensureAppUser(user: AuthUser) {
-  await prisma.user.upsert({
-    where: { id: user.id },
-    update: {
-      email: user.email,
-      name: user.name,
-    },
-    create: {
-      id: user.id,
-      email: user.email,
-      name: user.name,
-    },
-  });
-}
 
 export async function requireAuth() {
-  const headerStore = await headers();
-  const authHeader = headerStore.get("authorization");
-  const bearerToken = authHeader?.startsWith("Bearer ") ? authHeader.slice("Bearer ".length) : null;
-
-  const supabase = bearerToken
-    ? createSupabaseTokenClient(bearerToken)
-    : await createSupabaseServerClient();
-
-  const { data, error: authError } = await supabase.auth.getUser();
-  const authUser = data.user;
-
-  if (authError || !authUser?.id || !authUser.email) {
+  const session = await auth();
+  if (!session?.user?.id) {
     return { user: null, error: NextResponse.json({ error: "Unauthorized" }, { status: 401 }) };
   }
-
-  const user = {
-    id: authUser.id,
-    email: authUser.email,
-    name:
-      typeof authUser.user_metadata?.name === "string"
-        ? authUser.user_metadata.name
-        : typeof authUser.user_metadata?.full_name === "string"
-          ? authUser.user_metadata.full_name
-          : null,
-  };
-
-  await ensureAppUser(user);
-
-  return { user, error: null };
+  return { user: session.user as { id: string; email: string; name?: string | null }, error: null };
 }
 
 export function corsHeaders(origin?: string | null) {
