@@ -360,6 +360,42 @@ export default function LabsGuideScreen() {
             </LinearGradient>
           </Animated.View>
 
+          {/* Luna AI Lab Analysis */}
+          <Animated.View
+            entering={FadeInUp.delay(525).duration(600)}
+            className="mx-6 mt-4"
+          >
+            <Pressable
+              onPress={() => {
+                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                router.push({ pathname: '/(app)/luna', params: { prompt: 'I have my lab results and would like help understanding them. Can you walk me through what to look for?' } } as any);
+              }}
+              className="rounded-2xl p-5 border flex-row items-center"
+              style={{ backgroundColor: theme.bg.card, borderColor: `${theme.accent.purple}30` }}
+            >
+              <View
+                className="w-12 h-12 rounded-2xl items-center justify-center mr-4"
+                style={{ backgroundColor: `${theme.accent.purple}15` }}
+              >
+                <Sparkles size={22} color={theme.accent.purple} />
+              </View>
+              <View className="flex-1">
+                <Text
+                  style={{ fontFamily: 'Quicksand_600SemiBold', color: theme.text.primary }}
+                  className="text-sm mb-1"
+                >
+                  Ask Luna About Your Labs
+                </Text>
+                <Text
+                  style={{ fontFamily: 'Quicksand_400Regular', color: theme.text.tertiary, lineHeight: 18 }}
+                  className="text-xs"
+                >
+                  Share your lab values with Luna AI for a general analysis. Not a replacement for your doctor.
+                </Text>
+              </View>
+            </Pressable>
+          </Animated.View>
+
           {/* Disclaimer */}
           <Animated.View
             entering={FadeInUp.delay(550).duration(600)}

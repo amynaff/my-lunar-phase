@@ -8,6 +8,7 @@ const publicPaths = [
   "/verify-email",
   "/forgot-password",
   "/reset-password",
+  "/auth/callback",
   "/privacy",
   "/terms",
   "/api/auth",
@@ -73,26 +74,6 @@ export function middleware(request: NextRequest) {
       "Content-Type, Authorization"
     );
     response.headers.set("Access-Control-Allow-Credentials", "true");
-  }
-
-  // Auth redirect for protected pages (not API routes, not public paths)
-  if (
-    !pathname.startsWith("/api/") &&
-    !pathname.startsWith("/_next/") &&
-    !pathname.includes(".") &&
-    !isPublicPath(pathname)
-  ) {
-    const token =
-      request.cookies.get("next-auth.session-token")?.value ||
-      request.cookies.get("__Secure-next-auth.session-token")?.value ||
-      request.cookies.get("authjs.session-token")?.value ||
-      request.cookies.get("__Secure-authjs.session-token")?.value;
-
-    if (!token) {
-      const signInUrl = new URL("/sign-in", request.url);
-      signInUrl.searchParams.set("callbackUrl", pathname);
-      return NextResponse.redirect(signInUrl);
-    }
   }
 
   return response;

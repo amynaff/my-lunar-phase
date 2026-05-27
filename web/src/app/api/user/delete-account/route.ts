@@ -8,16 +8,6 @@ export async function DELETE() {
 
   try {
     // Cascading delete in proper order to respect foreign key constraints
-    // Delete sessions
-    await prisma.session.deleteMany({
-      where: { userId: user!.id },
-    });
-
-    // Delete accounts (OAuth/social connections)
-    await prisma.account.deleteMany({
-      where: { userId: user!.id },
-    });
-
     // Delete partner invites
     await prisma.partnerInvite.deleteMany({
       where: { creatorId: user!.id },

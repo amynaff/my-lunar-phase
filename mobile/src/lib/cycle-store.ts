@@ -226,6 +226,7 @@ interface CycleStore {
   cycleLength: number;
   periodLength: number;
   hasCompletedOnboarding: boolean;
+  isGuest: boolean;
   lifeStage: LifeStage;
 
   // Period history
@@ -241,6 +242,7 @@ interface CycleStore {
   setLifeStage: (stage: LifeStage) => void;
   completeOnboarding: () => void;
   resetOnboarding: () => void;
+  setGuest: (isGuest: boolean) => void;
 
   // Period logging actions
   logPeriodStart: (date: Date, notes?: string) => void;
@@ -534,6 +536,7 @@ export const useCycleStore = create<CycleStore>()(
       cycleLength: 28,
       periodLength: 5,
       hasCompletedOnboarding: false,
+      isGuest: false,
       lifeStage: 'regular' as LifeStage,
       groceryList: [],
       periodHistory: [],
@@ -543,7 +546,8 @@ export const useCycleStore = create<CycleStore>()(
       setPeriodLength: (days: number) => set({ periodLength: days }),
       setLifeStage: (stage: LifeStage) => set({ lifeStage: stage }),
       completeOnboarding: () => set({ hasCompletedOnboarding: true }),
-      resetOnboarding: () => set({ hasCompletedOnboarding: false, lastPeriodStart: null, lifeStage: 'regular', periodHistory: [] }),
+      resetOnboarding: () => set({ hasCompletedOnboarding: false, isGuest: false, lastPeriodStart: null, lifeStage: 'regular', periodHistory: [] }),
+      setGuest: (isGuest: boolean) => set({ isGuest }),
 
       // Period logging
       logPeriodStart: (date: Date, notes?: string) => {

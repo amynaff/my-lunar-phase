@@ -29,9 +29,8 @@
 
 1. Go to [Google Cloud Console](https://console.cloud.google.com)
 2. Create OAuth 2.0 credentials
-3. Set authorized redirect URI: `https://yourdomain.com/api/auth/callback/google`
-4. Copy Client ID → `GOOGLE_CLIENT_ID`
-5. Copy Client Secret → `GOOGLE_CLIENT_SECRET`
+3. Set authorized redirect URI to the Google callback shown in Supabase Auth provider settings
+4. Copy the Client ID and Client Secret into Supabase Auth > Providers > Google
 
 ## 3. Apple Sign-In Setup
 
@@ -44,7 +43,7 @@ Apple Sign In **requires HTTPS** — it will not work on `localhost`.
    - Enable **Sign in with Apple** → Configure
    - Primary App ID: select `com.mylunarphase.app`
    - Domains: `mylunarphase.com`
-   - Return URLs: `https://mylunarphase.com/api/auth/callback/apple`
+   - Return URLs: the Apple callback shown in Supabase Auth provider settings
 3. Note your **Team ID** (10 chars, top-right of Apple Developer portal)
 4. The private key file is at `~/Documents/AuthKey_53THZT6U4L,mlp_appledev.p8` (Key ID: `53THZT6U4L`)
 5. Generate the client secret JWT:
@@ -55,8 +54,8 @@ Apple Sign In **requires HTTPS** — it will not work on `localhost`.
      --key-id   53THZT6U4L \
      --client-id com.mylunarphase.siwa
    ```
-6. Copy the output JWT → `APPLE_CLIENT_SECRET`
-7. Set `APPLE_CLIENT_ID` = `com.mylunarphase.siwa`
+6. Copy the output JWT into Supabase Auth > Providers > Apple
+7. Set the Apple Services ID in Supabase Auth to `com.mylunarphase.siwa`
 8. Re-run this script every ~5 months (JWT expires after 6 months max)
 
 ## 4. Stripe Setup
@@ -92,13 +91,9 @@ Apple Sign In **requires HTTPS** — it will not work on `localhost`.
 3. Set the **Root Directory** to `web`
 4. Configure **Build Command**: `npx prisma generate && npm run build`
 5. Add ALL environment variables from `.env.example`
-6. Generate `NEXTAUTH_SECRET`:
-   ```bash
-   openssl rand -base64 32
-   ```
-7. Set `NEXTAUTH_URL` to your production domain
-8. Set `NEXT_PUBLIC_APP_URL` to your production domain
-9. Deploy
+6. Set `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY` from your Supabase project API settings
+7. Set `NEXT_PUBLIC_APP_URL` to your production domain
+8. Deploy
 
 ## 8. Post-Deployment Checklist
 
@@ -112,15 +107,15 @@ Apple Sign In **requires HTTPS** — it will not work on `localhost`.
 - [ ] Run Lighthouse audit
 - [ ] Set up monitoring/alerting
 
-## 9. Mobile App Migration
+## 9. Mobile App Configuration
 
-Update the mobile app to point at the new backend:
+Update the mobile app to point at the web API and Supabase project:
 
 ```
-EXPO_PUBLIC_VIBECODE_BACKEND_URL=https://yourdomain.com
+EXPO_PUBLIC_BACKEND_URL=https://yourdomain.com
+EXPO_PUBLIC_SUPABASE_URL=https://<project-ref>.supabase.co
+EXPO_PUBLIC_SUPABASE_ANON_KEY=<anon-key>
 ```
-
-The mobile app's auth system needs to be updated from better-auth to NextAuth. The API routes maintain backward compatibility for data endpoints (mood, community, partner, AI chat).
 
 ## Custom Domain
 

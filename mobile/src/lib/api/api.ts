@@ -1,5 +1,5 @@
 import { fetch } from "expo/fetch";
-import { getAuthCookie } from "../auth/auth-client";
+import { getAccessToken } from "../auth/auth-client";
 
 const baseUrl = process.env.EXPO_PUBLIC_BACKEND_URL!;
 
@@ -7,12 +7,13 @@ const request = async <T>(
   url: string,
   options: { method?: string; body?: string } = {}
 ): Promise<T> => {
+  const accessToken = await getAccessToken();
   const response = await fetch(`${baseUrl}${url}`, {
     ...options,
     credentials: "include",
     headers: {
       ...(options.body ? { "Content-Type": "application/json" } : {}),
-      Cookie: getAuthCookie(),
+      ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
     },
   });
   return response.json() as Promise<T>;

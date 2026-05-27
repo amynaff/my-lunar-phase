@@ -1,12 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@/lib/auth";
+import { requireAuth } from "@/lib/auth-helpers";
 import { prisma } from "@/lib/prisma";
 
 export async function POST(req: NextRequest) {
-  const session = await auth();
-  if (!session?.user?.id) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
+  const { user, error } = await requireAuth();
+  if (error) return error;
 
   const body = await req.json();
   const { endpoint, keys } = body;
@@ -16,18 +14,16 @@ export async function POST(req: NextRequest) {
 
   await prisma.pushSubscription.upsert({
     where: { endpoint },
-    update: { p256dh: keys.p256dh, auth: keys.auth, userId: session.user.id },
-    create: { userId: session.user.id, endpoint, p256dh: keys.p256dh, auth: keys.auth },
+    update: { p256dh: keys.p256dh, auth: keys.auth, userId: user!.id },
+    create: { userId: user!.id, endpoint, p256dh: keys.p256dh, auth: keys.auth },
   });
 
   return NextResponse.json({ success: true });
 }
 
 export async function DELETE(req: NextRequest) {
-  const session = await auth();
-  if (!session?.user?.id) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
+  const { user, error } = await requireAuth();
+  if (error) return error;
 
   const { endpoint } = await req.json();
   if (!endpoint) {
@@ -35,7 +31,7 @@ export async function DELETE(req: NextRequest) {
   }
 
   await prisma.pushSubscription.deleteMany({
-    where: { userId: session.user.id, endpoint },
+    where: { userId: user!.id, endpoint },
   });
 
   return NextResponse.json({ success: true });

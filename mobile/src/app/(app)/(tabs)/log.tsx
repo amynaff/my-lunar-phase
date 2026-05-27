@@ -3,9 +3,9 @@ import { View, Text, ScrollView, Pressable } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Animated, { FadeInDown, FadeInUp } from 'react-native-reanimated';
-import { ClipboardList, Smile, Droplets, ChevronRight } from 'lucide-react-native';
+import { ClipboardList, Smile, Droplets, ChevronRight, Heart, Brain, Activity, Wind } from 'lucide-react-native';
 import { useThemeStore, getTheme } from '@/lib/theme-store';
-import { useCycleStore, phaseInfo } from '@/lib/cycle-store';
+import { useCycleStore, phaseInfo, getMoonPhase, moonPhaseInfo, lifeStageInfo } from '@/lib/cycle-store';
 import { router } from 'expo-router';
 import { SymptomLogModal } from '@/components/SymptomLogModal';
 import { LogPeriodModal } from '@/components/LogPeriodModal';
@@ -25,6 +25,7 @@ export default function LogScreen() {
   const themeMode = useThemeStore(s => s.mode);
   const theme = getTheme(themeMode);
   const getCurrentPhase = useCycleStore(s => s.getCurrentPhase);
+  const lifeStage = useCycleStore(s => s.lifeStage);
 
   const [showSymptomModal, setShowSymptomModal] = useState(false);
   const [showPeriodModal, setShowPeriodModal] = useState(false);
@@ -37,8 +38,12 @@ export default function LogScreen() {
     Quicksand_600SemiBold,
   });
 
+  const isNonCycling = lifeStage === 'menopause' || lifeStage === 'postmenopause';
   const currentPhase = getCurrentPhase();
   const info = phaseInfo[currentPhase];
+  const stageInfo = lifeStageInfo[lifeStage];
+  const currentMoon = getMoonPhase();
+  const moonInfo = moonPhaseInfo[currentMoon];
 
   const today = new Date();
   const dateStr = today.toLocaleDateString('en-US', {
@@ -47,11 +52,14 @@ export default function LogScreen() {
     day: 'numeric',
   });
 
+  // Build actions based on life stage
   const actions = [
     {
       icon: ClipboardList,
       title: 'Log Symptoms',
-      description: 'Track physical symptoms and how you feel today',
+      description: isNonCycling
+        ? 'Track how you feel today — hot flashes, sleep, mood & more'
+        : 'Track physical symptoms and how you feel today',
       color: theme.accent.pink,
       onPress: () => setShowSymptomModal(true),
     },
@@ -62,13 +70,14 @@ export default function LogScreen() {
       color: theme.accent.purple,
       onPress: () => router.push('/log-mood' as any),
     },
-    {
+    // Only show Log Period for cycling users
+    ...(isNonCycling ? [] : [{
       icon: Droplets,
       title: 'Log Period',
       description: 'Track your menstrual flow and cycle data',
       color: theme.accent.rose,
       onPress: () => setShowPeriodModal(true),
-    },
+    }]),
   ];
 
   if (!fontsLoaded) return null;
@@ -105,31 +114,37 @@ export default function LogScreen() {
             </Text>
           </Animated.View>
 
-          {/* Phase Prompt */}
+          {/* Phase/Stage Prompt */}
           <Animated.View
             entering={FadeInUp.delay(200).duration(600)}
             className="mx-6 mt-5"
           >
             <LinearGradient
-              colors={[`${info.color}25`, `${info.color}10`]}
+              colors={isNonCycling
+                ? [`${stageInfo.color}25`, `${stageInfo.color}10`]
+                : [`${info.color}25`, `${info.color}10`]
+              }
               start={{ x: 0, y: 0 }}
               end={{ x: 1, y: 1 }}
-              style={{ borderRadius: 20, padding: 18, borderWidth: 1, borderColor: `${info.color}30` }}
+              style={{ borderRadius: 20, padding: 18, borderWidth: 1, borderColor: isNonCycling ? `${stageInfo.color}30` : `${info.color}30` }}
             >
               <View className="flex-row items-center mb-2">
-                <Text className="text-2xl mr-2">{info.emoji}</Text>
+                <Text className="text-2xl mr-2">{isNonCycling ? moonInfo.emoji : info.emoji}</Text>
                 <Text
                   style={{ fontFamily: 'Quicksand_600SemiBold', color: theme.text.primary }}
                   className="text-base"
                 >
-                  {info.name} Phase
+                  {isNonCycling ? stageInfo.name : `${info.name} Phase`}
                 </Text>
               </View>
               <Text
                 style={{ fontFamily: 'Quicksand_400Regular', color: theme.text.secondary }}
                 className="text-sm leading-5"
               >
-                How are you feeling in your {info.name.toLowerCase()} phase? Take a moment to check in with your body.
+                {isNonCycling
+                  ? 'How are you feeling today? Take a moment to check in with your body and track your wellness.'
+                  : `How are you feeling in your ${info.name.toLowerCase()} phase? Take a moment to check in with your body.`
+                }
               </Text>
             </LinearGradient>
           </Animated.View>

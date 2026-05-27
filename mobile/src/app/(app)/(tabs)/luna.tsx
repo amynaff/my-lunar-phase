@@ -13,10 +13,10 @@ import {
 import { LinearGradient } from 'expo-linear-gradient';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Animated, { FadeInUp, FadeInDown, FadeIn } from 'react-native-reanimated';
-import { Send, Sparkles, Moon, ArrowLeft, Trash2, Stethoscope, X, Check, AlertCircle } from 'lucide-react-native';
-import { useCycleStore, getMoonPhase, moonPhaseInfo, phaseInfo, perimenopauseSymptoms, menopauseSymptoms, postmenopauseSymptoms } from '@/lib/cycle-store';
+import { Send, Sparkles, Moon, Trash2, Stethoscope, X, Check, AlertCircle } from 'lucide-react-native';
+import { useCycleStore, getMoonPhase, moonPhaseInfo, phaseInfo, type CyclePhase, type LifeStage } from '@/lib/cycle-store';
 import { useThemeStore, getTheme } from '@/lib/theme-store';
-import { router, useLocalSearchParams } from 'expo-router';
+import { useLocalSearchParams, router } from 'expo-router';
 import * as Haptics from 'expo-haptics';
 import {
   useFonts,
@@ -46,6 +46,92 @@ interface Message {
   content: string;
   timestamp: Date;
 }
+
+// Phase-specific prompt suggestions
+const getPhasePrompts = (lifeStage: LifeStage, currentPhase: CyclePhase): string[] => {
+  if (lifeStage === 'regular') {
+    switch (currentPhase) {
+      case 'menstrual':
+        return [
+          "I'm on my period and feeling exhausted — what should I eat?",
+          "Gentle movement ideas while I'm menstruating",
+          "I'm menstruating and having bad cramps, any natural relief?",
+          "Best teas and warming foods during my period",
+          "What is PCOS and how does it affect my cycle?",
+          "What is endometriosis and what are the symptoms?",
+          "How to manage PCOS naturally with diet and lifestyle",
+          "How to treat endometriosis pain naturally",
+          "How can I support my iron levels during menstruation?",
+          "I'm on my period and craving chocolate — healthy swaps?",
+        ];
+      case 'follicular':
+        return [
+          "I'm in my follicular phase — what should I eat to boost energy?",
+          "Best workouts for my follicular phase",
+          "I'm feeling creative and energized — how do I channel this?",
+          "What foods support estrogen production right now?",
+          "Follicular phase meal plan ideas",
+          "How do I make the most of this high-energy phase?",
+        ];
+      case 'ovulatory':
+        return [
+          "I'm ovulating today — what's the best workout?",
+          "What should I eat during ovulation?",
+          "I'm ovulating and feeling social — how do I harness this energy?",
+          "Peak performance foods for my ovulatory phase",
+          "High intensity or low intensity exercise today?",
+          "How does ovulation affect my mood and skin?",
+        ];
+      case 'luteal':
+        return [
+          "I'm in my luteal phase and feeling irritable — what helps?",
+          "Healthy comfort foods for my luteal phase",
+          "I'm PMS-ing and bloated — what should I eat?",
+          "Gentle exercises for the luteal phase",
+          "How do I manage mood swings before my period?",
+          "Why am I so tired in my luteal phase?",
+        ];
+    }
+  }
+
+  if (lifeStage === 'perimenopause') {
+    return [
+      "I'm in perimenopause and can't sleep — what helps?",
+      "Managing hot flashes naturally during perimenopause",
+      "Best foods for perimenopause hormone balance",
+      "I'm perimenopausal and feeling anxious — what should I do?",
+      "Exercise that helps with perimenopause symptoms",
+      "Brain fog during perimenopause — any tips?",
+      "Why is my period so irregular right now?",
+      "Best supplements for perimenopause",
+    ];
+  }
+
+  if (lifeStage === 'menopause') {
+    return [
+      "I'm in menopause and having hot flashes — what foods help?",
+      "Best exercises for menopause weight management",
+      "How do I protect my bone health during menopause?",
+      "Night sweats keeping me up — natural solutions?",
+      "Menopause and mood changes — what can I do?",
+      "Heart-healthy foods for menopause",
+      "How to maintain muscle during menopause",
+      "Managing menopause fatigue naturally",
+    ];
+  }
+
+  // postmenopause
+  return [
+    "I'm postmenopausal and my joints ache — what should I eat?",
+    "Best exercises for postmenopausal bone density",
+    "How do I keep my heart healthy after menopause?",
+    "I'm postmenopausal and feeling tired — what foods give energy?",
+    "Maintaining muscle strength after menopause",
+    "Brain health foods for postmenopause",
+    "Best supplements for postmenopausal women",
+    "How to stay active and strong after menopause",
+  ];
+};
 
 // Common symptoms by life stage
 const getSymptomOptions = (lifeStage: string) => {
@@ -85,7 +171,6 @@ const getSymptomOptions = (lifeStage: string) => {
     ];
   }
 
-  // Regular cycle symptoms
   return [
     ...commonSymptoms,
     { id: 'breast_tenderness', name: 'Breast Tenderness', emoji: '💗' },
@@ -97,10 +182,12 @@ const getSymptomOptions = (lifeStage: string) => {
   ];
 };
 
-export default function LunaAIScreen() {
+export default function LunaTabScreen() {
   const insets = useSafeAreaInsets();
   const themeMode = useThemeStore((s) => s.mode);
   const theme = getTheme(themeMode);
+  const isGuest = useCycleStore((s) => s.isGuest);
+  const setGuest = useCycleStore((s) => s.setGuest);
   const lifeStage = useCycleStore((s) => s.lifeStage);
   const getCurrentPhase = useCycleStore((s) => s.getCurrentPhase);
   const scrollViewRef = useRef<ScrollView>(null);
@@ -131,6 +218,9 @@ export default function LunaAIScreen() {
   const moonInfo = moonPhaseInfo[currentMoon];
   const phaseInfoData = phaseInfo[currentPhase];
 
+  // Phase-specific prompts
+  const prompts = getPhasePrompts(lifeStage, currentPhase);
+
   // Get context info for display
   const getContextDisplay = () => {
     if (lifeStage === 'regular') {
@@ -149,9 +239,18 @@ export default function LunaAIScreen() {
 
   const contextInfo = getContextDisplay();
 
-  // Accent color based on life stage
   const accentColor =
     lifeStage === 'perimenopause' ? '#f59e0b' : lifeStage === 'menopause' ? '#8b5cf6' : theme.accent.purple;
+
+  // Life stage display label
+  const getStageLabel = () => {
+    switch (lifeStage) {
+      case 'regular': return phaseInfoData.name + ' Phase';
+      case 'perimenopause': return 'Perimenopause';
+      case 'menopause': return 'Menopause';
+      case 'postmenopause': return 'Postmenopause';
+    }
+  };
 
   const sendMessageWithText = async (text: string) => {
     if (!text.trim() || isLoading) return;
@@ -210,68 +309,7 @@ export default function LunaAIScreen() {
     }
   };
 
-  const sendMessage = async () => {
-    if (!inputText.trim() || isLoading) return;
-
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-
-    const userMessage: Message = {
-      id: Date.now().toString(),
-      role: 'user',
-      content: inputText.trim(),
-      timestamp: new Date(),
-    };
-
-    setMessages((prev) => [...prev, userMessage]);
-    setInputText('');
-    setIsLoading(true);
-
-    try {
-      // Build conversation history (last 10 messages for context)
-      const conversationHistory = [...messages, userMessage].slice(-10).map((m) => ({
-        role: m.role,
-        content: m.content,
-      }));
-
-      const response = await fetch(`${BACKEND_URL}/api/ai-chat`, {
-        method: 'POST',
-        headers: await getJsonHeaders(),
-        body: JSON.stringify({
-          messages: conversationHistory,
-          lifeStage,
-          currentPhase: lifeStage === 'regular' ? currentPhase : undefined,
-          moonPhase: lifeStage !== 'regular' ? moonInfo.name : undefined,
-        }),
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to get response');
-      }
-
-      const data = await response.json();
-      const assistantContent = data.choices?.[0]?.message?.content || "I'm sorry, I couldn't process that. Please try again.";
-
-      const assistantMessage: Message = {
-        id: (Date.now() + 1).toString(),
-        role: 'assistant',
-        content: assistantContent,
-        timestamp: new Date(),
-      };
-
-      setMessages((prev) => [...prev, assistantMessage]);
-    } catch (error) {
-      console.error('Chat error:', error);
-      const errorMessage: Message = {
-        id: (Date.now() + 1).toString(),
-        role: 'assistant',
-        content: "I'm having trouble connecting right now. Please check your connection and try again.",
-        timestamp: new Date(),
-      };
-      setMessages((prev) => [...prev, errorMessage]);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  const sendMessage = () => sendMessageWithText(inputText);
 
   const checkSymptoms = async () => {
     if (selectedSymptoms.length === 0 || isCheckingSymptoms) return;
@@ -279,16 +317,14 @@ export default function LunaAIScreen() {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     setIsCheckingSymptoms(true);
 
-    // Get symptom names
     const symptomNames = selectedSymptoms
       .map((id) => symptomOptions.find((s) => s.id === id)?.name)
       .filter(Boolean) as string[];
 
-    // Add user message to chat
     const userMessage: Message = {
       id: Date.now().toString(),
       role: 'user',
-      content: `🩺 Symptom Check: I'm experiencing ${symptomNames.join(', ')} (${symptomSeverity} severity)`,
+      content: `Symptom Check: I'm experiencing ${symptomNames.join(', ')} (${symptomSeverity} severity)`,
       timestamp: new Date(),
     };
     setMessages((prev) => [...prev, userMessage]);
@@ -307,30 +343,25 @@ export default function LunaAIScreen() {
         }),
       });
 
-      if (!response.ok) {
-        throw new Error('Failed to get response');
-      }
+      if (!response.ok) throw new Error('Failed to get response');
 
       const data = await response.json();
       const assistantContent = data.choices?.[0]?.message?.content || "I'm sorry, I couldn't analyze those symptoms. Please try again.";
 
-      const assistantMessage: Message = {
+      setMessages((prev) => [...prev, {
         id: (Date.now() + 1).toString(),
         role: 'assistant',
         content: assistantContent,
         timestamp: new Date(),
-      };
-
-      setMessages((prev) => [...prev, assistantMessage]);
+      }]);
     } catch (error) {
       console.error('Symptom check error:', error);
-      const errorMessage: Message = {
+      setMessages((prev) => [...prev, {
         id: (Date.now() + 1).toString(),
         role: 'assistant',
         content: "I'm having trouble connecting right now. Please check your connection and try again.",
         timestamp: new Date(),
-      };
-      setMessages((prev) => [...prev, errorMessage]);
+      }]);
     } finally {
       setIsCheckingSymptoms(false);
       setSelectedSymptoms([]);
@@ -350,7 +381,6 @@ export default function LunaAIScreen() {
     setMessages([]);
   };
 
-  // Scroll to bottom when new messages arrive
   useEffect(() => {
     if (messages.length > 0) {
       setTimeout(() => {
@@ -359,7 +389,6 @@ export default function LunaAIScreen() {
     }
   }, [messages]);
 
-  // Auto-send prompt if passed via navigation params
   useEffect(() => {
     if (initialPrompt && fontsLoaded) {
       setInputText(initialPrompt);
@@ -370,18 +399,61 @@ export default function LunaAIScreen() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [fontsLoaded]);
 
-  // Welcome message
   const getWelcomeMessage = () => {
     if (lifeStage === 'regular') {
-      return `Hi there! I'm Luna, your wellness companion. I see you're in your ${phaseInfoData.name.toLowerCase()} phase - a time for ${phaseInfoData.description.split(' - ')[1]?.toLowerCase() || 'honoring your body'}. How can I support you today?`;
+      return `Hi! I'm Luna, your wellness companion. You're in your ${phaseInfoData.name.toLowerCase()} phase right now. I have personalized suggestions for nutrition, movement, and self-care based on where you are in your cycle. What can I help with?`;
     }
     if (lifeStage === 'perimenopause') {
-      return `Welcome! I'm Luna, here to support you through your perimenopause journey. The ${moonInfo.name.toLowerCase()} brings ${moonInfo.energy.toLowerCase()} energy. What would you like guidance on today?`;
+      return `Welcome! I'm Luna, here to support you through perimenopause. I can help with nutrition, movement, symptoms, and everything in between. What would you like guidance on?`;
     }
-    return `Hello! I'm Luna, your wellness guide. During this ${moonInfo.name.toLowerCase()}, the energy invites ${moonInfo.energy.toLowerCase()}. How can I help you thrive today?`;
+    if (lifeStage === 'menopause') {
+      return `Hello! I'm Luna, your wellness guide through menopause. I'm here to help with bone health, sleep, energy, mood, and more. How can I support you today?`;
+    }
+    return `Hello! I'm Luna, your postmenopause wellness companion. I can help with joint health, bone density, heart health, energy, and staying strong. What would you like to know?`;
   };
 
   if (!fontsLoaded) return null;
+
+  if (isGuest) {
+    return (
+      <View className="flex-1">
+        <LinearGradient colors={theme.gradient} locations={[0, 0.25, 0.5, 0.75, 1]} style={{ flex: 1 }}>
+          <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', paddingHorizontal: 32, paddingTop: insets.top }}>
+            <View
+              className="w-24 h-24 rounded-full items-center justify-center mb-6"
+              style={{ backgroundColor: `${theme.accent.purple}15` }}
+            >
+              <Sparkles size={40} color={theme.accent.purple} />
+            </View>
+            <Text style={{ fontFamily: 'CormorantGaramond_600SemiBold', color: theme.text.primary, fontSize: 28, textAlign: 'center', marginBottom: 8 }}>
+              Meet Luna AI
+            </Text>
+            <Text style={{ fontFamily: 'Quicksand_400Regular', color: theme.text.secondary, fontSize: 15, textAlign: 'center', lineHeight: 22, marginBottom: 32 }}>
+              Your personal wellness companion — get nutrition tips, movement ideas, and self-care guidance tailored to your cycle phase.
+            </Text>
+            <Pressable
+              onPress={() => {
+                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+                setGuest(false);
+                router.replace('/sign-in');
+              }}
+            >
+              <LinearGradient
+                colors={[theme.accent.rose, theme.accent.purple]}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 0 }}
+                style={{ paddingVertical: 16, paddingHorizontal: 40, borderRadius: 16 }}
+              >
+                <Text style={{ fontFamily: 'Quicksand_600SemiBold', color: '#fff', fontSize: 16 }}>
+                  Sign in to unlock Luna
+                </Text>
+              </LinearGradient>
+            </Pressable>
+          </View>
+        </LinearGradient>
+      </View>
+    );
+  }
 
   return (
     <View className="flex-1">
@@ -400,16 +472,7 @@ export default function LunaAIScreen() {
             borderBottomColor={theme.border.light}
           >
             <View className="flex-row items-center justify-between">
-              <Pressable
-                onPress={() => {
-                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                  router.back();
-                }}
-                className="w-10 h-10 rounded-full items-center justify-center"
-                style={{ backgroundColor: `${accentColor}15` }}
-              >
-                <ArrowLeft size={20} color={accentColor} />
-              </Pressable>
+              <View className="w-10" />
 
               <View className="flex-1 items-center mx-4">
                 <View className="flex-row items-center">
@@ -429,7 +492,7 @@ export default function LunaAIScreen() {
                     style={{ fontFamily: 'Quicksand_400Regular', color: contextInfo.color }}
                     className="text-xs ml-1"
                   >
-                    {contextInfo.label}
+                    {getStageLabel()}
                   </Text>
                 </View>
               </View>
@@ -527,31 +590,22 @@ export default function LunaAIScreen() {
                   </View>
                 </Pressable>
 
-                {/* Suggestion Chips */}
-                <Text style={{ fontFamily: 'Quicksand_500Medium', color: theme.text.tertiary }} className="text-xs mb-3">
-                  Try asking about...
+                {/* Phase-specific prompt suggestions */}
+                <Text style={{ fontFamily: 'Quicksand_500Medium', color: theme.text.tertiary }} className="text-xs mb-1">
+                  Suggestions for your {getStageLabel().toLowerCase()}...
+                </Text>
+                <Text style={{ fontFamily: 'Quicksand_400Regular', color: theme.text.muted }} className="text-xs mb-3">
+                  Tip: Be specific for better answers — try including how you feel, what you ate, or your symptoms.
                 </Text>
                 <View className="flex-row flex-wrap" style={{ gap: 8 }}>
-                  {[
-                    'What should I eat today?',
-                    'Best exercise for now?',
-                    'Can low magnesium be disrupting my sleep?',
-                    'Why am I still mentally foggy after a full night of rest?',
-                    lifeStage !== 'regular' ? 'Managing hot flashes' : 'How do cortisol and blood sugar impact my recovery?',
-                    'Why do I keep waking up at 3 or 4am?',
-                    ...(lifeStage === 'menopause' || lifeStage === 'postmenopause' ? [
-                      '🦴 Bone health tips',
-                      '😴 Sleep support',
-                      '💜 Hormone balance',
-                    ] : []),
-                  ].map((suggestion) => (
+                  {prompts.map((suggestion) => (
                     <Pressable
                       key={suggestion}
                       onPress={() => {
-                        setInputText(suggestion);
                         Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                        sendMessageWithText(suggestion);
                       }}
-                      className="px-4 py-2 rounded-full border"
+                      className="px-4 py-2.5 rounded-2xl border"
                       style={{ backgroundColor: theme.bg.card, borderColor: theme.border.light }}
                     >
                       <Text style={{ fontFamily: 'Quicksand_400Regular', color: theme.text.secondary }} className="text-sm">
@@ -613,7 +667,7 @@ export default function LunaAIScreen() {
           {/* Input Area */}
           <View
             className="px-4 pb-2 border-t"
-            style={{ paddingBottom: insets.bottom + 8, borderTopColor: theme.border.light }}
+            style={{ paddingBottom: insets.bottom + 70, borderTopColor: theme.border.light }}
           >
             <View
               className="flex-row items-end mt-3 rounded-2xl border"
@@ -660,7 +714,6 @@ export default function LunaAIScreen() {
             style={{ paddingBottom: insets.bottom + 16, backgroundColor: theme.bg.primary }}
             className="rounded-t-3xl max-h-[85%]"
           >
-            {/* Modal Header */}
             <View className="p-5 border-b" style={{ borderColor: theme.border.light }}>
               <View className="flex-row items-center justify-between">
                 <View className="flex-row items-center">
@@ -690,7 +743,6 @@ export default function LunaAIScreen() {
             </View>
 
             <ScrollView className="px-5" contentContainerStyle={{ paddingVertical: 16 }}>
-              {/* Disclaimer */}
               <View
                 className="flex-row items-start p-3 rounded-xl mb-4"
                 style={{ backgroundColor: `${theme.accent.purple}10` }}
@@ -701,7 +753,6 @@ export default function LunaAIScreen() {
                 </Text>
               </View>
 
-              {/* Symptom Selection */}
               <Text style={{ fontFamily: 'Quicksand_500Medium', color: theme.text.muted }} className="text-xs mb-3 uppercase tracking-wide">
                 What are you feeling?
               </Text>
@@ -735,7 +786,6 @@ export default function LunaAIScreen() {
                 })}
               </View>
 
-              {/* Severity Selection */}
               {selectedSymptoms.length > 0 && (
                 <Animated.View entering={FadeIn.duration(300)}>
                   <Text style={{ fontFamily: 'Quicksand_500Medium', color: theme.text.muted }} className="text-xs mb-3 uppercase tracking-wide">
@@ -744,11 +794,7 @@ export default function LunaAIScreen() {
                   <View className="flex-row mb-5" style={{ gap: 8 }}>
                     {(['mild', 'moderate', 'severe'] as const).map((level) => {
                       const isSelected = symptomSeverity === level;
-                      const colors = {
-                        mild: '#22c55e',
-                        moderate: '#f59e0b',
-                        severe: '#ef4444',
-                      };
+                      const colors = { mild: '#22c55e', moderate: '#f59e0b', severe: '#ef4444' };
                       return (
                         <Pressable
                           key={level}
@@ -780,7 +826,6 @@ export default function LunaAIScreen() {
               )}
             </ScrollView>
 
-            {/* Submit Button */}
             <View className="px-5 pt-2">
               <Pressable
                 onPress={checkSymptoms}

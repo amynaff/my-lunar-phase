@@ -71,6 +71,7 @@ export default function HomeScreen() {
   const getDaysUntilNextPeriod = useCycleStore(s => s.getDaysUntilNextPeriod);
   const getDayOfCycle = useCycleStore(s => s.getDayOfCycle);
   const hasCompletedOnboarding = useCycleStore(s => s.hasCompletedOnboarding);
+  const isGuest = useCycleStore(s => s.isGuest);
   const storedLifeStage = useCycleStore(s => s.lifeStage);
   const themeMode = useThemeStore(s => s.mode);
   const theme = getTheme(themeMode);
@@ -101,10 +102,10 @@ export default function HomeScreen() {
   }, [fontsLoaded, fontError]);
 
   useEffect(() => {
-    if (isReady && !sessionLoading && session?.user && !hasCompletedOnboarding) {
+    if (isReady && !sessionLoading && (session?.user || isGuest) && !hasCompletedOnboarding) {
       router.replace('/onboarding');
     }
-  }, [hasCompletedOnboarding, isReady, session, sessionLoading]);
+  }, [hasCompletedOnboarding, isReady, session, sessionLoading, isGuest]);
 
   // Sync cycle data to backend for partner feature
   useEffect(() => {
@@ -175,24 +176,28 @@ export default function HomeScreen() {
         title: 'Heart Health',
         description: 'Cardiovascular wellness becomes especially important',
         color: '#ef4444',
+        prompt: `I'm ${isMenopause ? 'in menopause' : 'postmenopausal'}. What are the top recommendations for heart health — foods, exercise, and lifestyle?`,
       },
       {
         icon: Activity,
         title: 'Bone Health',
         description: 'Support bone density with movement & nutrition',
         color: '#8b5cf6',
+        prompt: `I'm ${isMenopause ? 'in menopause' : 'postmenopausal'}. What are the top recommendations for bone health — calcium, exercise, and supplements?`,
       },
       {
         icon: Brain,
         title: 'Brain Health',
         description: 'Cognitive wellness and mental clarity',
         color: '#06b6d4',
+        prompt: `I'm ${isMenopause ? 'in menopause' : 'postmenopausal'}. What are the top recommendations for brain health — foods, activities, and supplements for mental clarity?`,
       },
       {
         icon: Wind,
         title: 'Sleep & Energy',
         description: 'Quality rest and sustained vitality',
         color: '#f59e0b',
+        prompt: `I'm ${isMenopause ? 'in menopause' : 'postmenopausal'}. What are the top recommendations for better sleep and more energy?`,
       },
     ];
 
@@ -242,7 +247,7 @@ export default function HomeScreen() {
                     style={{ backgroundColor: `${stageColor}15`, borderColor: `${stageColor}30` }}
                     onPress={() => {
                       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                      router.push('/luna-ai');
+                      router.push('/(app)/luna');
                     }}
                   >
                     <Sparkles size={16} color={stageColor} />
@@ -324,7 +329,11 @@ export default function HomeScreen() {
                 {wellnessAreas.map((area, index) => (
                   <View key={area.title} style={{ width: '50%', padding: 6 }}>
                     <Animated.View entering={FadeInUp.delay(350 + index * 50).duration(400)}>
-                      <View
+                      <Pressable
+                        onPress={() => {
+                          Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                          router.push({ pathname: '/(app)/luna', params: { prompt: area.prompt } } as any);
+                        }}
                         className="rounded-2xl p-4 border"
                         style={{ backgroundColor: theme.bg.card, borderColor: theme.border.light }}
                       >
@@ -346,7 +355,13 @@ export default function HomeScreen() {
                         >
                           {area.description}
                         </Text>
-                      </View>
+                        <View className="flex-row items-center mt-2">
+                          <Text style={{ fontFamily: 'Quicksand_500Medium', color: area.color }} className="text-xs">
+                            Get tips
+                          </Text>
+                          <ChevronRight size={12} color={area.color} style={{ marginLeft: 2 }} />
+                        </View>
+                      </Pressable>
                     </Animated.View>
                   </View>
                 ))}
@@ -535,7 +550,7 @@ export default function HomeScreen() {
                 <Pressable
                   onPress={() => {
                     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                    router.push('/luna-ai');
+                    router.push('/(app)/luna');
                   }}
                 >
                   <View className="flex-row items-center mb-4">
@@ -579,7 +594,7 @@ export default function HomeScreen() {
                       key={chip.label}
                       onPress={() => {
                         Haptics.selectionAsync();
-                        router.push({ pathname: '/luna-ai', params: { prompt: chip.prompt } } as any);
+                        router.push({ pathname: '/(app)/luna', params: { prompt: chip.prompt } } as any);
                       }}
                       className="rounded-full px-4 py-2"
                       style={{ backgroundColor: `${stageColor}15`, borderWidth: 1, borderColor: `${stageColor}25` }}
@@ -688,7 +703,7 @@ export default function HomeScreen() {
                   style={{ backgroundColor: `${theme.accent.purple}15`, borderColor: `${theme.accent.purple}30` }}
                   onPress={() => {
                     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                    router.push('/luna-ai');
+                    router.push('/(app)/luna');
                   }}
                 >
                   <Sparkles size={16} color={theme.accent.purple} />
@@ -873,7 +888,7 @@ export default function HomeScreen() {
             <CycleInsightsCard
               themeMode={themeMode}
               onEditPeriodDates={() => setShowEditPeriodDates(true)}
-              onCheckSymptoms={() => router.push('/luna-ai')}
+              onCheckSymptoms={() => router.push('/(app)/luna')}
             />
           </Animated.View>
 
@@ -1003,7 +1018,7 @@ export default function HomeScreen() {
               <Pressable
                 onPress={() => {
                   Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                  router.push('/luna-ai');
+                  router.push('/(app)/luna');
                 }}
               >
                 <View className="flex-row items-center mb-4">
@@ -1047,7 +1062,7 @@ export default function HomeScreen() {
                     key={chip.label}
                     onPress={() => {
                       Haptics.selectionAsync();
-                      router.push({ pathname: '/luna-ai', params: { prompt: chip.prompt } } as any);
+                      router.push({ pathname: '/(app)/luna', params: { prompt: chip.prompt } } as any);
                     }}
                     className="rounded-full px-4 py-2"
                     style={{ backgroundColor: `${theme.accent.purple}15`, borderWidth: 1, borderColor: `${theme.accent.purple}25` }}

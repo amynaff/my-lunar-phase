@@ -7,15 +7,23 @@ import { Header } from "@/components/layout/header";
 import { MobileNav } from "@/components/layout/mobile-nav";
 import { GradientBackground } from "@/components/shared/gradient-background";
 import { useCycleSync } from "@/hooks/use-cycle-sync";
+import { useSession } from "@/hooks/use-session";
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const [ready, setReady] = useState(false);
+  const { isAuthenticated, isLoading } = useSession();
 
   // Sync cycle data between localStorage and database
   useCycleSync();
 
   useEffect(() => {
+    if (isLoading) return;
+    if (!isAuthenticated) {
+      router.replace("/sign-in");
+      return;
+    }
+
     // The ONLY reliable gate is hasCompletedOnboarding.
     // Check localStorage first, then fall back to server check.
     try {
@@ -24,7 +32,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
         const parsed = JSON.parse(raw);
         const state = parsed?.state;
         if (state?.hasCompletedOnboarding === true) {
-          setReady(true);
+          queueMicrotask(() => setReady(true));
           return;
         }
       }
@@ -54,7 +62,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
         })
         .catch(() => router.replace("/onboarding"));
     }
-  }, [router]);
+  }, [router, isAuthenticated, isLoading]);
 
   if (!ready) {
     return (

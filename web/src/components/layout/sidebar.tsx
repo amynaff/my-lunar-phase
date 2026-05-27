@@ -3,8 +3,8 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Home, Apple, Dumbbell, Heart, MessageCircle, Users, Settings, Sparkles, Moon, FlaskConical, CreditCard, BookOpen, Calendar, GraduationCap, TrendingUp, Lightbulb, LogOut } from "lucide-react";
-import { signOut } from "next-auth/react";
 import { cn } from "@/lib/cn";
+import { createSupabaseBrowserClient } from "@/lib/supabase/client";
 
 const mainNav = [
   { href: "/dashboard", label: "Home", icon: Home },
@@ -33,6 +33,7 @@ const bottomNav = [
 
 export function Sidebar() {
   const pathname = usePathname();
+  const supabase = createSupabaseBrowserClient();
 
   return (
     <aside className="hidden lg:flex flex-col w-64 h-screen sticky top-0 border-r border-border-light bg-bg-card-solid px-4 py-6 overflow-y-auto">
@@ -100,7 +101,10 @@ export function Sidebar() {
           </Link>
         ))}
         <button
-          onClick={() => signOut({ callbackUrl: "/sign-in" })}
+          onClick={async () => {
+            await supabase.auth.signOut();
+            window.location.href = "/sign-in";
+          }}
           className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-quicksand font-medium text-red-500 hover:bg-red-500/10 transition-colors mt-2"
         >
           <LogOut className="h-5 w-5" />

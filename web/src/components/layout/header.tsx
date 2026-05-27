@@ -4,10 +4,9 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Moon, Sun, Menu, X, LogOut, Home, Apple, Dumbbell, Heart, BookOpen, Sparkles, Calendar, MessageCircle, Users, FlaskConical, BarChart3, TrendingUp, GraduationCap, Lightbulb, Settings, CreditCard } from "lucide-react";
 import { useThemeStore } from "@/stores/theme-store";
-import { useSession } from "@/hooks/use-session";
-import { signOut } from "next-auth/react";
 import { useState } from "react";
 import { cn } from "@/lib/cn";
+import { createSupabaseBrowserClient } from "@/lib/supabase/client";
 
 const mainNav = [
   { href: "/dashboard", label: "Home", icon: Home },
@@ -37,6 +36,7 @@ const bottomNav = [
 
 function MobileSidebar({ onNavigate }: { onNavigate: () => void }) {
   const pathname = usePathname();
+  const supabase = createSupabaseBrowserClient();
 
   return (
     <div className="flex flex-col h-full px-4 py-6">
@@ -107,7 +107,10 @@ function MobileSidebar({ onNavigate }: { onNavigate: () => void }) {
           </Link>
         ))}
         <button
-          onClick={() => signOut({ callbackUrl: "/sign-in" })}
+          onClick={async () => {
+            await supabase.auth.signOut();
+            window.location.href = "/sign-in";
+          }}
           className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-quicksand font-medium text-red-500 hover:bg-red-500/10 transition-colors mt-2"
         >
           <LogOut className="h-5 w-5" />
@@ -120,7 +123,6 @@ function MobileSidebar({ onNavigate }: { onNavigate: () => void }) {
 
 export function Header() {
   const { mode, toggle } = useThemeStore();
-  const { user } = useSession();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   return (

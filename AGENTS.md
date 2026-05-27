@@ -20,10 +20,10 @@ my-lunar-phase/
 ├── backend/     — Hono API server (Bun + TypeScript), hosted on Railway
 ├── mobile/      — Expo/React Native app (Bun, not npm)
 ├── web/         — Next.js web app
-└── CLAUDE.md    — This file (root)
+└── AGENTS.md    — This file (root)
 ```
 
-Each package has its own `CLAUDE.md` with specific conventions — read them before working in that package.
+Each package has its own `AGENTS.md` with specific conventions — read them before working in that package.
 
 ## Stack
 

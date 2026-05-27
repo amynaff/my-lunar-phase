@@ -65,12 +65,8 @@ A comprehensive women's hormone wellness platform built with Next.js 15, TypeScr
 |----------|-------------|
 | `DATABASE_URL` | Supabase pooling connection string |
 | `DIRECT_URL` | Supabase direct connection string |
-| `NEXTAUTH_URL` | App URL (http://localhost:3000 for dev) |
-| `NEXTAUTH_SECRET` | Random 32+ char secret |
-| `GOOGLE_CLIENT_ID` | Google OAuth client ID |
-| `GOOGLE_CLIENT_SECRET` | Google OAuth client secret |
-| `APPLE_CLIENT_ID` | Apple Sign-In service ID |
-| `APPLE_CLIENT_SECRET` | Apple Sign-In secret key |
+| `NEXT_PUBLIC_SUPABASE_URL` | Supabase project URL |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Supabase anon public key |
 | `GROK_API_KEY` | X.ai Grok API key |
 | `STRIPE_SECRET_KEY` | Stripe secret key |
 | `STRIPE_WEBHOOK_SECRET` | Stripe webhook signing secret |
