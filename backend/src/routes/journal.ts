@@ -2,15 +2,7 @@ import { Hono } from "hono";
 import { zValidator } from "@hono/zod-validator";
 import { z } from "zod";
 import { prisma } from "../prisma";
-
-interface GrokResponse {
-  choices: Array<{
-    message: {
-      content: string;
-      role: string;
-    };
-  }>;
-}
+import { generateText } from "../lib/claude";
 
 const journalRouter = new Hono<{
   Variables: {
@@ -412,12 +404,6 @@ async function generateLunaReflection(
   cyclePhase?: string,
   prompt?: string
 ) {
-  const apiKey = process.env.GROK_API_KEY;
-  if (!apiKey) {
-    console.log("GROK_API_KEY not configured, skipping Luna reflection");
-    return;
-  }
-
   // Don't generate for very short entries
   if (content.length < 20) {
     return;
@@ -453,30 +439,12 @@ ${promptContext}`;
 ${content}`;
 
   try {
-    const response = await fetch("https://api.x.ai/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${apiKey}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        model: "grok-2-latest",
-        messages: [
-          { role: "system", content: systemPrompt },
-          { role: "user", content: userMessage },
-        ],
-        max_tokens: 200,
-        temperature: 0.8,
-      }),
+    const reflection = await generateText({
+      system: systemPrompt,
+      user: userMessage,
+      maxTokens: 200,
+      temperature: 0.8,
     });
-
-    if (!response.ok) {
-      console.error("Grok API error:", response.status);
-      return;
-    }
-
-    const data = (await response.json()) as GrokResponse;
-    const reflection = data.choices[0]?.message?.content;
 
     if (!reflection) {
       return;
@@ -497,12 +465,6 @@ ${content}`;
 // ==================== Pattern Detection Logic ====================
 
 async function triggerPatternDetection(userId: string) {
-  const apiKey = process.env.GROK_API_KEY;
-  if (!apiKey) {
-    console.log("GROK_API_KEY not configured, skipping pattern detection");
-    return;
-  }
-
   // Get recent entries (last 14 days for pattern detection)
   const twoWeeksAgo = new Date();
   twoWeeksAgo.setDate(twoWeeksAgo.getDate() - 14);
@@ -569,30 +531,12 @@ ${JSON.stringify(entriesForAnalysis, null, 2)}
 Please identify meaningful patterns and provide supportive insights.`;
 
   try {
-    const response = await fetch("https://api.x.ai/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${apiKey}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        model: "grok-2-latest",
-        messages: [
-          { role: "system", content: systemPrompt },
-          { role: "user", content: userMessage },
-        ],
-        max_tokens: 1000,
-        temperature: 0.6,
-      }),
+    const aiResponse = await generateText({
+      system: systemPrompt,
+      user: userMessage,
+      maxTokens: 1000,
+      temperature: 0.6,
     });
-
-    if (!response.ok) {
-      console.error("Grok API error:", response.status);
-      return;
-    }
-
-    const data = (await response.json()) as GrokResponse;
-    const aiResponse = data.choices[0]?.message?.content;
 
     if (!aiResponse) {
       return;
