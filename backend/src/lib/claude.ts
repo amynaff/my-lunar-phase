@@ -1,10 +1,13 @@
 import Anthropic from "@anthropic-ai/sdk";
+import { env } from "../env";
 
 // Default model for backend Claude calls. Keep in sync with routes/ai-chat.ts.
 const MODEL = "claude-sonnet-4-6";
 
 export function getAnthropicClient(): Anthropic | null {
-  const apiKey = process.env.ANTHROPIC_API_KEY;
+  // ANTHROPIC_API_KEY is validated as required at startup (see src/env.ts),
+  // so this is guaranteed present; the guard remains as defense in depth.
+  const apiKey = env.ANTHROPIC_API_KEY;
   if (!apiKey) {
     console.log("ANTHROPIC_API_KEY not configured");
     return null;
