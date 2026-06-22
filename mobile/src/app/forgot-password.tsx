@@ -54,7 +54,7 @@ export default function ForgotPasswordScreen() {
     setLoading(true);
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     try {
-      const result = await authClient.forgetPassword({
+      const result = await authClient.requestPasswordReset({
         email: email.trim(),
         redirectTo: (process.env.EXPO_PUBLIC_BACKEND_URL ?? '') + '/reset-password',
       });

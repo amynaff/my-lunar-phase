@@ -28,17 +28,16 @@ import {
   CormorantGaramond_400Regular,
   CormorantGaramond_600SemiBold,
 } from '@expo-google-fonts/cormorant-garamond';
-import { getAccessToken } from '@/lib/auth/auth-client';
+import { fetch } from 'expo/fetch';
+import { getAuthCookie } from '@/lib/auth/auth-client';
+import { useSession } from '@/lib/auth/use-session';
 
 const BACKEND_URL = process.env.EXPO_PUBLIC_BACKEND_URL!;
 
-const getJsonHeaders = async () => {
-  const accessToken = await getAccessToken();
-  return {
-    'Content-Type': 'application/json',
-    ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
-  };
-};
+const getJsonHeaders = () => ({
+  'Content-Type': 'application/json',
+  Cookie: getAuthCookie(),
+});
 
 interface Message {
   id: string;
@@ -186,8 +185,8 @@ export default function LunaTabScreen() {
   const insets = useSafeAreaInsets();
   const themeMode = useThemeStore((s) => s.mode);
   const theme = getTheme(themeMode);
-  const isGuest = useCycleStore((s) => s.isGuest);
-  const setGuest = useCycleStore((s) => s.setGuest);
+  const { data: session, isLoading: sessionLoading } = useSession();
+  const isGuest = !sessionLoading && !session;
   const lifeStage = useCycleStore((s) => s.lifeStage);
   const getCurrentPhase = useCycleStore((s) => s.getCurrentPhase);
   const scrollViewRef = useRef<ScrollView>(null);
@@ -276,7 +275,8 @@ export default function LunaTabScreen() {
 
       const response = await fetch(`${BACKEND_URL}/api/ai-chat`, {
         method: 'POST',
-        headers: await getJsonHeaders(),
+        credentials: 'include',
+        headers: getJsonHeaders(),
         body: JSON.stringify({
           messages: conversationHistory,
           lifeStage,
@@ -333,7 +333,8 @@ export default function LunaTabScreen() {
     try {
       const response = await fetch(`${BACKEND_URL}/api/ai-chat/symptom-check`, {
         method: 'POST',
-        headers: await getJsonHeaders(),
+        credentials: 'include',
+        headers: getJsonHeaders(),
         body: JSON.stringify({
           symptoms: symptomNames,
           severity: symptomSeverity,
@@ -434,7 +435,6 @@ export default function LunaTabScreen() {
             <Pressable
               onPress={() => {
                 Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-                setGuest(false);
                 router.replace('/sign-in');
               }}
             >
