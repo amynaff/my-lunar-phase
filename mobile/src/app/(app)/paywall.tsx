@@ -28,7 +28,7 @@ import {
 
 const { width } = Dimensions.get('window');
 
-type PlanType = 'monthly' | 'yearly' | 'lifetime';
+type PlanType = 'monthly' | 'yearly';
 
 const features = [
   {
@@ -66,7 +66,6 @@ export default function PaywallScreen() {
   const [packages, setPackages] = useState<{
     monthly?: PurchasesPackage;
     yearly?: PurchasesPackage;
-    lifetime?: PurchasesPackage;
   }>({});
   const [error, setError] = useState<string | null>(null);
   const upgradeToPremium = useSubscriptionStore(s => s.upgradeToPremium);
@@ -99,12 +98,7 @@ export default function PaywallScreen() {
             id === '$rc_monthly' || id.includes('monthly') || productId.includes('monthly');
           const isYearly =
             id === '$rc_annual' || id.includes('annual') || id.includes('yearly') || productId.includes('annual') || productId.includes('yearly');
-          const isLifetime =
-            id === '$rc_lifetime' || id.includes('lifetime') || productId.includes('lifetime');
-
-          if (isLifetime) {
-            pkgMap.lifetime = pkg;
-          } else if (isYearly) {
+          if (isYearly) {
             pkgMap.yearly = pkg;
           } else if (isMonthly) {
             pkgMap.monthly = pkg;
@@ -495,70 +489,6 @@ export default function PaywallScreen() {
                   </View>
                 </Pressable>
 
-                {/* Lifetime Plan */}
-                <Pressable
-                  onPress={() => {
-                    Haptics.selectionAsync();
-                    setSelectedPlan('lifetime');
-                  }}
-                >
-                  <View
-                    className="rounded-[20px] p-[18px] border-2"
-                    style={{
-                      backgroundColor: selectedPlan === 'lifetime' ? 'rgba(196, 181, 253, 0.1)' : 'rgba(255,255,255,0.04)',
-                      borderColor: selectedPlan === 'lifetime' ? '#c4b5fd' : 'rgba(255,255,255,0.1)',
-                    }}
-                  >
-                    <View className="flex-row items-center justify-between">
-                      <View className="flex-row items-center flex-1">
-                        <View
-                          className="w-6 h-6 rounded-full border-2 items-center justify-center mr-3"
-                          style={{
-                            borderColor: selectedPlan === 'lifetime' ? '#c4b5fd' : 'rgba(255,255,255,0.3)',
-                            backgroundColor: selectedPlan === 'lifetime' ? '#c4b5fd' : 'transparent',
-                          }}
-                        >
-                          {selectedPlan === 'lifetime' && (
-                            <Check size={14} color="#1a1033" />
-                          )}
-                        </View>
-                        <View>
-                          <View className="flex-row items-center">
-                            <Text
-                              style={{ fontFamily: 'Quicksand_600SemiBold', color: '#fff' }}
-                              className="text-lg"
-                            >
-                              Lifetime
-                            </Text>
-                            <View
-                              className="ml-2 px-2 py-0.5 rounded-full"
-                              style={{ backgroundColor: 'rgba(251, 191, 36, 0.2)' }}
-                            >
-                              <Text
-                                style={{ fontFamily: 'Quicksand_600SemiBold', color: '#fbbf24' }}
-                                className="text-xs"
-                              >
-                                ONE TIME
-                              </Text>
-                            </View>
-                          </View>
-                          <Text
-                            style={{ fontFamily: 'Quicksand_400Regular', color: 'rgba(255,255,255,0.5)' }}
-                            className="text-xs mt-0.5"
-                          >
-                            {getPlanSubtitle('lifetime')}
-                          </Text>
-                        </View>
-                      </View>
-                      <Text
-                        style={{ fontFamily: 'Quicksand_600SemiBold', color: '#fff' }}
-                        className="text-xl"
-                      >
-                        {getPrice('lifetime')}
-                      </Text>
-                    </View>
-                  </View>
-                </Pressable>
               </>
             )}
           </Animated.View>
@@ -672,11 +602,9 @@ export default function PaywallScreen() {
             style={{ fontFamily: 'Quicksand_400Regular', color: 'rgba(255,255,255,0.4)' }}
             className="text-xs text-center mt-3"
           >
-            {selectedPlan === 'lifetime'
-              ? 'One-time payment, access forever'
-              : selectedPlan === 'yearly'
+            {selectedPlan === 'yearly'
               ? `${getPrice('yearly')}/year after 7-day free trial`
-              : `${getPrice('monthly')}/month`}
+              : `${getPrice('monthly')}/month after 7-day free trial`}
           </Text>
         </View>
       </LinearGradient>

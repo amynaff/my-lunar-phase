@@ -1,4 +1,4 @@
-import { resend } from "@/lib/resend";
+import { getResendClient } from "@/lib/resend";
 
 export async function sendEmail({
   to,
@@ -10,6 +10,7 @@ export async function sendEmail({
   html: string;
 }) {
   const from = process.env.EMAIL_FROM || "MyLunarPhase <hello@mylunarphase.com>";
+  const resend = getResendClient();
   const { data, error } = await resend.emails.send({ from, to, subject, html });
   if (error) {
     console.error("Email send error:", error);
