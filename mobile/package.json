@@ -84,7 +84,7 @@
     "expo-linking": "~8.0.11",
     "expo-live-photo": "~1.0.8",
     "expo-location": "~19.0.8",
-    "expo-mail-composer": "~15.0.8",
+    "expo-mail-composer": "~55.0.13",
     "expo-manifests": "~1.0.10",
     "expo-media-library": "~18.2.1",
     "expo-mesh-gradient": "^0.4.8",
