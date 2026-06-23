@@ -43,12 +43,10 @@ export async function POST(req: NextRequest) {
     });
 
     return NextResponse.json({ success: true });
-  } catch (error: any) {
+  } catch (error) {
     console.error("Signup error:", error);
-    const dbUrl = process.env.DATABASE_URL ?? "NOT SET";
-    const host = dbUrl.includes("@") ? dbUrl.split("@")[1] : dbUrl.substring(0, 30);
     return NextResponse.json(
-      { error: "Something went wrong. Please try again.", debug: error?.message ?? String(error), db_host: host },
+      { error: "Something went wrong. Please try again." },
       { status: 500 }
     );
   }
