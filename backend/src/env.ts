@@ -11,6 +11,9 @@ const envSchema = z.object({
   BACKEND_URL: z.url("BACKEND_URL must be a valid URL").default("http://localhost:3000"), // Set via the Vibecode enviroment at run-time
   DATABASE_URL: z.string().default("file:./dev.db"),
   BETTER_AUTH_SECRET: z.string().min(1, "BETTER_AUTH_SECRET is required"),
+
+  // AI (Claude) — required for Luna AI chat, quick advice, symptom checker, and journal insights
+  ANTHROPIC_API_KEY: z.string().min(1, "ANTHROPIC_API_KEY is required for AI features (Luna AI, symptom checker)"),
 });
 
 /**
