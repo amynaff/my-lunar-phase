@@ -31,10 +31,6 @@ export const auth = betterAuth({
       // For native iOS apps, this is the bundle ID
       appBundleIdentifier: process.env.APPLE_BUNDLE_ID || "com.mylunarphase.app",
     },
-    google: {
-      clientId: process.env.GOOGLE_CLIENT_ID || "",
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET || "",
-    },
   },
 
   plugins: [
