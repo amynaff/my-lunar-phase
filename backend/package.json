@@ -5,7 +5,7 @@
   "private": true,
   "scripts": {
     "dev": "bun run --hot src/index.ts",
-    "postinstall": "bunx prisma generate && bunx prisma db push --skip-generate",
+    "postinstall": "bunx prisma generate",
     "start": "bun run src/index.ts",
     "typecheck": "tsc --noEmit"
   },
