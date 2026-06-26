@@ -8,7 +8,7 @@ export const authClient = createAuthClient({
   baseURL: process.env.EXPO_PUBLIC_BACKEND_URL! as string,
   plugins: [
     expoClient({
-      scheme: "lunaflow",
+      scheme: "my-lunar-phase",
       storagePrefix: "lunaflow",
       storage: SecureStore,
     }),

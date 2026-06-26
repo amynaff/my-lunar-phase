@@ -73,7 +73,7 @@ export default function SignInScreen() {
           AppleAuthentication.AppleAuthenticationScope.EMAIL,
         ],
       });
-      await signInWithApple(credential.identityToken!, credential.authorizationCode ?? undefined);
+      await signInWithApple(credential.identityToken!);
       router.replace('/(app)');
     } catch (err: any) {
       if (err?.code !== 'ERR_REQUEST_CANCELED') {
