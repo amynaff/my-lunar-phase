@@ -403,7 +403,7 @@ export default function PaywallScreen() {
                                 style={{ fontFamily: 'Quicksand_600SemiBold', color: '#f9a8d4' }}
                                 className="text-xs"
                               >
-                                SAVE 44%
+                                SAVE 50%
                               </Text>
                             </View>
                             <View
