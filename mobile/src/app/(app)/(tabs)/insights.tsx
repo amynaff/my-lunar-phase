@@ -199,6 +199,29 @@ const lifeStageMovementTips: Record<'perimenopause' | 'menopause', { recommendat
   },
 };
 
+const lifeStageSelfCareTips: Record<'perimenopause' | 'menopause', { theme: string; practices: string[] }> = {
+  perimenopause: {
+    theme: 'Navigate & Nurture',
+    practices: [
+      'Cooling practices for hot flashes — cold water, fans, light layers',
+      'Prioritize sleep — a cool, dark room and a consistent schedule',
+      'Daily stress relief — breathwork, meditation, or a walk',
+      'Track symptoms and triggers to spot your patterns',
+      'Connect with others moving through the transition',
+    ],
+  },
+  menopause: {
+    theme: 'Embrace & Thrive',
+    practices: [
+      'Make time for passions and the things that light you up',
+      'Daily mindfulness or meditation for calm and focus',
+      'Stay socially connected — community matters now',
+      'Gentle rituals: skincare, massage, restful evenings',
+      'Keep moving and creating — this is your second spring',
+    ],
+  },
+};
+
 // ── Symptom Trend Chart ───────────────────────────────────────────────────────
 
 function SymptomTrendChart({ accentColor, theme }: { accentColor: string; theme: ReturnType<typeof getTheme> }) {
@@ -369,7 +392,10 @@ export default function InsightsScreen() {
     lifeStage === 'perimenopause' ? lifeStageMovementTips.perimenopause
     : isMenoStage ? lifeStageMovementTips.menopause
     : phaseMovementTips[contentPhase];
-  const selfCare = phaseSelfCareTips[contentPhase];
+  const selfCare =
+    lifeStage === 'perimenopause' ? lifeStageSelfCareTips.perimenopause
+    : isMenoStage ? lifeStageSelfCareTips.menopause
+    : phaseSelfCareTips[contentPhase];
 
   const accentColor =
     lifeStage === 'perimenopause' ? '#f59e0b'
