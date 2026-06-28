@@ -8,7 +8,7 @@ import {
   Salad, Dumbbell, Heart, TrendingUp
 } from 'lucide-react-native';
 import { useThemeStore, getTheme } from '@/lib/theme-store';
-import { useCycleStore, phaseInfo, CyclePhase } from '@/lib/cycle-store';
+import { useCycleStore, phaseInfo, CyclePhase, getMoonPhase, moonPhaseInfo, getMoonPhaseCycleEquivalent } from '@/lib/cycle-store';
 import { useSymptomStore, availableSymptoms } from '@/lib/symptom-store';
 import { useSubscriptionStore } from '@/lib/subscription-store';
 import { router } from 'expo-router';
@@ -288,6 +288,7 @@ export default function InsightsScreen() {
   const theme = getTheme(themeMode);
   const getCurrentPhase = useCycleStore(s => s.getCurrentPhase);
   const getDayOfCycle = useCycleStore(s => s.getDayOfCycle);
+  const lifeStage = useCycleStore(s => s.lifeStage);
   const isPremium = useSubscriptionStore(s => s.tier === 'premium');
 
   const [fontsLoaded] = useFonts({
@@ -299,11 +300,47 @@ export default function InsightsScreen() {
   });
 
   const currentPhase = getCurrentPhase();
-  const info = phaseInfo[currentPhase];
   const dayOfCycle = getDayOfCycle();
-  const nutrition = phaseNutritionTips[currentPhase];
-  const movement = phaseMovementTips[currentPhase];
-  const selfCare = phaseSelfCareTips[currentPhase];
+  const isRegular = lifeStage === 'regular';
+
+  // Perimenopause/menopause cycles are irregular, so a fixed "day of cycle" is
+  // misleading. We follow the moon's steady rhythm instead, mapping it to an
+  // equivalent phase that drives nourishment / movement / rest guidance — while
+  // the cycle itself stays tracked through symptom patterns below.
+  const currentMoon = getMoonPhase();
+  const moonInfo = moonPhaseInfo[currentMoon];
+  const contentPhase: CyclePhase = isRegular ? currentPhase : getMoonPhaseCycleEquivalent(currentMoon);
+  const info = phaseInfo[contentPhase];
+  const nutrition = phaseNutritionTips[contentPhase];
+  const movement = phaseMovementTips[contentPhase];
+  const selfCare = phaseSelfCareTips[contentPhase];
+
+  const accentColor =
+    lifeStage === 'perimenopause' ? '#f59e0b'
+    : lifeStage === 'menopause' ? '#8b5cf6'
+    : info.color;
+
+  const stageLabel =
+    lifeStage === 'perimenopause' ? 'Your transition'
+    : lifeStage === 'menopause' || lifeStage === 'postmenopause' ? 'Your wellness'
+    : 'Your cycle data';
+
+  // Summary card — stage-aware so perimenopause never sees a misleading cycle day
+  const summaryColor = isRegular ? info.color : accentColor;
+  const summaryEmoji = isRegular ? info.emoji : moonInfo.emoji;
+  const summaryTitle = isRegular ? `${info.name} Phase` : moonInfo.name;
+  const summarySubtitle = isRegular
+    ? `Day ${dayOfCycle} of your cycle`
+    : lifeStage === 'perimenopause' ? 'Your transition rhythm' : "Nature's rhythm";
+  const summaryBadge = isRegular ? info.energy : moonInfo.energy;
+  const summaryDescription = isRegular
+    ? info.description
+    : lifeStage === 'perimenopause'
+      ? "Your cycle is still here — it's just changing. We follow the moon's steady rhythm to guide your nourishment, movement, and rest through this transition."
+      : info.description;
+  const summaryFootnote = isRegular
+    ? `Superpower: ${info.superpower}`
+    : 'Your patterns are tracked in Symptom Trends below';
 
   if (!fontsLoaded) return null;
 
@@ -329,7 +366,7 @@ export default function InsightsScreen() {
               style={{ fontFamily: 'CormorantGaramond_400Regular', color: theme.text.muted }}
               className="text-sm tracking-widest uppercase"
             >
-              Your cycle data
+              {stageLabel}
             </Text>
             <Text
               style={{ fontFamily: 'CormorantGaramond_600SemiBold', color: theme.text.primary }}
@@ -345,41 +382,41 @@ export default function InsightsScreen() {
             className="mx-6 mt-5"
           >
             <LinearGradient
-              colors={[`${info.color}30`, `${info.color}15`]}
+              colors={[`${summaryColor}30`, `${summaryColor}15`]}
               start={{ x: 0, y: 0 }}
               end={{ x: 1, y: 1 }}
-              style={{ borderRadius: 24, padding: 24, borderWidth: 1, borderColor: `${info.color}30` }}
+              style={{ borderRadius: 24, padding: 24, borderWidth: 1, borderColor: `${summaryColor}30` }}
             >
               <View className="flex-row items-center mb-3">
                 <View
                   className="w-14 h-14 rounded-full items-center justify-center mr-4"
                   style={{ backgroundColor: 'rgba(255,255,255,0.2)' }}
                 >
-                  <Text className="text-3xl">{info.emoji}</Text>
+                  <Text className="text-3xl">{summaryEmoji}</Text>
                 </View>
                 <View className="flex-1">
                   <Text
                     style={{ fontFamily: 'Quicksand_600SemiBold', color: theme.text.primary }}
                     className="text-lg"
                   >
-                    {info.name} Phase
+                    {summaryTitle}
                   </Text>
                   <Text
                     style={{ fontFamily: 'Quicksand_400Regular', color: theme.text.secondary }}
                     className="text-sm"
                   >
-                    Day {dayOfCycle} of your cycle
+                    {summarySubtitle}
                   </Text>
                 </View>
                 <View
                   className="px-3 py-1.5 rounded-full"
-                  style={{ backgroundColor: `${info.color}25` }}
+                  style={{ backgroundColor: `${summaryColor}25` }}
                 >
                   <Text
-                    style={{ fontFamily: 'Quicksand_600SemiBold', color: info.color }}
+                    style={{ fontFamily: 'Quicksand_600SemiBold', color: summaryColor }}
                     className="text-xs"
                   >
-                    {info.energy}
+                    {summaryBadge}
                   </Text>
                 </View>
               </View>
@@ -387,16 +424,16 @@ export default function InsightsScreen() {
                 style={{ fontFamily: 'Quicksand_400Regular', color: theme.text.secondary }}
                 className="text-sm leading-5"
               >
-                {info.description}
+                {summaryDescription}
               </Text>
-              <View className="mt-4 pt-4 border-t" style={{ borderTopColor: `${info.color}30` }}>
+              <View className="mt-4 pt-4 border-t" style={{ borderTopColor: `${summaryColor}30` }}>
                 <View className="flex-row items-center">
-                  <Sparkles size={14} color={info.color} />
+                  <Sparkles size={14} color={summaryColor} />
                   <Text
                     style={{ fontFamily: 'Quicksand_500Medium', color: theme.text.primary }}
                     className="text-xs ml-2"
                   >
-                    Superpower: {info.superpower}
+                    {summaryFootnote}
                   </Text>
                 </View>
               </View>
@@ -532,7 +569,7 @@ export default function InsightsScreen() {
               </Text>
             </View>
             {isPremium ? (
-              <SymptomTrendChart accentColor={info.color} theme={theme} />
+              <SymptomTrendChart accentColor={accentColor} theme={theme} />
             ) : (
               <Pressable
                 onPress={() => router.push('/paywall')}

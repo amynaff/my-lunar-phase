@@ -3,7 +3,7 @@ import { View, Text, ScrollView, Pressable } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Animated, { FadeInDown, FadeInUp } from 'react-native-reanimated';
-import { Heart, Activity, Brain, Wind, Sun, Star, ChevronRight } from 'lucide-react-native';
+import { Heart, Activity, Brain, Wind, Sun, Star, Leaf, ChevronRight } from 'lucide-react-native';
 import { useCycleStore, lifeStageInfo } from '@/lib/cycle-store';
 import { useThemeStore, getTheme } from '@/lib/theme-store';
 import { router } from 'expo-router';
@@ -50,16 +50,53 @@ const wellnessPillars = [
   },
 ];
 
+// Perimenopause-specific pillars — the cycle is still here, just changing
+const perimenopausePillars = [
+  {
+    icon: Leaf,
+    title: 'Hormone Balance',
+    description: 'Support shifting estrogen and progesterone as your cycle changes.',
+    color: '#f59e0b',
+    route: '/hormonal-education',
+  },
+  {
+    icon: Wind,
+    title: 'Mood & Sleep',
+    description: 'Calm the nervous system and rest deeper through the transition.',
+    color: '#06b6d4',
+    route: '/hormonal-education',
+  },
+  {
+    icon: Activity,
+    title: 'Bone & Muscle',
+    description: 'Protect bone density early with strength and weight-bearing movement.',
+    color: '#8b5cf6',
+    route: '/hormonal-education',
+  },
+  {
+    icon: Brain,
+    title: 'Energy & Focus',
+    description: 'Steady energy and mental clarity when brain fog shows up.',
+    color: '#ec4899',
+    route: '/hormonal-education',
+  },
+];
+
 export default function WellnessScreen() {
   const insets = useSafeAreaInsets();
   const storedLifeStage = useCycleStore(s => s.lifeStage);
   const themeMode = useThemeStore(s => s.mode);
   const theme = getTheme(themeMode);
 
+  const isPerimenopause = storedLifeStage === 'perimenopause';
   const isMenopause = storedLifeStage === 'menopause';
-  const stageColor = isMenopause ? '#8b5cf6' : '#ec4899';
-  const StageIcon = isMenopause ? Sun : Star;
+  const stageColor = isPerimenopause ? '#f59e0b' : isMenopause ? '#8b5cf6' : '#ec4899';
+  const StageIcon = isPerimenopause ? Leaf : isMenopause ? Sun : Star;
   const stageInfo = lifeStageInfo[storedLifeStage];
+  const bannerGradient: [string, string] = isPerimenopause
+    ? ['#fcd34d', '#f59e0b']
+    : isMenopause ? ['#c4b5fd', '#8b5cf6'] : ['#f9a8d4', '#ec4899'];
+  const pillars = isPerimenopause ? perimenopausePillars : wellnessPillars;
 
   const [fontsLoaded] = useFonts({
     CormorantGaramond_400Regular,
@@ -109,7 +146,7 @@ export default function WellnessScreen() {
             className="mx-6 mt-6"
           >
             <LinearGradient
-              colors={isMenopause ? ['#c4b5fd', '#8b5cf6'] : ['#f9a8d4', '#ec4899']}
+              colors={bannerGradient}
               start={{ x: 0, y: 0 }}
               end={{ x: 1, y: 1 }}
               style={{ borderRadius: 20, padding: 20 }}
@@ -151,7 +188,7 @@ export default function WellnessScreen() {
               Wellness Pillars
             </Text>
 
-            {wellnessPillars.map((pillar, index) => (
+            {pillars.map((pillar, index) => (
               <Animated.View key={pillar.title} entering={FadeInUp.delay(350 + index * 60).duration(400)}>
                 <Pressable
                   onPress={() => {

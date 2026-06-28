@@ -810,7 +810,7 @@ export default function HomeScreen() {
                   style={{ fontFamily: 'Quicksand_400Regular', color: theme.text.tertiary }}
                   className="text-xs leading-4 mb-4"
                 >
-                  Cycles can be unpredictable in perimenopause — that's completely normal. Log periods when they come to spot your patterns.
+                  Your cycle is still here — it's just changing, and that's completely normal in perimenopause. Log periods when they come to spot your patterns through the transition.
                 </Text>
                 <QuickLogPeriodButton
                   themeMode={themeMode}

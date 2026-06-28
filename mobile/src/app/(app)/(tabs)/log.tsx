@@ -5,7 +5,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Animated, { FadeInDown, FadeInUp } from 'react-native-reanimated';
 import { ClipboardList, Smile, Droplets, ChevronRight } from 'lucide-react-native';
 import { useThemeStore, getTheme } from '@/lib/theme-store';
-import { useCycleStore, phaseInfo } from '@/lib/cycle-store';
+import { useCycleStore, phaseInfo, getMoonPhase, moonPhaseInfo } from '@/lib/cycle-store';
 import { router } from 'expo-router';
 import { SymptomLogModal } from '@/components/SymptomLogModal';
 import { LogPeriodModal } from '@/components/LogPeriodModal';
@@ -25,6 +25,7 @@ export default function LogScreen() {
   const themeMode = useThemeStore(s => s.mode);
   const theme = getTheme(themeMode);
   const getCurrentPhase = useCycleStore(s => s.getCurrentPhase);
+  const lifeStage = useCycleStore(s => s.lifeStage);
 
   const [showSymptomModal, setShowSymptomModal] = useState(false);
   const [showPeriodModal, setShowPeriodModal] = useState(false);
@@ -39,6 +40,27 @@ export default function LogScreen() {
 
   const currentPhase = getCurrentPhase();
   const info = phaseInfo[currentPhase];
+  const isRegular = lifeStage === 'regular';
+
+  // Perimenopause/menopause cycles are irregular — frame the check-in around the
+  // transition and the moon's rhythm rather than an assumed cycle phase.
+  const currentMoon = getMoonPhase();
+  const moonInfo = moonPhaseInfo[currentMoon];
+  const promptColor = isRegular
+    ? info.color
+    : lifeStage === 'perimenopause' ? '#f59e0b'
+    : lifeStage === 'menopause' ? '#8b5cf6'
+    : info.color;
+  const promptEmoji = isRegular ? info.emoji : moonInfo.emoji;
+  const promptTitle = isRegular
+    ? `${info.name} Phase`
+    : lifeStage === 'perimenopause' ? 'Your transition'
+    : moonInfo.name;
+  const promptBody = isRegular
+    ? `How are you feeling in your ${info.name.toLowerCase()} phase? Take a moment to check in with your body.`
+    : lifeStage === 'perimenopause'
+      ? "Your cycle is still here — it's just changing. Check in with how you feel today, and log any symptoms to spot your patterns over time."
+      : `How are you feeling under the ${moonInfo.name.toLowerCase()}? Take a moment to check in with your body.`;
 
   const today = new Date();
   const dateStr = today.toLocaleDateString('en-US', {
@@ -111,25 +133,25 @@ export default function LogScreen() {
             className="mx-6 mt-5"
           >
             <LinearGradient
-              colors={[`${info.color}25`, `${info.color}10`]}
+              colors={[`${promptColor}25`, `${promptColor}10`]}
               start={{ x: 0, y: 0 }}
               end={{ x: 1, y: 1 }}
-              style={{ borderRadius: 20, padding: 18, borderWidth: 1, borderColor: `${info.color}30` }}
+              style={{ borderRadius: 20, padding: 18, borderWidth: 1, borderColor: `${promptColor}30` }}
             >
               <View className="flex-row items-center mb-2">
-                <Text className="text-2xl mr-2">{info.emoji}</Text>
+                <Text className="text-2xl mr-2">{promptEmoji}</Text>
                 <Text
                   style={{ fontFamily: 'Quicksand_600SemiBold', color: theme.text.primary }}
                   className="text-base"
                 >
-                  {info.name} Phase
+                  {promptTitle}
                 </Text>
               </View>
               <Text
                 style={{ fontFamily: 'Quicksand_400Regular', color: theme.text.secondary }}
                 className="text-sm leading-5"
               >
-                How are you feeling in your {info.name.toLowerCase()} phase? Take a moment to check in with your body.
+                {promptBody}
               </Text>
             </LinearGradient>
           </Animated.View>
