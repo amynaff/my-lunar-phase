@@ -2,6 +2,7 @@
   base = "web"
   command = "npx prisma generate && npm run build"
   publish = ".next"
+  ignore = "git diff --quiet HEAD^ HEAD -- ."
 
 [build.environment]
   NODE_VERSION = "20"
