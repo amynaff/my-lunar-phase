@@ -150,6 +150,55 @@ const phaseSelfCareTips: Record<CyclePhase, { theme: string; practices: string[]
   },
 };
 
+// Life-stage-specific nutrition & movement (perimenopause / menopause).
+// Sourced from the dedicated guidance on the Nutrition and Movement tabs so the
+// transition isn't shown rigid 28-day-cycle advice that doesn't fit it.
+const lifeStageNutritionTips: Record<'perimenopause' | 'menopause', { focus: string; tips: string[]; topFoods: string[] }> = {
+  perimenopause: {
+    focus: 'Balance & Support',
+    tips: [
+      'Eat protein at every meal to maintain muscle mass',
+      'Include phytoestrogen foods like flax, soy, and legumes',
+      'Stay hydrated — aim for 8+ glasses of water daily',
+      'Smaller, more frequent meals help stabilize energy',
+    ],
+    topFoods: ['Fatty fish', 'Flaxseeds', 'Leafy greens', 'Berries', 'Legumes', 'Greek yogurt'],
+  },
+  menopause: {
+    focus: 'Nourish & Thrive',
+    tips: [
+      'Prioritize protein to protect muscle and bone',
+      'Calcium needs rise to ~1200mg daily after menopause',
+      'Vitamin D is essential — consider supplementation',
+      'Mediterranean-style eating is well-researched for this stage',
+    ],
+    topFoods: ['Salmon', 'Sardines', 'Leafy greens', 'Berries', 'Olive oil', 'Tofu & tempeh'],
+  },
+};
+
+const lifeStageMovementTips: Record<'perimenopause' | 'menopause', { recommendation: string; tips: string[]; workouts: string[] }> = {
+  perimenopause: {
+    recommendation: 'Build Strength & Balance',
+    tips: [
+      'Strength training 2–3x weekly is crucial for bone density',
+      'Swimming and water aerobics can ease hot flashes',
+      'Yoga helps manage stress and improves sleep',
+      'Honor your energy — it may fluctuate day to day',
+    ],
+    workouts: ['Strength training', 'Walking', 'Yoga', 'Swimming', 'Pilates', 'Cycling'],
+  },
+  menopause: {
+    recommendation: 'Maintain & Strengthen',
+    tips: [
+      'Aim for strength training at least 2x per week',
+      'Weight-bearing exercise is crucial for bone density',
+      'Include balance work to prevent falls',
+      'Consistency beats intensity — daily movement matters',
+    ],
+    workouts: ['Strength training', 'Walking/Hiking', 'Yoga/Tai Chi', 'Swimming', 'Dance', 'Resistance bands'],
+  },
+};
+
 // ── Symptom Trend Chart ───────────────────────────────────────────────────────
 
 function SymptomTrendChart({ accentColor, theme }: { accentColor: string; theme: ReturnType<typeof getTheme> }) {
@@ -311,8 +360,15 @@ export default function InsightsScreen() {
   const moonInfo = moonPhaseInfo[currentMoon];
   const contentPhase: CyclePhase = isRegular ? currentPhase : getMoonPhaseCycleEquivalent(currentMoon);
   const info = phaseInfo[contentPhase];
-  const nutrition = phaseNutritionTips[contentPhase];
-  const movement = phaseMovementTips[contentPhase];
+  const isMenoStage = lifeStage === 'menopause' || lifeStage === 'postmenopause';
+  const nutrition =
+    lifeStage === 'perimenopause' ? lifeStageNutritionTips.perimenopause
+    : isMenoStage ? lifeStageNutritionTips.menopause
+    : phaseNutritionTips[contentPhase];
+  const movement =
+    lifeStage === 'perimenopause' ? lifeStageMovementTips.perimenopause
+    : isMenoStage ? lifeStageMovementTips.menopause
+    : phaseMovementTips[contentPhase];
   const selfCare = phaseSelfCareTips[contentPhase];
 
   const accentColor =
