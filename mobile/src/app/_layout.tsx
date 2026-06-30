@@ -41,6 +41,16 @@ function useProtectedRoute() {
   const segments = useSegments();
   const router = useRouter();
 
+  // Always hide the splash once auth state resolves. The splash is held open at
+  // startup by preventAutoHideAsync(); the home tab hides it when fonts load, but
+  // logged-out users land on the sign-in screen and would otherwise hang on the
+  // splash forever — which presents as a silent launch "crash" with no crash report.
+  useEffect(() => {
+    if (!isLoading) {
+      SplashScreen.hideAsync().catch(() => {});
+    }
+  }, [isLoading]);
+
   useEffect(() => {
     if (isLoading) return;
 
