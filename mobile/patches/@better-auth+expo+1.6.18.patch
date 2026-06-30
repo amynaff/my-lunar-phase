@@ -1,0 +1,23 @@
+diff --git a/node_modules/@better-auth/expo/dist/client.js b/node_modules/@better-auth/expo/dist/client.js
+index a03d416..9e0b155 100644
+--- a/node_modules/@better-auth/expo/dist/client.js
++++ b/node_modules/@better-auth/expo/dist/client.js
+@@ -58,14 +58,15 @@ var ExpoOnlineManager = class {
+ 		this.listeners.forEach((listener) => listener(online));
+ 	}
+ 	setup() {
+-		import("expo-network").then(({ addNetworkStateListener }) => {
++		try {
++			const { addNetworkStateListener } = require("expo-network");
+ 			const subscription = addNetworkStateListener((state) => {
+ 				this.setOnline(!!state.isInternetReachable);
+ 			});
+ 			this.unsubscribe = () => subscription.remove();
+-		}).catch(() => {
++		} catch {
+ 			this.setOnline(true);
+-		});
++		}
+ 		return () => {
+ 			this.unsubscribe?.();
+ 		};
