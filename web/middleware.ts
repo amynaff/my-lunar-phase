@@ -20,8 +20,6 @@ const publicPaths = [
 const corsOriginPatterns = [
   /^https?:\/\/localhost(:\d+)?$/,
   /^https?:\/\/127\.0\.0\.1(:\d+)?$/,
-  /\.dev\.vibecode\.run$/,
-  /\.vibecode\.run$/,
   /^https:\/\/(www\.)?mylunarphase\.com$/,
 ];
 

@@ -37,7 +37,7 @@
   - Referrer-Policy: strict-origin-when-cross-origin
   - X-XSS-Protection: 1; mode=block
   - Strict-Transport-Security: max-age=31536000; includeSubDomains
-- [x] CORS restricted to known origins (Vibecode, localhost)
+- [x] CORS restricted to known origins (mylunarphase.com, localhost)
 - [x] Environment variables validated with Zod at startup
 - [x] No debug info exposed in production error responses
 - [x] .env excluded from version control

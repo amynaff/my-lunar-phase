@@ -1,19 +1,20 @@
 ---
 name: deploy
-description: Step-by-step deployment guide for my-lunar-phase. Use when the user wants to deploy the backend or mobile app, check deployment readiness, or troubleshoot deployment issues.
+description: Step-by-step deployment guide for my-lunar-phase. Use when the user wants to deploy the backend, web, or mobile app, check deployment readiness, or troubleshoot deployment issues.
 ---
 
 # Deployment Guide — my-lunar-phase
 
 ## Project Overview
-- **Backend**: Bun + Hono + Prisma, hosted on Vibecode cloud
-- **Mobile**: Expo SDK 53 React Native app, distributed via Vibecode / App Store / Google Play
+- **Backend**: Bun + Hono + Prisma, hosted on **Railway** (Postgres)
+- **Web**: Next.js + Prisma + Tailwind, hosted on **Netlify**
+- **Mobile**: Expo SDK 53 React Native app, built locally via **Xcode** and distributed via **TestFlight / App Store** (Expo/EAS builds are exhausted)
+- **Auth**: better-auth (email + Apple Sign In)
+- **Database**: Railway Postgres (single backend; NOT Supabase, NOT SQLite in prod)
 
 ---
 
 ## Before Deploying — Checklist
-
-Run these checks first:
 
 ### Backend
 ```bash
@@ -21,62 +22,62 @@ cd backend
 bun run typecheck        # catch TypeScript errors before deploy
 ```
 
-Make sure these environment variables are set in production:
-- `GROK_API_KEY` — required for AI features
-- `DATABASE_URL` — auto-set by Vibecode in production (`file:/data/production.db`)
-- `VIBECODE_PROJECT_ID` — auto-set by Vibecode (enables DB viewer)
-- Any auth secrets used by `better-auth`
+Required production environment variables (set in Railway's Variables tab — see `backend/src/env.ts` for the validated schema; the app exits at startup if any are missing):
+- `DATABASE_URL` — Railway Postgres connection string (reference the Postgres service var)
+- `BETTER_AUTH_SECRET` — auth signing secret
+- `ANTHROPIC_API_KEY` — required for Luna AI chat, quick advice, symptom checker, journal insights
+- `BACKEND_URL` — public backend URL (Railway sets the host at run-time)
+- `PORT` / `NODE_ENV` — usually provided by Railway
 
-Check `backend/.env.example` for the full list. Never commit real secrets — use Vibecode's ENV tab or GitHub Secrets.
+Never commit real secrets — use Railway's Variables tab or GitHub Secrets.
+
+### Web
+- Hosted on Netlify; builds are skipped when `web/` is unchanged.
+- Ensure the web app's env points at the deployed Railway backend.
 
 ### Mobile
-- Make sure `EXPO_PUBLIC_VIBECODE_BACKEND_URL` points to the deployed backend URL
-- Confirm all API keys in the ENV tab of the Vibecode App are set
+- `EXPO_PUBLIC_BACKEND_URL` must point at the deployed Railway backend.
+- iOS build number lives as a **literal** `CFBundleVersion` in `mobile/ios/MyLunarPhase/Info.plist` (it is NOT driven by `app.json` `buildNumber` or the pbxproj `CURRENT_PROJECT_VERSION`). Bump it for every TestFlight build or App Store Connect rejects the duplicate.
 
 ---
 
-## Backend Deployment
+## Backend Deployment (Railway)
 
-Vibecode handles the backend automatically using `backend/scripts/start`.
+Railway auto-deploys on push to `main`.
 
-What `scripts/start` does in production:
-1. Sets `NODE_ENV=production`, `DATABASE_FILE=/data/production.db`
-2. Backs up the SQLite database (`VACUUM INTO backup`)
-3. Runs `bun install`
-4. Generates Prisma client (`bunx prisma generate`)
-5. Pushes schema changes (`bunx prisma db push --accept-data-loss`)
-6. Enables the Vibecode DB viewer
-7. Starts the server (`bun src/index.ts`)
+**To deploy**: merge/push to `main` → Railway builds with Bun and restarts the service.
 
-**To trigger a redeploy**: commit and push your changes to `main`. Vibecode auto-deploys on push.
-
-**Important**: After adding any new backend package with `bun add`, you MUST commit `package.json` and `bun.lock` before deploying:
+**Important**: the backend uses **Bun** (`bun.lock` is the source of truth). After adding a package, commit both:
 ```bash
+cd backend
 bun add some-package
-git add backend/package.json backend/bun.lock
+git add package.json bun.lock
 git commit -m "chore: add some-package"
 ```
+Do not introduce an npm `package-lock.json` in `backend/` — two lockfiles cause confusion and drift.
 
 ---
 
-## Mobile Deployment
+## Web Deployment (Netlify)
 
-### Development / Testing
-```bash
-cd mobile
-npm install --legacy-peer-deps
-npm run web           # Expo web preview
-# or
-npx expo start --tunnel   # tunnel for device testing
-```
+Push to `main` → Netlify builds the Next.js app. Builds are skipped automatically when nothing under `web/` changed.
 
-### App Store / Google Play Submission
-Use Vibecode's built-in submission flow:
-1. Open the **Vibecode App**
-2. Tap **Share** (top right)
-3. Select **Submit to App Store** or **Submit to Google Play**
+---
 
-Claude Code cannot assist with `app.json`, `eas.json`, or EAS CLI commands directly.
+## Mobile Deployment (Xcode → TestFlight)
+
+EAS/Expo cloud builds are exhausted, so builds are produced locally in Xcode.
+
+1. Bump `CFBundleVersion` in `mobile/ios/MyLunarPhase/Info.plist`.
+2. Archive (CLI or Xcode):
+   ```bash
+   cd mobile/ios
+   xcodebuild -workspace MyLunarPhase.xcworkspace -scheme MyLunarPhase \
+     -configuration Release -archivePath build/MyLunarPhase.xcarchive \
+     -allowProvisioningUpdates archive
+   ```
+3. **Distribute via Xcode Organizer** (NOT `xcodebuild -exportArchive`): copy the `.xcarchive` into `~/Library/Developer/Xcode/Archives/<date>/`, open Xcode → Window → Organizer → select it → Distribute App → App Store Connect → Upload → Automatically manage signing.
+   - CLI export fails with "No signing certificate iOS Distribution found / Cloud signing permission error" because there's no local distribution cert and the ASC API keys lack Admin cloud-signing rights. The Organizer uses the Account Holder login to create the cert.
 
 ---
 
@@ -84,11 +85,13 @@ Claude Code cannot assist with `app.json`, `eas.json`, or EAS CLI commands direc
 
 | Problem | Fix |
 |---|---|
-| `Cannot find package` on backend restart | Package not committed — run `git add package.json bun.lock && git commit` |
-| Prisma errors on deploy | Schema mismatch — check `prisma/schema.prisma` and run `bunx prisma db push` locally first |
-| Mobile can't reach backend | Check `EXPO_PUBLIC_VIBECODE_BACKEND_URL` is set correctly in ENV tab |
-| Auth not working | Verify `better-auth` secrets are set as env vars in Vibecode |
-| DB data lost after deploy | Backup is auto-created before each production deploy as `production.db-{timestamp}` |
+| `Cannot find package` on backend restart | Package not committed — `git add package.json bun.lock && git commit` |
+| Prisma errors on deploy | Schema mismatch — check `prisma/schema.prisma`, run `bunx prisma migrate deploy` / `db push` against the Railway DB |
+| Backend exits at startup with env errors | A required var in `backend/src/env.ts` is missing — set it in Railway Variables |
+| Mobile can't reach backend | Check `EXPO_PUBLIC_BACKEND_URL` points at the Railway backend |
+| Auth not working | Verify `BETTER_AUTH_SECRET` and Apple Sign In config |
+| iOS upload rejected: duplicate build | Bump `CFBundleVersion` in `mobile/ios/MyLunarPhase/Info.plist` |
+| iOS CLI export "no distribution certificate" | Distribute via Xcode Organizer instead (creates the cert via Account Holder login) |
 
 ---
 
@@ -102,8 +105,8 @@ cd backend && bun run typecheck
 git add -p
 git commit -m "feat: your changes"
 
-# 3. Push to main → Vibecode auto-deploys backend
+# 3. Push to main → Railway (backend) + Netlify (web) auto-deploy
 git push origin main
 
-# 4. For mobile app release → use Vibecode App > Share > Submit
+# 4. Mobile → bump Info.plist CFBundleVersion, archive in Xcode, upload via Organizer
 ```
