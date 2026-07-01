@@ -910,7 +910,17 @@ export default function SettingsScreen() {
               style={{ fontFamily: 'Quicksand_400Regular', color: theme.text.muted }}
               className="text-xs mt-2"
             >
-              Version 1.1.0
+              Version 1.2.0
+            </Text>
+            <Text
+              style={{ fontFamily: 'Quicksand_400Regular', color: theme.text.muted }}
+              className="text-[11px] text-center leading-4 mt-4 px-2"
+            >
+              My Lunar Phase is provided for wellness and educational purposes only. It is not
+              a medical device and does not provide medical advice, diagnosis, or contraception.
+              Cycle and fertility predictions are estimates and should not be relied on to
+              prevent or achieve pregnancy. Always consult a qualified healthcare provider for
+              medical concerns.
             </Text>
           </Animated.View>
         </ScrollView>
