@@ -33,6 +33,7 @@ import { useSubscriptionStore } from '@/lib/subscription-store';
 import { isRevenueCatEnabled } from '@/lib/revenuecatClient';
 import RevenueCatUI from 'react-native-purchases-ui';
 import { authClient } from '@/lib/auth/auth-client';
+import { resetUserData } from '@/lib/reset-user-data';
 import { useInvalidateSession } from '@/lib/auth/use-session';
 import { api } from '@/lib/api/api';
 import { router } from 'expo-router';
@@ -719,7 +720,11 @@ export default function SettingsScreen() {
                         style: 'destructive',
                         onPress: async () => {
                           await authClient.signOut();
+                          // Wait for the session cache to clear before wiping local
+                          // per-user data, so no mounted (app) screen can briefly
+                          // observe a wiped-but-still-"signed in" state.
                           await invalidateSession();
+                          resetUserData();
                         },
                       },
                     ]
@@ -754,11 +759,11 @@ export default function SettingsScreen() {
                           try {
                             // Delete the user account via API
                             await api.delete('/api/user/delete-account');
-                            // Clear local data
-                            resetOnboarding();
-                            // Sign out and redirect
+                            // Sign out and wait for the session cache to clear before
+                            // wiping local per-user data (see Sign Out above for why).
                             await authClient.signOut();
                             await invalidateSession();
+                            resetUserData();
                           } catch (error) {
                             Alert.alert('Error', 'Failed to delete account. Please try again.');
                           }

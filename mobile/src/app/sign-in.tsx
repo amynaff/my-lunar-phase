@@ -14,6 +14,7 @@ import * as Haptics from 'expo-haptics';
 import * as AppleAuthentication from 'expo-apple-authentication';
 import { useThemeStore, getTheme } from '@/lib/theme-store';
 import { signInWithApple } from '@/lib/auth/auth-client';
+import { useInvalidateSession } from '@/lib/auth/use-session';
 import {
   useFonts,
   CormorantGaramond_400Regular,
@@ -49,6 +50,7 @@ export default function SignInScreen() {
   const theme = getTheme(mode);
   const [error, setError] = useState<string | null>(null);
   const [appleLoading, setAppleLoading] = useState(false);
+  const invalidateSession = useInvalidateSession();
 
   const [fontsLoaded] = useFonts({
     CormorantGaramond_400Regular,
@@ -74,6 +76,7 @@ export default function SignInScreen() {
         ],
       });
       await signInWithApple(credential.identityToken!);
+      await invalidateSession();
       router.replace('/(app)');
     } catch (err: any) {
       if (err?.code !== 'ERR_REQUEST_CANCELED') {
@@ -82,7 +85,7 @@ export default function SignInScreen() {
     } finally {
       setAppleLoading(false);
     }
-  }, []);
+  }, [invalidateSession]);
 
   const handleContinueWithEmail = useCallback(() => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
