@@ -72,8 +72,8 @@ export default function PrivacyPage() {
                 <p className="text-sm">Handles subscription payments. We never see or store your credit card number. Stripe is PCI-compliant and processes payments securely. We only receive confirmation that a payment was made.</p>
               </div>
               <div className="bg-bg-card rounded-xl border border-border-light p-4">
-                <h3 className="font-semibold text-text-primary mb-1">Grok AI (Luna AI Chat)</h3>
-                <p className="text-sm">Powers the Luna AI wellness chat. When you use Luna AI, your message is sent to the AI to generate a response. Conversations are not used to train AI models. Your chat history is stored in your account so you can revisit it.</p>
+                <h3 className="font-semibold text-text-primary mb-1">Anthropic (Luna AI Chat)</h3>
+                <p className="text-sm">Powers the Luna AI wellness chat and journal insights. When you use these features, your message is sent to Anthropic (Claude) to generate a response. Conversations are not used to train AI models. Your chat history is stored in your account so you can revisit it.</p>
               </div>
               <div className="bg-bg-card rounded-xl border border-border-light p-4">
                 <h3 className="font-semibold text-text-primary mb-1">Resend (Email)</h3>

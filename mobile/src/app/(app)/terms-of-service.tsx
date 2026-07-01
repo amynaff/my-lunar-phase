@@ -179,7 +179,7 @@ export default function TermsOfServiceScreen() {
               <Pressable
                 onPress={() => {
                   Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                  Linking.openURL('mailto:lunaflowapp@proton.me?subject=My Lunar Phase Terms Question');
+                  Linking.openURL('mailto:support-mylunarphaseapp@proton.me?subject=My Lunar Phase Terms Question');
                 }}
               >
                 <LinearGradient

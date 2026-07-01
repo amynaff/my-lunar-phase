@@ -3,7 +3,7 @@ import { View, Text, ScrollView, Pressable, Linking } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Animated, { FadeInDown, FadeInUp } from 'react-native-reanimated';
-import { ArrowLeft, Shield, Lock, Eye, Database, Heart, Mail } from 'lucide-react-native';
+import { ArrowLeft, Shield, Lock, Eye, Database, Sparkles, Trash2, Users, Mail } from 'lucide-react-native';
 import { router } from 'expo-router';
 import * as Haptics from 'expo-haptics';
 import { useThemeStore, getTheme } from '@/lib/theme-store';
@@ -22,27 +22,37 @@ const PRIVACY_SECTIONS = [
   {
     icon: Shield,
     title: 'Your Privacy Matters',
-    content: 'My Lunar Phase is designed with your privacy as our top priority. We believe your health data belongs to you and only you.',
+    content: 'My Lunar Phase helps you understand your body, and we take the privacy of your health information seriously. This policy explains what we collect, how we use it, and the control you have over it.',
   },
   {
     icon: Database,
-    title: 'Data Storage',
-    content: 'All your personal cycle data, preferences, and settings are stored locally on your device. We do not have access to this information.',
+    title: 'Information We Collect',
+    content: 'To create your account and personalize the app, we collect:\n\n• Account details — your name and email address\n• Cycle & health data — periods, symptoms, and mood you log\n• Journal entries you write or record\n• Subscription status and basic device information (such as a notification token)',
   },
   {
     icon: Eye,
-    title: 'What We Don\'t Collect',
-    content: 'We do not collect, store, or have access to:\n\n• Your name or email\n• Your cycle or health data\n• Your location\n• Your contacts\n• Any personal identifiers',
+    title: 'How We Use Your Information',
+    content: 'We use your information only to run and improve the app: to sync your data across sign-ins, generate personalized cycle and wellness insights, send the reminders you enable, and manage your subscription. We do not use it for advertising.',
+  },
+  {
+    icon: Sparkles,
+    title: 'AI-Powered Insights',
+    content: 'When you use Luna AI or request journal insights, the entries you submit are sent to our AI provider (Anthropic) to generate a response. This content is not used to train AI models and is never sold.',
   },
   {
     icon: Lock,
-    title: 'Community Stories',
-    content: 'If you choose to share a story in our Community section, it is completely anonymous. Stories are not linked to any account or device identifier. We cannot trace any story back to you.',
+    title: 'Storage & Who We Share With',
+    content: 'Your data is stored on your device and on our secure servers in the United States. We share it only with the providers that help operate the app — Apple (sign-in and payments), RevenueCat (subscriptions), and Anthropic (AI features). We never sell or rent your personal data.',
   },
   {
-    icon: Heart,
-    title: 'Our Commitment',
-    content: 'My Lunar Phase was created by a woman, for women. We will never sell, share, or monetize your personal data. Your trust is more valuable to us than any data could ever be.',
+    icon: Trash2,
+    title: 'Your Control & Choices',
+    content: 'You can view and edit your data anytime in the app. You can delete your account whenever you like from Settings → Delete Account, and we will permanently delete your personal data within 30 days.',
+  },
+  {
+    icon: Users,
+    title: "Children's Privacy",
+    content: 'My Lunar Phase is not intended for anyone under 13, and we do not knowingly collect personal data from children under 13.',
   },
 ];
 
@@ -112,7 +122,7 @@ export default function PrivacyPolicyScreen() {
                 style={{ fontFamily: 'Quicksand_500Medium', color: theme.accent.purple }}
                 className="text-xs text-center"
               >
-                Last Updated: February 2026
+                Last Updated: July 2026
               </Text>
             </View>
           </Animated.View>
@@ -174,12 +184,12 @@ export default function PrivacyPolicyScreen() {
                 style={{ fontFamily: 'Quicksand_400Regular', color: theme.text.secondary }}
                 className="text-sm mb-4"
               >
-                If you have any questions about our privacy practices, please reach out to us. We're happy to explain anything in more detail.
+                We may update this policy from time to time; changes will be posted here with a new date. If you have any questions about our privacy practices, please reach out to us.
               </Text>
               <Pressable
                 onPress={() => {
                   Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                  Linking.openURL('mailto:mylunarphaseapp@proton.me?subject=My Lunar Phase Support');
+                  Linking.openURL('mailto:support-mylunarphaseapp@proton.me?subject=My Lunar Phase Support');
                 }}
               >
                 <LinearGradient
