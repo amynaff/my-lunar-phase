@@ -11,7 +11,7 @@ export async function sendEmail({
 }) {
   const from = process.env.EMAIL_FROM || "MyLunarPhase <hello@mylunarphase.com>";
   const resend = getResendClient();
-  const { data, error } = await resend.emails.send({ from, to, subject, html });
+  const { data, error } = await resend.emails.send({ from, replyTo: "mylunarphase@pm.me", to, subject, html });
   if (error) {
     console.error("Email send error:", error);
     throw new Error("Failed to send email");

@@ -189,7 +189,7 @@ export default function PrivacyPolicyScreen() {
               <Pressable
                 onPress={() => {
                   Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                  Linking.openURL('mailto:support-mylunarphaseapp@proton.me?subject=My Lunar Phase Support');
+                  Linking.openURL('mailto:mylunarphase@pm.me?subject=My Lunar Phase Support');
                 }}
               >
                 <LinearGradient

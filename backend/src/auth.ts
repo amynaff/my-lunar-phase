@@ -16,6 +16,7 @@ export const auth = betterAuth({
       const from = env.EMAIL_FROM || "MyLunarPhase <hello@mylunarphase.com>";
       const { error } = await resend.emails.send({
         from,
+        replyTo: "mylunarphase@pm.me",
         to: user.email,
         subject: "Reset your My Lunar Phase password",
         html: `

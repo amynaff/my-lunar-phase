@@ -126,7 +126,7 @@ export default function PrivacyPage() {
             <h2 className="font-cormorant text-2xl text-text-primary mb-3">Questions?</h2>
             <p>
               I believe in transparency. If you have any questions about your privacy or how your data is handled, please reach out at{" "}
-              <a href="mailto:support-mylunarphaseapp@proton.me" className="text-accent-purple hover:underline">support-mylunarphaseapp@proton.me</a>.
+              <a href="mailto:mylunarphase@pm.me" className="text-accent-purple hover:underline">mylunarphase@pm.me</a>.
             </p>
           </section>
 

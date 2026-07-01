@@ -20,7 +20,7 @@ export async function GET(req: NextRequest) {
 
   const vapidPublicKey = process.env.VAPID_PUBLIC_KEY;
   const vapidPrivateKey = process.env.VAPID_PRIVATE_KEY;
-  const vapidEmail = process.env.VAPID_EMAIL ?? "support-mylunarphaseapp@proton.me";
+  const vapidEmail = process.env.VAPID_EMAIL ?? "mylunarphase@pm.me";
 
   if (!vapidPublicKey || !vapidPrivateKey) {
     return NextResponse.json({ error: "VAPID keys not configured" }, { status: 503 });
