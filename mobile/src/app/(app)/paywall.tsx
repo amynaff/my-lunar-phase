@@ -242,7 +242,7 @@ export default function PaywallScreen() {
 
         <ScrollView
           className="flex-1"
-          contentContainerStyle={{ paddingBottom: insets.bottom + 180 }}
+          contentContainerStyle={{ paddingBottom: insets.bottom + 240 }}
           showsVerticalScrollIndicator={false}
         >
           {/* Header */}
@@ -606,6 +606,34 @@ export default function PaywallScreen() {
               ? `${getPrice('yearly')}/year after 7-day free trial`
               : `${getPrice('monthly')}/month after 7-day free trial`}
           </Text>
+          {/* Auto-renew disclosure + legal links (Apple Guideline 3.1.2) */}
+          <Text
+            style={{ fontFamily: 'Quicksand_400Regular', color: 'rgba(255,255,255,0.35)' }}
+            className="text-[10px] text-center leading-4 mt-2 px-1"
+          >
+            Payment is charged to your Apple Account. Your subscription renews automatically unless
+            canceled at least 24 hours before the end of the current period. Manage or cancel anytime
+            in your Apple Account settings.
+          </Text>
+          <View className="flex-row justify-center items-center mt-2">
+            <Pressable onPress={() => router.push('/(app)/terms-of-service')} hitSlop={8}>
+              <Text
+                style={{ fontFamily: 'Quicksand_500Medium', color: 'rgba(255,255,255,0.55)' }}
+                className="text-xs"
+              >
+                Terms of Service
+              </Text>
+            </Pressable>
+            <Text style={{ color: 'rgba(255,255,255,0.3)' }} className="text-xs mx-2">•</Text>
+            <Pressable onPress={() => router.push('/(app)/privacy-policy')} hitSlop={8}>
+              <Text
+                style={{ fontFamily: 'Quicksand_500Medium', color: 'rgba(255,255,255,0.55)' }}
+                className="text-xs"
+              >
+                Privacy Policy
+              </Text>
+            </Pressable>
+          </View>
         </View>
       </LinearGradient>
     </View>
