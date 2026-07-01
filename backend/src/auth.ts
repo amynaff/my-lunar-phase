@@ -3,6 +3,7 @@ import { expo } from "@better-auth/expo";
 import { prismaAdapter } from "better-auth/adapters/prisma";
 import { prisma } from "./prisma";
 import { env } from "./env";
+import { getResendClient } from "./lib/resend";
 
 export const auth = betterAuth({
   database: prismaAdapter(prisma, { provider: "postgresql" }),
@@ -10,6 +11,24 @@ export const auth = betterAuth({
   baseURL: env.BACKEND_URL,
   emailAndPassword: {
     enabled: true,
+    sendResetPassword: async ({ user, url }) => {
+      const resend = getResendClient();
+      const from = env.EMAIL_FROM || "MyLunarPhase <hello@mylunarphase.com>";
+      const { error } = await resend.emails.send({
+        from,
+        to: user.email,
+        subject: "Reset your My Lunar Phase password",
+        html: `
+          <p>We received a request to reset your My Lunar Phase password.</p>
+          <p><a href="${url}">Tap here to reset your password</a></p>
+          <p>If you didn't request this, you can safely ignore this email. This link expires in 1 hour.</p>
+        `,
+      });
+      if (error) {
+        console.error("Failed to send reset password email:", error);
+        throw new Error("Failed to send reset password email");
+      }
+    },
   },
 
   trustedOrigins: [
@@ -20,6 +39,10 @@ export const auth = betterAuth({
     "https://*.mylunarphase.com",
     "https://*.up.railway.app",
     "https://appleid.apple.com",
+    // Mobile app's custom URL scheme — required so the emailed reset-password
+    // link (which redirects to this deep link as its callbackURL) passes
+    // Better Auth's origin check on the /reset-password/:token callback route.
+    "my-lunar-phase://",
     env.BACKEND_URL,
   ],
 

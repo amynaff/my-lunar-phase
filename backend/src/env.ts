@@ -14,6 +14,11 @@ const envSchema = z.object({
 
   // AI (Claude) — required for Luna AI chat, quick advice, symptom checker, and journal insights
   ANTHROPIC_API_KEY: z.string().min(1, "ANTHROPIC_API_KEY is required for AI features (Luna AI, symptom checker)"),
+
+  // Email (Resend) — used to send password reset links. Optional so a missing
+  // key doesn't crash the whole server; sendResetPassword throws a clear error instead.
+  RESEND_API_KEY: z.string().optional(),
+  EMAIL_FROM: z.string().optional(),
 });
 
 /**

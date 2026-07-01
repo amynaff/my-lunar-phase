@@ -11,9 +11,8 @@ import {
 import { LinearGradient } from 'expo-linear-gradient';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Animated, { FadeInDown, FadeInUp } from 'react-native-reanimated';
-import { Moon, ArrowLeft, CheckCircle } from 'lucide-react-native';
-import { router } from 'expo-router';
-import * as Linking from 'expo-linking';
+import { Moon, ArrowLeft, CheckCircle, Eye, EyeOff } from 'lucide-react-native';
+import { router, useLocalSearchParams } from 'expo-router';
 import * as Haptics from 'expo-haptics';
 import { useThemeStore, getTheme } from '@/lib/theme-store';
 import { authClient } from '@/lib/auth/auth-client';
@@ -28,15 +27,19 @@ import {
   Quicksand_600SemiBold,
 } from '@expo-google-fonts/quicksand';
 
-export default function ForgotPasswordScreen() {
+export default function ResetPasswordScreen() {
   const insets = useSafeAreaInsets();
   const mode = useThemeStore((s) => s.mode);
   const theme = getTheme(mode);
+  const { token, error: linkError } = useLocalSearchParams<{ token?: string; error?: string }>();
 
-  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [sent, setSent] = useState(false);
+  const [error, setError] = useState<string | null>(
+    linkError ? 'This reset link is invalid or has expired. Please request a new one.' : null
+  );
+  const [done, setDone] = useState(false);
 
   const [fontsLoaded] = useFonts({
     CormorantGaramond_400Regular,
@@ -46,30 +49,31 @@ export default function ForgotPasswordScreen() {
     Quicksand_600SemiBold,
   });
 
-  const handleSendReset = useCallback(async () => {
-    if (!email.trim()) {
-      setError('Please enter your email address.');
+  const handleReset = useCallback(async () => {
+    if (!token) {
+      setError('This reset link is invalid or has expired. Please request a new one.');
+      return;
+    }
+    if (password.length < 8) {
+      setError('Password must be at least 8 characters.');
       return;
     }
     setError(null);
     setLoading(true);
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     try {
-      const result = await authClient.requestPasswordReset({
-        email: email.trim(),
-        redirectTo: Linking.createURL('/reset-password'),
-      });
+      const result = await authClient.resetPassword({ newPassword: password, token });
       if (result.error) {
-        setError(result.error.message ?? 'Failed to send reset link. Please try again.');
+        setError(result.error.message ?? 'Failed to reset password. Please try again.');
       } else {
-        setSent(true);
+        setDone(true);
       }
     } catch (err: any) {
-      setError(err?.message ?? 'Failed to send reset link. Please try again.');
+      setError(err?.message ?? 'Failed to reset password. Please try again.');
     } finally {
       setLoading(false);
     }
-  }, [email]);
+  }, [token, password]);
 
   if (!fontsLoaded) return null;
 
@@ -107,7 +111,7 @@ export default function ForgotPasswordScreen() {
             {/* Back button */}
             <Animated.View entering={FadeInDown.delay(50).duration(500)}>
               <Pressable
-                onPress={() => router.back()}
+                onPress={() => router.replace('/login')}
                 hitSlop={12}
                 style={({ pressed }) => ({
                   opacity: pressed ? 0.6 : 1,
@@ -149,7 +153,7 @@ export default function ForgotPasswordScreen() {
                   letterSpacing: 0.5,
                 }}
               >
-                Reset password
+                Set a new password
               </Text>
               <Text
                 style={{
@@ -161,11 +165,11 @@ export default function ForgotPasswordScreen() {
                   lineHeight: 22,
                 }}
               >
-                Enter your email and we'll send you{'\n'}a link to reset your password.
+                Choose a new password for your account.
               </Text>
             </Animated.View>
 
-            {sent ? (
+            {done ? (
               /* Success state */
               <Animated.View
                 entering={FadeInDown.duration(500)}
@@ -194,7 +198,7 @@ export default function ForgotPasswordScreen() {
                     marginBottom: 10,
                   }}
                 >
-                  Check your email
+                  Password updated
                 </Text>
                 <Text
                   style={{
@@ -203,17 +207,40 @@ export default function ForgotPasswordScreen() {
                     color: theme.text.secondary,
                     textAlign: 'center',
                     lineHeight: 22,
+                    marginBottom: 24,
                   }}
                 >
-                  We've sent a password reset link to{'\n'}
-                  <Text style={{ fontFamily: 'Quicksand_600SemiBold', color: theme.text.primary }}>
-                    {email}
-                  </Text>
+                  You can now sign in with your new password.
                 </Text>
+                <Pressable
+                  onPress={() => router.replace('/login')}
+                  style={({ pressed }) => ({ opacity: pressed ? 0.85 : 1 })}
+                >
+                  <LinearGradient
+                    colors={[theme.accent.rose, theme.accent.purple]}
+                    start={{ x: 0, y: 0 }}
+                    end={{ x: 1, y: 0 }}
+                    style={{
+                      paddingVertical: 14,
+                      paddingHorizontal: 28,
+                      borderRadius: 16,
+                    }}
+                  >
+                    <Text
+                      style={{
+                        fontFamily: 'Quicksand_600SemiBold',
+                        fontSize: 15,
+                        color: '#ffffff',
+                      }}
+                    >
+                      Back to sign in
+                    </Text>
+                  </LinearGradient>
+                </Pressable>
               </Animated.View>
             ) : (
               <>
-                {/* Email input */}
+                {/* New password input */}
                 <Animated.View entering={FadeInDown.delay(200).duration(600)} style={{ marginBottom: 28 }}>
                   <Text
                     style={{
@@ -224,29 +251,48 @@ export default function ForgotPasswordScreen() {
                       marginLeft: 2,
                     }}
                   >
-                    Email
+                    New password
                   </Text>
-                  <TextInput
-                    value={email}
-                    onChangeText={setEmail}
-                    keyboardType="email-address"
-                    autoCapitalize="none"
-                    autoCorrect={false}
-                    autoComplete="email"
-                    placeholder="you@example.com"
-                    placeholderTextColor={placeholderColor}
-                    style={{
-                      backgroundColor: inputBg,
-                      borderWidth: 1,
-                      borderColor: inputBorder,
-                      borderRadius: 14,
-                      paddingHorizontal: 16,
-                      paddingVertical: 16,
-                      fontFamily: 'Quicksand_400Regular',
-                      fontSize: 15,
-                      color: theme.text.primary,
-                    }}
-                  />
+                  <View style={{ position: 'relative' }}>
+                    <TextInput
+                      value={password}
+                      onChangeText={setPassword}
+                      secureTextEntry={!showPassword}
+                      autoCapitalize="none"
+                      autoCorrect={false}
+                      autoComplete="new-password"
+                      placeholder="Choose a new password"
+                      placeholderTextColor={placeholderColor}
+                      style={{
+                        backgroundColor: inputBg,
+                        borderWidth: 1,
+                        borderColor: inputBorder,
+                        borderRadius: 14,
+                        paddingHorizontal: 16,
+                        paddingVertical: 16,
+                        paddingRight: 52,
+                        fontFamily: 'Quicksand_400Regular',
+                        fontSize: 15,
+                        color: theme.text.primary,
+                      }}
+                    />
+                    <Pressable
+                      onPress={() => setShowPassword((v) => !v)}
+                      hitSlop={8}
+                      style={{
+                        position: 'absolute',
+                        right: 14,
+                        top: 0,
+                        bottom: 0,
+                        justifyContent: 'center',
+                      }}
+                    >
+                      {showPassword
+                        ? <EyeOff size={18} color={theme.text.muted} strokeWidth={1.8} />
+                        : <Eye size={18} color={theme.text.muted} strokeWidth={1.8} />
+                      }
+                    </Pressable>
+                  </View>
                 </Animated.View>
 
                 {/* Error message */}
@@ -265,10 +311,10 @@ export default function ForgotPasswordScreen() {
                   </Animated.View>
                 )}
 
-                {/* Send reset link button */}
+                {/* Save button */}
                 <Animated.View entering={FadeInUp.delay(300).duration(600)}>
                   <Pressable
-                    onPress={handleSendReset}
+                    onPress={handleReset}
                     disabled={loading}
                     style={({ pressed }) => ({
                       opacity: loading ? 0.7 : pressed ? 0.85 : 1,
@@ -293,39 +339,13 @@ export default function ForgotPasswordScreen() {
                           color: '#ffffff',
                         }}
                       >
-                        {loading ? 'Sending...' : 'Send reset link'}
+                        {loading ? 'Saving...' : 'Save new password'}
                       </Text>
                     </LinearGradient>
                   </Pressable>
                 </Animated.View>
               </>
             )}
-
-            {/* Back to login link */}
-            <Animated.View
-              entering={FadeInUp.delay(sent ? 100 : 380).duration(600)}
-              style={{ alignItems: 'center', marginTop: sent ? 0 : 28 }}
-            >
-              <Pressable onPress={() => router.back()} hitSlop={12}>
-                <Text
-                  style={{
-                    fontFamily: 'Quicksand_400Regular',
-                    fontSize: 14,
-                    color: theme.text.muted,
-                    textAlign: 'center',
-                  }}
-                >
-                  <Text
-                    style={{
-                      fontFamily: 'Quicksand_600SemiBold',
-                      color: theme.accent.purple,
-                    }}
-                  >
-                    Back to login
-                  </Text>
-                </Text>
-              </Pressable>
-            </Animated.View>
           </ScrollView>
         </KeyboardAvoidingView>
       </LinearGradient>

@@ -54,10 +54,14 @@ function useProtectedRoute() {
   useEffect(() => {
     if (isLoading) return;
 
-    const inAuthGroup = segments[0] === 'sign-in' || segments[0] === 'login' || segments[0] === 'sign-up' || segments[0] === 'forgot-password';
+    // reset-password must stay reachable even for an already-authenticated user
+    // (e.g. resetting from a device that never signed out), so it's excluded
+    // from the "bounce signed-in users out of the auth group" redirect below.
+    const isResetPassword = segments[0] === 'reset-password';
+    const inAuthGroup = segments[0] === 'sign-in' || segments[0] === 'login' || segments[0] === 'sign-up' || segments[0] === 'forgot-password' || isResetPassword;
     const inAppGroup = segments[0] === '(app)';
 
-    if (session?.user && inAuthGroup) {
+    if (session?.user && inAuthGroup && !isResetPassword) {
       router.replace('/(app)');
     } else if (!session?.user && inAppGroup) {
       router.replace('/sign-in');
@@ -76,6 +80,7 @@ function RootLayoutNav({ colorScheme }: { colorScheme: 'light' | 'dark' | null |
         <Stack.Screen name="login" />
         <Stack.Screen name="sign-up" />
         <Stack.Screen name="forgot-password" />
+        <Stack.Screen name="reset-password" />
       </Stack>
     </ThemeProvider>
   );
